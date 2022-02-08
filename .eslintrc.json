@@ -1,0 +1,40 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+        "plugin:vue/essential",
+        "airbnb-base",
+        "prettier"
+    ],
+    "parserOptions": {
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+    "plugins": [
+        "vue",
+        "prettier"
+    ],
+    "rules": {
+        // 參考 https://blog.csdn.net/weixin_43459866/article/details/114629507
+        "no-param-reassign": [
+            "error",
+            {
+                "ignorePropertyModificationsFor": [
+                    "state" // for vuex state 會出現 no-param-reassign 的問題題
+                ]
+            }
+        ],
+        // https://medium.com/@evenchange4/introducing-prettier-with-eslint-13f567ae0184
+        "prettier/prettier": [
+            "error",
+            {
+                "printWidth": 130, // 解決叫你 Insert ⏎
+                "singleQuote": true,
+                "tabWidth": 4
+            }
+        ]
+    }
+}
