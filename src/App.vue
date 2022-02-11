@@ -111,7 +111,7 @@ export default {
         // 將 starList 預設的塞進到 localstorage
         // console.log(this.starList);
         const diffDefault = this.getDifference(this.starList, localStarList); // 預設有，但本地沒有，則要新增
-        const diffLocal = this.getDifference(localStarList, this.starList); // 本地有，但預設沒有，則要砍掉
+        // const diffLocal = this.getDifference(localStarList, this.starList); // 本地有，但預設沒有，則要砍掉
 
         localStarList.push(...diffDefault); // 新增 append 預設到 localStarList
         localStorage.setItem('starList', JSON.stringify(localStarList)); // 將 localStarList 從 object 轉 string 後塞到 localstorage

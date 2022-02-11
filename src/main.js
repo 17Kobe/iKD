@@ -1,5 +1,6 @@
 // Vue 3.0 with Composition API Style
 // 參考 https://book.vue.tw/CH1/1-1-introduction.html
+// vite & plugin-vue & vite-plugin-singlefile should be listed in the project's dependencies, not devDependencies
 import { createApp } from 'vue';
 
 import ElementPlus from 'element-plus';
