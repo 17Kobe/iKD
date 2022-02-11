@@ -1,6 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import Dashboard from '../views/Dashboard.vue';
-import SingleStock from '../views/SingleStock.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -9,18 +8,6 @@ const router = createRouter({
             path: '/',
             name: 'dashboard',
             component: Dashboard,
-        },
-        {
-            path: '/stock/:id',
-            name: 'stock',
-            // lazy-loaded 不行用，否則 npm run build，再去執行會從 console 看到 t.map is not a function
-            component: SingleStock,
-            // component: () => import('../views/SingleStock.vue'),
-        },
-        {
-            path: '/axios',
-            name: 'Axios',
-            component: () => import('../views/Axios.vue'), // 懶加載組件
         },
     ],
 });

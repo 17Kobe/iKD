@@ -1,7 +1,12 @@
 <template>
     <div>
         <!-- {{ parentData.at(-1).close }} -->
-        <highcharts :constructorType="'stockChart'" :options="options" style="position: relative; top: 8px"></highcharts>
+        <highcharts
+            :constructorType="'stockChart'"
+            :options="options"
+            style="position: relative; top: 8px; background: transparent"
+        >
+        </highcharts>
         <!-- :updateArgs="[true, true, true]" -->
     </div>
 </template>
@@ -40,6 +45,7 @@ export default {
         return {
             chartOptions: {
                 chart: {
+                    backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
                     height: 100,
                     events: {
                         // 這裡指定後 就可以用
@@ -132,41 +138,30 @@ export default {
                 // 可參考 https://stackoverflow.com/questions/19438942/how-to-auto-format-dates-in-custom-tooltip-formatter
                 // 可參考 https://stackoverflow.com/questions/19932556/highstocks-tooltip-remove-the-phrase-week-from-monday
                 // 無關看看 http://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/tooltip/split/
-                // tooltip: {
-                //     // backgroundColor: 'transparent',
-                //     shadow: false,
-                //     borderWidth: 0,
-                //     split: false,
-                //     shared: true,
-                //     useHTML: true,
-                //     formatter() {
-                //         let str = '<div>';
+                tooltip: {
+                    // backgroundColor: 'transparent',
+                    shadow: false,
+                    borderWidth: 0,
+                    split: false,
+                    shared: true,
+                    useHTML: true,
+                    formatter() {
+                        let str = '<div>';
+                        const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+                        Highcharts.each(this.points, (point) => {
+                            const fontColor = point.y > point.point.open ? '#ee3333' : '#01aa00';
 
-                //         Highcharts.each(this.points, (point) => {
-                //             str += `<div style="height: ${point.series.yAxis.height}px">${point.series.name}: ${point.y}</div>`;
-                //         });
+                            str += `<div>日期：<span style="color: #3333ee; font-weight:bold;">${moment(point.x).format(
+                                'YYYY-MM-DD'
+                            )}(${dayOfWeek[moment(point.x).day()]})</span></div>`;
+                            str += `<div>開：${point.point.open} 收：<span style="color: ${fontColor}; font-weight:bold;">${point.y}</span></div>`;
+                            str += `<div>高：${point.point.high} 低：${point.point.low}</div>`;
+                        });
 
-                //         str += '</div>';
-                //         return str;
-                //     },
-                // },
-                // responsive: {
-                //     rules: [
-                //         {
-                //             // 在图表小于 500px 的情况下关闭图例
-                //             condition: {
-                //                 // 响应条件
-                //                 maxWidth: 300,
-                //             },
-                //             chartOptions: {
-                //                 // 响应内容
-                //                 legend: {
-                //                     enabled: false,
-                //                 },
-                //             },
-                //         },
-                //     ],
-                // },
+                        str += '</div>';
+                        return str;
+                    },
+                },
                 xAxis: {
                     type: 'datetime',
                     gridLineWidth: 1, // 顯示圖表X軸上的直色灰線
@@ -238,6 +233,8 @@ export default {
                         zIndex: 2,
                         data: [],
                         dataGrouping: {
+                            // anchor: 'end',
+                            // lastAnchor: 'end',
                             units: [['week', [1]]],
                         },
                     },
@@ -265,48 +262,13 @@ export default {
         options() {
             const options = Object.assign(this.chartOptions, {});
             console.log('==================');
-            console.log(`this.timeRange=${this.timeRange}`);
 
             options.series[0].data = this.ohlc;
-            options.rangeSelector.selected = this.timeRange;
             return options;
         },
     },
     created() {},
-    watch: {
-        // 重整頁面不會進來 watch stockData()，此時 stockData_len=0
-        // 若資料有時，會依序呼叫 onSelDataGrouping，再呼叫 onSelTimeRange
-        stockData() {
-            console.log('stockData watch');
-            const end = moment().unix() * 1000;
-            const start = moment().subtract(3, 'months').unix() * 1000;
-            this.chart.xAxis[0].setExtremes(start, end);
-        },
-    },
+    watch: {},
     methods: {},
 };
 </script>
-
-<style lang="sass">
-/* 要修改 element 要不帶 scoped，可參考 https://www.cnblogs.com/baebae996/p/13717082.html */
-.el-radio-button__inner
-    border: none !important
-
-/* 為了把 radio button 都變成 圓邊 */
-.el-radio-button__orig-radio:checked + .el-radio-button__inner
-    border-radius: 3px !important
-
-#timeRange .el-radio-button__inner
-    padding: 8px
-
-#timeRange .el-radio-button__orig-radio:checked + .el-radio-button__inner
-    background-color: #f5d44d !important
-    box-shadow: none !important
-    color: black
-</style>
-
-<style lang="sass" scoped>
-// #stock-name
-//     border: 1px solid #dcdfe6
-//     box-shadow: 0 2px 4px 0 rgb(0 0 0 / 12%), 0 0 6px 0 rgb(0 0 0 / 4%)
-</style>
