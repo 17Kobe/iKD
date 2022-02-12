@@ -20,7 +20,7 @@ import loadIndicatorsAll from 'highcharts/indicators/indicators-all';
 // 在這裡一定要用大括號，不然會錯，因為highcharts-vue.js中有命名為 Chart 的export
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
-import _ from 'lodash';
+// import _ from 'lodash';
 
 // 因為 series 是股票圖，所以要導入 stock 模組，才能有 type: 'candlestick'
 loadStock(Highcharts);

@@ -57,15 +57,15 @@
             <el-table-column prop="city" label="週KD" width="220" align="center" />
             <el-table-column label="週K線" width="220" align="center">
                 <template #default="scope">
-                    <WeekKdChart :parentData="scope.row.data" />
+                    <ChartWeekKd :parentData="scope.row.data" />
                 </template>
             </el-table-column>
-            <el-table-column prop="last_price1" label="成本" width="80" align="center">
+            <el-table-column prop="last_price1" label="成本" width="220" align="center">
                 <template #default="scope">
-                    <el-button size="small" icon="el-icon-s-tools text-xl" @click="drawer = true"></el-button>
+                    <el-button size="small" icon="el-icon-s-tools text-xl" @click="doShowDrawer(scope.row.id)"></el-button>
                 </template>
             </el-table-column>
-            <el-table-column prop="last_price1" label="訊號公式" width="80" align="center">
+            <el-table-column prop="last_price1" label="訊號公式" width="220" align="center">
                 <template #default="scope">
                     <el-button size="small" icon="el-icon-s-tools text-xl"></el-button>
                 </template>
@@ -74,72 +74,20 @@
                 <el-table-column prop="city" label="本益比" width="120" />
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
-        <el-drawer title="持有股票成本" v-model="drawer" direction="rtl" size="70%">
-            <el-form ref="formRef" :model="form" label-width="120px">
-                <el-form-item label="Activity name">
-                    <el-input v-model="form.name"></el-input>
-                </el-form-item>
-                <el-form-item label="Activity zone">
-                    <el-select v-model="form.region" placeholder="please select your zone">
-                        <el-option label="Zone one" value="shanghai"></el-option>
-                        <el-option label="Zone two" value="beijing"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="Activity time">
-                    <el-col :span="11">
-                        <el-date-picker
-                            v-model="form.date1"
-                            type="date"
-                            placeholder="Pick a date"
-                            style="width: 100%"
-                        ></el-date-picker>
-                    </el-col>
-                    <el-col :span="2" class="text-center">
-                        <span class="text-gray-500">-</span>
-                    </el-col>
-                    <el-col :span="11">
-                        <el-time-picker v-model="form.date2" placeholder="Pick a time" style="width: 100%"></el-time-picker>
-                    </el-col>
-                </el-form-item>
-                <el-form-item label="Instant delivery">
-                    <el-switch v-model="form.delivery"></el-switch>
-                </el-form-item>
-                <el-form-item label="Activity type">
-                    <el-checkbox-group v-model="form.type">
-                        <el-checkbox label="Online activities" name="type"></el-checkbox>
-                        <el-checkbox label="Promotion activities" name="type"></el-checkbox>
-                        <el-checkbox label="Offline activities" name="type"></el-checkbox>
-                        <el-checkbox label="Simple brand exposure" name="type"></el-checkbox>
-                    </el-checkbox-group>
-                </el-form-item>
-                <el-form-item label="Resources">
-                    <el-radio-group v-model="form.resource">
-                        <el-radio label="Sponsor"></el-radio>
-                        <el-radio label="Venue"></el-radio>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item label="Activity form">
-                    <el-input v-model="form.desc" type="textarea"></el-input>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="onSubmit">Create</el-button>
-                    <el-button>Cancel</el-button>
-                </el-form-item>
-            </el-form>
-        </el-drawer>
+        <FormCost ref="childFormCost" />
     </div>
 </template>
 
 <script>
-import WeekKdChart from '../components/WeekKdChart.vue';
+import ChartWeekKd from '../components/ChartWeekKd.vue';
+import FormCost from '../components/FormCost.vue';
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 
 export default {
-    components: { WeekKdChart },
+    components: { ChartWeekKd, FormCost },
     data() {
         return {
-            drawer: false,
             form: {
                 name: '',
                 region: '',
@@ -187,6 +135,14 @@ export default {
     methods: {
         getDifference(array1, array2) {
             return array1.filter((object1) => !array2.some((object2) => object1.id === object2.id));
+        },
+        doShowDrawer(id) {
+            console.log(id);
+            // console.log(this.$refs);
+            // 父改子去顯示 drawer 變數 不好，子要被改值
+            // 父傳一堆變數給子也不太好
+            // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
+            this.$refs.childFormCost.onInit(id);
         },
     },
 };

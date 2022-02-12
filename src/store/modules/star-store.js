@@ -1,5 +1,6 @@
 import axios from 'axios';
 import moment from 'moment';
+import _ from 'lodash';
 
 const defaultState = {
     starList: [
@@ -171,7 +172,9 @@ const star = {
             // );
         },
     },
-    getters: {},
+    getters: {
+        getStar: (state) => (id) => _.find(state.starList, ['id', id]),
+    },
 };
 
 export default star;
