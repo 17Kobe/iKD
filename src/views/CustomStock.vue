@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-table :data="starList" style="width: 100%">
+        <el-table :data="stockList" style="width: 100%">
             <el-table-column fixed label="名稱" width="130" align="center">
                 <template #default="scope">
                     <span style="font-size: 16px; font-weight: bold">
@@ -101,30 +101,30 @@ export default {
         };
     },
     computed: {
-        starList() {
-            return this.$store.state.star.starList;
+        stockList() {
+            return this.$store.state.stock.stockList;
         },
     },
     created() {
         console.log('created');
         // 取得 localstorage 自選股，最先開始是 null 時，會給予預設值空矩陣
-        const localStarList = JSON.parse(localStorage.getItem('starList')) || [];
-        // console.log(localStarList);
+        const localStockList = JSON.parse(localStorage.getItem('stockList')) || [];
+        // console.log(localStockList);
 
-        // 將 starList 預設的塞進到 localstorage
-        // console.log(this.starList);
-        const diffDefault = this.getDifference(this.starList, localStarList); // 預設有，但本地沒有，則要新增
-        // const diffLocal = this.getDifference(localStarList, this.starList); // 本地有，但預設沒有，則要砍掉
+        // 將 stockList 預設的塞進到 localstorage
+        // console.log(this.stockList);
+        const diffDefault = this.getDifference(this.stockList, localStockList); // 預設有，但本地沒有，則要新增
+        // const diffLocal = this.getDifference(localStockList, this.stockList); // 本地有，但預設沒有，則要砍掉
 
-        localStarList.push(...diffDefault); // 新增 append 預設到 localStarList
-        localStorage.setItem('starList', JSON.stringify(localStarList)); // 將 localStarList 從 object 轉 string 後塞到 localstorage
+        localStockList.push(...diffDefault); // 新增 append 預設到 localStockList
+        localStorage.setItem('stockList', JSON.stringify(localStockList)); // 將 localStockList 從 object 轉 string 後塞到 localstorage
         // console.log(diffLocal);
         // console.log(diffDefault);
-        // console.log(localStarList);
-        // console.log(this.starList);
+        // console.log(localStockList);
+        // console.log(this.stockList);
 
-        // 將 localstorage 重塞回到 vuex 的 starList
-        this.$store.commit('SAVE_STAR', localStarList);
+        // 將 localstorage 重塞回到 vuex 的 stockList
+        this.$store.commit('SAVE_STOCK_LIST', localStockList);
     },
     mounted() {
         console.log('mounted');
