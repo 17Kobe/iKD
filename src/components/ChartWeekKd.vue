@@ -202,21 +202,24 @@ export default {
                         // 調整 y 軸 tick的間距，運用到高度最大化，不浪費
                         tickPositioner() {
                             const positions = [];
-                            let tick = 0;
-                            let increment = (this.dataMax - this.dataMin) / 2;
-                            // const max = this.dataMax;
-                            const min = this.dataMin;
-                            if (increment > 1) {
-                                increment = Math.ceil(increment);
-                                tick = Math.floor(this.dataMin);
-                                for (tick; tick - increment <= this.dataMax; tick += increment) {
-                                    positions.push(tick);
-                                }
-                            } else {
-                                tick = Number(min.toFixed(1));
-                                increment = Number(increment.toFixed(3));
-                                for (tick; tick - increment <= this.dataMax; tick += increment) {
-                                    positions.push(Number(tick.toFixed(2)));
+                            // 一開始時 dataMax 及 dataMin會是null，然後再用 toFixed就會有錯，所以加 if 來避免
+                            if (this.dataMin && this.dataMax) {
+                                let tick = 0;
+                                let increment = (this.dataMax - this.dataMin) / 2;
+                                // const max = this.dataMax;
+                                const min = this.dataMin;
+                                if (increment > 1) {
+                                    increment = Math.ceil(increment);
+                                    tick = Math.floor(this.dataMin);
+                                    for (tick; tick - increment <= this.dataMax; tick += increment) {
+                                        positions.push(tick);
+                                    }
+                                } else {
+                                    tick = Number(min.toFixed(1));
+                                    increment = Number(increment.toFixed(3));
+                                    for (tick; tick - increment <= this.dataMax; tick += increment) {
+                                        positions.push(Number(tick.toFixed(2)));
+                                    }
                                 }
                             }
                             return positions;
@@ -249,14 +252,19 @@ export default {
 
         // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
         stockData() {
-            return this.parentData.map((value) => [
-                moment(value.date).valueOf(),
-                value.open,
-                value.max,
-                value.min,
-                value.close,
-                value.Trading_Volume,
-            ]);
+            // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            return (
+                (this.parentData &&
+                    this.parentData.map((value) => [
+                        moment(value.date).valueOf(),
+                        value.open,
+                        value.max,
+                        value.min,
+                        value.close,
+                        value.Trading_Volume,
+                    ])) ||
+                []
+            );
         },
 
         options() {

@@ -89,6 +89,13 @@ const stock = {
             state.stockList = data;
             // console.log(state.currStockDayData);
         },
+        SAVE_STOCK_COST(state, { stockId, data }) {
+            console.log(stockId);
+            console.log(data);
+
+            // object of array 去 find 並 update
+            state.stockList.find((v) => v.id === stockId).cost = data;
+        },
         SAVE_STOCK_PRICE(state) {
             console.log('SAVE_STOCK_PRICE');
             console.log(state.stockList);

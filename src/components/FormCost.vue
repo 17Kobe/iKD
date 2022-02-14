@@ -1,18 +1,26 @@
 <template>
-    <el-drawer :title="title" v-model="isShow" :show-close="true" direction="rtl" size="70%">
+    <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="70%">
         <el-form ref="form" :model="form" label-width="60px">
             <el-row v-for="(item, index) in form" :key="index">
                 <el-col :span="10">
                     <el-form-item label="成交價">
-                        <el-input v-model="item.cost" placeholder="ex: 33.43" :ref="`cost${index}`" @keyup="onChangeCost" />
+                        <el-input
+                            clearable
+                            v-model="item.cost"
+                            placeholder="ex: 33.43"
+                            :ref="`cost${index}`"
+                            @keyup="onChangeCost($event, index)"
+                            type="number"
+                        />
                     </el-form-item>
                 </el-col>
                 <el-col :span="6">
                     <el-form-item label="股數">
                         <el-input-number
-                            v-model="item.numberOfShares"
+                            type="number"
+                            v-model="item.number"
                             :step="1000"
-                            @keyup="onChangeNumberOfShares($event, index)"
+                            @keyup="onChangeNumber($event, index)"
                         />
                     </el-form-item>
                 </el-col>
@@ -27,7 +35,7 @@
             </el-form-item>
         </el-form>
         平均成交價： {{ averageCost }} 元<br />
-        總股數：{{ totalNumberOfShares }} 股 / {{ total1kNumberOfShares }} 張
+        總股數：{{ totalOfShares }} 股 / {{ totalOf1000Shares }} 張
     </el-drawer>
 </template>
 
@@ -35,46 +43,49 @@
 export default {
     data() {
         return {
+            stockId: null,
             isShow: false,
             title: '設定成本',
             stockData: {},
             costList: [],
-            // totalNumberOfShares: 0,
+            defaultCost: 0, // 預設的股價，用代入的
+            // totalNumber: 0,
             form: [
                 {
-                    cost: null,
-                    numberOfShares: 1000,
+                    cost: 0,
+                    number: 1000,
                 },
             ],
         };
     },
     computed: {
-        totalNumberOfShares() {
+        totalOfShares() {
             // https://stackoverflow.com/questions/50670204/sum-up-array-with-objects
-            const sum = this.form.reduce((acc, { numberOfShares }) => acc + numberOfShares, 0);
+            const sum = this.form.reduce((acc, { number }) => acc + number, 0);
             return sum;
         },
-        total1kNumberOfShares() {
+        totalOf1000Shares() {
+            console.log('totalOf1000Shares');
+
             // https://stackoverflow.com/questions/50670204/sum-up-array-with-objects
-            return parseFloat((this.totalNumberOfShares / 1000).toFixed(2));
+            return parseFloat((this.totalOfShares / 1000).toFixed(2));
         },
         averageCost() {
+            console.log('averageCost');
             // 有可能cost 為 null，所以要變更為0
-            const sum = this.form.reduce(
-                (acc, { cost, numberOfShares }) => acc + (parseInt(cost, 10) || 0) * parseInt(numberOfShares, 10),
-                0
-            );
+            const sum = this.form.reduce((acc, { cost, number }) => acc + (parseFloat(cost) || 0) * parseInt(number, 10), 0);
             // parseFloat 是為了去除小數點後面的0
-            const avg = parseFloat((sum / this.totalNumberOfShares).toFixed(2));
+            const avg = parseFloat((sum / this.totalOfShares).toFixed(2));
             return avg;
         },
     },
     mounted() {},
     methods: {
         onAdd() {
+            console.log('onAdd');
             const index = this.form.push({
-                cost: null,
-                numberOfShares: 1000,
+                cost: this.defaultCost,
+                number: 1000,
             });
             console.log(index);
             // nextTick()會在DOM已掛載、渲染完成後，執行nextTick()內的程式碼
@@ -83,29 +94,49 @@ export default {
                 this.$refs[`cost${index - 1}`][0].focus();
             });
         },
-        onChangeCost() {
-            console.log('stockId');
+        onChangeCost(e, index) {
+            console.log('onChangeCost');
+            // 加 parseFloat就要是要把字串變float，存在 the.form裡面
+            // 一定要搭配type="number"，否則小數點.會輸入不出來
+            this.form[index].cost = parseFloat(e.target.value);
         },
-        onChangeNumberOfShares(e, index) {
+        onChangeNumber(e, index) {
+            console.log('onChangeNumber');
             // 用 change 事件一樣會偵測不到，要用 keyup 事件才能在有按鍵輸入時即時反應值，
             //  e.target.value 是字串，要變整數。並且要給10才不會 eslint
-            this.form[index].numberOfShares = parseInt(e.target.value, 10);
+            this.form[index].number = parseInt(e.target.value, 10);
         },
         onDel(index) {
             this.form.splice(index, 1);
         },
         onInit(stockId) {
+            console.log('onInit');
+            this.stockId = stockId;
             this.isShow = true;
             // getters 在 vuex 只有在全域，沒有在個別 module，所以不用加 stock
             this.stockData = this.$store.getters.getStock(stockId); // 因為 computed 是在網頁開啟時就跑了，那時還沒有id就會變成沒過濾全都取了。為了在點擊設定才去取，所以要這樣
+            this.defaultCost = this.stockData.data.at(-1).close;
+
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定成本`;
-            console.log(this.data);
+            console.log(this.stockData);
             console.log(stockId);
             // this.$nextTick(() => {
             // this.$refs.cost0[0].focus();
             // });
         },
+        onClosed() {
+            console.log('2434');
+            this.$store.commit('SAVE_STOCK_COST', { stockId: this.stockId, data: this.form });
+        },
     },
 };
 // 父傳子參考 https://its201.com/article/weixin_49035434/119852222 方法1，的emit似乎 vue 3有改語法而不行了。但方法2沒用 emit仍正常
 </script>
+
+<style lang="sass">
+// 隱藏 input 若有屬性 type="number" 會出現上下箭頭的問題
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button
+    -webkit-appearance: none
+    margin: 0
+</style>
