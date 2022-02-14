@@ -89,12 +89,21 @@ const stock = {
             state.stockList = data;
             // console.log(state.currStockDayData);
         },
-        SAVE_STOCK_COST(state, { stockId, data }) {
+        SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost }) {
             console.log(stockId);
-            console.log(data);
+            console.log(costList);
 
             // object of array 去 find 並 update
-            state.stockList.find((v) => v.id === stockId).cost = data;
+            const found = state.stockList.find((v) => v.id === stockId);
+            found.cost = {};
+            found.cost.settings = [];
+            found.cost.settings = costList; // 複製數據複本
+            console.log(found.cost.cost_list);
+            found.cost.total = totalOfShares || 0; // null 則指定為0
+            found.cost.avg = averageCost || 0; // null 則指定為0
+
+            // save to localstorage
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         SAVE_STOCK_PRICE(state) {
             console.log('SAVE_STOCK_PRICE');

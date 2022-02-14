@@ -116,8 +116,20 @@ export default {
             // getters 在 vuex 只有在全域，沒有在個別 module，所以不用加 stock
             this.stockData = this.$store.getters.getStock(stockId); // 因為 computed 是在網頁開啟時就跑了，那時還沒有id就會變成沒過濾全都取了。為了在點擊設定才去取，所以要這樣
             this.defaultCost = this.stockData.data.at(-1).close;
-
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定成本`;
+
+            console.log(this.stockData.cost);
+            if (this.stockData.cost && this.stockData.cost.settings.length > 0) {
+                this.form = this.stockData.cost.settings;
+            } else {
+                console.log('this.stockData.cost.settings');
+                this.form = [
+                    {
+                        cost: this.defaultCost,
+                        number: 1000,
+                    },
+                ];
+            }
             console.log(this.stockData);
             console.log(stockId);
             // this.$nextTick(() => {
@@ -125,8 +137,13 @@ export default {
             // });
         },
         onClosed() {
-            console.log('2434');
-            this.$store.commit('SAVE_STOCK_COST', { stockId: this.stockId, data: this.form });
+            console.log(this.form);
+            this.$store.commit('SAVE_STOCK_COST', {
+                stockId: this.stockId,
+                costList: this.form,
+                totalOfShares: this.totalOfShares,
+                averageCost: this.averageCost,
+            });
         },
     },
 };
