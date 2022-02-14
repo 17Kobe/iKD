@@ -62,7 +62,25 @@
             </el-table-column>
             <el-table-column prop="last_price1" label="成本" width="220" align="center">
                 <template #default="scope">
-                    <el-button size="small" icon="el-icon-s-tools text-xl" @click="doShowDrawer(scope.row.id)"></el-button>
+                    <el-button
+                        size="small"
+                        @click="doShowDrawer(scope.row.id)"
+                        style="text-align: left; width: 190px; line-height: 18px"
+                    >
+                        <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 14px">
+                            <div>平均成本：{{ scope.row.cost.avg }} 元</div>
+                            <div>累積股數：{{ scope.row.cost.total }} 股</div>
+                            <div>成本金額：{{ scope.row.cost.sum.toLocaleString('en-US') }} 元</div>
+                            <el-progress :text-inside="true" :stroke-width="20" :percentage="50" status="exception">
+                                <span>Content</span>
+                            </el-progress>
+                            <!-- {{ parseFloat((scope.row.cost.total / 1000).toFixed(2)) }} 張) -->
+                        </div>
+
+                        <div v-else>
+                            <i class="el-icon-s-tools text-xl"></i>
+                        </div>
+                    </el-button>
                 </template>
             </el-table-column>
             <el-table-column prop="last_price1" label="訊號公式" width="220" align="center">

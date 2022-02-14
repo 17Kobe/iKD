@@ -89,7 +89,7 @@ const stock = {
             state.stockList = data;
             // console.log(state.currStockDayData);
         },
-        SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost }) {
+        SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
             console.log(stockId);
             console.log(costList);
 
@@ -101,6 +101,7 @@ const stock = {
             console.log(found.cost.cost_list);
             found.cost.total = totalOfShares || 0; // null 則指定為0
             found.cost.avg = averageCost || 0; // null 則指定為0
+            found.cost.sum = sumCost || 0; // null 則指定為0
 
             // save to localstorage
             localStorage.setItem('stockList', JSON.stringify(state.stockList));

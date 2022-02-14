@@ -34,6 +34,7 @@
                 <el-button type="primary" @click="onAdd"><i class="el-icon-plus"></i></el-button>
             </el-form-item>
         </el-form>
+        總金額 {{ sumCost.toLocaleString('en-US') }} 元<br />
         平均成交價： {{ averageCost }} 元<br />
         總股數：{{ totalOfShares }} 股 / {{ totalOf1000Shares }} 張
     </el-drawer>
@@ -70,13 +71,14 @@ export default {
             // https://stackoverflow.com/questions/50670204/sum-up-array-with-objects
             return parseFloat((this.totalOfShares / 1000).toFixed(2));
         },
-        averageCost() {
+        sumCost() {
             console.log('averageCost');
             // 有可能cost 為 null，所以要變更為0
-            const sum = this.form.reduce((acc, { cost, number }) => acc + (parseFloat(cost) || 0) * parseInt(number, 10), 0);
+            return this.form.reduce((acc, { cost, number }) => acc + (parseFloat(cost) || 0) * parseInt(number, 10), 0);
+        },
+        averageCost() {
             // parseFloat 是為了去除小數點後面的0
-            const avg = parseFloat((sum / this.totalOfShares).toFixed(2));
-            return avg;
+            return parseFloat((this.sumCost / this.totalOfShares).toFixed(2));
         },
     },
     mounted() {},
@@ -143,6 +145,7 @@ export default {
                 costList: this.form,
                 totalOfShares: this.totalOfShares,
                 averageCost: this.averageCost,
+                sumCost: this.sumCost,
             });
         },
     },
