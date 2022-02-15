@@ -71,9 +71,27 @@
                             <div>平均成本：{{ scope.row.cost.avg }} 元</div>
                             <div>累積股數：{{ scope.row.cost.total }} 股</div>
                             <div>成本金額：{{ scope.row.cost.sum.toLocaleString('en-US') }} 元</div>
-                            <el-progress :text-inside="true" :stroke-width="20" :percentage="50" status="exception">
-                                <span>Content</span>
+                            <el-progress
+                                v-if="scope.row.data && scope.row.data.length >= 1"
+                                :text-inside="true"
+                                :stroke-width="20"
+                                :percentage="
+                                    getRateOfReturnPercent(scope.row.cost.sum, scope.row.data.at(-1).close, scope.row.cost.total)
+                                "
+                                :status="
+                                    getRateOfReturn(scope.row.cost.sum, scope.row.data.at(-1).close, scope.row.cost.total) <= 0
+                                        ? 'success'
+                                        : 'exception'
+                                "
+                            >
+                                <span style="color: #606266"
+                                    >{{
+                                        getRateOfReturn(scope.row.cost.sum, scope.row.data.at(-1).close, scope.row.cost.total)
+                                    }}
+                                    %</span
+                                >
                             </el-progress>
+
                             <!-- {{ parseFloat((scope.row.cost.total / 1000).toFixed(2)) }} 張) -->
                         </div>
 
@@ -88,6 +106,7 @@
                     <el-button size="small" icon="el-icon-s-tools text-xl"></el-button>
                 </template>
             </el-table-column>
+            <el-table-column prop="city" label="訊號歷史報酬" width="220" align="center" />
             <!-- <el-table-column prop="city" label="淨值比" width="120" />
                 <el-table-column prop="city" label="本益比" width="120" />
                 <el-table-column prop="city" label="EPS" width="120" /> -->
@@ -106,16 +125,7 @@ export default {
     components: { ChartWeekKd, FormCost },
     data() {
         return {
-            form: {
-                name: '',
-                region: '',
-                date1: '',
-                date2: '',
-                delivery: false,
-                type: [],
-                resource: '',
-                desc: '',
-            },
+            rateOfReturn: 0,
         };
     },
     computed: {
@@ -161,6 +171,13 @@ export default {
             // 父傳一堆變數給子也不太好
             // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
             this.$refs.childFormCost.onInit(id);
+        },
+        getRateOfReturn(sum, close, total) {
+            return parseFloat((((close * total - sum) * 100) / sum).toFixed(2));
+        },
+        getRateOfReturnPercent(sum, close, total) {
+            //* 2 則最大值為50%
+            return Math.abs(parseFloat((((close * total - sum) * 100) / sum).toFixed(2))) * 2;
         },
     },
 };
