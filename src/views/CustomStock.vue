@@ -16,38 +16,33 @@
                         <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
                         <span
                             :style="[
-                                scope.row.daily_data.at(-2).close > scope.row.daily_data.at(-1).close
+                                scope.row.rate_of_price_spread < 0
                                     ? { color: '#01aa00' }
-                                    : scope.row.daily_data.at(-2).close < scope.row.daily_data.at(-1).close
+                                    : scope.row.rate_of_price_spread > 0
                                     ? { color: '#ee3333' }
                                     : { color: 'black' },
                                 { 'font-size': '16px' },
                             ]"
                         >
-                            {{ scope.row.daily_data.at(-1).close }}<br />
+                            {{ scope.row.last_price }}<br />
                             <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
                             <i
                                 :class="[
-                                    scope.row.daily_data.at(-2).close > scope.row.daily_data.at(-1).close
+                                    scope.row.rate_of_price_spread < 0
                                         ? 'el-icon-caret-bottom'
-                                        : scope.row.daily_data.at(-2).close < scope.row.daily_data.at(-1).close
+                                        : scope.row.rate_of_price_spread > 0
                                         ? 'el-icon-caret-top'
                                         : '',
                                 ]"
                                 :style="[
-                                    scope.row.daily_data.at(-2).close < scope.row.daily_data.at(-1).close
+                                    scope.row.rate_of_price_spread > 0
                                         ? { position: 'relative', top: '2px' }
                                         : { position: 'relative', top: '1px' },
                                 ]"
                             ></i>
                             <!-- 漲跌幅 如，2.53% -->
                             <span style="font-size: 14px">
-                                {{
-                                    (
-                                        ((scope.row.daily_data.at(-1).close - scope.row.daily_data.at(-2).close) * 100) /
-                                        scope.row.daily_data.at(-2).close
-                                    ).toFixed(2)
-                                }}%
+                                {{ scope.row.rate_of_price_spread ? scope.row.rate_of_price_spread + '%' : '' }}
                             </span>
                         </span>
                     </span>
@@ -81,27 +76,19 @@
                                 :percentage="
                                     getRateOfReturnPercent(
                                         scope.row.cost.sum,
-                                        scope.row.daily_data.at(-1).close,
+                                        scope.row.daily_data.at(-1)[4],
                                         scope.row.cost.total
                                     )
                                 "
                                 :status="
-                                    getRateOfReturn(
-                                        scope.row.cost.sum,
-                                        scope.row.daily_data.at(-1).close,
-                                        scope.row.cost.total
-                                    ) <= 0
+                                    getRateOfReturn(scope.row.cost.sum, scope.row.daily_data.at(-1)[4], scope.row.cost.total) <= 0
                                         ? 'success'
                                         : 'exception'
                                 "
                             >
                                 <span style="color: #606266"
                                     >{{
-                                        getRateOfReturn(
-                                            scope.row.cost.sum,
-                                            scope.row.daily_data.at(-1).close,
-                                            scope.row.cost.total
-                                        )
+                                        getRateOfReturn(scope.row.cost.sum, scope.row.daily_data.at(-1)[4], scope.row.cost.total)
                                     }}
                                     %</span
                                 >

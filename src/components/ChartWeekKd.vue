@@ -255,14 +255,7 @@ export default {
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             return (
                 (this.parentData &&
-                    this.parentData.map((value) => [
-                        moment(value.date).valueOf(),
-                        value.open,
-                        value.max,
-                        value.min,
-                        value.close,
-                        value.Trading_Volume,
-                    ])) ||
+                    this.parentData.map((value) => [moment(value[0]).valueOf(), value[1], value[2], value[3], value[4]])) ||
                 []
             );
         },
