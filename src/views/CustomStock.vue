@@ -12,7 +12,7 @@
             </el-table-column>
             <el-table-column label="股價" width="85" align="right">
                 <template #default="scope">
-                    <span v-if="scope.row.daily_data && scope.row.daily_data.length >= 2">
+                    <span v-if="scope.row.data_daily && scope.row.data_daily.length >= 2">
                         <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
                         <span
                             :style="[
@@ -52,7 +52,7 @@
             <el-table-column prop="city" label="週KD" width="220" align="center" />
             <el-table-column label="週K線" width="220" align="center">
                 <template #default="scope">
-                    <ChartWeekKd :parentData="scope.row.daily_data" />
+                    <ChartWeekKd :parentData="scope.row.data_weekly" />
                 </template>
             </el-table-column>
             <el-table-column prop="last_price1" label="成本" width="220" align="center">
@@ -70,25 +70,25 @@
                             <div>累積股數：{{ scope.row.cost.total }} 股</div>
                             <div>成本金額：{{ scope.row.cost.sum.toLocaleString('en-US') }} 元</div>
                             <el-progress
-                                v-if="scope.row.daily_data && scope.row.daily_data.length >= 1"
+                                v-if="scope.row.data_daily && scope.row.data_daily.length >= 1"
                                 :text-inside="true"
                                 :stroke-width="20"
                                 :percentage="
                                     getRateOfReturnPercent(
                                         scope.row.cost.sum,
-                                        scope.row.daily_data.at(-1)[4],
+                                        scope.row.data_daily.at(-1)[4],
                                         scope.row.cost.total
                                     )
                                 "
                                 :status="
-                                    getRateOfReturn(scope.row.cost.sum, scope.row.daily_data.at(-1)[4], scope.row.cost.total) <= 0
+                                    getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total) <= 0
                                         ? 'success'
                                         : 'exception'
                                 "
                             >
                                 <span style="color: #606266"
                                     >{{
-                                        getRateOfReturn(scope.row.cost.sum, scope.row.daily_data.at(-1)[4], scope.row.cost.total)
+                                        getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total)
                                     }}
                                     %</span
                                 >

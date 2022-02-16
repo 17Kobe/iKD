@@ -237,8 +237,9 @@ export default {
                         data: [],
                         dataGrouping: {
                             // anchor: 'end',
-                            // lastAnchor: 'end',
-                            units: [['week', [1]]],
+                            // firstAnchor: 'end',
+                            lastAnchor: 'lastPoint',
+                            units: [['day', [1]]],
                         },
                     },
                 ],
@@ -247,6 +248,7 @@ export default {
     },
     computed: {
         ohlc() {
+            console.log(this.stockData);
             return this.stockData.map((value) => [value[0], value[1], value[2], value[3], value[4]]);
         },
 

@@ -116,7 +116,7 @@ const stock = {
 
                 console.log(currStock[index]);
 
-                const stockData = stcokInfo.daily_data || []; // 有可能是 null 就變成 []
+                const stockData = stcokInfo.data_daily || []; // 有可能是 null 就變成 []
                 // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
                 const stockStartDate = moment(
                     stockData.length === 0 ? '2010-01-01' : moment(stockData.at(-1).date).add(1, 'days')
@@ -135,7 +135,8 @@ const stock = {
                     // 成功
                     .then((res) => {
                         // 預設值
-                        currStock[index].daily_data = currStock[index].daily_data || []; // 有可能是 null 就變成 []
+                        currStock[index].data_daily = currStock[index].data_daily || []; // 有可能是 null 就變成 []
+                        currStock[index].data_weekly = currStock[index].data_weekly || []; // 有可能是 null 就變成 []
                         currStock[index].last_price = currStock[index].last_price || null;
                         currStock[index].rate_of_price_spread = currStock[index].rate_of_price_spread || null;
 
@@ -153,14 +154,14 @@ const stock = {
                                 // element.Trading_Volume,
                             ]);
                         });
-                        currStock[index].daily_data.push(...values);
+                        currStock[index].data_daily.push(...values);
 
-                        // theArray[index].daily_data.push(...res.data.data); // 塞入股價資料
+                        // theArray[index].data_daily.push(...res.data.data); // 塞入股價資料
 
                         // 塞入漲跌幅、最後股價
                         if (res.data.data.length > 0) {
-                            const v1 = currStock[index].daily_data.at(-1)[4];
-                            const v2 = currStock[index].daily_data.at(-2)[4];
+                            const v1 = currStock[index].data_daily.at(-1)[4];
+                            const v2 = currStock[index].data_daily.at(-2)[4];
                             currStock[index].last_price = v1;
 
                             currStock[index].rate_of_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
@@ -168,64 +169,57 @@ const stock = {
 
                         // 塞入股價週線資料
                         if (res.data.data.length > 0) {
-                            const firstStockDate = moment(_.first(currStock[index].daily_data)[0]); // [] 不可能 undefined。因為是二維陣列，還要取第二維[0]代表date
-                            const lastStockDate = moment(_.last(currStock[index].daily_data)[0]);
+                            // const firstStockDate = moment(_.first(currStock[index].data_daily)[0]); // [] 不可能 undefined。因為是二維陣列，還要取第二維[0]代表date
+                            // const lastStockDate = moment(_.last(currStock[index].data_daily)[0]);
 
-                            console.log(firstStockDate.format('YYYY-MM-DD HH:mm:ss'));
-                            console.log(lastStockDate.format('YYYY-MM-DD HH:mm:ss'));
+                            // console.log(firstStockDate.format('YYYY-MM-DD HH:mm:ss'));
+                            // console.log(lastStockDate.format('YYYY-MM-DD HH:mm:ss'));
 
                             // for moment 參考 https://stackoverflow.com/questions/52936352/javascript-for-loop-to-add-days-in-a-month-object-moment-js
                             // lastStockDate.subtract(7, 'days') 因為我第一個要拿到就是減7天的值
                             // 這裡要用 -6 才能最後面的資料也都算進去，不過可能實際因沒有資料而加上也沒到完整一週都有資料，
                             const resData = [];
-                            let i = currStock[index].daily_data.length - 1;
-                            for (
-                                let m = lastStockDate.subtract(7, 'days');
-                                m.diff(firstStockDate, 'days') >= -6;
-                                m.subtract(7, 'days')
-                            ) {
-                                // console.log(`= ${m.format('YYYY-MM-DD')}`);
-                                // console.log(m.diff(firstStockDate, 'days'));
-                                // console.log(m.diff(moment(state.daily_data[i][0]), 'days'));
-                                // const n = moment(state.daily_data[i][0]);
-                                for (let n = i; n >= 0; n -= 1) {
-                                    // console.log(`==${moment(state.daily_data[n][0]).format('YYYY-MM-DD')}`);
-                                    // console.log(m.diff(moment(state.daily_data[n][0]), 'days'));
 
-                                    // 一開始 m 比較小, state.daily_data[i][0] 比較大，所以一定是負值，會從-7遞減
-                                    // ==0 也代表到下一個要算的日期了，要跳過，且index 不要-
-                                    if (m.diff(moment(currStock[index].daily_data[n][0]), 'days') >= 0) {
-                                        const startIndex = n + 1 > i ? i : n + 1;
-                                        const endIndex = i; // 因為外層array 是從日期最現在，往以前日期去掃。endIndex應該是最現在日期. i比n大
-                                        const range2dArray = _.slice(state.daily_data, startIndex, endIndex + 1);
-                                        const rangeHighArray = _.map(range2dArray, (v) => v[2]);
-                                        const rangeLowArray = _.map(range2dArray, (v) => v[3]);
-                                        // const rangeVolumeArray = _.map(range2dArray, (v) => v[5]);
+                            let i = currStock[index].data_daily.length - 1;
+                            let j = i;
+                            const lastStockDate = moment(_.last(currStock[index].data_daily)[0]);
+                            let firstDayOfWeek = lastStockDate.startOf('isoWeek');
+                            while (i >= 0) {
+                                console.log(i);
+                                console.log(moment(currStock[index].data_daily[i][0]).format('YYYY-MM-DD'));
+                                console.log(firstDayOfWeek.format('YYYY-MM-DD'));
+                                // 不能用 isSame 因為有可能那週沒資料，或那週星期一也放假，所以要用 isBefore
+                                if (moment(currStock[index].data_daily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
+                                    console.log('isBefore');
+                                    // 0最後一個也要跑進來
 
-                                        const date = currStock[index].daily_data[endIndex][0];
-                                        const open = currStock[index].daily_data[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
-                                        const close = currStock[index].daily_data[endIndex][4]; // 之前的i，還沒i=n是下一個
-                                        const low = _.min(rangeLowArray);
-                                        const high = _.max(rangeHighArray);
-                                        // const volume = _.sum(rangeVolumeArray);
+                                    // startIndex 值要小於等於 endIndex，for 是由大到小, i<j
+                                    const startIndex = i + 1; // 因為是找到前一個才算後面1個
+                                    const endIndex = j; // 因為外層array 是從日期最現在，往以前日期去掃。endIndex應該是最現在日期. i比n大
+                                    const range2dArray = _.slice(currStock[index].data_daily, startIndex, endIndex + 1);
+                                    const rangeHighArray = _.map(range2dArray, (v) => v[2]);
+                                    const rangeLowArray = _.map(range2dArray, (v) => v[3]);
+                                    // const rangeVolumeArray = _.map(range2dArray, (v) => v[5]);
 
-                                        // console.log(moment(date).format('YYYY-MM-DD'));
-                                        // console.log(low);
-                                        // console.log(high);
-                                        // resData.push([date, open, high, low, close, volume]);
-                                        resData.push([date, open, high, low, close]);
-                                        // console.log(rangeArray);
-                                        // console.log(open);
-                                        // console.log(close);
-                                        // const dayData = [open];
-                                        i = n; // 在這裡變化 i 的值
-                                        break;
-                                    }
+                                    const date = currStock[index].data_daily[endIndex][0];
+                                    const open = currStock[index].data_daily[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
+                                    const close = currStock[index].data_daily[endIndex][4]; // 之前的i，還沒i=n是下一個
+                                    const low = _.min(rangeLowArray);
+                                    const high = _.max(rangeHighArray);
+                                    // const volume = _.sum(rangeVolumeArray);
+
+                                    resData.push([date, open, high, low, close]);
+                                    j = startIndex - 1;
+
+                                    // 要採用下個i值的該週第一天，不能用firstDayOfWeek-7天，因為有可能該週都沒值
+                                    firstDayOfWeek = moment(currStock[index].data_daily[i][0]).startOf('isoWeek');
                                 }
+                                i -= 1;
                             }
+
                             console.log(resData);
                             // 必需要反轉，最小的值在最前面，最大的值在最後面，否則highcharts會只畫1個點
-                            // return _.reverse(resData);
+                            currStock[index].data_weekly = _.reverse(resData);
                         }
                         localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
                         // console.log('GET_STOCK_VALUE_OK');
