@@ -224,14 +224,6 @@ export default {
                             }
                             return positions;
                         },
-                        height: '0%',
-                    },
-                    {
-                        top: '0%',
-                        height: '100%',
-                        // startOnTick: false,
-                        // endOnTick: false,
-                        tickPositions: [0, 100],
                     },
                 ],
                 series: [
@@ -249,46 +241,6 @@ export default {
                             lastAnchor: 'lastPoint',
                             units: [['day', [1]]],
                         },
-                    },
-                    {
-                        yAxis: 1,
-                        type: 'stochastic',
-                        // type: 'slowstochastic',
-                        id: 'stochastic',
-                        // name: 'KD(9, 9)',
-                        linkedTo: 'aapl',
-                        lineWidth: 1, // 線寬用1，預設是2
-                        dataGrouping: {
-                            // anchor: 'end',
-                            // firstAnchor: 'end',
-                            lastAnchor: 'lastPoint',
-                            units: [['day', [1]]],
-                        },
-                        params: { periods: [9, 9] },
-                        // color: '#409EFF',
-                        // colors: ['red', 'green'],
-                        // colorByPoint: true,
-                        // signalLine: {
-                        //     // macd signalLine 顏色配置
-                        //     styles: {
-                        //         lineColor: 'red',
-                        //     },
-                        // },
-                        // macdLine: {
-                        //     // macd macdLine 顏色配置
-                        //     styles: {
-                        //         lineColor: 'red',
-                        //     },
-                        // },
-                        // https://www.coder.work/article/5870953
-                        // params: {
-                        //     period: 14,
-                        //     overbought: 70,
-                        //     oversold: 30,
-                        // },
-                        // dataGrouping: {
-                        //     units: [['week', [1]]],
-                        // },
                     },
                 ],
             },

@@ -49,10 +49,14 @@
                 </template>
             </el-table-column>
 
-            <el-table-column prop="city" label="週KD" width="220" align="center" />
-            <el-table-column label="週K線" width="220" align="center">
+            <el-table-column prop="city" label="週KD" width="220" align="center">
                 <template #default="scope">
                     <ChartWeekKd :parentData="scope.row.data_weekly" />
+                </template>
+            </el-table-column>
+            <el-table-column label="週K線" width="220" align="center">
+                <template #default="scope">
+                    <ChartWeekK :parentData="scope.row.data_weekly" />
                 </template>
             </el-table-column>
             <el-table-column prop="last_price1" label="成本" width="220" align="center">
@@ -120,12 +124,13 @@
 <script>
 import _ from 'lodash';
 import ChartWeekKd from '../components/ChartWeekKd.vue';
+import ChartWeekK from '../components/ChartWeekK.vue';
 import FormCost from '../components/FormCost.vue';
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 
 export default {
-    components: { ChartWeekKd, FormCost },
+    components: { ChartWeekKd, ChartWeekK, FormCost },
     data() {
         return {
             rateOfReturn: 0,
