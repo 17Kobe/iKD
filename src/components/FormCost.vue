@@ -25,8 +25,7 @@
                     </el-form-item>
                 </el-col>
                 <el-col :span="8">
-                    &nbsp;&nbsp;<el-button type="danger" @click="onDel(index)" v-if="index >= 1"
-                        ><i class="el-icon-minus"></i></el-button
+                    &nbsp;&nbsp;<el-button type="danger" @click="onDel(index)"><i class="el-icon-minus"></i></el-button
                 ></el-col>
             </el-row>
 
@@ -52,10 +51,10 @@ export default {
             defaultCost: 0, // 預設的股價，用代入的
             // totalNumber: 0,
             form: [
-                {
-                    cost: 0,
-                    number: 1000,
-                },
+                // {
+                //     cost: 0,
+                //     number: 1000,
+                // },
             ],
         };
     },
@@ -126,10 +125,10 @@ export default {
             } else {
                 console.log('this.stockData.cost.settings');
                 this.form = [
-                    {
-                        cost: this.defaultCost,
-                        number: 1000,
-                    },
+                    // {
+                    //     cost: this.defaultCost,
+                    //     number: 1000,
+                    // },
                 ];
             }
             console.log(this.stockData);

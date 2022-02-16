@@ -65,7 +65,10 @@
                     <el-button
                         size="small"
                         @click="doShowDrawer(scope.row.id)"
-                        style="text-align: left; width: 190px; line-height: 18px"
+                        :style="[
+                            scope.row.data.at(-2).close < scope.row.data.at(-1).close ? { width: '190px' } : {},
+                            { 'text-align': 'left', 'line-height': '18px' },
+                        ]"
                     >
                         <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 14px">
                             <div>平均成本：{{ scope.row.cost.avg }} 元</div>
