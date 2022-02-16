@@ -116,7 +116,7 @@ const stock = {
 
                 console.log(theArray[index]);
 
-                const stockData = stcokInfo.data || []; // 有可能是 null 就變成 []
+                const stockData = stcokInfo.daily_data || []; // 有可能是 null 就變成 []
                 // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
                 const stockStartDate = moment(
                     stockData.length === 0 ? '2010-01-01' : moment(stockData.at(-1).date).add(1, 'days')
@@ -134,9 +134,12 @@ const stock = {
                     })
                     // 成功
                     .then((res) => {
-                        theArray[index].data = theArray[index].data || []; // 有可能是 null 就變成 []
+                        theArray[index].daily_data = theArray[index].daily_data || []; // 有可能是 null 就變成 []
                         console.log(res.data.data);
-                        theArray[index].data.push(...res.data.data); // 塞入股價資料
+                        theArray[index].daily_data.push(...res.data.data); // 塞入股價資料
+
+                        if (res.data.data.length > 0) {
+                        }
                         // const values = [];
                         // res.data.data.forEach((element) => {
                         //     values.push([

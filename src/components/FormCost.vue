@@ -77,7 +77,8 @@ export default {
         },
         averageCost() {
             // parseFloat 是為了去除小數點後面的0
-            return parseFloat((this.sumCost / this.totalOfShares).toFixed(2));
+            // div 0 結果會 NaN, 所以把它變 /1
+            return parseFloat((this.sumCost / (this.totalOfShares === 0 ? 1 : this.totalOfShares)).toFixed(2));
         },
     },
     mounted() {},
@@ -116,7 +117,7 @@ export default {
             this.isShow = true;
             // getters 在 vuex 只有在全域，沒有在個別 module，所以不用加 stock
             this.stockData = this.$store.getters.getStock(stockId); // 因為 computed 是在網頁開啟時就跑了，那時還沒有id就會變成沒過濾全都取了。為了在點擊設定才去取，所以要這樣
-            this.defaultCost = this.stockData.data.at(-1).close;
+            this.defaultCost = this.stockData.daily_data.at(-1).close;
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定成本`;
 
             console.log(this.stockData.cost);

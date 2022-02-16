@@ -12,30 +12,30 @@
             </el-table-column>
             <el-table-column label="股價" width="85" align="right">
                 <template #default="scope">
-                    <span v-if="scope.row.data && scope.row.data.length >= 2">
+                    <span v-if="scope.row.daily_data && scope.row.daily_data.length >= 2">
                         <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
                         <span
                             :style="[
-                                scope.row.data.at(-2).close > scope.row.data.at(-1).close
+                                scope.row.daily_data.at(-2).close > scope.row.daily_data.at(-1).close
                                     ? { color: '#01aa00' }
-                                    : scope.row.data.at(-2).close < scope.row.data.at(-1).close
+                                    : scope.row.daily_data.at(-2).close < scope.row.daily_data.at(-1).close
                                     ? { color: '#ee3333' }
                                     : { color: 'black' },
                                 { 'font-size': '16px' },
                             ]"
                         >
-                            {{ scope.row.data.at(-1).close }}<br />
+                            {{ scope.row.daily_data.at(-1).close }}<br />
                             <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
                             <i
                                 :class="[
-                                    scope.row.data.at(-2).close > scope.row.data.at(-1).close
+                                    scope.row.daily_data.at(-2).close > scope.row.daily_data.at(-1).close
                                         ? 'el-icon-caret-bottom'
-                                        : scope.row.data.at(-2).close < scope.row.data.at(-1).close
+                                        : scope.row.daily_data.at(-2).close < scope.row.daily_data.at(-1).close
                                         ? 'el-icon-caret-top'
                                         : '',
                                 ]"
                                 :style="[
-                                    scope.row.data.at(-2).close < scope.row.data.at(-1).close
+                                    scope.row.daily_data.at(-2).close < scope.row.daily_data.at(-1).close
                                         ? { position: 'relative', top: '2px' }
                                         : { position: 'relative', top: '1px' },
                                 ]"
@@ -44,8 +44,8 @@
                             <span style="font-size: 14px">
                                 {{
                                     (
-                                        ((scope.row.data.at(-1).close - scope.row.data.at(-2).close) * 100) /
-                                        scope.row.data.at(-2).close
+                                        ((scope.row.daily_data.at(-1).close - scope.row.daily_data.at(-2).close) * 100) /
+                                        scope.row.daily_data.at(-2).close
                                     ).toFixed(2)
                                 }}%
                             </span>
@@ -57,7 +57,7 @@
             <el-table-column prop="city" label="週KD" width="220" align="center" />
             <el-table-column label="週K線" width="220" align="center">
                 <template #default="scope">
-                    <ChartWeekKd :parentData="scope.row.data" />
+                    <ChartWeekKd :parentData="scope.row.daily_data" />
                 </template>
             </el-table-column>
             <el-table-column prop="last_price1" label="成本" width="220" align="center">
@@ -66,7 +66,7 @@
                         size="small"
                         @click="doShowDrawer(scope.row.id)"
                         :style="[
-                            scope.row.data.at(-2).close < scope.row.data.at(-1).close ? { width: '190px' } : {},
+                            scope.row.cost && scope.row.cost.settings.length >= 1 ? { width: '190px' } : {},
                             { 'text-align': 'left', 'line-height': '18px' },
                         ]"
                     >
@@ -75,21 +75,33 @@
                             <div>累積股數：{{ scope.row.cost.total }} 股</div>
                             <div>成本金額：{{ scope.row.cost.sum.toLocaleString('en-US') }} 元</div>
                             <el-progress
-                                v-if="scope.row.data && scope.row.data.length >= 1"
+                                v-if="scope.row.daily_data && scope.row.daily_data.length >= 1"
                                 :text-inside="true"
                                 :stroke-width="20"
                                 :percentage="
-                                    getRateOfReturnPercent(scope.row.cost.sum, scope.row.data.at(-1).close, scope.row.cost.total)
+                                    getRateOfReturnPercent(
+                                        scope.row.cost.sum,
+                                        scope.row.daily_data.at(-1).close,
+                                        scope.row.cost.total
+                                    )
                                 "
                                 :status="
-                                    getRateOfReturn(scope.row.cost.sum, scope.row.data.at(-1).close, scope.row.cost.total) <= 0
+                                    getRateOfReturn(
+                                        scope.row.cost.sum,
+                                        scope.row.daily_data.at(-1).close,
+                                        scope.row.cost.total
+                                    ) <= 0
                                         ? 'success'
                                         : 'exception'
                                 "
                             >
                                 <span style="color: #606266"
                                     >{{
-                                        getRateOfReturn(scope.row.cost.sum, scope.row.data.at(-1).close, scope.row.cost.total)
+                                        getRateOfReturn(
+                                            scope.row.cost.sum,
+                                            scope.row.daily_data.at(-1).close,
+                                            scope.row.cost.total
+                                        )
                                     }}
                                     %</span
                                 >
@@ -119,6 +131,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import ChartWeekKd from '../components/ChartWeekKd.vue';
 import FormCost from '../components/FormCost.vue';
 // This starter template is using Vue 3 experimental <script setup> SFCs
