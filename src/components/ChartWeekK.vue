@@ -141,7 +141,8 @@ export default {
                 tooltip: {
                     // backgroundColor: 'transparent',
                     shadow: false,
-                    borderWidth: 0,
+                    // borderWidth: 0,
+                    borderColor: '#999999',
                     split: false,
                     shared: true,
                     useHTML: true,

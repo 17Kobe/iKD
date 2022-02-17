@@ -73,20 +73,6 @@ export default {
                             },
                         },
                     },
-                    line: {
-                        marker: {
-                            enabled: false,
-                        },
-                    },
-                    candlestick: {
-                        // 顏色值參考 https://www.jianshu.com/p/703d8ab8012e
-                        color: '#65b206',
-                        upColor: '#d41c1c',
-                        // 綠棒上下的線
-                        lineColor: '#4f9900',
-                        // 紅棒上下的線
-                        upLineColor: '#af0b0b', // docs
-                    },
                 },
                 rangeSelector: {
                     selected: 2,
@@ -141,21 +127,28 @@ export default {
                 tooltip: {
                     // backgroundColor: 'transparent',
                     shadow: false,
-                    borderWidth: 0,
+                    // borderWidth: 0,
+                    borderColor: '#999999',
                     split: false,
                     shared: true,
                     useHTML: true,
                     formatter() {
                         let str = '<div>';
                         const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
-                        this.points.forEach((point) => {
-                            const fontColor = point.y > point.point.open ? '#ee3333' : '#01aa00';
-
-                            str += `<div>日期：<span style="color: #3333ee; font-weight:bold;">${moment(point.x).format(
-                                'YYYY-MM-DD'
-                            )}(${dayOfWeek[moment(point.x).day()]})</span></div>`;
-                            str += `<div>開：${point.point.open} 收：<span style="color: ${fontColor}; font-weight:bold;">${point.y}</span></div>`;
-                            str += `<div>高：${point.point.high} 低：${point.point.low}</div>`;
+                        this.points.forEach((point, index) => {
+                            // const fontColor = point.y > point.point.open ? '#ee3333' : '#01aa00';
+                            if (index === 0) {
+                                str += `<div>日期：<span style="color: #3333ee; font-weight:bold;">${moment(point.x).format(
+                                    'YYYY-MM-DD'
+                                )}(${dayOfWeek[moment(point.x).day()]})</span></div>`;
+                                str += `<div><span style="color: #4286f5; font-weight:bold;">K</span>: ${parseFloat(
+                                    point.y.toFixed(2)
+                                )} `;
+                            } else if (index === 1) {
+                                str += `<span style="color: #e75c9a; font-weight:bold;">D</span>: ${parseFloat(
+                                    point.y.toFixed(2)
+                                )}</div>`;
+                            }
                         });
 
                         str += '</div>';
@@ -224,97 +217,40 @@ export default {
                             }
                             return positions;
                         },
-                        height: '0%',
-                    },
-                    {
-                        top: '0%',
-                        height: '100%',
-                        // startOnTick: false,
-                        // endOnTick: false,
-                        tickPositions: [0, 100],
                     },
                 ],
                 series: [
                     {
-                        yAxis: 0,
-                        // showInNavigator: false,
-                        type: 'candlestick',
                         name: 'K線',
-                        id: 'aapl',
-                        zIndex: 2,
-                        data: [],
-                        dataGrouping: {
-                            // anchor: 'end',
-                            // firstAnchor: 'end',
-                            lastAnchor: 'lastPoint',
-                            units: [['day', [1]]],
-                        },
+                        color: '#4286f5',
                     },
                     {
-                        yAxis: 1,
-                        type: 'stochastic',
-                        // type: 'slowstochastic',
-                        id: 'stochastic',
-                        // name: 'KD(9, 9)',
-                        linkedTo: 'aapl',
-                        lineWidth: 1, // 線寬用1，預設是2
-                        dataGrouping: {
-                            // anchor: 'end',
-                            // firstAnchor: 'end',
-                            lastAnchor: 'lastPoint',
-                            units: [['day', [1]]],
-                        },
-                        params: { periods: [9, 9] },
-                        // color: '#409EFF',
-                        // colors: ['red', 'green'],
-                        // colorByPoint: true,
-                        // signalLine: {
-                        //     // macd signalLine 顏色配置
-                        //     styles: {
-                        //         lineColor: 'red',
-                        //     },
-                        // },
-                        // macdLine: {
-                        //     // macd macdLine 顏色配置
-                        //     styles: {
-                        //         lineColor: 'red',
-                        //     },
-                        // },
-                        // https://www.coder.work/article/5870953
-                        // params: {
-                        //     period: 14,
-                        //     overbought: 70,
-                        //     oversold: 30,
-                        // },
-                        // dataGrouping: {
-                        //     units: [['week', [1]]],
-                        // },
+                        name: 'D線',
+                        color: '#e75c9a',
                     },
                 ],
             },
         };
     },
     computed: {
-        ohlc() {
-            console.log(this.stockData);
-            return this.stockData.map((value) => [value[0], value[1], value[2], value[3], value[4]]);
-        },
-
         // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
+        k() {
+            return this.stockData.map((value) => [value[0], value[1]]);
+        },
+        d() {
+            return this.stockData.map((value) => [value[0], value[2]]);
+        },
         stockData() {
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            return (
-                (this.parentData &&
-                    this.parentData.map((value) => [moment(value[0]).valueOf(), value[1], value[2], value[3], value[4]])) ||
-                []
-            );
+            return (this.parentData && this.parentData.map((value) => [moment(value[0]).valueOf(), value[1], value[2]])) || [];
         },
 
         options() {
             const options = Object.assign(this.chartOptions, {});
             console.log('==================');
 
-            options.series[0].data = this.ohlc;
+            options.series[0].data = this.k;
+            options.series[1].data = this.d;
             return options;
         },
     },

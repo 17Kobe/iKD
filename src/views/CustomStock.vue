@@ -51,7 +51,7 @@
 
             <el-table-column prop="city" label="週KD" width="220" align="center">
                 <template #default="scope">
-                    <ChartWeekKd :parentData="scope.row.data_weekly" />
+                    <ChartWeekKd :parentData="scope.row.data_weekly_kd" />
                 </template>
             </el-table-column>
             <el-table-column label="週K線" width="220" align="center">
@@ -84,12 +84,13 @@
                                         scope.row.cost.total
                                     )
                                 "
-                                :status="
+                                :color="
                                     getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total) <= 0
-                                        ? 'success'
-                                        : 'exception'
+                                        ? '#95e46e'
+                                        : '#ff9d9d'
                                 "
                             >
+                                <!-- '#fef0f0' #f690a9 -->
                                 <span style="color: #606266"
                                     >{{
                                         getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total)

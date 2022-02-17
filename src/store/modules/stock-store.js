@@ -137,6 +137,7 @@ const stock = {
                         // 預設值
                         currStock[index].data_daily = currStock[index].data_daily || []; // 有可能是 null 就變成 []
                         currStock[index].data_weekly = currStock[index].data_weekly || []; // 有可能是 null 就變成 []
+                        currStock[index].data_weekly_kd = currStock[index].data_weekly_kd || []; // 有可能是 null 就變成 []
                         currStock[index].last_price = currStock[index].last_price || null;
                         currStock[index].rate_of_price_spread = currStock[index].rate_of_price_spread || null;
 
@@ -185,12 +186,12 @@ const stock = {
                             const lastStockDate = moment(_.last(currStock[index].data_daily)[0]);
                             let firstDayOfWeek = lastStockDate.startOf('isoWeek');
                             while (i >= 0) {
-                                console.log(i);
-                                console.log(moment(currStock[index].data_daily[i][0]).format('YYYY-MM-DD'));
-                                console.log(firstDayOfWeek.format('YYYY-MM-DD'));
+                                // console.log(i);
+                                // console.log(moment(currStock[index].data_daily[i][0]).format('YYYY-MM-DD'));
+                                // console.log(firstDayOfWeek.format('YYYY-MM-DD'));
                                 // 不能用 isSame 因為有可能那週沒資料，或那週星期一也放假，所以要用 isBefore
                                 if (moment(currStock[index].data_daily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
-                                    console.log('isBefore');
+                                    // console.log('isBefore');
                                     // 0最後一個也要跑進來
 
                                     // startIndex 值要小於等於 endIndex，for 是由大到小, i<j
@@ -221,6 +222,38 @@ const stock = {
                             // 必需要反轉，最小的值在最前面，最大的值在最後面，否則highcharts會只畫1個點
                             currStock[index].data_weekly = _.reverse(resData);
                         }
+
+                        // 塞入股價週線KD資料
+                        if (res.data.data.length > 0) {
+                            const resData = [];
+                            let rsv = 0;
+                            let preK = 0;
+                            let preD = 0;
+                            let todayK = 0;
+                            let todayD = 0;
+
+                            // 從最早日期開始算，因為公式有用昨天
+                            for (let i = 0; i <= currStock[index].data_weekly.length - 1; i += 1) {
+                                const startIndex = i - 8 < 0 ? 0 : i - 8; // 如果減完小於0，就=0。正常寫法是-9+1，但我寫-8就好了
+                                const endIndex = i;
+                                const range2dArray = _.slice(currStock[index].data_weekly, startIndex, endIndex + 1);
+                                const rangeHighArray = _.map(range2dArray, (v) => v[2]);
+                                const rangeLowArray = _.map(range2dArray, (v) => v[3]);
+                                const low = _.min(rangeLowArray);
+                                const high = _.max(rangeHighArray);
+
+                                rsv = ((currStock[index].data_weekly[i][4] - low) / (high - low)) * 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
+                                todayK = (2 / 3) * preK + (1 / 3) * rsv; // k=2/3 * 昨日的k值 + 1/3*今日的RSV
+                                todayD = (2 / 3) * preD + (1 / 3) * todayK; // d=2/3 * 昨日的d值 + 1/3*今日的k值
+                                preK = todayK;
+                                preD = todayD;
+                                const date = currStock[index].data_weekly[endIndex][0];
+
+                                resData.push([date, todayK, todayD]);
+                            }
+                            currStock[index].data_weekly_kd = resData;
+                        }
+
                         localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
                         // console.log('GET_STOCK_VALUE_OK');
                         // context.commit('SAVE_STOCK_VALUE', res.data);
@@ -231,33 +264,6 @@ const stock = {
                         console.log(err);
                     });
             });
-
-            // 將淨值更新後再儲存至 localstorage
-
-            // return (
-            //     // 注意一下fullPath的大小寫，如此還可以帶query喔
-            //     axios
-            //         .get('https://api.finmindtrade.com/api/v4/data', {
-            //             params: {
-            //                 usr: this.state.account,
-            //                 pwd: this.state.password,
-            //                 dataset: 'TaiwanStockPrice',
-            //                 data_id: '0056',
-            //                 start_date: '2021-09-13',
-            //                 token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
-            //             },
-            //         })
-            //         // 成功
-            //         .then((res) => {
-            //             // console.log('GET_STOCK_VALUE_OK');
-            //             // context.commit('SAVE_STOCK_VALUE', res.data);
-            //             // context.commit('SAVE_CONTACT', res.data);
-            //         })
-            //         // 失敗
-            //         .catch((err) => {
-            //             console.log(err);
-            //         })
-            // );
         },
     },
     getters: {
