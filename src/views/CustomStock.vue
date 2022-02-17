@@ -70,9 +70,15 @@
                         ]"
                     >
                         <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 14px">
-                            <div>平均成本：{{ scope.row.cost.avg }} 元</div>
-                            <div>累積股數：{{ scope.row.cost.total }} 股</div>
-                            <div>成本金額：{{ scope.row.cost.sum.toLocaleString('en-US') }} 元</div>
+                            <div>
+                                平均成本：<span style="color: #4386f5">{{ scope.row.cost.avg }}</span> 元
+                            </div>
+                            <div>
+                                累積股數：<span style="color: #4386f5">{{ scope.row.cost.total }}</span> 股
+                            </div>
+                            <div>
+                                成本金額：<span style="color: #4386f5">{{ scope.row.cost.sum.toLocaleString('en-US') }}</span> 元
+                            </div>
                             <el-progress
                                 v-if="scope.row.data_daily && scope.row.data_daily.length >= 1"
                                 :text-inside="true"
