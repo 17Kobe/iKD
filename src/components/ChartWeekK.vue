@@ -148,7 +148,7 @@ export default {
                     formatter() {
                         let str = '<div>';
                         const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
-                        Highcharts.each(this.points, (point) => {
+                        this.points.forEach((point) => {
                             const fontColor = point.y > point.point.open ? '#ee3333' : '#01aa00';
 
                             str += `<div>日期：<span style="color: #3333ee; font-weight:bold;">${moment(point.x).format(
