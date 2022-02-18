@@ -139,7 +139,8 @@ const stock = {
                         currStock[index].data_weekly = currStock[index].data_weekly || []; // 有可能是 null 就變成 []
                         currStock[index].data_weekly_kd = currStock[index].data_weekly_kd || []; // 有可能是 null 就變成 []
                         currStock[index].last_price = currStock[index].last_price || null;
-                        currStock[index].rate_of_price_spread = currStock[index].rate_of_price_spread || null;
+                        currStock[index].last_price_date = currStock[index].last_price_date || null;
+                        currStock[index].last_price_spread = currStock[index].last_price_spread || null;
 
                         // 塞入股價日線資料
                         console.log(res.data.data);
@@ -165,7 +166,13 @@ const stock = {
                             const v2 = currStock[index].data_daily.at(-2)[4];
                             currStock[index].last_price = v1;
 
-                            currStock[index].rate_of_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
+                            const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+                            const currStockLastDate = moment(currStock[index].data_daily.at(-1)[0]);
+                            currStock[index].last_price_date = `${currStockLastDate.format('MM/DD')}(${
+                                dayOfWeek[currStockLastDate.day()]
+                            })`;
+
+                            currStock[index].last_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
                         }
 
                         // 塞入股價週線資料

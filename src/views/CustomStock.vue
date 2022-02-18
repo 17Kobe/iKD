@@ -16,9 +16,9 @@
                         <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
                         <span
                             :style="[
-                                scope.row.rate_of_price_spread < 0
+                                scope.row.last_price_spread < 0
                                     ? { color: '#01aa00' }
-                                    : scope.row.rate_of_price_spread > 0
+                                    : scope.row.last_price_spread > 0
                                     ? { color: '#ee3333' }
                                     : { color: 'black' },
                                 { 'font-size': '16px' },
@@ -28,22 +28,23 @@
                             <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
                             <i
                                 :class="[
-                                    scope.row.rate_of_price_spread < 0
+                                    scope.row.last_price_spread < 0
                                         ? 'el-icon-caret-bottom'
-                                        : scope.row.rate_of_price_spread > 0
+                                        : scope.row.last_price_spread > 0
                                         ? 'el-icon-caret-top'
                                         : '',
                                 ]"
                                 :style="[
-                                    scope.row.rate_of_price_spread > 0
+                                    scope.row.last_price_spread > 0
                                         ? { position: 'relative', top: '2px' }
                                         : { position: 'relative', top: '1px' },
                                 ]"
                             ></i>
                             <!-- 漲跌幅 如，2.53% -->
                             <span style="font-size: 14px">
-                                {{ scope.row.rate_of_price_spread ? scope.row.rate_of_price_spread + '%' : '' }}
+                                {{ scope.row.last_price_spread ? scope.row.last_price_spread + '%' : '' }}
                             </span>
+                            <div style="color: #cccccc; font-size: 14px">{{ scope.row.last_price_date }}</div>
                         </span>
                     </span>
                 </template>
@@ -114,12 +115,12 @@
                     </el-button>
                 </template>
             </el-table-column>
-            <el-table-column prop="last_price1" label="訊號公式" width="220" align="center">
+            <el-table-column prop="last_price1" label="買賣策略" width="220" align="center">
                 <template #default="scope">
                     <el-button size="small" icon="el-icon-s-tools text-xl"></el-button>
                 </template>
             </el-table-column>
-            <el-table-column prop="city" label="訊號歷史報酬" width="220" align="center" />
+            <el-table-column prop="city" label="策略歷史報酬" width="220" align="center" />
             <!-- <el-table-column prop="city" label="淨值比" width="120" />
                 <el-table-column prop="city" label="本益比" width="120" />
                 <el-table-column prop="city" label="EPS" width="120" /> -->
