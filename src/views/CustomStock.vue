@@ -24,7 +24,7 @@
                                 { 'font-size': '16px' },
                             ]"
                         >
-                            {{ scope.row.last_price }}<br />
+                            <div style="font-weight: bold">{{ scope.row.last_price }}</div>
                             <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
                             <i
                                 :class="[
@@ -64,7 +64,7 @@
                 <template #default="scope">
                     <el-button
                         size="small"
-                        @click="doShowDrawer(scope.row.id)"
+                        @click="doShowCost(scope.row.id)"
                         :style="[
                             scope.row.cost && scope.row.cost.settings.length >= 1 ? { width: '190px' } : {},
                             { 'text-align': 'left', 'line-height': '18px' },
@@ -117,7 +117,57 @@
             </el-table-column>
             <el-table-column prop="last_price1" label="買賣策略" width="220" align="center">
                 <template #default="scope">
-                    <el-button size="small" icon="el-icon-s-tools text-xl"></el-button>
+                    <el-button
+                        size="small"
+                        @click="doShowPolicy(scope.row.id)"
+                        :style="[
+                            scope.row.cost && scope.row.cost.settings.length >= 1 ? { width: '190px' } : {},
+                            { 'text-align': 'left', 'line-height': '18px' },
+                        ]"
+                    >
+                        <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 14px">
+                            <div>
+                                平均成本：<span style="color: #4386f5">{{ scope.row.cost.avg }}</span> 元
+                            </div>
+                            <div>
+                                累積股數：<span style="color: #4386f5">{{ scope.row.cost.total }}</span> 股
+                            </div>
+                            <div>
+                                成本金額：<span style="color: #4386f5">{{ scope.row.cost.sum.toLocaleString('en-US') }}</span> 元
+                            </div>
+                            <el-progress
+                                v-if="scope.row.data_daily && scope.row.data_daily.length >= 1"
+                                :text-inside="true"
+                                :stroke-width="20"
+                                :percentage="
+                                    getRateOfReturnPercent(
+                                        scope.row.cost.sum,
+                                        scope.row.data_daily.at(-1)[4],
+                                        scope.row.cost.total
+                                    )
+                                "
+                                :color="
+                                    getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total) <= 0
+                                        ? '#95e46e'
+                                        : '#ff9d9d'
+                                "
+                            >
+                                <!-- '#fef0f0' #f690a9 -->
+                                <span style="color: #606266"
+                                    >{{
+                                        getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total)
+                                    }}
+                                    %</span
+                                >
+                            </el-progress>
+
+                            <!-- {{ parseFloat((scope.row.cost.total / 1000).toFixed(2)) }} 張) -->
+                        </div>
+
+                        <div v-else>
+                            <i class="el-icon-s-tools text-xl"></i>
+                        </div>
+                    </el-button>
                 </template>
             </el-table-column>
             <el-table-column prop="city" label="策略歷史報酬" width="220" align="center" />
@@ -126,6 +176,7 @@
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
         <FormCost ref="childFormCost" />
+        <FormPolicy ref="childFormPolicy" />
     </div>
 </template>
 
@@ -134,11 +185,12 @@ import _ from 'lodash';
 import ChartWeekKd from '../components/ChartWeekKd.vue';
 import ChartWeekK from '../components/ChartWeekK.vue';
 import FormCost from '../components/FormCost.vue';
+import FormPolicy from '../components/FormPolicy.vue';
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 
 export default {
-    components: { ChartWeekKd, ChartWeekK, FormCost },
+    components: { ChartWeekKd, ChartWeekK, FormCost, FormPolicy },
     data() {
         return {
             rateOfReturn: 0,
@@ -180,13 +232,21 @@ export default {
         getDifference(array1, array2) {
             return array1.filter((object1) => !array2.some((object2) => object1.id === object2.id));
         },
-        doShowDrawer(id) {
+        doShowCost(id) {
             console.log(id);
             // console.log(this.$refs);
             // 父改子去顯示 drawer 變數 不好，子要被改值
             // 父傳一堆變數給子也不太好
             // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
             this.$refs.childFormCost.onInit(id);
+        },
+        doShowPolicy(id) {
+            console.log(id);
+            // console.log(this.$refs);
+            // 父改子去顯示 drawer 變數 不好，子要被改值
+            // 父傳一堆變數給子也不太好
+            // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
+            this.$refs.childFormPolicy.onInit(id);
         },
         getRateOfReturn(sum, close, total) {
             return parseFloat((((close * total - sum) * 100) / sum).toFixed(2));

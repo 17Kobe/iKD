@@ -188,6 +188,20 @@ export default {
                 },
                 yAxis: [
                     {
+                        plotLines: [
+                            {
+                                color: 'red',
+                                dashStyle: 'LongDash',
+                                value: 20,
+                                width: 1,
+                            },
+                            {
+                                color: 'green',
+                                dashStyle: 'LongDash',
+                                value: 80,
+                                width: 1,
+                            },
+                        ],
                         startOnTick: false,
                         showLastLabel: true,
                         // endOnTick: false,
