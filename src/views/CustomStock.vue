@@ -129,37 +129,6 @@
                             <div>
                                 平均成本：<span style="color: #4386f5">{{ scope.row.cost.avg }}</span> 元
                             </div>
-                            <div>
-                                累積股數：<span style="color: #4386f5">{{ scope.row.cost.total }}</span> 股
-                            </div>
-                            <div>
-                                成本金額：<span style="color: #4386f5">{{ scope.row.cost.sum.toLocaleString('en-US') }}</span> 元
-                            </div>
-                            <el-progress
-                                v-if="scope.row.data_daily && scope.row.data_daily.length >= 1"
-                                :text-inside="true"
-                                :stroke-width="20"
-                                :percentage="
-                                    getRateOfReturnPercent(
-                                        scope.row.cost.sum,
-                                        scope.row.data_daily.at(-1)[4],
-                                        scope.row.cost.total
-                                    )
-                                "
-                                :color="
-                                    getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total) <= 0
-                                        ? '#95e46e'
-                                        : '#ff9d9d'
-                                "
-                            >
-                                <!-- '#fef0f0' #f690a9 -->
-                                <span style="color: #606266"
-                                    >{{
-                                        getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total)
-                                    }}
-                                    %</span
-                                >
-                            </el-progress>
 
                             <!-- {{ parseFloat((scope.row.cost.total / 1000).toFixed(2)) }} 張) -->
                         </div>
@@ -181,7 +150,6 @@
 </template>
 
 <script>
-import _ from 'lodash';
 import ChartWeekKd from '../components/ChartWeekKd.vue';
 import ChartWeekK from '../components/ChartWeekK.vue';
 import FormCost from '../components/FormCost.vue';

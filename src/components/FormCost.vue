@@ -2,7 +2,7 @@
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="70%">
         <el-form ref="form" :model="form" label-width="60px">
             <el-row v-for="(item, index) in form" :key="index">
-                <el-col :span="10">
+                <el-col :xs="3" :sm="6" :md="4" :lg="4" :xl="3">
                     <el-form-item label="成交價">
                         <el-input
                             clearable
@@ -14,7 +14,7 @@
                         />
                     </el-form-item>
                 </el-col>
-                <el-col :span="6">
+                <el-col :xs="4" :sm="6" :md="5" :lg="5" :xl="4">
                     <el-form-item label="股數">
                         <el-input-number
                             type="number"
@@ -24,7 +24,7 @@
                         />
                     </el-form-item>
                 </el-col>
-                <el-col :span="8">
+                <el-col :xs="1" :sm="6" :md="3" :lg="3" :xl="2">
                     &nbsp;&nbsp;<el-button type="danger" @click="onDel(index)"><i class="el-icon-minus"></i></el-button
                 ></el-col>
             </el-row>
@@ -40,6 +40,8 @@
 </template>
 
 <script>
+import _ from 'lodash';
+
 export default {
     data() {
         return {
@@ -122,17 +124,8 @@ export default {
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定成本`;
 
             console.log(this.stockData.cost);
-            if (this.stockData.cost && this.stockData.cost.settings.length > 0) {
-                this.form = this.stockData.cost.settings;
-            } else {
-                console.log('this.stockData.cost.settings');
-                this.form = [
-                    // {
-                    //     cost: this.defaultCost,
-                    //     number: 1000,
-                    // },
-                ];
-            }
+            if (_.has(this.stockData, 'cost.settings')) this.form = this.stockData.cost.settings;
+
             console.log(this.stockData);
             console.log(stockId);
             // this.$nextTick(() => {
