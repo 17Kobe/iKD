@@ -106,6 +106,18 @@ const stock = {
             // save to localstorage
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
+        SAVE_STOCK_POLICY(state, { stockId, policyList }) {
+            console.log(stockId);
+            console.log(policyList);
+
+            // object of array 去 find 並 update
+            const found = state.stockList.find((v) => v.id === stockId);
+            found.policy = {};
+            found.policy = policyList; // 複製數據複本
+
+            // save to localstorage
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+        },
         SAVE_STOCK_PRICE(state) {
             console.log('SAVE_STOCK_PRICE');
             console.log(state.stockList);
@@ -134,34 +146,34 @@ const stock = {
                     })
                     // 成功
                     .then((res) => {
-                        // 預設值
-                        currStock[index].data_daily = currStock[index].data_daily || []; // 有可能是 null 就變成 []
-                        currStock[index].data_weekly = currStock[index].data_weekly || []; // 有可能是 null 就變成 []
-                        currStock[index].data_weekly_kd = currStock[index].data_weekly_kd || []; // 有可能是 null 就變成 []
-                        currStock[index].last_price = currStock[index].last_price || null;
-                        currStock[index].last_price_date = currStock[index].last_price_date || null;
-                        currStock[index].last_price_spread = currStock[index].last_price_spread || null;
+                        if (_.has(res, 'data.data') && res.data.data.length > 0) {
+                            // 預設值
+                            currStock[index].data_daily = currStock[index].data_daily || []; // 有可能是 null 就變成 []
+                            currStock[index].data_weekly = currStock[index].data_weekly || []; // 有可能是 null 就變成 []
+                            currStock[index].data_weekly_kd = currStock[index].data_weekly_kd || []; // 有可能是 null 就變成 []
+                            currStock[index].last_price = currStock[index].last_price || null;
+                            currStock[index].last_price_date = currStock[index].last_price_date || null;
+                            currStock[index].last_price_spread = currStock[index].last_price_spread || null;
 
-                        // 塞入股價日線資料
-                        console.log(res.data.data);
+                            // 塞入股價日線資料
+                            // console.log(res.data.data);
 
-                        const values = [];
-                        res.data.data.forEach((element) => {
-                            values.push([
-                                element.date,
-                                element.open,
-                                element.max,
-                                element.min,
-                                element.close,
-                                // element.Trading_Volume,
-                            ]);
-                        });
-                        currStock[index].data_daily.push(...values);
+                            const values = [];
+                            res.data.data.forEach((element) => {
+                                values.push([
+                                    element.date,
+                                    element.open,
+                                    element.max,
+                                    element.min,
+                                    element.close,
+                                    // element.Trading_Volume,
+                                ]);
+                            });
+                            currStock[index].data_daily.push(...values);
 
-                        // theArray[index].data_daily.push(...res.data.data); // 塞入股價資料
+                            // theArray[index].data_daily.push(...res.data.data); // 塞入股價資料
 
-                        // 塞入漲跌幅、最後股價
-                        if (res.data.data.length > 0) {
+                            // 塞入漲跌幅、最後股價
                             const v1 = currStock[index].data_daily.at(-1)[4];
                             const v2 = currStock[index].data_daily.at(-2)[4];
                             currStock[index].last_price = v1;
@@ -173,10 +185,8 @@ const stock = {
                             })`;
 
                             currStock[index].last_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
-                        }
 
-                        // 塞入股價週線資料
-                        if (res.data.data.length > 0) {
+                            // 塞入股價週線資料
                             // const firstStockDate = moment(_.first(currStock[index].data_daily)[0]); // [] 不可能 undefined。因為是二維陣列，還要取第二維[0]代表date
                             // const lastStockDate = moment(_.last(currStock[index].data_daily)[0]);
 
@@ -186,7 +196,7 @@ const stock = {
                             // for moment 參考 https://stackoverflow.com/questions/52936352/javascript-for-loop-to-add-days-in-a-month-object-moment-js
                             // lastStockDate.subtract(7, 'days') 因為我第一個要拿到就是減7天的值
                             // 這裡要用 -6 才能最後面的資料也都算進去，不過可能實際因沒有資料而加上也沒到完整一週都有資料，
-                            const resData = [];
+                            let resData = [];
 
                             let i = currStock[index].data_daily.length - 1;
                             let j = i;
@@ -228,11 +238,9 @@ const stock = {
                             console.log(resData);
                             // 必需要反轉，最小的值在最前面，最大的值在最後面，否則highcharts會只畫1個點
                             currStock[index].data_weekly = _.reverse(resData);
-                        }
 
-                        // 塞入股價週線KD資料
-                        if (res.data.data.length > 0) {
-                            const resData = [];
+                            // 塞入股價週線KD資料
+                            resData = [];
                             let rsv = 0;
                             let preK = 0;
                             let preD = 0;
@@ -240,16 +248,16 @@ const stock = {
                             let todayD = 0;
 
                             // 從最早日期開始算，因為公式有用昨天
-                            for (let i = 0; i <= currStock[index].data_weekly.length - 1; i += 1) {
-                                const startIndex = i - 8 < 0 ? 0 : i - 8; // 如果減完小於0，就=0。正常寫法是-9+1，但我寫-8就好了
-                                const endIndex = i;
+                            for (let k = 0; k <= currStock[index].data_weekly.length - 1; k += 1) {
+                                const startIndex = k - 8 < 0 ? 0 : k - 8; // 如果減完小於0，就=0。正常寫法是-9+1，但我寫-8就好了
+                                const endIndex = k;
                                 const range2dArray = _.slice(currStock[index].data_weekly, startIndex, endIndex + 1);
                                 const rangeHighArray = _.map(range2dArray, (v) => v[2]);
                                 const rangeLowArray = _.map(range2dArray, (v) => v[3]);
                                 const low = _.min(rangeLowArray);
                                 const high = _.max(rangeHighArray);
 
-                                rsv = ((currStock[index].data_weekly[i][4] - low) / (high - low)) * 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
+                                rsv = ((currStock[index].data_weekly[k][4] - low) / (high - low)) * 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
                                 todayK = (2 / 3) * preK + (1 / 3) * rsv; // k=2/3 * 昨日的k值 + 1/3*今日的RSV
                                 todayD = (2 / 3) * preD + (1 / 3) * todayK; // d=2/3 * 昨日的d值 + 1/3*今日的k值
                                 preK = todayK;

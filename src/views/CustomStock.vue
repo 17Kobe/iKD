@@ -60,7 +60,7 @@
                     <ChartWeekK :parentData="scope.row.data_weekly" />
                 </template>
             </el-table-column>
-            <el-table-column prop="last_price1" label="成本" width="220" align="center">
+            <el-table-column label="成本" width="220" align="center">
                 <template #default="scope">
                     <el-button
                         size="small"
@@ -72,13 +72,25 @@
                     >
                         <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 14px">
                             <div>
-                                平均成本：<span style="color: #4386f5">{{ scope.row.cost.avg }}</span> 元
+                                <el-tag class="ml-2" size="small" style="margin: 1px 0px">平均成本</el-tag>&nbsp;<span
+                                    style="color: #4386f5"
+                                    >{{ scope.row.cost.avg }}</span
+                                >
+                                元
                             </div>
                             <div>
-                                累積股數：<span style="color: #4386f5">{{ scope.row.cost.total }}</span> 股
+                                <el-tag class="ml-2" size="small" style="margin: 1px 0px">累積股數</el-tag>&nbsp;<span
+                                    style="color: #4386f5"
+                                    >{{ scope.row.cost.total }}</span
+                                >
+                                股
                             </div>
                             <div>
-                                成本金額：<span style="color: #4386f5">{{ scope.row.cost.sum.toLocaleString('en-US') }}</span> 元
+                                <el-tag class="ml-2" size="small" style="margin: 1px 0px">成本金額</el-tag>&nbsp;<span
+                                    style="color: #4386f5"
+                                    >{{ scope.row.cost.sum.toLocaleString('en-US') }}</span
+                                >
+                                元
                             </div>
                             <el-progress
                                 v-if="scope.row.data_daily && scope.row.data_daily.length >= 1"
@@ -93,12 +105,12 @@
                                 "
                                 :color="
                                     getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total) <= 0
-                                        ? '#95e46e'
-                                        : '#ff9d9d'
+                                        ? '#ccff90'
+                                        : '#f28b82'
                                 "
                             >
                                 <!-- '#fef0f0' #f690a9 -->
-                                <span style="color: #606266"
+                                <span style="color: #222326"
                                     >{{
                                         getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total)
                                     }}
@@ -115,19 +127,39 @@
                     </el-button>
                 </template>
             </el-table-column>
-            <el-table-column prop="last_price1" label="買賣策略" width="220" align="center">
+            <el-table-column label="買賣策略" width="270" align="center">
                 <template #default="scope">
                     <el-button
                         size="small"
                         @click="doShowPolicy(scope.row.id)"
                         :style="[
-                            scope.row.cost && scope.row.cost.settings.length >= 1 ? { width: '190px' } : {},
+                            scope.row.policy && (scope.row.policy.buy.length >= 1 || scope.row.policy.sell.length >= 1)
+                                ? { width: '220px' }
+                                : {},
                             { 'text-align': 'left', 'line-height': '18px' },
                         ]"
                     >
-                        <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 14px">
-                            <div>
-                                平均成本：<span style="color: #4386f5">{{ scope.row.cost.avg }}</span> 元
+                        <div
+                            v-if="scope.row.policy && (scope.row.policy.buy.length >= 1 || scope.row.policy.sell.length >= 1)"
+                            style="font-size: 14px"
+                        >
+                            <div v-for="(item, index) in scope.row.policy.buy" :key="index">
+                                <div>
+                                    <el-tag class="ml-2" type="danger" size="small" style="margin: 1px 0px">買</el-tag>
+                                    <span style="font-size: 12px">
+                                        &nbsp;{{ item.label }}&nbsp;<span style="color: #4386f5">{{ item.limit }}</span
+                                        >&nbsp;{{ item.limit_desc }}</span
+                                    >
+                                </div>
+                            </div>
+                            <div v-for="(item, index) in scope.row.policy.sell" :key="index">
+                                <div>
+                                    <el-tag class="ml-2" type="success" size="small" style="margin: 1px 0px">賣</el-tag>
+                                    <span style="font-size: 12px">
+                                        &nbsp;{{ item.label }}&nbsp;<span style="color: #4386f5">{{ item.limit }}</span
+                                        >&nbsp;{{ item.limit_desc }}</span
+                                    >
+                                </div>
                             </div>
 
                             <!-- {{ parseFloat((scope.row.cost.total / 1000).toFixed(2)) }} 張) -->

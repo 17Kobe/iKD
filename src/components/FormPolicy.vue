@@ -79,13 +79,13 @@ export default {
                 {
                     value: 'kd_gold',
                     label: '週 KD 黃金交叉',
-                    default_limit: 20,
+                    default_limit: 40,
                     default_limit_desc: '以下',
                 },
                 {
                     value: 'kd_turn',
                     label: '週 KD 往上轉折',
-                    default_limit: 20,
+                    default_limit: 40,
                     default_limit_desc: '以下',
                 },
                 {
@@ -178,7 +178,7 @@ export default {
             // label: '週 KD 黃金交叉',
             const index = this.form.buy.push({
                 method: this.buyOptions[foundIndex].value,
-
+                label: this.buyOptions[foundIndex].label, // 前端顯示用，非 selected value用
                 limit: this.buyOptions[foundIndex].default_limit,
                 limit_desc: this.buyOptions[foundIndex].default_limit_desc,
             });
@@ -211,7 +211,7 @@ export default {
             // label: '週 KD 黃金交叉',
             const index = this.form.sell.push({
                 method: this.sellOptions[foundIndex].value,
-
+                label: this.sellOptions[foundIndex].label, // 前端顯示用，非 selected value用
                 limit: this.sellOptions[foundIndex].default_limit,
                 limit_desc: this.sellOptions[foundIndex].default_limit_desc,
             });
@@ -235,6 +235,7 @@ export default {
             const found = _.find(this.buyOptions, ['value', selValue]);
             console.log(found);
             console.log(this.form.buy);
+            this.form.buy[index].label = found.label;
             this.form.buy[index].limit = found.default_limit;
             this.form.buy[index].limit_desc = found.default_limit_desc;
         },
@@ -245,6 +246,7 @@ export default {
             const found = _.find(this.sellOptions, ['value', selValue]);
             console.log(found);
             console.log(this.form.sell);
+            this.form.sell[index].label = found.label;
             this.form.sell[index].limit = found.default_limit;
             this.form.sell[index].limit_desc = found.default_limit_desc;
         },
@@ -257,6 +259,8 @@ export default {
             // eslint-disable-next-line prefer-destructuring
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定買賣策略`;
 
+            console.log(this.stockData);
+
             if (_.has(this.stockData, 'policy')) this.form = this.stockData.policy;
 
             console.log(this.stockData);
@@ -266,14 +270,11 @@ export default {
             // });
         },
         onClosed() {
-            // console.log(this.form);
-            // this.$store.commit('SAVE_STOCK_COST', {
-            //     stockId: this.stockId,
-            //     costList: this.form,
-            //     totalOfShares: this.totalOfShares,
-            //     averageCost: this.averageCost,
-            //     sumCost: this.sumCost,
-            // });
+            console.log(this.form);
+            this.$store.commit('SAVE_STOCK_POLICY', {
+                stockId: this.stockId,
+                policyList: this.form,
+            });
         },
     },
 };
