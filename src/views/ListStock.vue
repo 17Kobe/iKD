@@ -73,7 +73,7 @@
                     >
                         <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 14px">
                             <div>
-                                <el-tag class="ml-2" size="small" style="margin: 1px 0px">平均股本</el-tag>&nbsp;<span
+                                <el-tag class="ml-2" size="small" style="margin: 1px 0px">持股成本</el-tag>&nbsp;<span
                                     style="color: #4386f5"
                                     >{{ scope.row.cost.avg }}</span
                                 >
@@ -115,7 +115,10 @@
                                     >{{
                                         getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total)
                                     }}
-                                    %</span
+                                    %&nbsp;/&nbsp;{{
+                                        getReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total)
+                                    }}
+                                    元</span
                                 >
                             </el-progress>
 
@@ -180,7 +183,7 @@
                 <el-table-column prop="city" label="本益比" width="120" />
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
-        <el-button @click="onAdd" style="margin-top: 10px"><i class="el-icon-edit"></i>&nbsp;編輯自選股</el-button>
+        <el-button style="margin-top: 10px"><i class="el-icon-edit"></i>&nbsp;新增自選股</el-button>
         <FormCost ref="childFormCost" />
         <FormPolicy ref="childFormPolicy" />
     </div>
@@ -195,6 +198,7 @@ import FormPolicy from '../components/FormPolicy.vue';
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 
 export default {
+    name: 'component-list',
     components: { ChartWeekKd, ChartWeekK, FormCost, FormPolicy },
     data() {
         return {
@@ -253,12 +257,15 @@ export default {
             // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
             this.$refs.childFormPolicy.onInit(id);
         },
+        getReturn(sum, close, total) {
+            return Number((close * total - sum).toFixed(2)).toLocaleString('en-US');
+        },
         getRateOfReturn(sum, close, total) {
-            return parseFloat((((close * total - sum) * 100) / sum).toFixed(2));
+            return Number((((close * total - sum) * 100) / sum).toFixed(2));
         },
         getRateOfReturnPercent(sum, close, total) {
             //* 2 則最大值為50%
-            return Math.abs(parseFloat((((close * total - sum) * 100) / sum).toFixed(2))) * 2;
+            return Math.abs(Number((((close * total - sum) * 100) / sum).toFixed(2))) * 2;
         },
         onChangeStar(selValue, index) {
             console.log(selValue);
@@ -300,4 +307,9 @@ export default {
 // 為了解決table內cell要/n換行的問題
 .el-table .el-table__body .cell
     white-space: pre-line
+// 隱藏 input 若有屬性 type="number" 會出現上下箭頭的問題, 寫在各別vue用 scoped不行，不加scoped又會報錯，所以寫在global
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button
+    -webkit-appearance: none
+    margin: 0
 </style>

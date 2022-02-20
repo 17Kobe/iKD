@@ -152,7 +152,7 @@ export default {
                         this.points.forEach((point) => {
                             const fontColor = point.y > point.point.open ? '#ee3333' : '#01aa00';
 
-                            str += `<div>日期：${moment(point.x).format(
+                            str += `<div style="text-align:center;">${moment(point.x).format(
                                 'YYYY-MM-DD'
                             )}(<span style="color: #3333ee; font-weight:bold;">${dayOfWeek[moment(point.x).day()]}</span>)</div>`;
                             str += `<div>開：${point.point.open} <span style="color: #3333ee">收</span>：<span style="color: ${fontColor}; font-weight:bold;">${point.y}</span></div>`;

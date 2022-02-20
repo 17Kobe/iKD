@@ -43,6 +43,7 @@
 import _ from 'lodash';
 
 export default {
+    name: 'component-form-cost',
     data() {
         return {
             stockId: null,
@@ -70,17 +71,17 @@ export default {
             console.log('totalOf1000Shares');
 
             // https://stackoverflow.com/questions/50670204/sum-up-array-with-objects
-            return parseFloat((this.totalOfShares / 1000).toFixed(2));
+            return Number((this.totalOfShares / 1000).toFixed(2));
         },
         sumCost() {
             console.log('averageCost');
             // 有可能cost 為 null，所以要變更為0
-            return this.form.reduce((acc, { cost, number }) => acc + (parseFloat(cost) || 0) * parseInt(number, 10), 0);
+            return this.form.reduce((acc, { cost, number }) => acc + (Number(cost) || 0) * parseInt(number, 10), 0);
         },
         averageCost() {
             // parseFloat 是為了去除小數點後面的0
             // div 0 結果會 NaN, 所以把它變 /1
-            return parseFloat((this.sumCost / (this.totalOfShares === 0 ? 1 : this.totalOfShares)).toFixed(2));
+            return Number((this.sumCost / (this.totalOfShares === 0 ? 1 : this.totalOfShares)).toFixed(2));
         },
     },
     mounted() {},
@@ -102,7 +103,7 @@ export default {
             console.log('onChangeCost');
             // 加 parseFloat就要是要把字串變float，存在 the.form裡面
             // 一定要搭配type="number"，否則小數點.會輸入不出來
-            this.form[index].cost = parseFloat(e.target.value);
+            this.form[index].cost = Number(e.target.value);
         },
         onChangeNumber(e, index) {
             console.log('onChangeNumber');
@@ -146,11 +147,3 @@ export default {
 };
 // 父傳子參考 https://its201.com/article/weixin_49035434/119852222 方法1，的emit似乎 vue 3有改語法而不行了。但方法2沒用 emit仍正常
 </script>
-
-<style lang="sass">
-// 隱藏 input 若有屬性 type="number" 會出現上下箭頭的問題
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button
-    -webkit-appearance: none
-    margin: 0
-</style>

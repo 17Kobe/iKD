@@ -138,16 +138,16 @@ export default {
                         this.points.forEach((point, index) => {
                             // const fontColor = point.y > point.point.open ? '#ee3333' : '#01aa00';
                             if (index === 0) {
-                                str += `<div>日期：${moment(point.x).format(
+                                str += `<div style="text-align:center;">${moment(point.x).format(
                                     'YYYY-MM-DD'
                                 )}(<span style="color: #3333ee; font-weight:bold;">${
                                     dayOfWeek[moment(point.x).day()]
                                 }</span>)</div>`;
-                                str += `<div><span style="color: #4286f5; font-weight:bold;">K</span>: ${parseFloat(
+                                str += `<div><span style="color: #4286f5; font-weight:bold;">K</span>: ${Number(
                                     point.y.toFixed(2)
                                 )} `;
                             } else if (index === 1) {
-                                str += `<span style="color: #e75c9a; font-weight:bold;">D</span>: ${parseFloat(
+                                str += `<span style="color: #e75c9a; font-weight:bold;">D</span>: ${Number(
                                     point.y.toFixed(2)
                                 )}</div>`;
                             }

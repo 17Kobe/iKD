@@ -66,6 +66,7 @@
 import _ from 'lodash';
 
 export default {
+    name: 'component-form-policy',
     data() {
         return {
             stockId: null,
@@ -280,11 +281,3 @@ export default {
 };
 // 父傳子參考 https://its201.com/article/weixin_49035434/119852222 方法1，的emit似乎 vue 3有改語法而不行了。但方法2沒用 emit仍正常
 </script>
-
-<style lang="sass">
-// 隱藏 input 若有屬性 type="number" 會出現上下箭頭的問題
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button
-    -webkit-appearance: none
-    margin: 0
-</style>
