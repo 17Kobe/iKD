@@ -53,12 +53,12 @@
 
             <el-table-column prop="city" label="週KD" width="220" align="center">
                 <template #default="scope">
-                    <ChartWeekKd :parentData="scope.row.data_weekly_kd" />
+                    <ChartWeekKd :parentData="scope.row" />
                 </template>
             </el-table-column>
             <el-table-column label="週K線" width="220" align="center">
                 <template #default="scope">
-                    <ChartWeekK :parentData="scope.row.data_weekly" />
+                    <ChartWeekK :parentData="scope.row" />
                 </template>
             </el-table-column>
             <el-table-column label="成本" width="220" align="center">

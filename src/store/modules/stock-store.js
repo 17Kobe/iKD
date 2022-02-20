@@ -192,7 +192,7 @@ const stock = {
 
                             const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
                             const currStockLastDate = moment(currStock[index].data_daily.at(-1)[0]);
-                            currStock[index].last_price_date = `${currStockLastDate.format('MM/DD')}(${
+                            currStock[index].last_price_date = `${currStockLastDate.format('M/DD')}(${
                                 dayOfWeek[currStockLastDate.day()]
                             })`;
 

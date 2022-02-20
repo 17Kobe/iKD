@@ -20,7 +20,7 @@ import loadIndicatorsAll from 'highcharts/indicators/indicators-all';
 // 在這裡一定要用大括號，不然會錯，因為highcharts-vue.js中有命名為 Chart 的export
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
-// import _ from 'lodash';
+import _ from 'lodash';
 
 // 因為 series 是股票圖，所以要導入 stock 模組，才能有 type: 'candlestick'
 loadStock(Highcharts);
@@ -258,7 +258,20 @@ export default {
         },
         stockData() {
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            return (this.parentData && this.parentData.map((value) => [moment(value[0]).valueOf(), value[1], value[2]])) || [];
+            return (
+                (this.parentData.data_weekly_kd &&
+                    this.parentData.data_weekly_kd.map((value) => [moment(value[0]).valueOf(), value[1], value[2]])) ||
+                []
+            );
+        },
+        kdGoldLimit() {
+            let ret = null;
+            if (_.has(this.parentData, 'policy.buy')) {
+                const found = _.find(this.parentData.policy.buy, ['method', 'kd_gold']);
+                if (found) ret = found.limit; // 若非 nundefined
+            }
+            console.log(ret);
+            return ret;
         },
 
         options() {

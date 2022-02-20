@@ -109,7 +109,7 @@ export default {
             ],
             sellOptions: [
                 {
-                    value: 'kd_gold',
+                    value: 'kd_dead',
                     label: '週 KD 死亡交叉',
                     default_limit: 80,
                     default_limit_desc: '以上',
