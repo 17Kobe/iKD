@@ -155,7 +155,7 @@ export default {
                             str += `<div>日期：${moment(point.x).format(
                                 'YYYY-MM-DD'
                             )}(<span style="color: #3333ee; font-weight:bold;">${dayOfWeek[moment(point.x).day()]}</span>)</div>`;
-                            str += `<div>開：${point.point.open} 收：<span style="color: ${fontColor}; font-weight:bold;">${point.y}</span></div>`;
+                            str += `<div>開：${point.point.open} <span style="color: #3333ee">收</span>：<span style="color: ${fontColor}; font-weight:bold;">${point.y}</span></div>`;
                             str += `<div>高：${point.point.high} 低：${point.point.low}</div>`;
                         });
 

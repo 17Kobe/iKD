@@ -89,6 +89,18 @@ const stock = {
             state.stockList = data;
             // console.log(state.currStockDayData);
         },
+        SAVE_STOCK_STAR(state, { stockId, star }) {
+            console.log(stockId);
+            console.log(star);
+
+            // object of array 去 find 並 update
+            const found = state.stockList.find((v) => v.id === stockId);
+            found.star = 0;
+            found.star = star; // 複製數據複本
+
+            // save to localstorage
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+        },
         SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
             console.log(stockId);
             console.log(costList);

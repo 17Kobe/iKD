@@ -1,13 +1,14 @@
 <template>
     <div>
         <el-table :data="stockList" style="width: 100%">
-            <el-table-column fixed label="名稱" width="130" align="center">
+            <el-table-column fixed label="名稱" width="140" align="center">
                 <template #default="scope">
                     <span style="font-size: 16px; font-weight: bold">
                         {{ scope.row.name }}
                     </span>
                     <br />
                     <span style="color: #cccccc">{{ scope.row.id }}</span>
+                    <el-rate v-model="scope.row.star" size="small" @change="onChangeStar($event, scope.row.id)"> </el-rate>
                 </template>
             </el-table-column>
             <el-table-column label="股價" width="85" align="right">
@@ -254,6 +255,11 @@ export default {
         getRateOfReturnPercent(sum, close, total) {
             //* 2 則最大值為50%
             return Math.abs(parseFloat((((close * total - sum) * 100) / sum).toFixed(2))) * 2;
+        },
+        onChangeStar(selValue, index) {
+            console.log(selValue);
+            console.log(index);
+            this.$store.commit('SAVE_STOCK_STAR', { stockId: index, star: selValue });
         },
     },
 };
