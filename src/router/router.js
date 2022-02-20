@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
-import CustomStock from '../views/CustomStock.vue';
+import ListStock from '../views/ListStock.vue';
 import AssetAllocation from '../views/AssetAllocation.vue';
 
 const router = createRouter({
@@ -9,7 +9,7 @@ const router = createRouter({
             path: '/',
             name: 'dashboard',
             components: {
-                default: CustomStock, // 預設第一頁是顯示 自訂股票
+                default: ListStock, // 預設第一頁是顯示 自訂股票
                 asset: AssetAllocation, // 點到 tab 時，會顯示 router-view 的 name
             },
         },

@@ -8,12 +8,12 @@
                 </template>
                 <router-view></router-view>
             </el-tab-pane>
-            <el-tab-pane>
+            <!-- <el-tab-pane>
                 <template #label>
                     <span><i class="el-icon-menu"></i> 資產配置</span>
                 </template>
                 <router-view name="asset"></router-view>
-            </el-tab-pane>
+            </el-tab-pane> -->
         </el-tabs>
     </div>
 </template>
