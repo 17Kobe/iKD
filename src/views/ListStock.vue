@@ -73,7 +73,7 @@
                     >
                         <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 14px">
                             <div>
-                                <el-tag class="ml-2" size="small" style="margin: 1px 0px">平均成本</el-tag>&nbsp;<span
+                                <el-tag class="ml-2" size="small" style="margin: 1px 0px">平均股本</el-tag>&nbsp;<span
                                     style="color: #4386f5"
                                     >{{ scope.row.cost.avg }}</span
                                 >
@@ -87,7 +87,7 @@
                                 股
                             </div>
                             <div>
-                                <el-tag class="ml-2" size="small" style="margin: 1px 0px">成本金額</el-tag>&nbsp;<span
+                                <el-tag class="ml-2" size="small" style="margin: 1px 0px">本　　金</el-tag>&nbsp;<span
                                     style="color: #4386f5"
                                     >{{ scope.row.cost.sum.toLocaleString('en-US') }}</span
                                 >
@@ -173,10 +173,14 @@
                 </template>
             </el-table-column>
             <el-table-column prop="city" label="策略歷史報酬" width="220" align="center" />
+            <!-- <el-table-column prop="city" label="功能" width="220" align="center">
+                <el-button type="danger" @click="onDel()"><i class="el-icon-minus"></i></el-button>
+            </el-table-column> -->
             <!-- <el-table-column prop="city" label="淨值比" width="120" />
                 <el-table-column prop="city" label="本益比" width="120" />
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
+        <el-button @click="onAdd" style="margin-top: 10px"><i class="el-icon-edit"></i>&nbsp;編輯自選股</el-button>
         <FormCost ref="childFormCost" />
         <FormPolicy ref="childFormPolicy" />
     </div>
