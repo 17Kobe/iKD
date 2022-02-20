@@ -83,7 +83,7 @@ export default {
                     default_limit_desc: '以下',
                 },
                 {
-                    value: 'kd_turn',
+                    value: 'kd_turn_up',
                     label: '週 KD 往上轉折',
                     default_limit: 40,
                     default_limit_desc: '以下',
@@ -115,7 +115,7 @@ export default {
                     default_limit_desc: '以上',
                 },
                 {
-                    value: 'kd_turn',
+                    value: 'kd_turn_down',
                     label: '週 KD 往下轉折',
                     default_limit: 80,
                     default_limit_desc: '以上',
@@ -139,13 +139,13 @@ export default {
                 //     default_limit_desc: '',
                 // },
                 {
-                    value: 'Option6',
+                    value: 'take_profit',
                     label: '停利',
                     default_limit: '10',
                     default_limit_desc: '%',
                 },
                 {
-                    value: 'Option7',
+                    value: 'stop_loss',
                     label: '停損',
                     default_limit: '10',
                     default_limit_desc: '%',

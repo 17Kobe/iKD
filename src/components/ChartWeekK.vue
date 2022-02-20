@@ -249,16 +249,21 @@ export default {
     },
     computed: {
         ohlc() {
-            console.log(this.stockData);
-            return this.stockData.map((value) => [value[0], value[1], value[2], value[3], value[4]]);
+            console.log(this.stockDataOfPrice);
+            return this.stockDataOfPrice.map((value) => [value[0], value[1], value[2], value[3], value[4]]);
         },
 
         // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
         stockData() {
+            return this.$store.getters.getStock(this.parentData);
+        },
+        stockDataOfPrice() {
+            console.log('stockDataOfPrice');
+            // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             return (
-                (this.parentData.data_weekly &&
-                    this.parentData.data_weekly.map((value) => [
+                (this.stockData.data_weekly &&
+                    this.stockData.data_weekly.map((value) => [
                         moment(value[0]).valueOf(),
                         value[1],
                         value[2],
@@ -268,7 +273,7 @@ export default {
                 []
             );
         },
-
+        //
         options() {
             const options = Object.assign(this.chartOptions, {});
             console.log('==================');

@@ -296,6 +296,10 @@ const stock = {
     getters: {
         // object of array to filter
         getStock: (state) => (id) => _.find(state.stockList, ['id', id]),
+
+        // kd 一定要去直取 policy，而非取 stock，才能Policy有改有連動
+        // getStockPolicy: (state, getters) => (id) => _.has(getters.getStock(id), 'policy') ? getters.getStock(id).policy : null,
+        // _.has(_.find(state.stockList, ['id', id]), 'policy') ? _.find(state.stockList, ['id', id]).policy : null,
     },
 };
 

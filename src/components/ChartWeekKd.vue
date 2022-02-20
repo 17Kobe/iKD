@@ -190,13 +190,25 @@ export default {
                     {
                         plotLines: [
                             {
-                                color: 'red',
+                                color: '#ff9494', // 黃金交叉
                                 dashStyle: 'LongDash',
-                                value: 20,
+                                value: 30,
                                 width: 1,
                             },
                             {
-                                color: 'green',
+                                color: 'red', // 黃金轉折
+                                dashStyle: 'LongDash',
+                                value: 30,
+                                width: 1,
+                            },
+                            {
+                                color: 'green', // 死亡交叉
+                                dashStyle: 'LongDash',
+                                value: 90,
+                                width: 1,
+                            },
+                            {
+                                color: '#76dc43', // 死亡轉折
                                 dashStyle: 'LongDash',
                                 value: 80,
                                 width: 1,
@@ -251,23 +263,67 @@ export default {
     computed: {
         // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
         k() {
-            return this.stockData.map((value) => [value[0], value[1]]);
+            return this.stockDataOfPrice.map((value) => [value[0], value[1]]);
         },
         d() {
-            return this.stockData.map((value) => [value[0], value[2]]);
+            return this.stockDataOfPrice.map((value) => [value[0], value[2]]);
         },
         stockData() {
+            console.log('stockData');
+            // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            return this.$store.getters.getStock(this.parentData);
+        },
+
+        stockDataOfPrice() {
+            console.log('stockDataOfPrice');
+            // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             return (
-                (this.parentData.data_weekly_kd &&
-                    this.parentData.data_weekly_kd.map((value) => [moment(value[0]).valueOf(), value[1], value[2]])) ||
+                (this.stockData.data_weekly_kd &&
+                    this.stockData.data_weekly_kd.map((value) => [moment(value[0]).valueOf(), value[1], value[2]])) ||
                 []
             );
         },
+
         kdGoldLimit() {
-            let ret = null;
-            if (_.has(this.parentData, 'policy.buy')) {
-                const found = _.find(this.parentData.policy.buy, ['method', 'kd_gold']);
+            // 黃金交叉，值要畫橫線
+            console.log('kdGoldLimit');
+            let ret = -999; // 讓他畫線畫在看到到的地方
+            if (_.has(this.stockData, 'policy.buy')) {
+                const found = _.find(this.stockData.policy.buy, ['method', 'kd_gold']);
+                if (found) ret = found.limit; // 若非 nundefined
+            }
+            console.log(ret);
+            return ret;
+        },
+        kdTurnUpLmit() {
+            // 黃金轉折，值要畫橫線
+            console.log('kdGoldTurn');
+            let ret = -999; // 讓他畫線畫在看到到的地方
+            if (_.has(this.stockData, 'policy.buy')) {
+                const found = _.find(this.stockData.policy.buy, ['method', 'kd_turn_up']);
+                if (found) ret = found.limit; // 若非 nundefined
+            }
+            console.log(ret);
+            return ret;
+        },
+        kdDeadLimit() {
+            // 死亡交叉，值要畫橫線
+            console.log('kdDeadLimit');
+            let ret = -999; // 讓他畫線畫在看到到的地方
+            if (_.has(this.stockData, 'policy.sell')) {
+                const found = _.find(this.stockData.policy.sell, ['method', 'kd_dead']);
+                if (found) ret = found.limit; // 若非 nundefined
+            }
+            console.log(ret);
+            return ret;
+        },
+        kdTurnDownLmit() {
+            // 死亡交叉，值要畫橫線
+            console.log('kdTurnUpLmit');
+            let ret = -999; // 讓他畫線畫在看到到的地方
+            if (_.has(this.stockData, 'policy.sell')) {
+                const found = _.find(this.stockData.policy.sell, ['method', 'kd_turn_down']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
             console.log(ret);
@@ -280,6 +336,12 @@ export default {
 
             options.series[0].data = this.k;
             options.series[1].data = this.d;
+
+            console.log(options.yAxis[0].plotLines[0].value);
+            options.yAxis[0].plotLines[0].value = this.kdGoldLimit;
+            options.yAxis[0].plotLines[1].value = this.kdTurnUpLmit;
+            options.yAxis[0].plotLines[2].value = this.kdDeadLimit;
+            options.yAxis[0].plotLines[3].value = this.kdTurnDownLmit;
             return options;
         },
     },
