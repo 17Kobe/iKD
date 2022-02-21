@@ -62,7 +62,7 @@ export default {
     methods: {
         remoteMethod(query) {
             if (query) {
-                console.log(query);
+                // console.log(query);
 
                 this.loading = true;
                 // const found = _.filter(this.taiwanStockList, { stock_id: query }); // found 是 array
@@ -72,12 +72,15 @@ export default {
                 );
 
                 this.loading = false;
-                this.stockList = [];
+                const optionList = [];
                 found.forEach((item) => {
-                    console.log(item);
-                    this.stockList.push({ label: item.stock_name, value: item.stock_id });
+                    // console.log(item);
+                    optionList.push({ label: item.stock_name, value: item.stock_id });
                 });
+                // 因為同一公司，可能屬不同產業，但同一個代碼，所以要過濾掉
+                this.stockList = _.uniqBy(optionList, 'value');
 
+                // console.log(this.stockList);
                 // this.stockList = [
                 //     { label: 'aaa', value: 'aaa' },
                 //     { label: 'aa', value: 'aa' },

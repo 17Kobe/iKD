@@ -208,6 +208,7 @@ const stock = {
                     if (_.has(res, 'data.data') && res.data.data.length > 0) {
                         state.taiwanStockList.push(...res.data.data);
                     }
+                    // 因為同一公司，可能屬不同產業，但同一個代碼，所以要過濾掉
                 })
                 // 失敗
                 .catch((err) => {
