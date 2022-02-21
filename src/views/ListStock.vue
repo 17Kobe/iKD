@@ -175,7 +175,32 @@
                     </el-button>
                 </template>
             </el-table-column>
-            <el-table-column prop="city" label="策略歷史報酬" width="220" align="center" />
+            <el-table-column prop="city" label="策略歷史報酬" width="220" align="center">
+                <div>
+                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">累積報酬率</el-tag>&nbsp;<span
+                        style="color: #4386f5"
+                    ></span>
+                    %
+                </div>
+                <div>
+                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">每回報酬率</el-tag>&nbsp;<span
+                        style="color: #4386f5"
+                    ></span>
+                    %
+                </div>
+                <div>
+                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">年化報酬率</el-tag>&nbsp;<span
+                        style="color: #4386f5"
+                    ></span>
+                    %
+                </div>
+                <div>
+                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">年均報酬率</el-tag>&nbsp;<span
+                        style="color: #4386f5"
+                    ></span>
+                    %
+                </div>
+            </el-table-column>
             <!-- <el-table-column prop="city" label="功能" width="220" align="center">
                 <el-button type="danger" @click="onDel()"><i class="el-icon-minus"></i></el-button>
             </el-table-column> -->

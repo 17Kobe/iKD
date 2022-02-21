@@ -1,5 +1,13 @@
 <template>
-    <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="70%">
+    <el-drawer
+        :title="title"
+        @opened="onOpend()"
+        @closed="onClosed()"
+        v-model="isShow"
+        :show-close="true"
+        direction="rtl"
+        size="70%"
+    >
         <el-form ref="form" :model="form" label-width="60px">
             <el-form-item>
                 <el-select
@@ -7,9 +15,10 @@
                     filterable
                     remote
                     reserve-keyword
-                    placeholder="輸入股票代碼"
+                    placeholder="輸入股票名稱 或 代號"
                     :remote-method="remoteMethod"
                     :loading="loading"
+                    ref="search"
                 >
                     <el-option v-for="item in stockList" :key="item.value" :label="item.label" :value="item.value"> </el-option>
                 </el-select>
@@ -29,7 +38,7 @@ export default {
     data() {
         return {
             isShow: false,
-            title: '設定自選股',
+            title: '新增自選股',
 
             stockId: '',
             loading: false,
@@ -57,7 +66,10 @@ export default {
 
                 this.loading = true;
                 // const found = _.filter(this.taiwanStockList, { stock_id: query }); // found 是 array
-                const found = _.filter(this.taiwanStockList, (o) => o.stock_id.indexOf(query) > -1);
+                const found = _.filter(
+                    this.taiwanStockList,
+                    (o) => o.stock_id.indexOf(query) > -1 || o.stock_name.indexOf(query) > -1
+                );
 
                 this.loading = false;
                 this.stockList = [];
@@ -79,21 +91,11 @@ export default {
             console.log('onAdd');
             console.log(this.stockId);
             console.log(this.stockList);
-            const found = _.find(this.stockList, ['value', this.stockId]);
-            // => object for 'fred'
-            this.$store.commit('SAVE_A_STOCK', { name: found.label, id: found.value });
-        },
-        onChangeCost(e, index) {
-            console.log('onChangeCost');
-            // 加 parseFloat就要是要把字串變float，存在 the.form裡面
-            // 一定要搭配type="number"，否則小數點.會輸入不出來
-            this.form[index].cost = Number(e.target.value);
-        },
-        onChangeNumber(e, index) {
-            console.log('onChangeNumber');
-            // 用 change 事件一樣會偵測不到，要用 keyup 事件才能在有按鍵輸入時即時反應值，
-            //  e.target.value 是字串，要變整數。並且要給10才不會 eslint
-            this.form[index].number = parseInt(e.target.value, 10);
+
+            // 需要判斷是不存在，不能是空的才能加入
+            // 選到的
+            const selected = _.find(this.stockList, ['value', this.stockId]);
+            this.$store.commit('SAVE_A_STOCK', { name: selected.label, id: selected.value });
         },
         onDel(index) {
             this.form.splice(index, 1);
@@ -112,9 +114,12 @@ export default {
 
             // console.log(this.stockData);
             // console.log(stockId);
-            // // this.$nextTick(() => {
-            // // this.$refs.cost0[0].focus();
-            // // });
+        },
+        onOpend() {
+            // set focus 要寫在這不能寫在 onInit，否則會影響動畫lag
+            this.$nextTick(() => {
+                this.$refs.search.focus();
+            });
         },
         onClosed() {
             // console.log(this.form);
