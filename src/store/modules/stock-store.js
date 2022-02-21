@@ -57,6 +57,7 @@ const defaultState = {
         //     id: '00635U',
         // },
     ],
+    taiwanStockList: [],
 };
 
 const stock = {
@@ -92,6 +93,15 @@ const stock = {
             // console.log(data);
             state.stockList = data;
             // console.log(state.currStockDayData);
+        },
+        SAVE_A_STOCK(state, data) {
+            // data 是 object {name: XXX, id: XXX}
+            console.log('SAVE_A_STOCK');
+            // console.log(data);
+            state.stockList.push(data);
+            // console.log(state.currStockDayData);
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            this.commit('SAVE_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
         SAVE_STOCK_STAR(state, { stockId, star }) {
             console.log(stockId);
@@ -133,6 +143,28 @@ const stock = {
 
             // save to localstorage
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
+        },
+        SAVE_TAIWAN_STOCK(state) {
+            console.log('SAVE_TAIWAN_STOCK');
+
+            axios
+                .get('https://api.finmindtrade.com/api/v4/data', {
+                    params: {
+                        dataset: 'TaiwanStockInfo',
+                        token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
+                    },
+                })
+                // 成功
+                .then((res) => {
+                    state.taiwanStockList = [];
+                    if (_.has(res, 'data.data') && res.data.data.length > 0) {
+                        state.taiwanStockList.push(...res.data.data);
+                    }
+                })
+                // 失敗
+                .catch((err) => {
+                    console.log(err);
+                });
         },
         SAVE_STOCK_PRICE(state) {
             console.log('SAVE_STOCK_PRICE');

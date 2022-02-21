@@ -183,9 +183,10 @@
                 <el-table-column prop="city" label="本益比" width="120" />
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
-        <el-button style="margin-top: 10px"><i class="el-icon-edit"></i>&nbsp;新增自選股</el-button>
+        <el-button style="margin-top: 10px" @click="doShowSearch()"><i class="el-icon-edit"></i>&nbsp;新增自選股</el-button>
         <FormCost ref="childFormCost" />
         <FormPolicy ref="childFormPolicy" />
+        <FormSearch ref="childFormSearch" />
     </div>
 </template>
 
@@ -194,12 +195,13 @@ import ChartWeekKd from '../components/ChartWeekKd.vue';
 import ChartWeekK from '../components/ChartWeekK.vue';
 import FormCost from '../components/FormCost.vue';
 import FormPolicy from '../components/FormPolicy.vue';
+import FormSearch from '../components/FormSearch.vue';
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 
 export default {
     name: 'component-list',
-    components: { ChartWeekKd, ChartWeekK, FormCost, FormPolicy },
+    components: { ChartWeekKd, ChartWeekK, FormCost, FormPolicy, FormSearch },
     data() {
         return {
             rateOfReturn: 0,
@@ -236,6 +238,7 @@ export default {
         // 在 mounted() 事件時就可以發送，因為此時不須 data 及 computed 資料都準備好(因為沒有要data 參數，在create())
 
         this.$store.commit('SAVE_STOCK_PRICE');
+        this.$store.commit('SAVE_TAIWAN_STOCK');
     },
     methods: {
         getDifference(array1, array2) {
@@ -256,6 +259,13 @@ export default {
             // 父傳一堆變數給子也不太好
             // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
             this.$refs.childFormPolicy.onInit(id);
+        },
+        doShowSearch() {
+            // console.log(this.$refs);
+            // 父改子去顯示 drawer 變數 不好，子要被改值
+            // 父傳一堆變數給子也不太好
+            // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
+            this.$refs.childFormSearch.onInit();
         },
         getReturn(sum, close, total) {
             return Number((close * total - sum).toFixed(2)).toLocaleString('en-US');
