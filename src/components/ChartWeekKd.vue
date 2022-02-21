@@ -71,6 +71,11 @@ export default {
                             hover: {
                                 enabled: false,
                             },
+                            // disable fading series on marker hover
+                            // https://stackoverflow.com/questions/55595123/highcharts-disable-fading-series-on-marker-hover/55595271
+                            inactive: {
+                                opacity: 1,
+                            },
                         },
                     },
                 },
@@ -135,6 +140,8 @@ export default {
                     formatter() {
                         let str = '<div>';
                         const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+                        console.log(this.points);
+                        // 在畫買賣訊號有可能沒有 points，是 undefined
                         this.points.forEach((point, index) => {
                             // const fontColor = point.y > point.point.open ? '#ee3333' : '#01aa00';
                             if (index === 0) {
@@ -249,12 +256,37 @@ export default {
                 ],
                 series: [
                     {
+                        marker: {
+                            symbol: 'square',
+                        },
                         name: 'K線',
                         color: '#4286f5',
                     },
                     {
                         name: 'D線',
                         color: '#e75c9a',
+                    },
+                    {
+                        type: 'scatter',
+
+                        color: 'rgba(223, 83, 83, 0.9',
+
+                        marker: {
+                            symbol: 'circle',
+                        },
+                        // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
+                        enableMouseTracking: false,
+                    },
+                    {
+                        type: 'scatter',
+
+                        color: 'rgba(82, 157, 1, 0.9',
+
+                        marker: {
+                            symbol: 'circle',
+                        },
+                        // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
+                        enableMouseTracking: false,
                     },
                 ],
             },
@@ -281,6 +313,33 @@ export default {
             return (
                 (this.stockData.data_weekly_kd &&
                     this.stockData.data_weekly_kd.map((value) => [moment(value[0]).valueOf(), value[1], value[2]])) ||
+                []
+            );
+        },
+
+        stockDataOfPolicyResultBuy() {
+            console.log('stockDataOfPolicyResultBuy');
+            // console.log(this.stockDataOfPolicy);
+            // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            return (
+                (this.stockData.policy_result &&
+                    _.filter(this.stockData.policy_result, (o) => o.result === '買進').map((obj) => [
+                        moment(obj.date).valueOf(),
+                        obj.k,
+                    ])) ||
+                []
+            );
+        },
+        stockDataOfPolicyResultSell() {
+            console.log('stockDataOfPolicyResultBuy');
+            // console.log(this.stockDataOfPolicy);
+            // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            return (
+                (this.stockData.policy_result &&
+                    _.filter(this.stockData.policy_result, (o) => o.result === '賣出').map((obj) => [
+                        moment(obj.date).valueOf(),
+                        obj.k,
+                    ])) ||
                 []
             );
         },
@@ -336,6 +395,8 @@ export default {
 
             options.series[0].data = this.k;
             options.series[1].data = this.d;
+            options.series[2].data = this.stockDataOfPolicyResultBuy;
+            options.series[3].data = this.stockDataOfPolicyResultSell;
 
             console.log(options.yAxis[0].plotLines[0].value);
             options.yAxis[0].plotLines[0].value = this.kdGoldLimit;
