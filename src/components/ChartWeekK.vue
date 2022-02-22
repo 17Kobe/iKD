@@ -1,12 +1,18 @@
 <template>
-    <div>
+    <div style="position: relative">
         <!-- {{ parentData.at(-1).close }} -->
         <highcharts
             :constructorType="'stockChart'"
-            :options="options"
+            :options="chartOptions"
             style="position: relative; top: 8px; background: transparent"
         >
         </highcharts>
+        <!-- <div
+            style="position: absolute; top: 84px; left: 115px; font-size: 12px"
+            v-if="stockDataOfPrice && stockDataOfPrice.length > 0"
+        >
+            <span style="color: #834beb">股價</span>: {{ stockDataOfPrice.at(-1)[1].toFixed(2) }}
+        </div> -->
         <!-- :updateArgs="[true, true, true]" -->
     </div>
 </template>
@@ -42,8 +48,36 @@ export default {
     components: { highcharts: Chart },
     props: ['parentData'],
     data() {
-        return {
-            chartOptions: {
+        return {};
+    },
+    computed: {
+        ohlc() {
+            console.log(this.stockDataOfPrice);
+            return this.stockDataOfPrice.map((value) => [value[0], value[1], value[2], value[3], value[4]]);
+        },
+
+        // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
+        stockData() {
+            return this.$store.getters.getStock(this.parentData);
+        },
+        stockDataOfPrice() {
+            console.log('stockDataOfPrice');
+            // console.log(this.stockDataOfPolicy);
+            // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            return (
+                (this.stockData.data_weekly &&
+                    this.stockData.data_weekly.map((value) => [
+                        moment(value[0]).valueOf(),
+                        value[1],
+                        value[2],
+                        value[3],
+                        value[4],
+                    ])) ||
+                []
+            );
+        },
+        chartOptions() {
+            return {
                 chart: {
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
                     height: 100,
@@ -235,51 +269,16 @@ export default {
                         name: 'K線',
                         id: 'aapl',
                         zIndex: 2,
-                        data: [],
                         dataGrouping: {
                             // anchor: 'end',
                             // firstAnchor: 'end',
                             lastAnchor: 'lastPoint',
                             units: [['day', [1]]],
                         },
+                        data: this.ohlc,
                     },
                 ],
-            },
-        };
-    },
-    computed: {
-        ohlc() {
-            console.log(this.stockDataOfPrice);
-            return this.stockDataOfPrice.map((value) => [value[0], value[1], value[2], value[3], value[4]]);
-        },
-
-        // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
-        stockData() {
-            return this.$store.getters.getStock(this.parentData);
-        },
-        stockDataOfPrice() {
-            console.log('stockDataOfPrice');
-            // console.log(this.stockDataOfPolicy);
-            // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            return (
-                (this.stockData.data_weekly &&
-                    this.stockData.data_weekly.map((value) => [
-                        moment(value[0]).valueOf(),
-                        value[1],
-                        value[2],
-                        value[3],
-                        value[4],
-                    ])) ||
-                []
-            );
-        },
-        //
-        options() {
-            const options = Object.assign(this.chartOptions, {});
-            console.log('==================');
-
-            options.series[0].data = this.ohlc;
-            return options;
+            };
         },
     },
     created() {},

@@ -7,7 +7,7 @@
             style="position: relative; top: 8px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 85px; left: 97px; font-size: 12px" v-if="k && k.length > 0">
+        <div style="position: absolute; top: 84px; left: 97px; font-size: 12px" v-if="k && k.length > 0">
             <span style="color: #4286f5">K</span>: {{ k.at(-1)[1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
             {{ d.at(-1)[1].toFixed(2) }}
         </div>
@@ -273,7 +273,7 @@ export default {
                                 // 取得該股價並且顯示
                                 str += `<span style="color: #e75c9a; font-weight:bold;">D</span>: ${Number(
                                     point.y.toFixed(2)
-                                )}<br><span style="color: #ee4d2d; font-weight:bold;">股價</span>: ${found[4]}
+                                )}<br><span style="color: #834beb; font-weight:bold;">股價</span>: ${found[4]}
                                 </div>`;
                             }
                         });
