@@ -8,10 +8,10 @@
         direction="rtl"
         size="70%"
     >
-        <el-form ref="form" :model="form" label-width="60px">
-            <el-form-item>
+        <el-form ref="form" :rules="rules" :model="form" label-width="60px">
+            <el-form-item prop="stockId">
                 <el-select
-                    v-model="stockId"
+                    v-model="form.stockId"
                     filterable
                     remote
                     reserve-keyword
@@ -20,7 +20,8 @@
                     :loading="loading"
                     ref="search"
                 >
-                    <el-option v-for="item in stockList" :key="item.value" :label="item.label" :value="item.value"> </el-option>
+                    <el-option v-for="item in stockOptions" :key="item.value" :label="item.label" :value="item.value">
+                    </el-option>
                 </el-select>
             </el-form-item>
             <el-form-item>
@@ -36,26 +37,45 @@ import _ from 'lodash';
 export default {
     name: 'component-form-search',
     data() {
+        const validateDuplcate = (rule, value, callback) => {
+            console.log(value);
+
+            if (_.some(this.customStockList, { id: value })) {
+                const selected = _.find(this.stockOptions, ['value', this.form.stockId]);
+                callback(new Error(`${selected.label}(${value}) 已存在!`));
+            } else {
+                callback();
+            }
+        };
         return {
             isShow: false,
             title: '新增自選股',
 
-            stockId: '',
             loading: false,
-            stockList: [],
+            stockOptions: [],
 
             stockData: {},
-            form: [
+            form: {
+                stockId: '',
                 // {
                 //     cost: 0,
                 //     number: 1000,
                 // },
-            ],
+            },
+            rules: {
+                stockId: [
+                    { required: true, message: '輸入股票名稱 或 代號', trigger: 'change' },
+                    { validator: validateDuplcate, trigger: 'change' },
+                ],
+            },
         };
     },
     computed: {
         taiwanStockList() {
             return this.$store.state.stock.taiwanStockList;
+        },
+        customStockList() {
+            return this.$store.state.stock.stockList;
         },
     },
     mounted() {},
@@ -78,7 +98,7 @@ export default {
                     optionList.push({ label: item.stock_name, value: item.stock_id });
                 });
                 // 因為同一公司，可能屬不同產業，但同一個代碼，所以要過濾掉
-                this.stockList = _.uniqBy(optionList, 'value');
+                this.stockOptions = _.uniqBy(optionList, 'value');
 
                 // console.log(this.stockList);
                 // this.stockList = [
@@ -86,19 +106,26 @@ export default {
                 //     { label: 'aa', value: 'aa' },
                 // ];
             } else {
-                this.stockList = [];
+                this.stockOptions = [];
             }
         },
 
         onAdd() {
             console.log('onAdd');
-            console.log(this.stockId);
-            console.log(this.stockList);
+            console.log(this.form.stockId);
+            console.log(this.stockOptions);
 
-            // 需要判斷是不存在，不能是空的才能加入
-            // 選到的
-            const selected = _.find(this.stockList, ['value', this.stockId]);
-            this.$store.commit('SAVE_A_STOCK', { name: selected.label, id: selected.value });
+            this.$refs.form.validate((valid) => {
+                if (valid) {
+                    // 需要判斷是不存在，不能是空的才能加入
+                    // 選到的
+                    const selected = _.find(this.stockOptions, ['value', this.form.stockId]);
+                    this.$store.commit('SAVE_A_STOCK', { name: selected.label, id: selected.value });
+                    return true;
+                }
+                console.log('error submit!!');
+                return false;
+            });
         },
         onDel(index) {
             this.form.splice(index, 1);
