@@ -5,12 +5,35 @@ import { createApp } from 'vue';
 
 import ElementPlus from 'element-plus';
 
-import App from './App.vue';
-import router from './router/router';
-import store from './store/store';
-
 import 'element-plus/lib/theme-chalk/index.css';
 import './index.css';
+
+// 這裡是用局部註冊，而非寫在 main.js 是全局註冊
+import Highcharts from 'highcharts';
+import loadStock from 'highcharts/modules/stock';
+// 參考 https://github.com/weizhenye/vue-highcharts/issues/39
+import loadIndicatorsAll from 'highcharts/indicators/indicators-all';
+// 在這裡一定要用大括號，不然會錯，因為highcharts-vue.js中有命名為 Chart 的export
+
+import store from './store/store';
+import router from './router/router';
+import App from './App.vue';
+
+// 因為 series 是股票圖，所以要導入 stock 模組，才能有 type: 'candlestick'
+loadStock(Highcharts);
+loadIndicatorsAll(Highcharts);
+
+// highcharts 全域設定
+Highcharts.setOptions({
+    lang: { rangeSelectorZoom: '' }, // 不顯示 'zoom' 文字
+    global: {
+        useUTC: false,
+    },
+    credits: {
+        // 將 highchart credit 圖最下方超連結隱藏
+        enabled: false,
+    },
+});
 
 // 建立 vue 的實體物件並指定至 app
 const app = createApp(App);

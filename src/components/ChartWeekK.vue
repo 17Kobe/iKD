@@ -18,31 +18,9 @@
 </template>
 
 <script>
-// 這裡是用局部註冊，而非寫在 main.js 是全局註冊
-import Highcharts from 'highcharts';
-import loadStock from 'highcharts/modules/stock';
-// 參考 https://github.com/weizhenye/vue-highcharts/issues/39
-import loadIndicatorsAll from 'highcharts/indicators/indicators-all';
-// 在這裡一定要用大括號，不然會錯，因為highcharts-vue.js中有命名為 Chart 的export
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
 import _ from 'lodash';
-
-// 因為 series 是股票圖，所以要導入 stock 模組，才能有 type: 'candlestick'
-loadStock(Highcharts);
-loadIndicatorsAll(Highcharts);
-
-// highcharts 全域設定
-Highcharts.setOptions({
-    lang: { rangeSelectorZoom: '' }, // 不顯示 'zoom' 文字
-    global: {
-        useUTC: false,
-    },
-    credits: {
-        // 將 highchart credit 圖最下方超連結隱藏
-        enabled: false,
-    },
-});
 
 export default {
     components: { highcharts: Chart },
