@@ -82,8 +82,8 @@ export default {
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             return (
-                (this.stockData.policy_result &&
-                    _.filter(this.stockData.policy_result, (o) => o.result === '買進').map((obj) => [
+                (_.has(this.stockData, 'policy.result') &&
+                    _.filter(this.stockData.policy.result, (o) => o.result === '買進').map((obj) => [
                         moment(obj.date).valueOf(),
                         obj.k,
                     ])) ||
@@ -95,8 +95,8 @@ export default {
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             return (
-                (this.stockData.policy_result &&
-                    _.filter(this.stockData.policy_result, (o) => o.result === '賣出').map((obj) => [
+                (_.has(this.stockData, 'policy.result') &&
+                    _.filter(this.stockData.policy.result, (o) => o.result === '賣出').map((obj) => [
                         moment(obj.date).valueOf(),
                         obj.k,
                     ])) ||
@@ -108,8 +108,8 @@ export default {
             // 黃金交叉，值要畫橫線
             console.log('kdGoldLimit');
             let ret = -999; // 讓他畫線畫在看到到的地方
-            if (_.has(this.stockData, 'policy.buy')) {
-                const found = _.find(this.stockData.policy.buy, ['method', 'kd_gold']);
+            if (_.has(this.stockData, 'policy.settings.buy')) {
+                const found = _.find(this.stockData.policy.settings.buy, ['method', 'kd_gold']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
             console.log(ret);
@@ -119,8 +119,8 @@ export default {
             // 黃金轉折，值要畫橫線
             console.log('kdGoldTurn');
             let ret = -999; // 讓他畫線畫在看到到的地方
-            if (_.has(this.stockData, 'policy.buy')) {
-                const found = _.find(this.stockData.policy.buy, ['method', 'kd_turn_up']);
+            if (_.has(this.stockData, 'policy.settings.buy')) {
+                const found = _.find(this.stockData.policy.settings.buy, ['method', 'kd_turn_up']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
             console.log(ret);
@@ -130,8 +130,8 @@ export default {
             // 死亡交叉，值要畫橫線
             console.log('kdDeadLimit');
             let ret = -999; // 讓他畫線畫在看到到的地方
-            if (_.has(this.stockData, 'policy.sell')) {
-                const found = _.find(this.stockData.policy.sell, ['method', 'kd_dead']);
+            if (_.has(this.stockData, 'policy.settings.sell')) {
+                const found = _.find(this.stockData.policy.settings.sell, ['method', 'kd_dead']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
             console.log(ret);
@@ -141,8 +141,8 @@ export default {
             // 死亡交叉，值要畫橫線
             console.log('kdTurnUpLmit');
             let ret = -999; // 讓他畫線畫在看到到的地方
-            if (_.has(this.stockData, 'policy.sell')) {
-                const found = _.find(this.stockData.policy.sell, ['method', 'kd_turn_down']);
+            if (_.has(this.stockData, 'policy.settings.sell')) {
+                const found = _.find(this.stockData.policy.settings.sell, ['method', 'kd_turn_down']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
             console.log(ret);

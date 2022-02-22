@@ -262,7 +262,7 @@ export default {
 
             console.log(this.stockData);
 
-            if (_.has(this.stockData, 'policy')) this.form = this.stockData.policy;
+            if (_.has(this.stockData, 'policy.settings')) this.form = this.stockData.policy.settings;
 
             console.log(this.stockData);
             console.log(stockId);

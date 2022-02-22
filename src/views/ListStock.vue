@@ -137,17 +137,23 @@
                         size="small"
                         @click="doShowPolicy(scope.row.id)"
                         :style="[
-                            scope.row.policy && (scope.row.policy.buy.length >= 1 || scope.row.policy.sell.length >= 1)
+                            scope.row.policy &&
+                            scope.row.policy.settings &&
+                            (scope.row.policy.settings.buy.length >= 1 || scope.row.policy.settings.sell.length >= 1)
                                 ? { width: '220px' }
                                 : {},
                             { 'text-align': 'left', 'line-height': '18px' },
                         ]"
                     >
                         <div
-                            v-if="scope.row.policy && (scope.row.policy.buy.length >= 1 || scope.row.policy.sell.length >= 1)"
+                            v-if="
+                                scope.row.policy &&
+                                scope.row.policy.settings &&
+                                (scope.row.policy.settings.buy.length >= 1 || scope.row.policy.settings.sell.length >= 1)
+                            "
                             style="font-size: 14px"
                         >
-                            <div v-for="(item, index) in scope.row.policy.buy" :key="index">
+                            <div v-for="(item, index) in scope.row.policy.settings.buy" :key="index">
                                 <div>
                                     <el-tag class="ml-2" type="danger" size="small" style="margin: 1px 0px">買</el-tag>
                                     <span style="font-size: 12px">
@@ -156,7 +162,7 @@
                                     >
                                 </div>
                             </div>
-                            <div v-for="(item, index) in scope.row.policy.sell" :key="index">
+                            <div v-for="(item, index) in scope.row.policy.settings.sell" :key="index">
                                 <div>
                                     <el-tag class="ml-2" type="success" size="small" style="margin: 1px 0px">賣</el-tag>
                                     <span style="font-size: 12px">

@@ -16,10 +16,10 @@ const defaultState = {
         //     name: '聯發科',
         //     id: '2454',
         // },
-        {
-            name: '大立光',
-            id: '3008',
-        },
+        // {
+        //     name: '大立光',
+        //     id: '3008',
+        // },
         // {
         //     name: '台達電',
         //     id: '2308',
@@ -145,59 +145,64 @@ const stock = {
 
             // object of array 去 find 並 update
             const found = state.stockList.find((v) => v.id === stockId);
-            found.policy = {};
-            found.policy = policyList; // 複製數據複本
+            found.policy = { settings: {} };
+            found.policy.settings = policyList; // 複製數據複本
 
             // save to localstorage
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
         },
         SAVE_STOCK_POLICY_RESULT(state, stockId) {
-            console.log(stockId);
+            console.log('SAVE_STOCK_POLICY_RESULT');
 
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
 
             // 黃金交叉、死亡交叉
             const policyResult = [];
-            const foundKdGold = _.find(foundStock.policy.buy, ['method', 'kd_gold']);
-            const foundKdDead = _.find(foundStock.policy.sell, ['method', 'kd_dead']);
 
-            let kdGoldReady = false;
-            let kdDeadReady = false;
-            foundStock.data_weekly_kd.forEach((item) => {
-                const k = item[1];
-                const d = item[2];
-                // 黃金交叉 買進訊號
-                if (foundKdGold) {
-                    if (k < d) {
-                        kdGoldReady = true;
-                    }
-                    if (k <= foundKdGold.limit && k >= d && kdGoldReady) {
-                        // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
-                        policyResult.push({ date: item[0], result: '買進', mehtod: 'kd_gold', k });
-                        kdGoldReady = false;
-                    }
-                }
-                // 死亡交叉 賣出訊號
-                if (foundKdDead) {
-                    if (k > d) {
-                        kdDeadReady = true;
-                    }
-                    if (k >= foundKdDead.limit && k <= d && kdDeadReady) {
-                        // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
-                        policyResult.push({ date: item[0], result: '賣出', mehtod: 'kd_dead', k });
-                        kdDeadReady = false;
-                    }
-                }
-                console.log(item);
-            });
+            console.log(foundStock);
+            if (_.has(foundStock, 'policy.settings.buy') && _.has(foundStock, 'policy.settings.sell')) {
+                console.log('SAVE_STOCK_POLICY_RESULT foundStock');
+                const foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
+                const foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
 
-            foundStock.policy_result = [];
-            foundStock.policy_result.push(...policyResult);
+                let kdGoldReady = false;
+                let kdDeadReady = false;
+                foundStock.data_weekly_kd.forEach((item) => {
+                    const k = item[1];
+                    const d = item[2];
+                    // 黃金交叉 買進訊號
+                    if (foundKdGold) {
+                        if (k < d) {
+                            kdGoldReady = true;
+                        }
+                        if (k <= foundKdGold.limit && k >= d && kdGoldReady) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            policyResult.push({ date: item[0], result: '買進', mehtod: 'kd_gold', k });
+                            kdGoldReady = false;
+                        }
+                    }
+                    // 死亡交叉 賣出訊號
+                    if (foundKdDead) {
+                        if (k > d) {
+                            kdDeadReady = true;
+                        }
+                        if (k >= foundKdDead.limit && k <= d && kdDeadReady) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            policyResult.push({ date: item[0], result: '賣出', mehtod: 'kd_dead', k });
+                            kdDeadReady = false;
+                        }
+                    }
+                    console.log(item);
+                });
 
-            // save to localstorage
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+                foundStock.policy.result = [];
+                foundStock.policy.result.push(...policyResult);
+
+                // save to localstorage
+                localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            }
         },
         SAVE_TAIWAN_STOCK(state) {
             console.log('SAVE_TAIWAN_STOCK');
