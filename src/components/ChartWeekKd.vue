@@ -1,12 +1,17 @@
 <template>
-    <div>
+    <div style="position: relative">
         <!-- {{ parentData.at(-1).close }} -->
         <highcharts
             :constructorType="'stockChart'"
-            :options="options"
+            :options="chartOptions"
             style="position: relative; top: 8px; background: transparent"
         >
         </highcharts>
+        <div style="position: absolute; top: 85px; left: 97px; font-size: 12px" v-if="k && k.length > 0">
+            <span style="color: #4286f5">K</span>: {{ k.at(-1)[1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
+            {{ d.at(-1)[1].toFixed(2) }}
+        </div>
+
         <!-- :updateArgs="[true, true, true]" -->
     </div>
 </template>
@@ -43,7 +48,111 @@ export default {
     props: ['parentData'],
     data() {
         return {
-            chartOptions: {
+            // chartOptions: {
+            // },
+        };
+    },
+    computed: {
+        // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
+        k() {
+            return this.stockDataOfKdPrice.map((value) => [value[0], value[1]]);
+        },
+        d() {
+            return this.stockDataOfKdPrice.map((value) => [value[0], value[2]]);
+        },
+        stockData() {
+            console.log('stockData');
+            // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            return this.$store.getters.getStock(this.parentData);
+        },
+
+        stockDataOfKdPrice() {
+            console.log('stockDataOfKdPrice');
+            // console.log(this.stockDataOfPolicy);
+            // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            return (
+                (this.stockData.data_weekly_kd &&
+                    this.stockData.data_weekly_kd.map((value) => [moment(value[0]).valueOf(), value[1], value[2]])) ||
+                []
+            );
+        },
+
+        stockDataOfPolicyResultBuy() {
+            console.log('stockDataOfPolicyResultBuy');
+            // console.log(this.stockDataOfPolicy);
+            // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            return (
+                (this.stockData.policy_result &&
+                    _.filter(this.stockData.policy_result, (o) => o.result === '買進').map((obj) => [
+                        moment(obj.date).valueOf(),
+                        obj.k,
+                    ])) ||
+                []
+            );
+        },
+        stockDataOfPolicyResultSell() {
+            console.log('stockDataOfPolicyResultBuy');
+            // console.log(this.stockDataOfPolicy);
+            // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            return (
+                (this.stockData.policy_result &&
+                    _.filter(this.stockData.policy_result, (o) => o.result === '賣出').map((obj) => [
+                        moment(obj.date).valueOf(),
+                        obj.k,
+                    ])) ||
+                []
+            );
+        },
+
+        kdGoldLimit() {
+            // 黃金交叉，值要畫橫線
+            console.log('kdGoldLimit');
+            let ret = -999; // 讓他畫線畫在看到到的地方
+            if (_.has(this.stockData, 'policy.buy')) {
+                const found = _.find(this.stockData.policy.buy, ['method', 'kd_gold']);
+                if (found) ret = found.limit; // 若非 nundefined
+            }
+            console.log(ret);
+            return ret;
+        },
+        kdTurnUpLmit() {
+            // 黃金轉折，值要畫橫線
+            console.log('kdGoldTurn');
+            let ret = -999; // 讓他畫線畫在看到到的地方
+            if (_.has(this.stockData, 'policy.buy')) {
+                const found = _.find(this.stockData.policy.buy, ['method', 'kd_turn_up']);
+                if (found) ret = found.limit; // 若非 nundefined
+            }
+            console.log(ret);
+            return ret;
+        },
+        kdDeadLimit() {
+            // 死亡交叉，值要畫橫線
+            console.log('kdDeadLimit');
+            let ret = -999; // 讓他畫線畫在看到到的地方
+            if (_.has(this.stockData, 'policy.sell')) {
+                const found = _.find(this.stockData.policy.sell, ['method', 'kd_dead']);
+                if (found) ret = found.limit; // 若非 nundefined
+            }
+            console.log(ret);
+            return ret;
+        },
+        kdTurnDownLmit() {
+            // 死亡交叉，值要畫橫線
+            console.log('kdTurnUpLmit');
+            let ret = -999; // 讓他畫線畫在看到到的地方
+            if (_.has(this.stockData, 'policy.sell')) {
+                const found = _.find(this.stockData.policy.sell, ['method', 'kd_turn_down']);
+                if (found) ret = found.limit; // 若非 nundefined
+            }
+            console.log(ret);
+            return ret;
+        },
+
+        chartOptions() {
+            // component 參考 https://stackoverflow.com/questions/68381856/how-to-access-highcharts-stock-tooltip-data-in-vue
+            const component = this;
+            return {
                 chart: {
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
                     height: 100,
@@ -154,9 +263,18 @@ export default {
                                     point.y.toFixed(2)
                                 )} `;
                             } else if (index === 1) {
+                                console.log(point.point.index);
+
+                                const found = _.find(
+                                    component.stockData.data_weekly,
+                                    (array) => array[0] === moment(point.x).format('YYYY-MM-DD')
+                                );
+
+                                // 取得該股價並且顯示
                                 str += `<span style="color: #e75c9a; font-weight:bold;">D</span>: ${Number(
                                     point.y.toFixed(2)
-                                )}</div>`;
+                                )}<br><span style="color: #ee4d2d; font-weight:bold;">股價</span>: ${found[4]}
+                                </div>`;
                             }
                         });
 
@@ -199,25 +317,25 @@ export default {
                             {
                                 color: '#ff9494', // 黃金交叉
                                 dashStyle: 'LongDash',
-                                value: 30,
+                                value: this.kdGoldLimit,
                                 width: 1,
                             },
                             {
                                 color: 'red', // 黃金轉折
                                 dashStyle: 'LongDash',
-                                value: 30,
+                                value: this.kdTurnUpLmit,
                                 width: 1,
                             },
                             {
                                 color: 'green', // 死亡交叉
                                 dashStyle: 'LongDash',
-                                value: 90,
+                                value: this.kdDeadLimit,
                                 width: 1,
                             },
                             {
                                 color: '#76dc43', // 死亡轉折
                                 dashStyle: 'LongDash',
-                                value: 80,
+                                value: this.kdTurnDownLmit,
                                 width: 1,
                             },
                         ],
@@ -256,15 +374,14 @@ export default {
                 ],
                 series: [
                     {
-                        marker: {
-                            symbol: 'square',
-                        },
                         name: 'K線',
                         color: '#4286f5',
+                        data: this.k,
                     },
                     {
                         name: 'D線',
                         color: '#e75c9a',
+                        data: this.d,
                     },
                     {
                         type: 'scatter',
@@ -276,6 +393,7 @@ export default {
                         },
                         // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
+                        data: this.stockDataOfPolicyResultBuy,
                     },
                     {
                         type: 'scatter',
@@ -287,123 +405,10 @@ export default {
                         },
                         // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
+                        data: this.stockDataOfPolicyResultSell,
                     },
                 ],
-            },
-        };
-    },
-    computed: {
-        // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
-        k() {
-            return this.stockDataOfPrice.map((value) => [value[0], value[1]]);
-        },
-        d() {
-            return this.stockDataOfPrice.map((value) => [value[0], value[2]]);
-        },
-        stockData() {
-            console.log('stockData');
-            // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            return this.$store.getters.getStock(this.parentData);
-        },
-
-        stockDataOfPrice() {
-            console.log('stockDataOfPrice');
-            // console.log(this.stockDataOfPolicy);
-            // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            return (
-                (this.stockData.data_weekly_kd &&
-                    this.stockData.data_weekly_kd.map((value) => [moment(value[0]).valueOf(), value[1], value[2]])) ||
-                []
-            );
-        },
-
-        stockDataOfPolicyResultBuy() {
-            console.log('stockDataOfPolicyResultBuy');
-            // console.log(this.stockDataOfPolicy);
-            // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            return (
-                (this.stockData.policy_result &&
-                    _.filter(this.stockData.policy_result, (o) => o.result === '買進').map((obj) => [
-                        moment(obj.date).valueOf(),
-                        obj.k,
-                    ])) ||
-                []
-            );
-        },
-        stockDataOfPolicyResultSell() {
-            console.log('stockDataOfPolicyResultBuy');
-            // console.log(this.stockDataOfPolicy);
-            // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            return (
-                (this.stockData.policy_result &&
-                    _.filter(this.stockData.policy_result, (o) => o.result === '賣出').map((obj) => [
-                        moment(obj.date).valueOf(),
-                        obj.k,
-                    ])) ||
-                []
-            );
-        },
-
-        kdGoldLimit() {
-            // 黃金交叉，值要畫橫線
-            console.log('kdGoldLimit');
-            let ret = -999; // 讓他畫線畫在看到到的地方
-            if (_.has(this.stockData, 'policy.buy')) {
-                const found = _.find(this.stockData.policy.buy, ['method', 'kd_gold']);
-                if (found) ret = found.limit; // 若非 nundefined
-            }
-            console.log(ret);
-            return ret;
-        },
-        kdTurnUpLmit() {
-            // 黃金轉折，值要畫橫線
-            console.log('kdGoldTurn');
-            let ret = -999; // 讓他畫線畫在看到到的地方
-            if (_.has(this.stockData, 'policy.buy')) {
-                const found = _.find(this.stockData.policy.buy, ['method', 'kd_turn_up']);
-                if (found) ret = found.limit; // 若非 nundefined
-            }
-            console.log(ret);
-            return ret;
-        },
-        kdDeadLimit() {
-            // 死亡交叉，值要畫橫線
-            console.log('kdDeadLimit');
-            let ret = -999; // 讓他畫線畫在看到到的地方
-            if (_.has(this.stockData, 'policy.sell')) {
-                const found = _.find(this.stockData.policy.sell, ['method', 'kd_dead']);
-                if (found) ret = found.limit; // 若非 nundefined
-            }
-            console.log(ret);
-            return ret;
-        },
-        kdTurnDownLmit() {
-            // 死亡交叉，值要畫橫線
-            console.log('kdTurnUpLmit');
-            let ret = -999; // 讓他畫線畫在看到到的地方
-            if (_.has(this.stockData, 'policy.sell')) {
-                const found = _.find(this.stockData.policy.sell, ['method', 'kd_turn_down']);
-                if (found) ret = found.limit; // 若非 nundefined
-            }
-            console.log(ret);
-            return ret;
-        },
-
-        options() {
-            const options = Object.assign(this.chartOptions, {});
-            console.log('==================');
-
-            options.series[0].data = this.k;
-            options.series[1].data = this.d;
-            options.series[2].data = this.stockDataOfPolicyResultBuy;
-            options.series[3].data = this.stockDataOfPolicyResultSell;
-
-            console.log(options.yAxis[0].plotLines[0].value);
-            options.yAxis[0].plotLines[0].value = this.kdGoldLimit;
-            options.yAxis[0].plotLines[1].value = this.kdTurnUpLmit;
-            options.yAxis[0].plotLines[2].value = this.kdDeadLimit;
-            options.yAxis[0].plotLines[3].value = this.kdTurnDownLmit;
-            return options;
+            };
         },
     },
     created() {},

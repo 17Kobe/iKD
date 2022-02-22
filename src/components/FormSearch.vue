@@ -8,7 +8,7 @@
         direction="rtl"
         size="70%"
     >
-        <el-form ref="form" :rules="rules" :model="form" label-width="60px">
+        <el-form ref="formSearchRef" :rules="rules" :model="form" label-width="60px">
             <el-form-item prop="stockId">
                 <el-select
                     v-model="form.stockId"
@@ -128,7 +128,7 @@ export default {
             console.log(this.form.stockId);
             console.log(this.stockOptions);
 
-            this.$refs.form.validate((valid) => {
+            this.$refs.formSearchRef.validate((valid) => {
                 if (valid) {
                     // 需要判斷是不存在，不能是空的才能加入
                     // 選到的

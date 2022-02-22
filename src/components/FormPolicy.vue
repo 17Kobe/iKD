@@ -1,6 +1,6 @@
 <template>
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="70%">
-        <el-form ref="form" :model="form.buy" label-width="60px">
+        <el-form ref="formPolicyBuyRef" :model="form.buy" label-width="60px">
             <div style="font-size: 24px; margin: 0px 10px 10px">買進</div>
 
             <el-row v-for="(item, index) in form.buy" :key="index">
@@ -30,7 +30,7 @@
             </el-form-item>
         </el-form>
 
-        <el-form ref="form" :model="form.sell" label-width="60px">
+        <el-form ref="formPolicySellRef" :model="form.sell" label-width="60px">
             <div style="font-size: 24px; margin: 0px 10px 10px">賣出</div>
 
             <el-row v-for="(item, index) in form.sell" :key="index">

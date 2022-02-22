@@ -112,12 +112,12 @@
                             >
                                 <!-- '#fef0f0' #f690a9 -->
                                 <span style="color: #222326"
-                                    >{{
+                                    ><b>{{
                                         getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total)
-                                    }}
-                                    %&nbsp;/&nbsp;{{
+                                    }}</b>
+                                    %&nbsp;/&nbsp;<b>{{
                                         getReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total)
-                                    }}
+                                    }}</b>
                                     元</span
                                 >
                             </el-progress>
@@ -296,9 +296,11 @@ export default {
             return Number((close * total - sum).toFixed(2)).toLocaleString('en-US');
         },
         getRateOfReturn(sum, close, total) {
+            if (!sum || sum === 0) return 0; // sum 等於0不能做為除法
             return Number((((close * total - sum) * 100) / sum).toFixed(2));
         },
         getRateOfReturnPercent(sum, close, total) {
+            if (!sum || sum === 0) return 0; // sum 等於0不能做為除法
             //* 2 則最大值為50%
             return Math.abs(Number((((close * total - sum) * 100) / sum).toFixed(2))) * 2;
         },

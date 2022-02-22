@@ -1,6 +1,6 @@
 <template>
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="70%">
-        <el-form ref="form" :model="form" label-width="60px">
+        <el-form ref="formCostRef" :model="form" label-width="60px">
             <el-row v-for="(item, index) in form" :key="index">
                 <el-col :xs="3" :sm="6" :md="4" :lg="4" :xl="3">
                     <el-form-item label="成交價">

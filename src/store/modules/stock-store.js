@@ -106,10 +106,8 @@ const stock = {
         DEL_A_STOCK(state, data) {
             // data 是 object {name: XXX, id: XXX}
             console.log('DEL_A_STOCK');
-            console.log(data);
             // 移除某個自選股
             _.remove(state.stockList, (obj) => obj.id === data);
-            console.log(state.stockList);
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         SAVE_STOCK_STAR(state, { stockId, star }) {
