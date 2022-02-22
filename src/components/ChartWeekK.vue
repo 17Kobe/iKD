@@ -26,7 +26,7 @@ import loadIndicatorsAll from 'highcharts/indicators/indicators-all';
 // 在這裡一定要用大括號，不然會錯，因為highcharts-vue.js中有命名為 Chart 的export
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
-// import _ from 'lodash';
+import _ from 'lodash';
 
 // 因為 series 是股票圖，所以要導入 stock 模組，才能有 type: 'candlestick'
 loadStock(Highcharts);
@@ -64,9 +64,10 @@ export default {
             console.log('stockDataOfPrice');
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            // 只取出最後52筆的週KD資料出來，約1年，因為1年52週
             return (
                 (this.stockData.data_weekly &&
-                    this.stockData.data_weekly.map((value) => [
+                    _.slice(this.stockData.data_weekly, -52).map((value) => [
                         moment(value[0]).valueOf(),
                         value[1],
                         value[2],
@@ -86,7 +87,7 @@ export default {
                         // 參考：https://codesandbox.io/s/vue-template-nutgx?file=/src/components/Chart.vue:598-660
                         load: (function (self) {
                             return function () {
-                                console.log('---------------------------------------');
+                                // console.log('---------------------------------------');
 
                                 // 預設顯示的時間範圍是6個月
                                 self.chart = this;

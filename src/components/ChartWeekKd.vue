@@ -70,9 +70,14 @@ export default {
             console.log('stockDataOfKdPrice');
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            // 只取出最後52筆的週KD資料出來，約1年，因為1年52週
             return (
                 (this.stockData.data_weekly_kd &&
-                    this.stockData.data_weekly_kd.map((value) => [moment(value[0]).valueOf(), value[1], value[2]])) ||
+                    _.slice(this.stockData.data_weekly_kd, -52).map((value) => [
+                        moment(value[0]).valueOf(),
+                        value[1],
+                        value[2],
+                    ])) ||
                 []
             );
         },
@@ -81,12 +86,13 @@ export default {
             console.log('stockDataOfPolicyResultBuy');
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            // 需要小於365天，1年
             return (
                 (_.has(this.stockData, 'policy.result') &&
-                    _.filter(this.stockData.policy.result, (o) => o.result === '買進').map((obj) => [
-                        moment(obj.date).valueOf(),
-                        obj.k,
-                    ])) ||
+                    _.filter(
+                        this.stockData.policy.result,
+                        (o) => moment().diff(moment(o.date), 'days') <= 365 && o.result === '買進'
+                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
                 []
             );
         },
@@ -94,12 +100,13 @@ export default {
             console.log('stockDataOfPolicyResultBuy');
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            // 需要小於365天，1年
             return (
                 (_.has(this.stockData, 'policy.result') &&
-                    _.filter(this.stockData.policy.result, (o) => o.result === '賣出').map((obj) => [
-                        moment(obj.date).valueOf(),
-                        obj.k,
-                    ])) ||
+                    _.filter(
+                        this.stockData.policy.result,
+                        (o) => moment().diff(moment(o.date), 'days') <= 365 && o.result === '賣出'
+                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
                 []
             );
         },
@@ -161,7 +168,7 @@ export default {
                         // 參考：https://codesandbox.io/s/vue-template-nutgx?file=/src/components/Chart.vue:598-660
                         load: (function (self) {
                             return function () {
-                                console.log('---------------------------------------');
+                                // console.log('---------------------------------------');
 
                                 // 預設顯示的時間範圍是6個月
                                 self.chart = this;
