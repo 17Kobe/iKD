@@ -28,6 +28,19 @@
                 <el-button type="primary" @click="onAdd"><i class="el-icon-plus"></i></el-button>
             </el-form-item>
         </el-form>
+        <el-table :data="customStockList" :show-header="false" :stripe="true" style="width: 100%">
+            <el-table-column fixed label="名稱">
+                <template #default="scope">
+                    <span style="font-size: 16px; font-weight: bold"> {{ scope.row.name }} </span>&nbsp;
+                    <span style="color: #cccccc">{{ scope.row.id }}</span>
+                </template>
+            </el-table-column>
+            <el-table-column fixed label="名稱">
+                <template #default="scope">
+                    <el-button type="danger" size="small" @click="onDel(scope.row.id)"><i class="el-icon-minus"></i></el-button>
+                </template>
+            </el-table-column>
+        </el-table>
     </el-drawer>
 </template>
 
@@ -127,8 +140,9 @@ export default {
                 return false;
             });
         },
-        onDel(index) {
-            this.form.splice(index, 1);
+        onDel(stockId) {
+            console.log(stockId);
+            this.$store.commit('DEL_A_STOCK', stockId);
         },
         onInit() {
             console.log('onInit');

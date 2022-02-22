@@ -103,6 +103,15 @@ const stock = {
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.commit('SAVE_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
+        DEL_A_STOCK(state, data) {
+            // data 是 object {name: XXX, id: XXX}
+            console.log('DEL_A_STOCK');
+            console.log(data);
+            // 移除某個自選股
+            _.remove(state.stockList, (obj) => obj.id === data);
+            console.log(state.stockList);
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+        },
         SAVE_STOCK_STAR(state, { stockId, star }) {
             console.log(stockId);
             console.log(star);
