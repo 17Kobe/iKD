@@ -21,7 +21,7 @@
                                     ? { color: '#01aa00' }
                                     : scope.row.last_price_spread > 0
                                     ? { color: '#ee3333' }
-                                    : { color: 'black' },
+                                    : { color: '#495057' },
                                 { 'font-size': '16px' },
                             ]"
                         >
@@ -43,7 +43,7 @@
                             ></i>
                             <!-- 漲跌幅 如，2.53% -->
                             <span style="font-size: 14px">
-                                {{ scope.row.last_price_spread ? scope.row.last_price_spread + '%' : '' }}
+                                {{ scope.row.last_price_spread !== null ? scope.row.last_price_spread + '%' : '' }}
                             </span>
                             <div style="color: #cccccc; font-size: 14px">{{ scope.row.last_price_date }}</div>
                         </span>
