@@ -422,6 +422,17 @@ const stock = {
             // getStockPolicy: (state, getters) => (id) => _.has(getters.getStock(id), 'policy') ? getters.getStock(id).policy : null,
             // _.has(_.find(state.stockList, ['id', id]), 'policy') ? _.find(state.stockList, ['id', id]).policy : null,
         },
+        getStockDataWeeklyKd: (state, getters) => (id) => {
+            console.log('getStockDataWeekly');
+            // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
+            const found = getters.getStock(id);
+            return found.data && found.data.weekly_kd
+                ? _.slice(found.data.weekly_kd, -52).map((value) => [moment(value[0]).valueOf(), value[1], value[2]])
+                : [];
+            // kd 一定要去直取 policy，而非取 stock，才能Policy有改有連動
+            // getStockPolicy: (state, getters) => (id) => _.has(getters.getStock(id), 'policy') ? getters.getStock(id).policy : null,
+            // _.has(_.find(state.stockList, ['id', id]), 'policy') ? _.find(state.stockList, ['id', id]).policy : null,
+        },
     },
 };
 

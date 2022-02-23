@@ -49,16 +49,17 @@ export default {
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 只取出最後52筆的週KD資料出來，約1年，因為1年52週
-            return (
-                (this.stockData.data &&
-                    this.stockData.data.weekly_kd &&
-                    _.slice(this.stockData.data.weekly_kd, -52).map((value) => [
-                        moment(value[0]).valueOf(),
-                        value[1],
-                        value[2],
-                    ])) ||
-                []
-            );
+            // return (
+            //     (this.stockData.data &&
+            //         this.stockData.data.weekly_kd &&
+            //         _.slice(this.stockData.data.weekly_kd, -52).map((value) => [
+            //             moment(value[0]).valueOf(),
+            //             value[1],
+            //             value[2],
+            //         ])) ||
+            //     []
+            // );
+            return this.$store.getters.getStockDataWeeklyKd(this.parentData);
         },
 
         stockDataOfPolicyResultBuy() {
