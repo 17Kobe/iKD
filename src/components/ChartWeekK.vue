@@ -29,31 +29,38 @@ export default {
         return {};
     },
     computed: {
-        ohlc() {
-            console.log(this.stockDataOfPrice);
-            return this.stockDataOfPrice.map((value) => [value[0], value[1], value[2], value[3], value[4]]);
-        },
+        // ohlc() {
+        //     console.log(this.stockDataWeekly);
+        //     return this.stockDataWeekly.map((value) => [value[0], value[1], value[2], value[3], value[4]]);
+        // },
 
         // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
         stockData() {
+            console.log('stockData');
             return this.$store.getters.getStock(this.parentData);
         },
-        stockDataOfPrice() {
+        ohlc() {
             console.log('stockDataOfPrice');
-            // console.log(this.stockDataOfPolicy);
-            // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            // 只取出最後52筆的週KD資料出來，約1年，因為1年52週
-            return (
-                (this.stockData.data_weekly &&
-                    _.slice(this.stockData.data_weekly, -52).map((value) => [
-                        moment(value[0]).valueOf(),
-                        value[1],
-                        value[2],
-                        value[3],
-                        value[4],
-                    ])) ||
-                []
-            );
+            const aaa = this.$store.getters.getStockDataWeekly(this.parentData);
+            console.log(aaa.length);
+            return aaa;
+            // return this.$store.getters.getStockDataWeekly(this.parentData);
+            // console.log(this.stockData);
+
+            // // console.log(this.stockDataOfPolicy);
+            // // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            // // 只取出最後52筆的週KD資料出來，約1年，因為1年52週
+            // return (
+            //     (_.has(this.stockData, 'data.weekly') &&
+            //         _.slice(this.stockData.data.weekly, -52).map((value) => [
+            //             moment(value[0]).valueOf(),
+            //             value[1],
+            //             value[2],
+            //             value[3],
+            //             value[4],
+            //         ])) ||
+            //     []
+            // );
         },
         chartOptions() {
             return {

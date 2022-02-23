@@ -121,7 +121,7 @@ export default {
             // getters 在 vuex 只有在全域，沒有在個別 module，所以不用加 stock
             this.stockData = this.$store.getters.getStock(stockId); // 因為 computed 是在網頁開啟時就跑了，那時還沒有id就會變成沒過濾全都取了。為了在點擊設定才去取，所以要這樣
             // eslint-disable-next-line prefer-destructuring
-            this.defaultCost = this.stockData.data_daily.at(-1)[4];
+            this.defaultCost = this.stockData.data.daily.at(-1)[4];
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定成本`;
 
             console.log(this.stockData.cost);
