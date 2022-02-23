@@ -187,24 +187,40 @@
                         style="color: #4386f5"
                     ></span>
                     %
+                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">計算期間</el-tag>&nbsp;<span
+                        style="color: #4386f5"
+                    ></span>
+                    年
                 </div>
                 <div>
                     <el-tag class="ml-2" size="small" style="margin: 1px 0px">每回報酬率</el-tag>&nbsp;<span
                         style="color: #4386f5"
                     ></span>
                     %
+                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">每回天數</el-tag>&nbsp;<span
+                        style="color: #4386f5"
+                    ></span>
+                    天
                 </div>
                 <div>
                     <el-tag class="ml-2" size="small" style="margin: 1px 0px">年化報酬率</el-tag>&nbsp;<span
                         style="color: #4386f5"
                     ></span>
                     %
+                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">買賣次數</el-tag>&nbsp;<span
+                        style="color: #4386f5"
+                    ></span>
+                    次
                 </div>
                 <div>
                     <el-tag class="ml-2" size="small" style="margin: 1px 0px">年均報酬率</el-tag>&nbsp;<span
                         style="color: #4386f5"
                     ></span>
                     %
+                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">最大賺賠</el-tag>&nbsp;<span
+                        style="color: #4386f5"
+                    ></span>
+                    次
                 </div>
             </el-table-column>
             <!-- <el-table-column prop="city" label="功能" width="220" align="center">
