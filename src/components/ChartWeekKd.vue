@@ -70,10 +70,9 @@ export default {
             return (
                 (this.stockData.policy &&
                     this.stockData.policy.result &&
-                    _.filter(
-                        this.stockData.policy.result,
-                        (o) => moment().diff(moment(o.date), 'days') <= 365 && o.result === '買進'
-                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
+                    _.filter(this.stockData.policy.result, (o) => moment().diff(moment(o.date), 'days') <= 365 && o.isBuy).map(
+                        (obj) => [moment(obj.date).valueOf(), obj.k]
+                    )) ||
                 []
             );
         },
@@ -85,10 +84,9 @@ export default {
             return (
                 (this.stockData.policy &&
                     this.stockData.policy.result &&
-                    _.filter(
-                        this.stockData.policy.result,
-                        (o) => moment().diff(moment(o.date), 'days') <= 365 && o.result === '賣出'
-                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
+                    _.filter(this.stockData.policy.result, (o) => moment().diff(moment(o.date), 'days') <= 365 && o.isSell).map(
+                        (obj) => [moment(obj.date).valueOf(), obj.k]
+                    )) ||
                 []
             );
         },

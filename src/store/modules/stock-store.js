@@ -234,7 +234,12 @@ const stock = {
                         }
                         if (k <= foundKdGold.limit && k >= d && kdGoldReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
-                            policyResult.push({ date: item[0], result: '買進', mehtod: 'kd_gold', k });
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            if (index === -1) policyResult.push({ date: item[0], isBuy: true, k });
+                            else {
+                                policyResult[index].isBuy = true;
+                                policyResult[index].k = k;
+                            }
                             kdGoldReady = false;
                         }
                     }
@@ -245,7 +250,12 @@ const stock = {
                         }
                         if (k >= foundKdDead.limit && k <= d && kdDeadReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
-                            policyResult.push({ date: item[0], result: '賣出', mehtod: 'kd_dead', k });
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            if (index === -1) policyResult.push({ date: item[0], isSell: true, k });
+                            else {
+                                policyResult[index].isSell = true;
+                                policyResult[index].k = k;
+                            }
                             kdDeadReady = false;
                         }
                     }
