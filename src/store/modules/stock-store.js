@@ -240,19 +240,25 @@ const stock = {
                 const stockData = stcokInfo.data_daily || []; // 有可能是 null 就變成 []
                 // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
                 const stockStartDate = moment(
-                    stockData.length === 0 ? '2010-01-01' : moment(stockData.at(-1).date).add(1, 'days')
+                    stockData.length === 0 ? '2010-01-01' : moment(stockData.at(-1)[0]).add(1, 'days')
                 ).format('YYYY-MM-DD');
 
                 // 按照網站存在的日期才發出API需求
                 // https://stackoverflow.com/questions/36197031/how-to-use-moment-js-to-check-whether-the-current-time-is-between-2-times
-                const currentTime = moment('', 'hh:mm:ss');
+                const currentTime = moment();
                 const stockMarketCloseTime = moment('13:30:00', 'hh:mm:ss');
                 let siteExistsLatestDate = moment().format('YYYY-MM-DD');
                 if (currentTime.isBefore(stockMarketCloseTime))
                     siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
-                console.log(stockStartDate);
+                // console.log(currentTime.format('YYYY-MM-DD hh:mm:ss'));
+                // console.log(stockMarketCloseTime.format('YYYY-MM-DD hh:mm:ss'));
+                // console.log(siteExistsLatestDate);
+                // console.log(stockData);
+                // console.log(stockData.at(-1)[0]);
+                // console.log(stockStartDate);
 
-                if (moment(siteExistsLatestDate).isAfter(stockStartDate)) {
+                // 因為我有將 stockStartDate + 1天，所以有 Same
+                if (moment(siteExistsLatestDate).isSameOrAfter(stockStartDate)) {
                     axios
                         .get('https://api.finmindtrade.com/api/v4/data', {
                             params: {
