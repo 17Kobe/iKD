@@ -13,7 +13,7 @@
             </el-table-column>
             <el-table-column label="股價" width="85" align="right">
                 <template #default="scope">
-                    <span v-if="scope.row.data && scope.row.data_daily && scope.row.data_daily.length >= 2">
+                    <span v-if="scope.row.data && scope.row.data.daily && scope.row.data.daily.length >= 2">
                         <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
                         <span
                             :style="[
@@ -94,18 +94,18 @@
                                 元
                             </div>
                             <el-progress
-                                v-if="scope.row.data && scope.row.data_daily && scope.row.data_daily.length >= 1"
+                                v-if="scope.row.data && scope.row.data.daily && scope.row.data.daily.length >= 1"
                                 :text-inside="true"
                                 :stroke-width="20"
                                 :percentage="
                                     getRateOfReturnPercent(
                                         scope.row.cost.sum,
-                                        scope.row.data_daily.at(-1)[4],
+                                        scope.row.data.daily.at(-1)[4],
                                         scope.row.cost.total
                                     )
                                 "
                                 :color="
-                                    getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total) <= 0
+                                    getRateOfReturn(scope.row.cost.sum, scope.row.data.daily.at(-1)[4], scope.row.cost.total) <= 0
                                         ? '#ccff90'
                                         : '#f28b82'
                                 "
@@ -113,10 +113,10 @@
                                 <!-- '#fef0f0' #f690a9 -->
                                 <span style="color: #222326"
                                     ><b>{{
-                                        getRateOfReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total)
+                                        getRateOfReturn(scope.row.cost.sum, scope.row.data.daily.at(-1)[4], scope.row.cost.total)
                                     }}</b>
                                     %&nbsp;/&nbsp;<b>{{
-                                        getReturn(scope.row.cost.sum, scope.row.data_daily.at(-1)[4], scope.row.cost.total)
+                                        getReturn(scope.row.cost.sum, scope.row.data.daily.at(-1)[4], scope.row.cost.total)
                                     }}</b>
                                     元</span
                                 >

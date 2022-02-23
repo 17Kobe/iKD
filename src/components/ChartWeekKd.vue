@@ -50,8 +50,9 @@ export default {
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 只取出最後52筆的週KD資料出來，約1年，因為1年52週
             return (
-                (this.stockData.data_weekly_kd &&
-                    _.slice(this.stockData.data_weekly_kd, -52).map((value) => [
+                (this.stockData.data &&
+                    this.stockData.data.weekly_kd &&
+                    _.slice(this.stockData.data.weekly_kd, -52).map((value) => [
                         moment(value[0]).valueOf(),
                         value[1],
                         value[2],
@@ -66,7 +67,8 @@ export default {
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 需要小於365天，1年
             return (
-                (_.has(this.stockData, 'policy.result') &&
+                (this.stockData.policy &&
+                    this.stockData.policy.result &&
                     _.filter(
                         this.stockData.policy.result,
                         (o) => moment().diff(moment(o.date), 'days') <= 365 && o.result === '買進'
@@ -80,7 +82,8 @@ export default {
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 需要小於365天，1年
             return (
-                (_.has(this.stockData, 'policy.result') &&
+                (this.stockData.policy &&
+                    this.stockData.policy.result &&
                     _.filter(
                         this.stockData.policy.result,
                         (o) => moment().diff(moment(o.date), 'days') <= 365 && o.result === '賣出'
@@ -93,7 +96,7 @@ export default {
             // 黃金交叉，值要畫橫線
             console.log('kdGoldLimit');
             let ret = -999; // 讓他畫線畫在看到到的地方
-            if (_.has(this.stockData, 'policy.settings.buy')) {
+            if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.buy) {
                 const found = _.find(this.stockData.policy.settings.buy, ['method', 'kd_gold']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
@@ -104,7 +107,7 @@ export default {
             // 黃金轉折，值要畫橫線
             console.log('kdGoldTurn');
             let ret = -999; // 讓他畫線畫在看到到的地方
-            if (_.has(this.stockData, 'policy.settings.buy')) {
+            if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.buy) {
                 const found = _.find(this.stockData.policy.settings.buy, ['method', 'kd_turn_up']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
@@ -115,7 +118,7 @@ export default {
             // 死亡交叉，值要畫橫線
             console.log('kdDeadLimit');
             let ret = -999; // 讓他畫線畫在看到到的地方
-            if (_.has(this.stockData, 'policy.settings.sell')) {
+            if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.sell) {
                 const found = _.find(this.stockData.policy.settings.sell, ['method', 'kd_dead']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
@@ -126,7 +129,7 @@ export default {
             // 死亡交叉，值要畫橫線
             console.log('kdTurnUpLmit');
             let ret = -999; // 讓他畫線畫在看到到的地方
-            if (_.has(this.stockData, 'policy.settings.sell')) {
+            if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.sell) {
                 const found = _.find(this.stockData.policy.settings.sell, ['method', 'kd_turn_down']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
@@ -252,7 +255,7 @@ export default {
                                 console.log(point.point.index);
 
                                 const found = _.find(
-                                    component.stockData.data_weekly,
+                                    component.stockData.data.weekly,
                                     (array) => array[0] === moment(point.x).format('YYYY-MM-DD')
                                 );
 

@@ -29,25 +29,9 @@ export default {
         return {};
     },
     computed: {
-        // stockData 只會最初跑，股價變更時只會觸發ohlc，而不會觸發stckData
-        stockData() {
-            console.log('stockData');
-            return this.$store.getters.getStock(this.parentData);
-        },
         ohlc() {
             console.log('ohlc');
-            // console.log(this.stockDataOfPolicy);
-            // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            // 只取出最後52筆的週KD資料出來，約1年，因為1年52週
-            return (
-                _.slice(this.stockData.data_weekly, -52).map((value) => [
-                    moment(value[0]).valueOf(),
-                    value[1],
-                    value[2],
-                    value[3],
-                    value[4],
-                ]) || []
-            );
+            return this.$store.getters.getStockDataWeekly(this.parentData);
         },
         chartOptions() {
             return {
