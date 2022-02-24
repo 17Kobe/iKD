@@ -550,8 +550,89 @@ const stock = {
 
                 // save to localstorage
                 localStorage.setItem('stockList', JSON.stringify(state.stockList));
+
+                this.commit('SAVE_STOCK_POLICY_RETURN_RESULT', stockId); // 計算policy且有關報酬率的結果
             }
             console.log('SAVE_STOCK_POLICY_RESULT OK');
+        },
+        SAVE_STOCK_POLICY_RETURN_RESULT(state, stockId) {
+            console.log('SAVE_STOCK_POLICY_RETURN_RESULT');
+
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            // 一定有 policy.settings.buy 及 sell 因為前面SAVE_STOCK_POLICYRESULT 已經判斷過了
+            console.log(foundStock);
+
+            let foundCostDown = false;
+            let foundEarn = false;
+            if (_.has(foundStock, 'policy.settings.buy')) {
+                foundCostDown = _.find(foundStock.policy.settings.buy, ['method', 'cost_down']);
+            }
+            if (_.has(foundStock, 'policy.settings.sell')) {
+                foundEarn = _.find(foundStock.policy.settings.sell, ['method', 'earn']);
+            }
+
+            let isReadyToSell = false;
+            let numberOfBuy = 0;
+            let accPriceOfBuy = 0;
+            // 最後一天強制再多塞入一個isLatest來計算最新的報酬率
+            if (foundStock.policy.result.length > 0) {
+                const lastDate = moment(foundStock.policy.result.at(-1).date);
+                const currentDate = moment(foundStock.data.daily.at(-1)[0]);
+
+                if (currentDate.isAfter(lastDate)) {
+                    foundStock.policy.result.push({
+                        date: currentDate.format('YYYY-MM-DD'),
+                        isLatest: true,
+                        price: foundStock.data.daily.at(-1)[4],
+                        reason: ['latest'],
+                    });
+                }
+            }
+
+            foundStock.policy.result.forEach((obj) => {
+                // 必需有買才要在第一次賣時算報酬率
+                if (!isReadyToSell && obj.isBuy && !obj.isSell && !obj.isBuyCancel) {
+                    // 如果有 搭配 成本價跌超過，則在此決定那個買是否真的要買
+                    let isCancelToBuy = false;
+                    if (foundCostDown && numberOfBuy > 1) {
+                        // 會在買超過1次才會進來判斷，因為這樣才有之前報酬率
+                        const rateOfReturn = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
+                        if (rateOfReturn * 100 > -foundCostDown) {
+                            // 比負10還大，就是沒超過，就不買了。foundCostDown都是正值，但實際人認知是負值
+                            isCancelToBuy = true;
+                            obj.isBuyCancel = true;
+                            obj.reason.push('cost_down');
+                        }
+                    }
+                    // 去累加買入訊號單位
+                    if (!isCancelToBuy) {
+                        numberOfBuy += 1;
+                        accPriceOfBuy += obj.price;
+                        isReadyToSell = true;
+                    }
+                } else if (isReadyToSell && ((obj.isSell && !obj.isBuy && !obj.isSellCancel) || obj.isLatest)) {
+                    // 不能同時當天有買也有賣，這樣也會取消
+                    // 去累加買入訊號單位
+                    const rateOfReturn = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
+
+                    // 搭配 絕對正報酬
+                    let isCancelToSell = false;
+                    if (foundEarn && rateOfReturn * 100 < foundEarn.limit) {
+                        isCancelToSell = true;
+                        obj.isSellCancel = true;
+                        obj.reason.push('earn');
+                    }
+                    if (!isCancelToSell || obj.isLatest) {
+                        // 就算是取消賣，最後一天也是要去算最新報酬喔
+                        obj.rateOfReturn = rateOfReturn;
+                        numberOfBuy = 0;
+                        isReadyToSell = false;
+                    }
+                }
+            });
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+
+            console.log('SAVE_STOCK_POLICY_RETURN_RESULT OK');
         },
     },
     getters: {
