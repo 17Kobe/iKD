@@ -7,57 +7,55 @@ const defaultState = {
         {
             name: '元大高股息',
             id: '0056',
-            data: { daily: [] },
         },
         {
             name: '台積電',
             id: '2330',
-            data: { daily: [] },
         },
-        {
-            name: '聯發科',
-            id: '2454',
-        },
-        {
-            name: '大立光',
-            id: '3008',
-        },
-        {
-            name: '台達電',
-            id: '2308',
-        },
-        {
-            name: '元大金',
-            id: '2885',
-        },
-        {
-            name: '玉山金',
-            id: '2884',
-        },
-        {
-            name: '富邦金',
-            id: '2881',
-        },
-        {
-            name: '卜蜂',
-            id: '1215',
-        },
-        {
-            name: '統一',
-            id: '1216',
-        },
-        {
-            name: '中華電',
-            id: '2412',
-        },
-        {
-            name: '統一FANG+',
-            id: '00757',
-        },
-        {
-            name: '期元大 S&P 黃金',
-            id: '00635U',
-        },
+        // {
+        //     name: '聯發科',
+        //     id: '2454',
+        // },
+        // {
+        //     name: '大立光',
+        //     id: '3008',
+        // },
+        // {
+        //     name: '台達電',
+        //     id: '2308',
+        // },
+        // {
+        //     name: '元大金',
+        //     id: '2885',
+        // },
+        // {
+        //     name: '玉山金',
+        //     id: '2884',
+        // },
+        // {
+        //     name: '富邦金',
+        //     id: '2881',
+        // },
+        // {
+        //     name: '卜蜂',
+        //     id: '1215',
+        // },
+        // {
+        //     name: '統一',
+        //     id: '1216',
+        // },
+        // {
+        //     name: '中華電',
+        //     id: '2412',
+        // },
+        // {
+        //     name: '統一FANG+',
+        //     id: '00757',
+        // },
+        // {
+        //     name: '期元大 S&P 黃金',
+        //     id: '00635U',
+        // },
     ],
 };
 
@@ -183,108 +181,8 @@ const stock = {
 
             // save to localstorage
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線, 看console.log會依序執行commit，一個一個執行完才執行下個，看起來沒問題
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
-        },
-        SAVE_STOCK_POLICY_RESULT(state, stockId) {
-            console.log('SAVE_STOCK_POLICY_RESULT');
-
-            // object of array 去 find 並 update
-            const foundStock = state.stockList.find((v) => v.id === stockId);
-
-            // 黃金交叉、死亡交叉
-            const policyResult = [];
-
-            console.log(foundStock);
-            if (_.has(foundStock, 'policy.settings.buy') && _.has(foundStock, 'policy.settings.sell')) {
-                console.log('SAVE_STOCK_POLICY_RESULT foundStock');
-                const foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
-                const foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
-                const foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
-                const foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
-
-                let kdGoldReady = false;
-                let kdDeadReady = false;
-                let preK = 0;
-                let kdTurnUpReady = false;
-                let kdTurnDownReady = false;
-                foundStock.data.weekly_kd.forEach((item) => {
-                    const k = item[1];
-                    const d = item[2];
-                    // 週 KD 黃金交叉 買進訊號
-                    if (foundKdGold) {
-                        if (k < d) {
-                            kdGoldReady = true;
-                        }
-                        if (k <= foundKdGold.limit && k >= d && kdGoldReady) {
-                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
-                            const index = _.findIndex(policyResult, ['date', item[0]]);
-                            if (index === -1) policyResult.push({ date: item[0], isBuy: true, k });
-                            else {
-                                policyResult[index].isBuy = true;
-                                policyResult[index].k = k;
-                            }
-                            kdGoldReady = false;
-                        }
-                    }
-                    // 週 KD 往上轉折 買進訊號
-                    if (foundKdTurnUp) {
-                        if (k < preK) {
-                            kdTurnUpReady = true;
-                        }
-                        if (k <= foundKdTurnUp.limit && k >= preK && kdTurnUpReady) {
-                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
-                            const index = _.findIndex(policyResult, ['date', item[0]]);
-                            if (index === -1) policyResult.push({ date: item[0], isBuy: true, k });
-                            else {
-                                policyResult[index].isBuy = true;
-                                policyResult[index].k = k;
-                            }
-                            kdTurnUpReady = false;
-                        }
-                    }
-
-                    // 週 KD 死亡交叉 賣出訊號
-                    if (foundKdDead) {
-                        if (k > d) {
-                            kdDeadReady = true;
-                        }
-                        if (k >= foundKdDead.limit && k <= d && kdDeadReady) {
-                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
-                            const index = _.findIndex(policyResult, ['date', item[0]]);
-                            if (index === -1) policyResult.push({ date: item[0], isSell: true, k });
-                            else {
-                                policyResult[index].isSell = true;
-                                policyResult[index].k = k;
-                            }
-                            kdDeadReady = false;
-                        }
-                    }
-                    // 週 KD 往下轉折 賣出訊號
-                    if (foundKdTurnDown) {
-                        if (k > preK) {
-                            kdTurnDownReady = true;
-                        }
-                        if (k >= foundKdTurnDown.limit && k <= preK && kdTurnDownReady) {
-                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
-                            const index = _.findIndex(policyResult, ['date', item[0]]);
-                            if (index === -1) policyResult.push({ date: item[0], isSell: true, k });
-                            else {
-                                policyResult[index].isSell = true;
-                                policyResult[index].k = k;
-                            }
-                            kdTurnDownReady = false;
-                        }
-                    }
-                    preK = k;
-                    console.log(item);
-                });
-
-                foundStock.policy.result = [];
-                foundStock.policy.result.push(...policyResult);
-
-                // save to localstorage
-                localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            }
         },
         SAVE_STOCK_PRICE(state, { stockId, data }) {
             console.log('SAVE_STOCK_PRICE');
@@ -295,6 +193,8 @@ const stock = {
                 state.stockList[index].data.daily = state.stockList[index].data.daily || []; // 有可能是 null 就變成 []
                 state.stockList[index].data.weekly = state.stockList[index].data.weekly || []; // 有可能是 null 就變成 []
                 state.stockList[index].data.weekly_kd = state.stockList[index].data.weekly_kd || []; // 有可能是 null 就變成 []
+                state.stockList[index].data.ma1 = state.stockList[index].data.ma1 || []; // 有可能是 null 就變成 [] 第一條MA線
+                state.stockList[index].data.ma2 = state.stockList[index].data.ma2 || []; // 有可能是 null 就變成 [] 第二條MA線
                 state.stockList[index].last_price = state.stockList[index].last_price || null;
                 state.stockList[index].last_price_date = state.stockList[index].last_price_date || null;
                 state.stockList[index].last_price_spread = state.stockList[index].last_price_spread || null;
@@ -386,7 +286,7 @@ const stock = {
                 state.stockList[index].data.weekly = _.reverse(resData);
                 // this.$set(state.stockList[index].data, 'weekly', _.reverse(resData));
 
-                // 塞入股價週線KD資料
+                // ===================塞入股價週線KD資料===================
                 resData = [];
                 let rsv = 0;
                 let preK = 0;
@@ -415,9 +315,179 @@ const stock = {
                 }
                 state.stockList[index].data.weekly_kd = resData;
 
+                // ===================塞入localstorage===================
                 localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+                this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線
                 console.log('SAVE_STOCK_PRICE OK');
             }
+        },
+        SAVE_STOCK_MA(state, stockId) {
+            console.log('SAVE_STOCK_MA');
+
+            const index = _.findIndex(state.stockList, ['id', stockId]);
+            state.stockList[index].data.ma1 = [];
+            state.stockList[index].data.ma2 = [];
+            let resData = [];
+            let preMaLimit = 0; // 先前的MA參數值，不可能為0，所以設為0
+            // ===================塞入股價週線MA1資料===================
+            if (_.has(state.stockList[index], 'policy.settings.buy')) {
+                const foundMaBuy = _.find(state.stockList[index].policy.settings.buy, ['method', 'ma_buy']);
+                if (foundMaBuy) {
+                    resData = [];
+                    const maBuyLimit = foundMaBuy.limit;
+                    preMaLimit = maBuyLimit;
+                    for (let k = 0; k <= state.stockList[index].data.weekly.length - 1; k += 1) {
+                        const startIndex = k - maBuyLimit - 1 < 0 ? 0 : k - maBuyLimit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
+                        const endIndex = k;
+                        const range2dArray = _.slice(state.stockList[index].data.weekly, startIndex, endIndex + 1);
+                        const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
+                        const average = _.mean(rangeCloseArray);
+
+                        const date = state.stockList[index].data.weekly[endIndex][0];
+
+                        resData.push([date, average]);
+                    }
+                    state.stockList[index].data.ma1 = resData;
+                }
+            }
+            // ===================塞入股價週線MA2資料(有可能最後是塞MA1，若MA1沒資料的話)===================
+            if (_.has(state.stockList[index], 'policy.settings.sell')) {
+                const foundMaSell = _.find(state.stockList[index].policy.settings.sell, ['method', 'ma_sell']);
+                if (foundMaSell && preMaLimit !== foundMaSell.limit) {
+                    resData = [];
+                    const maSellLimit = foundMaSell.limit;
+                    for (let k = 0; k <= state.stockList[index].data.weekly.length - 1; k += 1) {
+                        const startIndex = k - maSellLimit - 1 < 0 ? 0 : k - maSellLimit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
+                        const endIndex = k;
+                        const range2dArray = _.slice(state.stockList[index].data.weekly, startIndex, endIndex + 1);
+                        const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
+                        const average = _.mean(rangeCloseArray);
+
+                        const date = state.stockList[index].data.weekly[endIndex][0];
+
+                        resData.push([date, average]);
+                    }
+                    if (_.has(state.stockList[index], 'data.ma1') && _.isEmpty(state.stockList[index].data.ma1)) {
+                        state.stockList[index].data.ma1 = resData;
+                    } else {
+                        state.stockList[index].data.ma2 = resData;
+                    }
+                }
+            }
+
+            // ===================塞入localstorage===================
+            localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+            console.log('SAVE_STOCK_MA OK');
+        },
+        SAVE_STOCK_POLICY_RESULT(state, stockId) {
+            console.log('SAVE_STOCK_POLICY_RESULT');
+
+            // object of array 去 find 並 update
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+
+            // 黃金交叉、死亡交叉
+            const policyResult = [];
+
+            console.log(foundStock);
+            if (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell')) {
+                console.log('SAVE_STOCK_POLICY_RESULT foundStock');
+                let foundKdGold = false;
+                let foundKdTurnUp = false;
+                let foundKdDead = false;
+                let foundKdTurnDown = false;
+                if (_.has(foundStock, 'policy.settings.buy')) {
+                    foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
+                    foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
+                }
+                if (_.has(foundStock, 'policy.settings.sell')) {
+                    foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
+                    foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
+                }
+
+                let kdGoldReady = false;
+                let kdDeadReady = false;
+                let preK = 0;
+                let kdTurnUpReady = false;
+                let kdTurnDownReady = false;
+                foundStock.data.weekly_kd.forEach((item) => {
+                    const k = item[1];
+                    const d = item[2];
+                    // 週 KD 黃金交叉 買進訊號
+                    if (foundKdGold) {
+                        if (k < d) {
+                            kdGoldReady = true;
+                        }
+                        if (k <= foundKdGold.limit && k >= d && kdGoldReady) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            if (index === -1) policyResult.push({ date: item[0], isBuy: true, k });
+                            else {
+                                policyResult[index].isBuy = true;
+                                policyResult[index].k = k;
+                            }
+                            kdGoldReady = false;
+                        }
+                    }
+                    // 週 KD 往上轉折 買進訊號
+                    if (foundKdTurnUp) {
+                        if (k < preK) {
+                            kdTurnUpReady = true;
+                        }
+                        if (k <= foundKdTurnUp.limit && k >= preK && kdTurnUpReady) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            if (index === -1) policyResult.push({ date: item[0], isBuy: true, k });
+                            else {
+                                policyResult[index].isBuy = true;
+                                policyResult[index].k = k;
+                            }
+                            kdTurnUpReady = false;
+                        }
+                    }
+
+                    // 週 KD 死亡交叉 賣出訊號
+                    if (foundKdDead) {
+                        if (k > d) {
+                            kdDeadReady = true;
+                        }
+                        if (k >= foundKdDead.limit && k <= d && kdDeadReady) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            if (index === -1) policyResult.push({ date: item[0], isSell: true, k });
+                            else {
+                                policyResult[index].isSell = true;
+                                policyResult[index].k = k;
+                            }
+                            kdDeadReady = false;
+                        }
+                    }
+                    // 週 KD 往下轉折 賣出訊號
+                    if (foundKdTurnDown) {
+                        if (k > preK) {
+                            kdTurnDownReady = true;
+                        }
+                        if (k >= foundKdTurnDown.limit && k <= preK && kdTurnDownReady) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            if (index === -1) policyResult.push({ date: item[0], isSell: true, k });
+                            else {
+                                policyResult[index].isSell = true;
+                                policyResult[index].k = k;
+                            }
+                            kdTurnDownReady = false;
+                        }
+                    }
+                    preK = k;
+                    console.log(item);
+                });
+
+                foundStock.policy.result = [];
+                foundStock.policy.result.push(...policyResult);
+
+                // save to localstorage
+                localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            }
+            console.log('SAVE_STOCK_POLICY_RESULT OK');
         },
     },
     getters: {

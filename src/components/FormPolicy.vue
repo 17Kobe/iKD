@@ -90,7 +90,7 @@ export default {
                     default_limit_desc: '以下',
                 },
                 {
-                    value: 'ma',
+                    value: 'ma_buy',
                     label: '搭配 MA 均線',
                     default_limit: 14,
                     default_limit_desc: '日均線之上', // 均線之下或均線之上，先做均線之上好了
@@ -122,7 +122,7 @@ export default {
                     default_limit_desc: '以上',
                 },
                 {
-                    value: 'ma',
+                    value: 'ma_sell',
                     label: '搭配 MA 均線',
                     default_limit: 14,
                     default_limit_desc: '日均線之下', // 均線之下或均線之上，先做均線之上好了
