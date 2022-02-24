@@ -513,8 +513,8 @@ const stock = {
                     }
                 });
 
-                foundStock.policy.result = [];
-                foundStock.policy.result.push(...policyResult);
+                foundStock.policy.result1 = [];
+                foundStock.policy.result1.push(...policyResult);
 
                 // save to localstorage
                 localStorage.setItem('stockList', JSON.stringify(state.stockList));

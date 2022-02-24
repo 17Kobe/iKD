@@ -69,8 +69,8 @@ export default {
             // 需要小於365天，1年
             return (
                 (this.stockData.policy &&
-                    this.stockData.policy.result &&
-                    _.filter(this.stockData.policy.result, (o) => moment().diff(moment(o.date), 'days') <= 365 && o.isBuy).map(
+                    this.stockData.policy.result1 &&
+                    _.filter(this.stockData.policy.result1, (o) => moment().diff(moment(o.date), 'days') <= 365 && o.isBuy).map(
                         (obj) => [moment(obj.date).valueOf(), obj.k]
                     )) ||
                 []
@@ -83,8 +83,8 @@ export default {
             // 需要小於365天，1年
             return (
                 (this.stockData.policy &&
-                    this.stockData.policy.result &&
-                    _.filter(this.stockData.policy.result, (o) => moment().diff(moment(o.date), 'days') <= 365 && o.isSell).map(
+                    this.stockData.policy.result1 &&
+                    _.filter(this.stockData.policy.result1, (o) => moment().diff(moment(o.date), 'days') <= 365 && o.isSell).map(
                         (obj) => [moment(obj.date).valueOf(), obj.k]
                     )) ||
                 []
