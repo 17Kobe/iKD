@@ -7,12 +7,9 @@
             style="position: relative; top: 8px; background: transparent"
         >
         </highcharts>
-        <!-- <div
-            style="position: absolute; top: 84px; left: 115px; font-size: 12px"
-            v-if="stockDataOfPrice && stockDataOfPrice.length > 0"
-        >
-            <span style="color: #834beb">股價</span>: {{ stockDataOfPrice.at(-1)[1].toFixed(2) }}
-        </div> -->
+        <div style="position: absolute; top: 83px; left: 115px; font-size: 12px" v-if="ohlc && ohlc.length > 0">
+            <span style="color: #834beb">收</span>: {{ ohlc.at(-1)[3].toFixed(2) }}
+        </div>
         <!-- :updateArgs="[true, true, true]" -->
     </div>
 </template>
@@ -33,15 +30,20 @@ export default {
             console.log('ohlc');
             return this.$store.getters.getStockDataWeekly(this.parentData);
         },
-        ma1() {
-            console.log('ohlc');
-            return this.$store.getters.getStockDataWeeklyMa1(this.parentData);
+        ma_buy() {
+            console.log('ma_buy');
+            return this.$store.getters.getStockDataWeeklyMaBuy(this.parentData);
         },
-        ma2() {
-            console.log('ohlc');
-            return this.$store.getters.getStockDataWeeklyMa2(this.parentData);
+        ma_sell() {
+            console.log('ma_sell');
+            return this.$store.getters.getStockDataWeeklyMaSell(this.parentData);
+        },
+        ma_policy() {
+            console.log('ma_policy');
+            return this.$store.getters.getStockPolicyMa(this.parentData);
         },
         chartOptions() {
+            const component = this;
             return {
                 chart: {
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
@@ -149,14 +151,25 @@ export default {
                     formatter() {
                         let str = '<div>';
                         const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
-                        this.points.forEach((point) => {
-                            const fontColor = point.y > point.point.open ? '#ee3333' : '#01aa00';
+                        this.points.forEach((point, index) => {
+                            if (index === 0) {
+                                const fontColor = point.y > point.point.open ? '#ee3333' : '#01aa00';
 
-                            str += `<div style="text-align:center;">${moment(point.x).format(
-                                'YYYY-MM-DD'
-                            )}(<span style="color: #3333ee; font-weight:bold;">${dayOfWeek[moment(point.x).day()]}</span>)</div>`;
-                            str += `<div>開：${point.point.open} <span style="color: #3333ee">收</span>：<span style="color: ${fontColor}; font-weight:bold;">${point.y}</span></div>`;
-                            str += `<div>高：${point.point.high} 低：${point.point.low}</div>`;
+                                str += `<div style="text-align:center;">${moment(point.x).format(
+                                    'YYYY-MM-DD'
+                                )}(<span style="color: #3333ee; font-weight:bold;">${
+                                    dayOfWeek[moment(point.x).day()]
+                                }</span>)</div>`;
+                                str += `<div>開：${point.point.open} <span style="color: #3333ee">收</span>：<span style="color: ${fontColor}; font-weight:bold;">${point.y}</span></div>`;
+                                str += `<div>高：${point.point.high} 低：${point.point.low}</div>`;
+                            } else {
+                                console.log(component);
+
+                                const color = index === 1 ? '#834beb' : '#e6a23c';
+                                const limit = index === 1 ? component.ma_policy.ma_buy_limit : component.ma_policy.ma_sell_limit;
+                                str += `<span><span style="color: ${color}">MA(${limit})</span>: ${point.y.toFixed(2)}
+                                </span>`;
+                            }
                         });
 
                         str += '</div>';
@@ -245,9 +258,9 @@ export default {
                     },
                     {
                         type: 'line',
-                        name: 'MA1線',
-                        color: '#4286f5',
-                        data: this.ma1,
+                        name: 'MA Buy線',
+                        color: '#834beb',
+                        data: this.ma_buy,
                         dataGrouping: {
                             // anchor: 'end',
                             // firstAnchor: 'end',
@@ -257,9 +270,9 @@ export default {
                     },
                     {
                         type: 'line',
-                        name: 'MA2線',
-                        color: '#e75c9a',
-                        data: this.ma2,
+                        name: 'MA Sell線',
+                        color: '#e6a23c',
+                        data: this.ma_sell,
                         dataGrouping: {
                             // anchor: 'end',
                             // firstAnchor: 'end',

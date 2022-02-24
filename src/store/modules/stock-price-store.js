@@ -193,8 +193,8 @@ const stock = {
                 state.stockList[index].data.daily = state.stockList[index].data.daily || []; // 有可能是 null 就變成 []
                 state.stockList[index].data.weekly = state.stockList[index].data.weekly || []; // 有可能是 null 就變成 []
                 state.stockList[index].data.weekly_kd = state.stockList[index].data.weekly_kd || []; // 有可能是 null 就變成 []
-                state.stockList[index].data.ma1 = state.stockList[index].data.ma1 || []; // 有可能是 null 就變成 [] 第一條MA線
-                state.stockList[index].data.ma2 = state.stockList[index].data.ma2 || []; // 有可能是 null 就變成 [] 第二條MA線
+                state.stockList[index].data.ma_buy = state.stockList[index].data.ma_buy || []; // 有可能是 null 就變成 [] 第一條MA線
+                state.stockList[index].data.ma_sell = state.stockList[index].data.ma_sell || []; // 有可能是 null 就變成 [] 第二條MA線
                 state.stockList[index].last_price = state.stockList[index].last_price || null;
                 state.stockList[index].last_price_date = state.stockList[index].last_price_date || null;
                 state.stockList[index].last_price_spread = state.stockList[index].last_price_spread || null;
@@ -325,8 +325,8 @@ const stock = {
             console.log('SAVE_STOCK_MA');
 
             const index = _.findIndex(state.stockList, ['id', stockId]);
-            state.stockList[index].data.ma1 = [];
-            state.stockList[index].data.ma2 = [];
+            state.stockList[index].data.ma_buy = [];
+            state.stockList[index].data.ma_sell = [];
             let resData = [];
             let preMaLimit = 0; // 先前的MA參數值，不可能為0，所以設為0
             // ===================塞入股價週線MA1資料===================
@@ -347,10 +347,10 @@ const stock = {
 
                         resData.push([date, average]);
                     }
-                    state.stockList[index].data.ma1 = resData;
+                    state.stockList[index].data.ma_buy = resData;
                 }
             }
-            // ===================塞入股價週線MA2資料(有可能最後是塞MA1，若MA1沒資料的話)===================
+            // ===================塞入股價週線MA BUY資料(有可能最後是塞MA1，若MA1沒資料的話)===================
             if (_.has(state.stockList[index], 'policy.settings.sell')) {
                 const foundMaSell = _.find(state.stockList[index].policy.settings.sell, ['method', 'ma_sell']);
                 if (foundMaSell && preMaLimit !== foundMaSell.limit) {
@@ -367,11 +367,11 @@ const stock = {
 
                         resData.push([date, average]);
                     }
-                    if (_.has(state.stockList[index], 'data.ma1') && _.isEmpty(state.stockList[index].data.ma1)) {
-                        state.stockList[index].data.ma1 = resData;
-                    } else {
-                        state.stockList[index].data.ma2 = resData;
-                    }
+                    // if (_.has(state.stockList[index], 'data.ma1') && _.isEmpty(state.stockList[index].data.ma1)) {
+                    //     state.stockList[index].data.ma1 = resData;
+                    // } else {
+                    state.stockList[index].data.ma_sell = resData;
+                    // }
                 }
             }
 
@@ -521,21 +521,36 @@ const stock = {
                 ? _.slice(found.data.weekly_kd, -52).map((value) => [moment(value[0]).valueOf(), value[1], value[2]])
                 : [];
         },
-        getStockDataWeeklyMa1: (state, getters) => (id) => {
-            console.log('getStockDataWeeklyMa1');
+        getStockDataWeeklyMaBuy: (state, getters) => (id) => {
+            console.log('getStockDataWeeklyMaBuy');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.ma1
-                ? _.slice(found.data.ma1, -52).map((value) => [moment(value[0]).valueOf(), value[1]])
+            return found.data && found.data.ma_buy
+                ? _.slice(found.data.ma_buy, -52).map((value) => [moment(value[0]).valueOf(), value[1]])
                 : [];
         },
-        getStockDataWeeklyMa2: (state, getters) => (id) => {
-            console.log('getStockDataWeeklyMa2');
+        getStockDataWeeklyMaSell: (state, getters) => (id) => {
+            console.log('getStockDataWeeklyMaSell');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.ma2
-                ? _.slice(found.data.ma2, -52).map((value) => [moment(value[0]).valueOf(), value[1]])
+            return found.data && found.data.ma_sell
+                ? _.slice(found.data.ma_sell, -52).map((value) => [moment(value[0]).valueOf(), value[1]])
                 : [];
+        },
+        getStockPolicyMa: (state, getters) => (id) => {
+            console.log('getStockPolicyMa');
+            const ret = { ma_buy_limit: 0, ma_sell_limit: 0 };
+            // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
+            const found = getters.getStock(id);
+            if (_.has(found, 'policy.settings.buy')) {
+                const maBuy = _.find(found.policy.settings.buy, ['method', 'ma_buy']);
+                if (maBuy) ret.ma_buy_limit = maBuy.limit;
+            }
+            if (_.has(found, 'policy.settings.sell')) {
+                const maSell = _.find(found.policy.settings.sell, ['method', 'ma_sell']);
+                if (maSell) ret.ma_sell_limit = maSell.limit;
+            }
+            return ret;
         },
     },
 };

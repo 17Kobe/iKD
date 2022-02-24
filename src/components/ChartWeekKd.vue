@@ -7,7 +7,7 @@
             style="position: relative; top: 8px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 84px; left: 97px; font-size: 12px" v-if="k && k.length > 0">
+        <div style="position: absolute; top: 83px; left: 97px; font-size: 12px" v-if="k && k.length > 0">
             <span style="color: #4286f5">K</span>: {{ k.at(-1)[1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
             {{ d.at(-1)[1].toFixed(2) }}
         </div>
