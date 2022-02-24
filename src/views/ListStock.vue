@@ -182,46 +182,67 @@
                 </template>
             </el-table-column>
             <el-table-column prop="city" label="策略歷史報酬" width="220" align="center">
-                <div>
-                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">累積報酬率</el-tag>&nbsp;<span
-                        style="color: #4386f5"
-                    ></span>
-                    %
-                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">計算期間</el-tag>&nbsp;<span
-                        style="color: #4386f5"
-                    ></span>
-                    年
-                </div>
-                <div>
-                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">每回報酬率</el-tag>&nbsp;<span
-                        style="color: #4386f5"
-                    ></span>
-                    %
-                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">每回天數</el-tag>&nbsp;<span
-                        style="color: #4386f5"
-                    ></span>
-                    天
-                </div>
-                <div>
-                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">年化報酬率</el-tag>&nbsp;<span
-                        style="color: #4386f5"
-                    ></span>
-                    %
-                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">買賣次數</el-tag>&nbsp;<span
-                        style="color: #4386f5"
-                    ></span>
-                    次
-                </div>
-                <div>
-                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">年均報酬率</el-tag>&nbsp;<span
-                        style="color: #4386f5"
-                    ></span>
-                    %
-                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">最大賺賠</el-tag>&nbsp;<span
-                        style="color: #4386f5"
-                    ></span>
-                    次
-                </div>
+                <template #default="scope">
+                    <el-popover
+                        placement="bottom-start"
+                        title="策略歷史記錄"
+                        width="200"
+                        trigger="hover"
+                        hide-after="0"
+                        :ref="`popover-${scope.row.id}`"
+                        @show="doShowHistory($event, scope.row.id)"
+                    >
+                        <el-table :data="historyData">
+                            <el-table-column width="130" property="name" label="日期"></el-table-column>
+                            <el-table-column width="80" property="id" label="買賣"></el-table-column>
+                            <el-table-column width="80" property="id" label="報酬"></el-table-column>
+                        </el-table>
+                        <template #reference>
+                            <div>
+                                <div>
+                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">累積報酬率</el-tag>&nbsp;<span
+                                        style="color: #4386f5"
+                                    ></span>
+                                    %
+                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">計算期間</el-tag>&nbsp;<span
+                                        style="color: #4386f5"
+                                    ></span>
+                                    年
+                                </div>
+                                <div>
+                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">每回報酬率</el-tag>&nbsp;<span
+                                        style="color: #4386f5"
+                                    ></span>
+                                    %
+                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">每回天數</el-tag>&nbsp;<span
+                                        style="color: #4386f5"
+                                    ></span>
+                                    天
+                                </div>
+                                <div>
+                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">年化報酬率</el-tag>&nbsp;<span
+                                        style="color: #4386f5"
+                                    ></span>
+                                    %
+                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">買賣次數</el-tag>&nbsp;<span
+                                        style="color: #4386f5"
+                                    ></span>
+                                    次
+                                </div>
+                                <div>
+                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">年均報酬率</el-tag>&nbsp;<span
+                                        style="color: #4386f5"
+                                    ></span>
+                                    %
+                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">最大賺賠</el-tag>&nbsp;<span
+                                        style="color: #4386f5"
+                                    ></span>
+                                    次
+                                </div>
+                            </div>
+                        </template>
+                    </el-popover>
+                </template>
             </el-table-column>
             <!-- <el-table-column prop="city" label="功能" width="220" align="center">
                 <el-button type="danger" @click="onDel()"><i class="el-icon-minus"></i></el-button>
@@ -252,6 +273,7 @@ export default {
     data() {
         return {
             rateOfReturn: 0,
+            historyData: [],
         };
     },
     computed: {
@@ -313,6 +335,51 @@ export default {
             // 父傳一堆變數給子也不太好
             // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
             this.$refs.childFormSearch.onInit();
+        },
+        doShowHistory(e, id) {
+            console.log(e, id);
+            if (id === '0056') {
+                this.historyData = [
+                    {
+                        date: '2016-05-02',
+                        name: '王力宏',
+                        address: '上海市普陀区金沙江路 1518 弄',
+                    },
+                    {
+                        date: '2016-05-04',
+                        name: '王小虎',
+                        address: '上海市普陀区金沙江路 1518 弄',
+                    },
+                    {
+                        date: '2016-05-01',
+                        name: '王小虎',
+                        address: '上海市普陀区金沙江路 1518 弄',
+                    },
+                    {
+                        date: '2016-05-03',
+                        name: '王小虎',
+                        address: '上海市普陀区金沙江路 1518 弄',
+                    },
+                ];
+            } else {
+                this.historyData = [
+                    {
+                        date: '2016-05-04',
+                        name: '王小虎',
+                        address: '上海市普陀区金沙江路 1518 弄',
+                    },
+                    {
+                        date: '2016-05-01',
+                        name: '王小虎',
+                        address: '上海市普陀区金沙江路 1518 弄',
+                    },
+                    {
+                        date: '2016-05-03',
+                        name: '王小虎',
+                        address: '上海市普陀区金沙江路 1518 弄',
+                    },
+                ];
+            }
         },
         getReturn(sum, close, total) {
             return Number((close * total - sum).toFixed(2)).toLocaleString('en-US');
