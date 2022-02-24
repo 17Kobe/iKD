@@ -256,7 +256,7 @@ export default {
     },
     computed: {
         stockList() {
-            return this.$store.state.stock.stockList;
+            return this.$store.state.price.stockList;
         },
     },
     created() {

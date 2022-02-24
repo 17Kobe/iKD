@@ -85,10 +85,10 @@ export default {
     },
     computed: {
         taiwanStockList() {
-            return this.$store.state.stock.taiwanStockList;
+            return this.$store.state.taiwan.taiwanStockList;
         },
         customStockList() {
-            return this.$store.state.stock.stockList;
+            return this.$store.state.taiwan.stockList;
         },
     },
     mounted() {},
