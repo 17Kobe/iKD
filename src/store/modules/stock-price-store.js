@@ -425,10 +425,12 @@ const stock = {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
                             const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
-                            if (index === -1) policyResult.push({ date: item[0], isBuy: true, k, price: dataWeeklyPrice });
+                            if (index === -1)
+                                policyResult.push({ date: item[0], isBuy: true, k, price: dataWeeklyPrice, reason: ['kd_gold'] });
                             else {
                                 policyResult[index].isBuy = true;
                                 policyResult[index].k = k;
+                                policyResult[index].reason.push('kd_gold');
                             }
                             kdGoldReady = false;
                         }
@@ -442,10 +444,18 @@ const stock = {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
                             const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
-                            if (index === -1) policyResult.push({ date: item[0], isBuy: true, k, price: dataWeeklyPrice });
+                            if (index === -1)
+                                policyResult.push({
+                                    date: item[0],
+                                    isBuy: true,
+                                    k,
+                                    price: dataWeeklyPrice,
+                                    reason: ['kd_turn_up'],
+                                });
                             else {
                                 policyResult[index].isBuy = true;
                                 policyResult[index].k = k;
+                                policyResult[index].reason.push('kd_turn_up');
                             }
                             kdTurnUpReady = false;
                         }
@@ -460,10 +470,18 @@ const stock = {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
                             const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
-                            if (index === -1) policyResult.push({ date: item[0], isSell: true, k, price: dataWeeklyPrice });
+                            if (index === -1)
+                                policyResult.push({
+                                    date: item[0],
+                                    isSell: true,
+                                    k,
+                                    price: dataWeeklyPrice,
+                                    reason: ['kd_dead'],
+                                });
                             else {
                                 policyResult[index].isSell = true;
                                 policyResult[index].k = k;
+                                policyResult[index].reason.push('kd_dead');
                             }
                             kdDeadReady = false;
                         }
@@ -477,10 +495,18 @@ const stock = {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
                             const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
-                            if (index === -1) policyResult.push({ date: item[0], isSell: true, k, price: dataWeeklyPrice });
+                            if (index === -1)
+                                policyResult.push({
+                                    date: item[0],
+                                    isSell: true,
+                                    k,
+                                    price: dataWeeklyPrice,
+                                    reason: ['kd_turn_down'],
+                                });
                             else {
                                 policyResult[index].isSell = true;
                                 policyResult[index].k = k;
+                                policyResult[index].reason.push('kd_turn_down');
                             }
                             kdTurnDownReady = false;
                         }
@@ -501,6 +527,7 @@ const stock = {
                             item.isBuyCancel = true;
                             // item.price = priceValueForBuy;
                             item.ma_buy = maBuyValue;
+                            item.reason.push('ma_buy');
                         }
                     }
                     // 賣出時，找出該天的日均線
@@ -513,6 +540,7 @@ const stock = {
                             item.isSellCancel = true;
                             // item.price = priceValueForSell;
                             item.ma_buy = maSellValue;
+                            item.reason.push('ma_sell');
                         }
                     }
                 });
