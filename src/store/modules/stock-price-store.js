@@ -413,7 +413,7 @@ const stock = {
                 let preK = 0;
                 let kdTurnUpReady = false;
                 let kdTurnDownReady = false;
-                foundStock.data.weekly_kd.forEach((item) => {
+                foundStock.data.weekly_kd.forEach((item, dataIndex) => {
                     const k = item[1];
                     const d = item[2];
                     // 週 KD 黃金交叉 買進訊號
@@ -424,7 +424,8 @@ const stock = {
                         if (k <= foundKdGold.limit && k >= d && kdGoldReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            if (index === -1) policyResult.push({ date: item[0], isBuy: true, k });
+                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            if (index === -1) policyResult.push({ date: item[0], isBuy: true, k, price: dataWeeklyPrice });
                             else {
                                 policyResult[index].isBuy = true;
                                 policyResult[index].k = k;
@@ -440,7 +441,8 @@ const stock = {
                         if (k <= foundKdTurnUp.limit && k >= preK && kdTurnUpReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            if (index === -1) policyResult.push({ date: item[0], isBuy: true, k });
+                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            if (index === -1) policyResult.push({ date: item[0], isBuy: true, k, price: dataWeeklyPrice });
                             else {
                                 policyResult[index].isBuy = true;
                                 policyResult[index].k = k;
@@ -457,7 +459,8 @@ const stock = {
                         if (k >= foundKdDead.limit && k <= d && kdDeadReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            if (index === -1) policyResult.push({ date: item[0], isSell: true, k });
+                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            if (index === -1) policyResult.push({ date: item[0], isSell: true, k, price: dataWeeklyPrice });
                             else {
                                 policyResult[index].isSell = true;
                                 policyResult[index].k = k;
@@ -473,7 +476,8 @@ const stock = {
                         if (k >= foundKdTurnDown.limit && k <= preK && kdTurnDownReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            if (index === -1) policyResult.push({ date: item[0], isSell: true, k });
+                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            if (index === -1) policyResult.push({ date: item[0], isSell: true, k, price: dataWeeklyPrice });
                             else {
                                 policyResult[index].isSell = true;
                                 policyResult[index].k = k;
@@ -491,11 +495,11 @@ const stock = {
                     if (item.isBuy && foundMaBuy) {
                         const foundDataMaBuy = _.find(foundStock.data.ma_buy, (array) => array[0] === item.date);
                         const maBuyValue = foundDataMaBuy[1];
-                        const foundDataWeekly = _.find(foundStock.data.weekly, (array) => array[0] === item.date);
-                        const priceValueForBuy = foundDataWeekly[4];
-                        if (priceValueForBuy <= maBuyValue) {
+                        // const foundDataWeekly = _.find(foundStock.data.weekly, (array) => array[0] === item.date);
+                        // const priceValueForBuy = foundDataWeekly[4];
+                        if (item.price <= maBuyValue) {
                             item.isBuyCancel = true;
-                            item.price = priceValueForBuy;
+                            // item.price = priceValueForBuy;
                             item.ma_buy = maBuyValue;
                         }
                     }
@@ -503,11 +507,11 @@ const stock = {
                     if (item.isSell && foundMaSell) {
                         const foundDataMaSell = _.find(foundStock.data.ma_sell, (array) => array[0] === item.date);
                         const maSellValue = foundDataMaSell[1];
-                        const foundDataWeekly = _.find(foundStock.data.weekly, (array) => array[0] === item.date);
-                        const priceValueForSell = foundDataWeekly[4];
-                        if (priceValueForSell <= maSellValue) {
+                        // const foundDataWeekly = _.find(foundStock.data.weekly, (array) => array[0] === item.date);
+                        // const priceValueForSell = foundDataWeekly[4];
+                        if (item.price >= maSellValue) {
                             item.isSellCancel = true;
-                            item.price = priceValueForSell;
+                            // item.price = priceValueForSell;
                             item.ma_buy = maSellValue;
                         }
                     }
