@@ -221,13 +221,18 @@ const stock = {
                 console.log('SAVE_STOCK_POLICY_RESULT foundStock');
                 const foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
                 const foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
+                const foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
+                const foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
 
                 let kdGoldReady = false;
                 let kdDeadReady = false;
+                let preK = 0;
+                let kdTurnUpReady = false;
+                let kdTurnDownReady = false;
                 foundStock.data.weekly_kd.forEach((item) => {
                     const k = item[1];
                     const d = item[2];
-                    // 黃金交叉 買進訊號
+                    // 週 KD 黃金交叉 買進訊號
                     if (foundKdGold) {
                         if (k < d) {
                             kdGoldReady = true;
@@ -243,7 +248,24 @@ const stock = {
                             kdGoldReady = false;
                         }
                     }
-                    // 死亡交叉 賣出訊號
+                    // 週 KD 往上轉折 買進訊號
+                    if (foundKdTurnUp) {
+                        if (k < preK) {
+                            kdTurnUpReady = true;
+                        }
+                        if (k <= foundKdTurnUp.limit && k >= preK && kdTurnUpReady) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            if (index === -1) policyResult.push({ date: item[0], isBuy: true, k });
+                            else {
+                                policyResult[index].isBuy = true;
+                                policyResult[index].k = k;
+                            }
+                            kdTurnUpReady = false;
+                        }
+                    }
+
+                    // 週 KD 死亡交叉 賣出訊號
                     if (foundKdDead) {
                         if (k > d) {
                             kdDeadReady = true;
@@ -259,6 +281,23 @@ const stock = {
                             kdDeadReady = false;
                         }
                     }
+                    // 週 KD 往下轉折 賣出訊號
+                    if (foundKdTurnDown) {
+                        if (k > preK) {
+                            kdTurnDownReady = true;
+                        }
+                        if (k >= foundKdTurnDown.limit && k <= preK && kdTurnDownReady) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            if (index === -1) policyResult.push({ date: item[0], isSell: true, k });
+                            else {
+                                policyResult[index].isSell = true;
+                                policyResult[index].k = k;
+                            }
+                            kdTurnDownReady = false;
+                        }
+                    }
+                    preK = k;
                     console.log(item);
                 });
 
