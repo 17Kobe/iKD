@@ -395,13 +395,17 @@ const stock = {
                 let foundKdTurnUp = false;
                 let foundKdDead = false;
                 let foundKdTurnDown = false;
+                let foundMaBuy = false;
+                let foundMaSell = false;
                 if (_.has(foundStock, 'policy.settings.buy')) {
                     foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
                     foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
+                    foundMaBuy = _.find(foundStock.policy.settings.buy, ['method', 'ma_buy']);
                 }
                 if (_.has(foundStock, 'policy.settings.sell')) {
                     foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
                     foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
+                    foundMaSell = _.find(foundStock.policy.settings.sell, ['method', 'ma_sell']);
                 }
 
                 let kdGoldReady = false;
@@ -479,6 +483,34 @@ const stock = {
                     }
                     preK = k;
                     console.log(item);
+                });
+
+                // 搭配 MA 均線 日均線之上
+                policyResult.forEach((item) => {
+                    // 買進時，找出該天的日均線
+                    if (item.isBuy && foundMaBuy) {
+                        const foundDataMaBuy = _.find(foundStock.data.ma_buy, (array) => array[0] === item.date);
+                        const maBuyValue = foundDataMaBuy[1];
+                        const foundDataWeekly = _.find(foundStock.data.weekly, (array) => array[0] === item.date);
+                        const priceValueForBuy = foundDataWeekly[4];
+                        if (priceValueForBuy <= maBuyValue) {
+                            item.isBuyCancel = true;
+                            item.price = priceValueForBuy;
+                            item.ma_buy = maBuyValue;
+                        }
+                    }
+                    // 賣出時，找出該天的日均線
+                    if (item.isSell && foundMaSell) {
+                        const foundDataMaSell = _.find(foundStock.data.ma_sell, (array) => array[0] === item.date);
+                        const maSellValue = foundDataMaSell[1];
+                        const foundDataWeekly = _.find(foundStock.data.weekly, (array) => array[0] === item.date);
+                        const priceValueForSell = foundDataWeekly[4];
+                        if (priceValueForSell <= maSellValue) {
+                            item.isSellCancel = true;
+                            item.price = priceValueForSell;
+                            item.ma_buy = maSellValue;
+                        }
+                    }
                 });
 
                 foundStock.policy.result = [];

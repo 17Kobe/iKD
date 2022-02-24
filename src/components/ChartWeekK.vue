@@ -7,8 +7,16 @@
             style="position: relative; top: 8px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 83px; left: 115px; font-size: 12px" v-if="ohlc && ohlc.length > 0">
-            <span style="color: #834beb">收</span>: {{ ohlc.at(-1)[3].toFixed(2) }}
+        <div style="position: absolute; top: 83px; right: 14px; font-size: 12px" v-if="ohlc && ohlc.length > 0">
+            <!-- <span style="color: #834beb">P</span>: {{ Number(ohlc.at(-1)[3].toFixed(2)) }} -->
+            <span v-if="ma_buy && ma_buy.length > 0"
+                ><span style="color: #834beb">&nbsp;MA({{ ma_policy.ma_buy_limit }})</span>:
+                {{ Number(ma_buy.at(-1)[1].toFixed(2)) }}</span
+            >
+            <span v-if="ma_sell && ma_sell.length > 0"
+                ><span style="color: #e6a23c">&nbsp;MA({{ ma_policy.ma_sell_limit }})</span>:
+                {{ Number(ma_sell.at(-1)[1].toFixed(2)) }}</span
+            >
         </div>
         <!-- :updateArgs="[true, true, true]" -->
     </div>
