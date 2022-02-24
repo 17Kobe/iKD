@@ -33,6 +33,14 @@ export default {
             console.log('ohlc');
             return this.$store.getters.getStockDataWeekly(this.parentData);
         },
+        ma1() {
+            console.log('ohlc');
+            return this.$store.getters.getStockDataWeeklyMa1(this.parentData);
+        },
+        ma2() {
+            console.log('ohlc');
+            return this.$store.getters.getStockDataWeeklyMa2(this.parentData);
+        },
         chartOptions() {
             return {
                 chart: {
@@ -234,6 +242,30 @@ export default {
                             units: [['day', [1]]],
                         },
                         data: this.ohlc,
+                    },
+                    {
+                        type: 'line',
+                        name: 'MA1線',
+                        color: '#4286f5',
+                        data: this.ma1,
+                        dataGrouping: {
+                            // anchor: 'end',
+                            // firstAnchor: 'end',
+                            lastAnchor: 'lastPoint',
+                            units: [['day', [1]]],
+                        },
+                    },
+                    {
+                        type: 'line',
+                        name: 'MA2線',
+                        color: '#e75c9a',
+                        data: this.ma2,
+                        dataGrouping: {
+                            // anchor: 'end',
+                            // firstAnchor: 'end',
+                            lastAnchor: 'lastPoint',
+                            units: [['day', [1]]],
+                        },
                     },
                 ],
             };
