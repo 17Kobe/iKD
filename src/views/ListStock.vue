@@ -181,14 +181,14 @@
                     </el-button>
                 </template>
             </el-table-column>
-            <el-table-column prop="city" label="策略歷史報酬" width="220" align="center">
+            <el-table-column prop="city" label="策略歷史報酬" width="270" align="center">
                 <template #default="scope">
                     <el-popover
                         placement="bottom-start"
                         title="策略歷史記錄"
                         width="200"
                         trigger="hover"
-                        hide-after="0"
+                        :hide-after="0"
                         :ref="`popover-${scope.row.id}`"
                         @show="doShowHistory($event, scope.row.id)"
                     >
@@ -199,45 +199,48 @@
                         </el-table>
                         <template #reference>
                             <div>
-                                <div>
-                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">累積報酬率</el-tag>&nbsp;<span
-                                        style="color: #4386f5"
-                                    ></span>
-                                    %
-                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">計算期間</el-tag>&nbsp;<span
-                                        style="color: #4386f5"
-                                    ></span>
-                                    年
-                                </div>
-                                <div>
-                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">每回報酬率</el-tag>&nbsp;<span
-                                        style="color: #4386f5"
-                                    ></span>
-                                    %
-                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">每回天數</el-tag>&nbsp;<span
-                                        style="color: #4386f5"
-                                    ></span>
-                                    天
-                                </div>
-                                <div>
-                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">年化報酬率</el-tag>&nbsp;<span
-                                        style="color: #4386f5"
-                                    ></span>
-                                    %
-                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">買賣次數</el-tag>&nbsp;<span
-                                        style="color: #4386f5"
-                                    ></span>
-                                    次
-                                </div>
-                                <div>
-                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">年均報酬率</el-tag>&nbsp;<span
-                                        style="color: #4386f5"
-                                    ></span>
-                                    %
-                                    <el-tag class="ml-2" size="small" style="margin: 1px 0px">最大賺賠</el-tag>&nbsp;<span
-                                        style="color: #4386f5"
-                                    ></span>
-                                    次
+                                <div v-if="scope.row.policy && scope.row.policy.stats">
+                                    <div>
+                                        <el-tag class="ml-2" size="small" style="margin: 1px 0px">累積報酬率</el-tag>&nbsp;<span
+                                            style="color: #4386f5"
+                                            >{{ Number((scope.row.policy.stats.sum_of_returns * 100).toFixed(2)) }}</span
+                                        >
+                                        %
+                                        <el-tag class="ml-2" size="small" style="margin: 1px 0px">計算期間</el-tag>&nbsp;<span
+                                            style="color: #4386f5"
+                                        ></span>
+                                        年
+                                    </div>
+                                    <div>
+                                        <el-tag class="ml-2" size="small" style="margin: 1px 0px">每回報酬率</el-tag>&nbsp;<span
+                                            style="color: #4386f5"
+                                        ></span>
+                                        %
+                                        <el-tag class="ml-2" size="small" style="margin: 1px 0px">每回天數</el-tag>&nbsp;<span
+                                            style="color: #4386f5"
+                                        ></span>
+                                        天
+                                    </div>
+                                    <div>
+                                        <el-tag class="ml-2" size="small" style="margin: 1px 0px">年化報酬率</el-tag>&nbsp;<span
+                                            style="color: #4386f5"
+                                        ></span>
+                                        %
+                                        <el-tag class="ml-2" size="small" style="margin: 1px 0px">買賣次數</el-tag>&nbsp;<span
+                                            style="color: #4386f5"
+                                        ></span>
+                                        次
+                                    </div>
+                                    <div>
+                                        <el-tag class="ml-2" size="small" style="margin: 1px 0px">年均報酬率</el-tag>&nbsp;<span
+                                            style="color: #4386f5"
+                                        ></span>
+                                        %
+                                        <el-tag class="ml-2" size="small" style="margin: 1px 0px">最大賺賠</el-tag>&nbsp;<span
+                                            style="color: #4386f5"
+                                        ></span>
+                                        次
+                                    </div>
                                 </div>
                             </div>
                         </template>
@@ -252,6 +255,7 @@
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
         <el-button style="margin-top: 10px" @click="doShowSearch()"><i class="el-icon-edit"></i>&nbsp;新增自選股</el-button>
+        <el-button style="margin-top: 10px" @click="doShowSearch()"><i class="el-icon-download"></i>&nbsp;匯出設定檔</el-button>
         <FormCost ref="childFormCost" />
         <FormPolicy ref="childFormPolicy" />
         <FormSearch ref="childFormSearch" />
@@ -307,7 +311,6 @@ export default {
         // 在 mounted() 事件時就可以發送，因為此時不須 data 及 computed 資料都準備好(因為沒有要data 參數，在create())
 
         this.$store.dispatch('GET_STOCK_PRICE');
-        this.$store.dispatch('GET_TAIWAN_STOCK');
     },
     methods: {
         getDifference(array1, array2) {
@@ -334,6 +337,7 @@ export default {
             // 父改子去顯示 drawer 變數 不好，子要被改值
             // 父傳一堆變數給子也不太好
             // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
+            this.$store.dispatch('GET_TAIWAN_STOCK');
             this.$refs.childFormSearch.onInit();
         },
         doShowHistory(e, id) {

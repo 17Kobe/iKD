@@ -70,7 +70,7 @@ export default {
             return (
                 (this.stockData.policy &&
                     this.stockData.policy.result &&
-                    _.filter(this.stockData.policy.result, (o) => moment().diff(moment(o.date), 'days') <= 365 && o.isBuy).map(
+                    _.filter(this.stockData.policy.result, (o) => moment().diff(moment(o.date), 'days') <= 365 && o.is_buy).map(
                         (obj) => [moment(obj.date).valueOf(), obj.k]
                     )) ||
                 []
@@ -84,7 +84,7 @@ export default {
             return (
                 (this.stockData.policy &&
                     this.stockData.policy.result &&
-                    _.filter(this.stockData.policy.result, (o) => moment().diff(moment(o.date), 'days') <= 365 && o.isSell).map(
+                    _.filter(this.stockData.policy.result, (o) => moment().diff(moment(o.date), 'days') <= 365 && o.is_sell).map(
                         (obj) => [moment(obj.date).valueOf(), obj.k]
                     )) ||
                 []

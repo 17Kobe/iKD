@@ -12,14 +12,14 @@ const defaultState = {
             name: '台積電',
             id: '2330',
         },
-        // {
-        //     name: '聯發科',
-        //     id: '2454',
-        // },
-        // {
-        //     name: '大立光',
-        //     id: '3008',
-        // },
+        {
+            name: '聯發科',
+            id: '2454',
+        },
+        {
+            name: '大立光',
+            id: '3008',
+        },
         // {
         //     name: '台達電',
         //     id: '2308',
@@ -426,9 +426,15 @@ const stock = {
                             const index = _.findIndex(policyResult, ['date', item[0]]);
                             const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
                             if (index === -1)
-                                policyResult.push({ date: item[0], isBuy: true, k, price: dataWeeklyPrice, reason: ['kd_gold'] });
+                                policyResult.push({
+                                    date: item[0],
+                                    is_buy: true,
+                                    k,
+                                    price: dataWeeklyPrice,
+                                    reason: ['kd_gold'],
+                                });
                             else {
-                                policyResult[index].isBuy = true;
+                                policyResult[index].is_buy = true;
                                 policyResult[index].k = k;
                                 policyResult[index].reason.push('kd_gold');
                             }
@@ -447,13 +453,13 @@ const stock = {
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
-                                    isBuy: true,
+                                    is_buy: true,
                                     k,
                                     price: dataWeeklyPrice,
                                     reason: ['kd_turn_up'],
                                 });
                             else {
-                                policyResult[index].isBuy = true;
+                                policyResult[index].is_buy = true;
                                 policyResult[index].k = k;
                                 policyResult[index].reason.push('kd_turn_up');
                             }
@@ -473,13 +479,13 @@ const stock = {
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
-                                    isSell: true,
+                                    is_sell: true,
                                     k,
                                     price: dataWeeklyPrice,
                                     reason: ['kd_dead'],
                                 });
                             else {
-                                policyResult[index].isSell = true;
+                                policyResult[index].is_sell = true;
                                 policyResult[index].k = k;
                                 policyResult[index].reason.push('kd_dead');
                             }
@@ -498,13 +504,13 @@ const stock = {
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
-                                    isSell: true,
+                                    is_sell: true,
                                     k,
                                     price: dataWeeklyPrice,
                                     reason: ['kd_turn_down'],
                                 });
                             else {
-                                policyResult[index].isSell = true;
+                                policyResult[index].is_sell = true;
                                 policyResult[index].k = k;
                                 policyResult[index].reason.push('kd_turn_down');
                             }
@@ -518,26 +524,26 @@ const stock = {
                 // 搭配 MA 均線 日均線之上
                 policyResult.forEach((item) => {
                     // 買進時，找出該天的日均線
-                    if (item.isBuy && foundMaBuy) {
+                    if (item.is_buy && foundMaBuy) {
                         const foundDataMaBuy = _.find(foundStock.data.ma_buy, (array) => array[0] === item.date);
                         const maBuyValue = foundDataMaBuy[1];
                         // const foundDataWeekly = _.find(foundStock.data.weekly, (array) => array[0] === item.date);
                         // const priceValueForBuy = foundDataWeekly[4];
                         if (item.price <= maBuyValue) {
-                            item.isBuyCancel = true;
+                            item.is_buy_cancel = true;
                             // item.price = priceValueForBuy;
                             item.ma_buy = maBuyValue;
                             item.reason.push('ma_buy');
                         }
                     }
                     // 賣出時，找出該天的日均線
-                    if (item.isSell && foundMaSell) {
+                    if (item.is_sell && foundMaSell) {
                         const foundDataMaSell = _.find(foundStock.data.ma_sell, (array) => array[0] === item.date);
                         const maSellValue = foundDataMaSell[1];
                         // const foundDataWeekly = _.find(foundStock.data.weekly, (array) => array[0] === item.date);
                         // const priceValueForSell = foundDataWeekly[4];
                         if (item.price >= maSellValue) {
-                            item.isSellCancel = true;
+                            item.is_sell_cancel = true;
                             // item.price = priceValueForSell;
                             item.ma_buy = maSellValue;
                             item.reason.push('ma_sell');
@@ -571,9 +577,6 @@ const stock = {
                 foundEarn = _.find(foundStock.policy.settings.sell, ['method', 'earn']);
             }
 
-            let isReadyToSell = false;
-            let numberOfBuy = 0;
-            let accPriceOfBuy = 0;
             // 最後一天強制再多塞入一個isLatest來計算最新的報酬率
             if (foundStock.policy.result.length > 0) {
                 const lastDate = moment(foundStock.policy.result.at(-1).date);
@@ -589,9 +592,14 @@ const stock = {
                 }
             }
 
+            let isReadyToSell = false;
+            let numberOfBuy = 0;
+            let accPriceOfBuy = 0;
+            let dateOfFirstBuy = '';
             foundStock.policy.result.forEach((obj) => {
                 // 必需有買才要在第一次賣時算報酬率
-                if (!isReadyToSell && obj.isBuy && !obj.isSell && !obj.isBuyCancel) {
+                if (obj.is_buy && !obj.is_sell && !obj.is_buy_cancel) {
+                    // !isReadyToSell && 不需要這個判斷，因為隨時都可買
                     // 如果有 搭配 成本價跌超過，則在此決定那個買是否真的要買
                     let isCancelToBuy = false;
                     if (foundCostDown && numberOfBuy > 1) {
@@ -600,17 +608,22 @@ const stock = {
                         if (rateOfReturn * 100 > -foundCostDown) {
                             // 比負10還大，就是沒超過，就不買了。foundCostDown都是正值，但實際人認知是負值
                             isCancelToBuy = true;
-                            obj.isBuyCancel = true;
+                            obj.is_buy_cancel = true;
                             obj.reason.push('cost_down');
                         }
                     }
                     // 去累加買入訊號單位
+                    // console.log(obj);
+                    // console.log(isCancelToBuy);
                     if (!isCancelToBuy) {
                         numberOfBuy += 1;
+                        // console.log(numberOfBuy);
+                        if (numberOfBuy === 1) dateOfFirstBuy = obj.date; // 賣出要記，之後可以知道該次賣出最早的買進時間，然後再算總期間累計報酬
                         accPriceOfBuy += obj.price;
+                        obj.is_sure_buy = true;
                         isReadyToSell = true;
                     }
-                } else if (isReadyToSell && ((obj.isSell && !obj.isBuy && !obj.isSellCancel) || obj.isLatest)) {
+                } else if (isReadyToSell && ((obj.is_sell && !obj.is_buy && !obj.is_sell_cancel) || obj.isLatest)) {
                     // 不能同時當天有買也有賣，這樣也會取消
                     // 去累加買入訊號單位
                     const rateOfReturn = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
@@ -619,20 +632,61 @@ const stock = {
                     let isCancelToSell = false;
                     if (foundEarn && rateOfReturn * 100 < foundEarn.limit) {
                         isCancelToSell = true;
-                        obj.isSellCancel = true;
+                        obj.is_sell_cancel = true;
                         obj.reason.push('earn');
                     }
                     if (!isCancelToSell || obj.isLatest) {
                         // 就算是取消賣，最後一天也是要去算最新報酬喔
-                        obj.rateOfReturn = rateOfReturn;
+                        obj.rate_of_return = rateOfReturn;
+                        obj.number_of_buy = numberOfBuy;
+                        obj.date_of_first_buy = dateOfFirstBuy;
+                        obj.is_sure_sell = true;
+                        dateOfFirstBuy = '';
                         numberOfBuy = 0;
+                        accPriceOfBuy = 0;
                         isReadyToSell = false;
                     }
                 }
             });
+
+            foundStock.policy.stats = {};
+
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            this.commit('SAVE_STOCK_POLICY_RETURN_STATS', stockId);
 
             console.log('SAVE_STOCK_POLICY_RETURN_RESULT OK');
+        },
+
+        SAVE_STOCK_POLICY_RETURN_STATS(state, stockId) {
+            console.log('SAVE_STOCK_POLICY_RETURN_STATS');
+
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            foundStock.policy.stats = {};
+
+            let numberOfSell = 0;
+            let sumOfReturns = 0;
+            console.log('1111');
+
+            foundStock.policy.result.forEach((obj) => {
+                console.log('3333');
+                if (moment().diff(obj.date, 'years') <= 9) {
+                    console.log('5555');
+                    if (obj.is_sure_sell) {
+                        console.log('6666');
+                        numberOfSell += 1;
+                        // 為了算"計算期間"，第一個買入的日期要知道
+                        sumOfReturns += obj.rate_of_return;
+                    }
+                    // 如今天是2022-02-25，則會算到2012-02-26。2012-02-25就不算了
+                }
+            });
+            console.log(sumOfReturns);
+            console.log(numberOfSell);
+
+            foundStock.policy.stats.sum_of_returns = sumOfReturns;
+            foundStock.policy.stats.average_of_returns = numberOfSell === 0 ? 0 : sumOfReturns / numberOfSell;
+
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
     },
     getters: {
