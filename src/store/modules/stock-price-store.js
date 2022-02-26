@@ -183,10 +183,15 @@ const stock = {
 
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
-            if (policyList.buy.length === 0 && policyList.sell.length === 0 && _.has(foundStock, 'policy.settings')) {
+            if (
+                _.has(foundStock, 'policy.settings') &&
+                (!_.has(policyList, 'buy') ||
+                    !_.has(policyList, 'sell') ||
+                    (policyList.buy.length === 0 && policyList.sell.length === 0))
+            ) {
                 delete foundStock.policy;
             } else {
-                foundStock.policy = { settings: {} };
+                foundStock.policy = { settings: { buy: [], sell: [] } };
                 foundStock.policy.settings = policyList; // 複製數據複本
 
                 // save to localstorage
