@@ -725,7 +725,7 @@ const stock = {
                     console.log(dateOfFirstBuy);
                     console.log(diffDays);
                     console.log(diffDays / 365);
-                    const diffYears = diffDays / 365 > 0 ? Math.floor(diffDays / 365) : 0;
+                    const diffYears = diffDays / 365 > 0 ? diffDays / 365 : 0;
                     const diffRemainingDays = diffDays % 365 > 0 ? diffDays % 365 : 0;
                     foundStock.policy.stats.diiff_years = diffYears;
                     foundStock.policy.stats.diiff_remaining_days = diffRemainingDays;
@@ -738,6 +738,7 @@ const stock = {
                 foundStock.policy.stats.average_buy_number = numberOfSell === 0 ? 0 : sumOfBuyNumber / numberOfSell;
                 foundStock.policy.stats.max_earn = maxEarn;
                 foundStock.policy.stats.max_lose = maxLose;
+                foundStock.policy.stats.number_of_sell = numberOfSell;
                 // foundStock.policy.stats.average_annual_return = (compoundOfReturns - 1) / diffYearsFloat;
                 foundStock.policy.stats.average_annual_return = sumOfReturns / diffYearsFloat;
                 foundStock.policy.stats.internal_of_return = compoundOfReturns ** (1 / diffYearsFloat) - 1;
