@@ -262,7 +262,9 @@ export default {
 
             console.log(this.stockData);
 
-            if (_.has(this.stockData, 'policy.settings')) this.form = this.stockData.policy.settings;
+            // 深拷貝，不然一直畫KD的橫線
+            if (_.has(this.stockData, 'policy.settings')) this.form = _.cloneDeep(this.stockData.policy.settings);
+            else this.form = {};
 
             console.log(this.stockData);
             console.log(stockId);

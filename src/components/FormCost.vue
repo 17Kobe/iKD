@@ -125,7 +125,8 @@ export default {
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定成本`;
 
             console.log(this.stockData.cost);
-            if (_.has(this.stockData, 'cost.settings')) this.form = this.stockData.cost.settings;
+            if (_.has(this.stockData, 'cost.settings')) this.form = _.cloneDeep(this.stockData.cost.settings);
+            else this.form = [];
 
             console.log(this.stockData);
             console.log(stockId);

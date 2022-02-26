@@ -158,14 +158,21 @@ const stock = {
             console.log(costList);
 
             // object of array 去 find 並 update
-            const found = state.stockList.find((v) => v.id === stockId);
-            found.cost = {};
-            found.cost.settings = [];
-            found.cost.settings = costList; // 複製數據複本
-            console.log(found.cost.cost_list);
-            found.cost.total = totalOfShares || 0; // null 則指定為0
-            found.cost.avg = averageCost || 0; // null 則指定為0
-            found.cost.sum = sumCost || 0; // null 則指定為0
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+
+            if (costList.length === 0 && _.has(foundStock, 'cost.settings')) {
+                delete foundStock.cost;
+            } else {
+                foundStock.cost = {};
+                foundStock.cost.settings = [];
+                foundStock.cost.settings = costList; // 複製數據複本
+                console.log(foundStock.cost.cost_list);
+                foundStock.cost.total = totalOfShares || 0; // null 則指定為0
+                foundStock.cost.avg = averageCost || 0; // null 則指定為0
+                foundStock.cost.sum = sumCost || 0; // null 則指定為0
+
+                // save to localstorage
+            }
 
             // save to localstorage
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
@@ -175,11 +182,15 @@ const stock = {
             console.log(policyList);
 
             // object of array 去 find 並 update
-            const found = state.stockList.find((v) => v.id === stockId);
-            found.policy = { settings: {} };
-            found.policy.settings = policyList; // 複製數據複本
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            if (policyList.buy.length === 0 && policyList.sell.length === 0 && _.has(foundStock, 'policy.settings')) {
+                delete foundStock.policy;
+            } else {
+                foundStock.policy = { settings: {} };
+                foundStock.policy.settings = policyList; // 複製數據複本
 
-            // save to localstorage
+                // save to localstorage
+            }
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線, 看console.log會依序執行commit，一個一個執行完才執行下個，看起來沒問題
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
@@ -661,31 +672,73 @@ const stock = {
             console.log('SAVE_STOCK_POLICY_RETURN_STATS');
 
             const foundStock = state.stockList.find((v) => v.id === stockId);
-            foundStock.policy.stats = {};
 
-            let numberOfSell = 0;
-            let sumOfReturns = 0;
-            console.log('1111');
+            // 必需有買或賣的設定
+            if (
+                (_.has(foundStock, 'policy.settings.buy') && foundStock.policy.settings.buy.length > 0) ||
+                (_.has(foundStock, 'policy.settings.sell') && foundStock.policy.settings.sell.length > 0)
+            ) {
+                foundStock.policy.stats = {};
+                let numberOfSell = 0;
+                let sumOfReturns = 0;
+                let dateOfFirstBuy = '';
+                let holdDays = 0;
+                let sumOfBuyNumber = 0;
+                let maxEarn = -999999;
+                let maxLose = 999999;
+                let compoundOfReturns = 1; // 複利報酬率，為了算年均及年化報酬率，本是1
 
-            foundStock.policy.result.forEach((obj) => {
-                console.log('3333');
-                if (moment().diff(obj.date, 'years') <= 9) {
-                    console.log('5555');
-                    if (obj.is_sure_sell) {
-                        console.log('6666');
-                        numberOfSell += 1;
-                        // 為了算"計算期間"，第一個買入的日期要知道
-                        sumOfReturns += obj.rate_of_return;
+                foundStock.policy.result.forEach((obj) => {
+                    if (moment().diff(obj.date, 'years') <= 9) {
+                        if (obj.is_sure_sell) {
+                            numberOfSell += 1;
+                            // 為了算"計算期間"，第一個買入的日期要知道
+                            sumOfReturns += obj.rate_of_return;
+                            if (numberOfSell === 1) {
+                                // 賣的第一個要計時間
+                                dateOfFirstBuy = obj.date_of_first_buy;
+                                console.log(obj.date);
+                                console.log(obj.date_of_first_buy);
+                            }
+                            holdDays += moment(obj.date).diff(moment(obj.date_of_first_buy), 'days');
+                            sumOfBuyNumber += obj.number_of_buy;
+
+                            // 算最大賺及最大賠
+                            if (obj.rate_of_return > maxEarn) maxEarn = obj.rate_of_return;
+                            if (obj.rate_of_return < maxLose) maxLose = obj.rate_of_return;
+
+                            compoundOfReturns += compoundOfReturns * obj.rate_of_return;
+                        }
+                        // 如今天是2022-02-25，則會算到2012-02-26。2012-02-25就不算了
                     }
-                    // 如今天是2022-02-25，則會算到2012-02-26。2012-02-25就不算了
+                });
+                console.log(sumOfReturns);
+                console.log(numberOfSell);
+                let diffYearsFloat = 0;
+                if (dateOfFirstBuy !== '') {
+                    const diffDays = moment().diff(moment(dateOfFirstBuy), 'days');
+                    console.log(dateOfFirstBuy);
+                    console.log(diffDays);
+                    console.log(diffDays / 365);
+                    const diffYears = diffDays / 365 > 0 ? Math.floor(diffDays / 365) : 0;
+                    const diffRemainingDays = diffDays % 365 > 0 ? diffDays % 365 : 0;
+                    foundStock.policy.stats.diiff_years = diffYears;
+                    foundStock.policy.stats.diiff_remaining_days = diffRemainingDays;
+                    diffYearsFloat = diffDays / 365;
                 }
-            });
-            console.log(sumOfReturns);
-            console.log(numberOfSell);
 
-            foundStock.policy.stats.sum_of_returns = sumOfReturns;
-            foundStock.policy.stats.average_of_returns = numberOfSell === 0 ? 0 : sumOfReturns / numberOfSell;
-
+                foundStock.policy.stats.sum_of_returns = sumOfReturns;
+                foundStock.policy.stats.average_of_returns = numberOfSell === 0 ? 0 : sumOfReturns / numberOfSell;
+                foundStock.policy.stats.average_hold_days = numberOfSell === 0 ? 0 : Math.floor(holdDays / numberOfSell);
+                foundStock.policy.stats.average_buy_number = numberOfSell === 0 ? 0 : sumOfBuyNumber / numberOfSell;
+                foundStock.policy.stats.max_earn = maxEarn;
+                foundStock.policy.stats.max_lose = maxLose;
+                // foundStock.policy.stats.average_annual_return = (compoundOfReturns - 1) / diffYearsFloat;
+                foundStock.policy.stats.average_annual_return = sumOfReturns / diffYearsFloat;
+                foundStock.policy.stats.internal_of_return = compoundOfReturns ** (1 / diffYearsFloat) - 1;
+            } else if (_.has(foundStock, 'policy.stats')) {
+                delete foundStock.policy.stats;
+            }
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
     },
