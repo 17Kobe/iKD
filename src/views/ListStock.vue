@@ -200,8 +200,7 @@
                     >
                         <el-table :data="historyData" :ref="`popover-child-${scope.row.id}`">
                             <el-table-column width="130" property="date" label="日期"></el-table-column>
-                            <el-table-column width="80" property="buy_or_sell" label="買賣" :formatter="buyOrSellFormatter">
-                            </el-table-column>
+                            <el-table-column width="80" property="buy_or_sell" label="買賣"> </el-table-column>
                             <el-table-column width="80" property="price" label="股價"></el-table-column>
                             <el-table-column width="80" property="rate_of_return" label="報酬"></el-table-column>
                         </el-table>

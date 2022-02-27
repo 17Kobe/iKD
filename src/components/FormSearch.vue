@@ -40,10 +40,14 @@
                     <el-button type="danger" size="small" @click="onDel(scope.row.id, scope.row.name)"
                         ><i class="el-icon-minus"></i
                     ></el-button>
-                    <el-button type="info" :disabled="scope.$index === 0" size="small" @click=""
+                    <el-button type="info" :disabled="scope.$index === 0" size="small" @click="onMove(scope.row.id, 'top')"
                         ><i class="el-icon-caret-top"></i
                     ></el-button>
-                    <el-button type="info" :disabled="scope.$index === customStockList.length - 1" size="small" @click=""
+                    <el-button
+                        type="info"
+                        :disabled="scope.$index === customStockList.length - 1"
+                        size="small"
+                        @click="onMove(scope.row.id, 'bottom')"
                         ><i class="el-icon-caret-bottom"></i
                     ></el-button>
                 </template>
@@ -169,6 +173,9 @@ export default {
                         message: '取消刪除!',
                     });
                 });
+        },
+        onMove(stockId, direction) {
+            this.$store.commit('MOVE_A_STOCK', { stockId, direction });
         },
         onInit() {
             console.log('onInit');

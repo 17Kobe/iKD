@@ -24,38 +24,38 @@ const defaultState = {
             name: '台達電',
             id: '2308',
         },
-        {
-            name: '元大金',
-            id: '2885',
-        },
-        {
-            name: '玉山金',
-            id: '2884',
-        },
-        {
-            name: '富邦金',
-            id: '2881',
-        },
-        {
-            name: '卜蜂',
-            id: '1215',
-        },
-        {
-            name: '統一',
-            id: '1216',
-        },
-        {
-            name: '中華電',
-            id: '2412',
-        },
-        {
-            name: '統一FANG+',
-            id: '00757',
-        },
-        {
-            name: '期元大 S&P 黃金',
-            id: '00635U',
-        },
+        // {
+        //     name: '元大金',
+        //     id: '2885',
+        // },
+        // {
+        //     name: '玉山金',
+        //     id: '2884',
+        // },
+        // {
+        //     name: '富邦金',
+        //     id: '2881',
+        // },
+        // {
+        //     name: '卜蜂',
+        //     id: '1215',
+        // },
+        // {
+        //     name: '統一',
+        //     id: '1216',
+        // },
+        // {
+        //     name: '中華電',
+        //     id: '2412',
+        // },
+        // {
+        //     name: '統一FANG+',
+        //     id: '00757',
+        // },
+        // {
+        //     name: '期元大 S&P 黃金',
+        //     id: '00635U',
+        // },
     ],
 };
 
@@ -133,6 +133,25 @@ const stock = {
             // console.log(state.currStockDayData);
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.dispatch('GET_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
+        },
+        MOVE_A_STOCK(state, { stockId, direction }) {
+            // data 是 object {name: XXX, id: XXX}
+            console.log('MOVE_A_STOCK');
+            console.log(stockId);
+            console.log(direction);
+            const index = _.findIndex(state.stockList, ['id', stockId]);
+            console.log(index);
+
+            const tmpStock = state.stockList.splice(index, 1)[0]; // 找出來是[{}]，所以要加[0]
+            console.log(tmpStock);
+            if (direction === 'bottom') {
+                state.stockList.splice(index + 1, 0, tmpStock);
+            }
+            if (direction === 'top') {
+                state.stockList.splice(index - 1, 0, tmpStock);
+            }
+            // console.log(state.currStockDayData);
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         DEL_A_STOCK(state, data) {
             // data 是 object {name: XXX, id: XXX}
