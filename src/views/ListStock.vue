@@ -306,10 +306,11 @@
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
         <el-button style="margin-top: 10px" @click="doShowSearch()"><i class="el-icon-edit"></i>&nbsp;新增自選股</el-button>
-        <el-button style="margin-top: 10px" @click="doShowSearch()"><i class="el-icon-download"></i>&nbsp;匯出設定檔</el-button>
+        <el-button style="margin-top: 10px" @click="doShowExport()"><i class="el-icon-download"></i>&nbsp;匯出設定檔</el-button>
         <FormCost ref="childFormCost" />
         <FormPolicy ref="childFormPolicy" />
         <FormSearch ref="childFormSearch" />
+        <FormExport ref="childFormExport" />
     </div>
 </template>
 
@@ -319,12 +320,13 @@ import ChartWeekK from '../components/ChartWeekK.vue';
 import FormCost from '../components/FormCost.vue';
 import FormPolicy from '../components/FormPolicy.vue';
 import FormSearch from '../components/FormSearch.vue';
+import FormExport from '../components/FormExport.vue';
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 
 export default {
     name: 'component-list',
-    components: { ChartWeekKd, ChartWeekK, FormCost, FormPolicy, FormSearch },
+    components: { ChartWeekKd, ChartWeekK, FormCost, FormPolicy, FormSearch, FormExport },
     data() {
         return {
             rateOfReturn: 0,
@@ -390,6 +392,9 @@ export default {
             // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
             this.$store.dispatch('GET_TAIWAN_STOCK');
             this.$refs.childFormSearch.onInit();
+        },
+        doShowExport() {
+            this.$refs.childFormExport.onInit();
         },
         doShowHistory(e, id) {
             console.log(e, id);
