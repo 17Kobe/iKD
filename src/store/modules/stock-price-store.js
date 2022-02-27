@@ -3,6 +3,7 @@ import moment from 'moment';
 import _ from 'lodash';
 
 const defaultState = {
+    // progressMultiple: 0.5, //* 4 則最大值為25%。 * 2 則最大值為50%。 * 1 則最大值為100%。 0.6%最大值為166% 0.5最大值為200%  0.2 最大值為500% 0.1 最大值為1000%
     stockList: [
         {
             name: '元大高股息',
@@ -852,6 +853,35 @@ const stock = {
                       })
                   )
                 : [];
+        },
+        getProgressMultiple: (state) => () => {
+            console.log('getProgressMultiple');
+
+            const maxEarnOrLoseRate = _.max(
+                _.map(state.stockList, (obj) => {
+                    if (obj.cost) {
+                        return Math.abs(
+                            Number((((obj.last_price * obj.cost.total - obj.cost.sum) * 100) / obj.cost.sum).toFixed(2))
+                        );
+                    }
+
+                    return 0;
+                })
+            );
+            let progressMultiple = 1; // 預設值
+            //* 4 則最大值為25%。 * 2 則最大值為50%。 * 1 則最大值為100%。 0.6%最大值為166% 0.5最大值為200%  0.2 最大值為500% 0.1 最大值為1000%  0.05最大值為2000  0.01 最大值為10000%
+            console.log(maxEarnOrLoseRate);
+            if (maxEarnOrLoseRate <= 25) progressMultiple = 4;
+            else if (maxEarnOrLoseRate <= 50) progressMultiple = 2;
+            else if (maxEarnOrLoseRate <= 100) progressMultiple = 1;
+            else if (maxEarnOrLoseRate <= 166) progressMultiple = 0.6;
+            else if (maxEarnOrLoseRate <= 500) progressMultiple = 0.2;
+            else if (maxEarnOrLoseRate <= 1000) progressMultiple = 0.1;
+            else if (maxEarnOrLoseRate <= 2000) progressMultiple = 0.05;
+            else if (maxEarnOrLoseRate <= 10000) progressMultiple = 0.01;
+            // state.progressMultiple = progressMultiple;
+            console.log(progressMultiple);
+            return progressMultiple;
         },
     },
 };

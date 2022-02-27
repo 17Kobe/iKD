@@ -338,6 +338,9 @@ export default {
         stockList() {
             return this.$store.state.price.stockList;
         },
+        progressMultiple() {
+            return this.$store.getters.getProgressMultiple();
+        },
     },
     created() {
         console.log('created');
@@ -457,8 +460,8 @@ export default {
         },
         getRateOfReturnPercent(sum, close, total) {
             if (!sum || sum === 0) return 0; // sum 等於0不能做為除法
-            //* 2 則最大值為50%
-            return Math.abs(Number((((close * total - sum) * 100) / sum).toFixed(2))) * 2;
+            //* 4 則最大值為25%。 * 2 則最大值為50%。 * 1 則最大值為100%。 0.6%最大值為166% 0.5最大值為200%  0.2 最大值為500% 0.1 最大值為1000%
+            return Math.abs(Number((((close * total - sum) * 100) / sum).toFixed(2))) * this.progressMultiple;
         },
         onChangeStar(selValue, index) {
             console.log(selValue);
