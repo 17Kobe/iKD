@@ -71,23 +71,29 @@
                             { 'text-align': 'left', 'line-height': '18px' },
                         ]"
                     >
-                        <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 12px">
+                        <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 13px">
                             <div>
-                                持股成本&nbsp;<el-tag
+                                持股成本&nbsp;&nbsp;<el-tag
                                     :type="scope.row.cost.avg <= scope.row.last_price ? 'danger' : 'success'"
                                     class="ml-2"
                                     size="small"
                                     style="margin: 1px 0px"
-                                    ><span style="font-size: 14px; font-weight: bold">{{ scope.row.cost.avg }}</span> 元</el-tag
+                                    ><span style="font-size: 14px; font-weight: bold">{{
+                                        scope.row.cost.avg.toLocaleString('en-US')
+                                    }}</span>
+                                    元</el-tag
                                 >
                             </div>
                             <div>
-                                累積股數&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
-                                    ><span style="font-size: 14px; font-weight: bold">{{ scope.row.cost.total }}</span> 股</el-tag
+                                累積股數&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                                    ><span style="font-size: 14px; font-weight: bold">{{
+                                        scope.row.cost.total.toLocaleString('en-US')
+                                    }}</span>
+                                    股</el-tag
                                 >
                             </div>
                             <div>
-                                本　　金&nbsp;<el-tag class="ml-2" size="small" style="margin: 1px 0px"
+                                本　　金&nbsp;&nbsp;<el-tag class="ml-2" size="small" style="margin: 1px 0px"
                                     ><span style="font-size: 14px; font-weight: bold">{{
                                         scope.row.cost.sum.toLocaleString('en-US')
                                     }}</span>
@@ -116,7 +122,7 @@
                                     <span style="font-size: 14px; font-weight: bold">{{
                                         getReturn(scope.row.cost.sum, scope.row.data.daily.at(-1)[4], scope.row.cost.total)
                                     }}</span>
-                                    元&nbsp;<span style="font-size: 14px; font-weight: bold; color: #999999">{{
+                                    元&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 13px; font-weight: bold; color: #999999">{{
                                         getRateOfReturn(scope.row.cost.sum, scope.row.data.daily.at(-1)[4], scope.row.cost.total)
                                     }}</span
                                     >&nbsp;%</span
@@ -156,15 +162,17 @@
                                 scope.row.policy.settings.sell &&
                                 (scope.row.policy.settings.buy.length >= 1 || scope.row.policy.settings.sell.length >= 1)
                             "
-                            style="font-size: 14px"
+                            style="font-size: 13px"
                         >
                             <div v-for="(item, index) in scope.row.policy.settings.buy" :key="index">
                                 <div>
                                     <el-tag class="ml-2" type="danger" size="small" style="margin: 1px 0px"
                                         ><span style="font-size: 14px; font-weight: bold">買</span></el-tag
                                     >
-                                    <span style="font-size: 12px">
-                                        &nbsp;{{ item.label }}&nbsp;<span style="color: #4386f5">{{ item.limit }}</span
+                                    <span>
+                                        &nbsp;{{ item.label }}&nbsp;<span style="color: #4386f5; font-size: 14px">{{
+                                            item.limit
+                                        }}</span
                                         >&nbsp;{{ item.limit_desc }}</span
                                     >
                                 </div>
@@ -174,8 +182,10 @@
                                     <el-tag class="ml-2" type="success" size="small" style="margin: 1px 0px"
                                         ><span style="font-size: 14px; font-weight: bold">賣</span></el-tag
                                     >
-                                    <span style="font-size: 12px">
-                                        &nbsp;{{ item.label }}&nbsp;<span style="color: #4386f5">{{ item.limit }}</span
+                                    <span>
+                                        &nbsp;{{ item.label }}&nbsp;<span style="color: #4386f5; font-size: 14px">{{
+                                            item.limit
+                                        }}</span
                                         >&nbsp;{{ item.limit_desc }}</span
                                     >
                                 </div>
@@ -209,11 +219,11 @@
                         </el-table>
                         <template #reference>
                             <div>
-                                <div v-if="scope.row.policy && scope.row.policy.stats" style="font-size: 12px">
+                                <div v-if="scope.row.policy && scope.row.policy.stats" style="font-size: 13px">
                                     <el-row :gutter="20">
                                         <el-col :span="7" style="padding: 0; text-align: left"><span>計算期間</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
-                                            ><span style="color: #4386f5">{{
+                                            ><span style="color: #4386f5; font-size: 14px">{{
                                                 Number(scope.row.policy.stats.diiff_years.toFixed(1))
                                             }}</span>
                                             年
@@ -231,7 +241,7 @@
                                     <el-row :gutter="20">
                                         <el-col :span="7" style="padding: 0; text-align: left"><span>累積報酬率</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
-                                            ><span style="color: #4386f5">{{
+                                            ><span style="color: #4386f5; font-size: 14px">{{
                                                 Number((scope.row.policy.stats.sum_of_returns * 100).toFixed(1))
                                             }}</span>
                                             %</el-col
@@ -249,7 +259,7 @@
                                     <el-row :gutter="20">
                                         <el-col :span="7" style="padding: 0; text-align: left"><span>每回報酬率</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
-                                            ><span style="color: #4386f5">{{
+                                            ><span style="color: #4386f5; font-size: 14px">{{
                                                 Number((scope.row.policy.stats.average_of_returns * 100).toFixed(1))
                                             }}</span>
                                             %</el-col
