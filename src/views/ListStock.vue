@@ -315,6 +315,7 @@
 </template>
 
 <script>
+import _ from 'lodash';
 import ChartWeekKd from '../components/ChartWeekKd.vue';
 import ChartWeekK from '../components/ChartWeekK.vue';
 import FormCost from '../components/FormCost.vue';
@@ -346,17 +347,21 @@ export default {
 
         // 將 stockList 預設的塞進到 localstorage
         // console.log(this.stockList);
-        const diffDefault = this.getDifference(this.stockList, localStockList); // 預設有，但本地沒有，則要新增
+        // const diffDefault = this.getDifference(this.stockList, localStockList); // 預設有，但本地沒有，則要新增
         // const diffLocal = this.getDifference(localStockList, this.stockList); // 本地有，但預設沒有，則要砍掉
 
-        localStockList.push(...diffDefault); // 新增 append 預設到 localStockList
-        localStorage.setItem('stockList', JSON.stringify(localStockList)); // 將 localStockList 從 object 轉 string 後塞到 localstorage
-        // console.log(diffLocal);
-        // console.log(diffDefault);
-        // console.log(localStockList);
-        // console.log(this.stockList);
+        // 空時，或沒資料(有可能刪光)，就載入預設清單
+        if (_.isEmpty(localStockList)) {
+            localStockList.push(...this.stockList); // 新增 append 預設到 localStockList
+            localStorage.setItem('stockList', JSON.stringify(localStockList)); // 將 localStockList 從 object 轉 string 後塞到 localstorage
+            // console.log(diffLocal);
+            // console.log(diffDefault);
+            // console.log(localStockList);
+            // console.log(this.stockList);
 
-        // 將 localstorage 重塞回到 vuex 的 stockList
+            // 將 localstorage 重塞回到 vuex 的 stockList
+        }
+        // localStockList 有可能是本地資料，或是預設資料。然後再呼叫載入 this.stockList
         this.$store.commit('SAVE_STOCK_LIST', localStockList);
     },
     mounted() {
