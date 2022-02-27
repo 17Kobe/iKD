@@ -37,7 +37,15 @@
             </el-table-column>
             <el-table-column fixed label="名稱">
                 <template #default="scope">
-                    <el-button type="danger" size="small" @click="onDel(scope.row.id)"><i class="el-icon-minus"></i></el-button>
+                    <el-button type="danger" size="small" @click="onDel(scope.row.id, scope.row.name)"
+                        ><i class="el-icon-minus"></i
+                    ></el-button>
+                    <el-button type="info" :disabled="scope.$index === 0" size="small" @click=""
+                        ><i class="el-icon-caret-top"></i
+                    ></el-button>
+                    <el-button type="info" :disabled="scope.$index === customStockList.length - 1" size="small" @click=""
+                        ><i class="el-icon-caret-bottom"></i
+                    ></el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -46,6 +54,7 @@
 
 <script>
 import _ from 'lodash';
+import { ElMessageBox, ElMessage } from 'element-plus';
 
 export default {
     name: 'component-form-search',
@@ -140,9 +149,26 @@ export default {
                 return false;
             });
         },
-        onDel(stockId) {
-            console.log(stockId);
-            this.$store.commit('DEL_A_STOCK', stockId);
+        onDel(stockId, stockName) {
+            ElMessageBox.confirm(`將要刪除[${stockName}]?`, '刪除', {
+                confirmButtonText: '刪除',
+                cancelButtonText: '取消',
+                type: 'warning',
+            })
+                .then(() => {
+                    console.log(stockId);
+                    this.$store.commit('DEL_A_STOCK', stockId);
+                    ElMessage({
+                        type: 'success',
+                        message: '完成刪除!',
+                    });
+                })
+                .catch(() => {
+                    ElMessage({
+                        type: 'info',
+                        message: '取消刪除!',
+                    });
+                });
         },
         onInit() {
             console.log('onInit');
