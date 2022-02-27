@@ -77,22 +77,21 @@
                                     :type="scope.row.cost.avg <= scope.row.last_price ? 'danger' : 'success'"
                                     class="ml-2"
                                     size="small"
-                                    style="margin: 1px 0px; font-size: 14px"
-                                    >{{ scope.row.cost.avg }} 元</el-tag
+                                    style="margin: 1px 0px"
+                                    ><span style="font-size: 14px; font-weight: bold">{{ scope.row.cost.avg }}</span> 元</el-tag
                                 >
                             </div>
                             <div>
-                                累積股數&nbsp;<el-tag
-                                    type="info"
-                                    class="ml-2"
-                                    size="small"
-                                    style="margin: 1px 0px; font-size: 14px"
-                                    >{{ scope.row.cost.total }} 股</el-tag
+                                累積股數&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                                    ><span style="font-size: 14px; font-weight: bold">{{ scope.row.cost.total }}</span> 股</el-tag
                                 >
                             </div>
                             <div>
-                                本　　金&nbsp;<el-tag class="ml-2" size="small" style="margin: 1px 0px; font-size: 14px"
-                                    >{{ scope.row.cost.sum.toLocaleString('en-US') }} 元</el-tag
+                                本　　金&nbsp;<el-tag class="ml-2" size="small" style="margin: 1px 0px"
+                                    ><span style="font-size: 14px; font-weight: bold">{{
+                                        scope.row.cost.sum.toLocaleString('en-US')
+                                    }}</span>
+                                    元</el-tag
                                 >
                             </div>
                             <el-progress
@@ -113,14 +112,14 @@
                                 "
                             >
                                 <!-- '#fef0f0' #f690a9 -->
-                                <span style="color: #222326"
-                                    ><b>{{
-                                        getRateOfReturn(scope.row.cost.sum, scope.row.data.daily.at(-1)[4], scope.row.cost.total)
-                                    }}</b>
-                                    %&nbsp;/&nbsp;<b>{{
+                                <span style="color: #222326; font-size: 12px">
+                                    <span style="font-size: 14px; font-weight: bold">{{
                                         getReturn(scope.row.cost.sum, scope.row.data.daily.at(-1)[4], scope.row.cost.total)
-                                    }}</b>
-                                    元</span
+                                    }}</span>
+                                    元&nbsp;<span style="font-size: 14px; font-weight: bold; color: #999999">{{
+                                        getRateOfReturn(scope.row.cost.sum, scope.row.data.daily.at(-1)[4], scope.row.cost.total)
+                                    }}</span
+                                    >&nbsp;%</span
                                 >
                             </el-progress>
 
@@ -161,7 +160,9 @@
                         >
                             <div v-for="(item, index) in scope.row.policy.settings.buy" :key="index">
                                 <div>
-                                    <el-tag class="ml-2" type="danger" size="small" style="margin: 1px 0px">買</el-tag>
+                                    <el-tag class="ml-2" type="danger" size="small" style="margin: 1px 0px"
+                                        ><span style="font-size: 14px; font-weight: bold">買</span></el-tag
+                                    >
                                     <span style="font-size: 12px">
                                         &nbsp;{{ item.label }}&nbsp;<span style="color: #4386f5">{{ item.limit }}</span
                                         >&nbsp;{{ item.limit_desc }}</span
@@ -170,7 +171,9 @@
                             </div>
                             <div v-for="(item, index) in scope.row.policy.settings.sell" :key="index">
                                 <div>
-                                    <el-tag class="ml-2" type="success" size="small" style="margin: 1px 0px">賣</el-tag>
+                                    <el-tag class="ml-2" type="success" size="small" style="margin: 1px 0px"
+                                        ><span style="font-size: 14px; font-weight: bold">賣</span></el-tag
+                                    >
                                     <span style="font-size: 12px">
                                         &nbsp;{{ item.label }}&nbsp;<span style="color: #4386f5">{{ item.limit }}</span
                                         >&nbsp;{{ item.limit_desc }}</span
@@ -217,12 +220,11 @@
                                         </el-col>
                                         <el-col :span="7" style="padding: 0"><span>賣出次數</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
-                                            ><el-tag
-                                                type="info"
-                                                class="ml-2"
-                                                size="small"
-                                                style="margin: 1px 0px; font-size: 14px"
-                                                >{{ scope.row.policy.stats.number_of_sell }} 次</el-tag
+                                            ><el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                                                ><span style="font-size: 14px; font-weight: bold">{{
+                                                    scope.row.policy.stats.number_of_sell
+                                                }}</span>
+                                                次</el-tag
                                             ></el-col
                                         >
                                     </el-row>
@@ -236,12 +238,11 @@
                                         >
                                         <el-col :span="7" style="padding: 0"><span>每回天數</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
-                                            ><el-tag
-                                                type="warning"
-                                                class="ml-2"
-                                                size="small"
-                                                style="margin: 1px 0px; font-size: 14px"
-                                                >{{ scope.row.policy.stats.average_hold_days }} 天</el-tag
+                                            ><el-tag type="warning" class="ml-2" size="small" style="margin: 1px 0px"
+                                                ><span style="font-size: 14px; font-weight: bold">{{
+                                                    scope.row.policy.stats.average_hold_days
+                                                }}</span>
+                                                天</el-tag
                                             >
                                         </el-col>
                                     </el-row>
@@ -262,33 +263,31 @@
                                         > -->
                                         <el-col :span="7" style="padding: 0"><span>最大賺幅</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
-                                            ><el-tag
-                                                type="danger"
-                                                class="ml-2"
-                                                size="small"
-                                                style="margin: 1px 0px; font-size: 14px"
-                                                >{{ Number((scope.row.policy.stats.max_earn * 100).toFixed(1)) }}%</el-tag
+                                            ><el-tag type="danger" class="ml-2" size="small" style="margin: 1px 0px"
+                                                ><span style="font-size: 14px; font-weight: bold">{{
+                                                    Number((scope.row.policy.stats.max_earn * 100).toFixed(1))
+                                                }}</span>
+                                                %</el-tag
                                             >
                                         </el-col>
                                     </el-row>
                                     <el-row :gutter="20">
                                         <el-col :span="7" style="padding: 0; text-align: left"><span>年化報酬率</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
-                                            ><el-tag class="ml-2" size="small" style="margin: 1px 0px; font-size: 14px"
-                                                >{{
+                                            ><el-tag class="ml-2" size="small" style="margin: 1px 0px"
+                                                ><span style="font-size: 14px; font-weight: bold">{{
                                                     Number((scope.row.policy.stats.internal_of_return * 100).toFixed(1))
-                                                }}
+                                                }}</span>
                                                 %</el-tag
                                             >
                                         </el-col>
                                         <el-col :span="7" style="padding: 0"><span>最大賠幅</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
-                                            ><el-tag
-                                                type="success"
-                                                class="ml-2"
-                                                size="small"
-                                                style="margin: 1px 0px; font-size: 14px"
-                                                >{{ Number((scope.row.policy.stats.max_lose * 100).toFixed(1)) }}%</el-tag
+                                            ><el-tag type="success" class="ml-2" size="small" style="margin: 1px 0px"
+                                                ><span style="font-size: 14px; font-weight: bold">{{
+                                                    Number((scope.row.policy.stats.max_lose * 100).toFixed(1))
+                                                }}</span>
+                                                %</el-tag
                                             ></el-col
                                         >
                                     </el-row>
