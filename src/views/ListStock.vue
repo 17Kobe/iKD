@@ -198,10 +198,12 @@
                         :ref="`popover-${scope.row.id}`"
                         @show="doShowHistory($event, scope.row.id)"
                     >
-                        <el-table :data="historyData">
-                            <el-table-column width="130" property="name" label="日期"></el-table-column>
-                            <el-table-column width="80" property="id" label="買賣"></el-table-column>
-                            <el-table-column width="80" property="id" label="報酬"></el-table-column>
+                        <el-table :data="historyData" :ref="`popover-child-${scope.row.id}`">
+                            <el-table-column width="130" property="date" label="日期"></el-table-column>
+                            <el-table-column width="80" property="buy_or_sell" label="買賣" :formatter="buyOrSellFormatter">
+                            </el-table-column>
+                            <el-table-column width="80" property="price" label="股價"></el-table-column>
+                            <el-table-column width="80" property="rate_of_return" label="報酬"></el-table-column>
                         </el-table>
                         <template #reference>
                             <div>
@@ -392,48 +394,50 @@ export default {
         },
         doShowHistory(e, id) {
             console.log(e, id);
-            if (id === '0056') {
-                this.historyData = [
-                    {
-                        date: '2016-05-02',
-                        name: '王力宏',
-                        address: '上海市普陀区金沙江路 1518 弄',
-                    },
-                    {
-                        date: '2016-05-04',
-                        name: '王小虎',
-                        address: '上海市普陀区金沙江路 1518 弄',
-                    },
-                    {
-                        date: '2016-05-01',
-                        name: '王小虎',
-                        address: '上海市普陀区金沙江路 1518 弄',
-                    },
-                    {
-                        date: '2016-05-03',
-                        name: '王小虎',
-                        address: '上海市普陀区金沙江路 1518 弄',
-                    },
-                ];
-            } else {
-                this.historyData = [
-                    {
-                        date: '2016-05-04',
-                        name: '王小虎',
-                        address: '上海市普陀区金沙江路 1518 弄',
-                    },
-                    {
-                        date: '2016-05-01',
-                        name: '王小虎',
-                        address: '上海市普陀区金沙江路 1518 弄',
-                    },
-                    {
-                        date: '2016-05-03',
-                        name: '王小虎',
-                        address: '上海市普陀区金沙江路 1518 弄',
-                    },
-                ];
-            }
+
+            this.historyData = this.$store.getters.getStockPolicyResultHistory(id);
+            // if (id === '0056') {
+            //     this.historyData = [
+            //         {
+            //             date: '2016-05-02',
+            //             name: '王力宏',
+            //             address: '上海市普陀区金沙江路 1518 弄',
+            //         },
+            //         {
+            //             date: '2016-05-04',
+            //             name: '王小虎',
+            //             address: '上海市普陀区金沙江路 1518 弄',
+            //         },
+            //         {
+            //             date: '2016-05-01',
+            //             name: '王小虎',
+            //             address: '上海市普陀区金沙江路 1518 弄',
+            //         },
+            //         {
+            //             date: '2016-05-03',
+            //             name: '王小虎',
+            //             address: '上海市普陀区金沙江路 1518 弄',
+            //         },
+            //     ];
+            // } else {
+            //     this.historyData = [
+            //         {
+            //             date: '2016-05-04',
+            //             name: '王小虎',
+            //             address: '上海市普陀区金沙江路 1518 弄',
+            //         },
+            //         {
+            //             date: '2016-05-01',
+            //             name: '王小虎',
+            //             address: '上海市普陀区金沙江路 1518 弄',
+            //         },
+            //         {
+            //             date: '2016-05-03',
+            //             name: '王小虎',
+            //             address: '上海市普陀区金沙江路 1518 弄',
+            //         },
+            //     ];
+            // }
         },
         getReturn(sum, close, total) {
             return Number((close * total - sum).toFixed(2)).toLocaleString('en-US');
@@ -452,6 +456,9 @@ export default {
             console.log(index);
             this.$store.commit('SAVE_STOCK_STAR', { stockId: index, star: selValue });
         },
+        // buyOrSellFormatter(row, column, cellValue) {
+        //     return '<b>buy</b>';
+        // },
     },
 };
 </script>

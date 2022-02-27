@@ -810,6 +810,27 @@ const stock = {
             }
             return ret;
         },
+        getStockPolicyResultHistory: (state, getters) => (id) => {
+            console.log('getStockPolicyResultHistory');
+            // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
+            const found = getters.getStock(id);
+            return found.policy && found.policy.result
+                ? _.map(
+                      _.reverse(
+                          _.filter(
+                              found.policy.result,
+                              (obj) => moment().diff(obj.date, 'years') <= 9 && (obj.is_sure_buy || obj.is_sure_sell)
+                          )
+                      ),
+                      (obj) => ({
+                          date: obj.date,
+                          buy_or_sell: obj.is_sure_buy ? '買' : '賣',
+                          price: obj.price,
+                          rate_of_return: obj.rate_of_return ? `${Number((obj.rate_of_return * 100).toFixed(1))}%` : '',
+                      })
+                  )
+                : [];
+        },
     },
 };
 
