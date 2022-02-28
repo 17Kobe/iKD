@@ -617,13 +617,14 @@ const stock = {
             }
 
             // 最後一天強制再多塞入一個is_latest來計算最新的報酬率
+            let dataDailyLastDate = null;
             if (foundStock.policy.result.length > 0) {
-                const lastDate = moment(foundStock.policy.result.at(-1).date);
-                const currentDate = moment(foundStock.data.daily.at(-1)[0]);
+                const policyResultLastDate = moment(foundStock.policy.result.at(-1).date);
+                dataDailyLastDate = moment(foundStock.data.daily.at(-1)[0]);
 
-                if (currentDate.isAfter(lastDate)) {
+                if (dataDailyLastDate.isAfter(policyResultLastDate)) {
                     foundStock.policy.result.push({
-                        date: currentDate.format('YYYY-MM-DD'),
+                        date: dataDailyLastDate.format('YYYY-MM-DD'),
                         is_latest: true,
                         price: foundStock.data.daily.at(-1)[4],
                         reason: ['latest'],
@@ -661,6 +662,12 @@ const stock = {
                         accPriceOfBuy += obj.price;
                         obj.is_sure_buy = true;
                         isReadyToSell = true;
+                        // 如果最後一天剛好也是買，那也需要算報酬率, 但算完可能也是0(也許不用算直接給0)
+                        if (dataDailyLastDate.isSame(moment(obj.date))) {
+                            obj.date_of_first_buy = dateOfFirstBuy;
+                            obj.rate_of_return = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
+                            obj.number_of_buy = numberOfBuy;
+                        }
                     }
                 } else if (isReadyToSell && ((obj.is_sell && !obj.is_buy && !obj.is_sell_cancel) || obj.is_latest)) {
                     // 不能同時當天有買也有賣，這樣也會取消
@@ -684,9 +691,12 @@ const stock = {
                         numberOfBuy = 0;
                         accPriceOfBuy = 0;
                         isReadyToSell = false;
+
+                        // 如果是最後一個日期，且也不是賣，並且之前有買，這時要算一下最新狀態，有可能是要買入或賣出或都沒有，
+                        // if (obj.is_latest)
                     }
                 } else if (!isReadyToSell && obj.is_latest) {
-                    // 如果最新日期，但是前面沒有買，代表也不用算現在報酬率，所以要取消
+                    // 如果最新日期，但是前面沒有買，而且也沒有賣，代表也不用算現在報酬率，所以要取消
                     foundStock.policy.result.pop(); // 移除最後一個元素
                 }
             });
@@ -774,7 +784,8 @@ const stock = {
                 foundStock.policy.stats.number_of_sell = numberOfSell;
                 // foundStock.policy.stats.average_annual_return = (compoundOfReturns - 1) / diffYearsFloat;
                 foundStock.policy.stats.average_annual_return = sumOfReturns / diffYearsFloat;
-                foundStock.policy.stats.internal_of_return = diffYearsFloat===0 ? 0: compoundOfReturns ** (1 / diffYearsFloat) - 1;
+                foundStock.policy.stats.internal_of_return =
+                    diffYearsFloat === 0 ? 0 : compoundOfReturns ** (1 / diffYearsFloat) - 1;
             } else if (_.has(foundStock, 'policy.stats')) {
                 delete foundStock.policy.stats;
             }
@@ -857,9 +868,9 @@ const stock = {
                           )
                       ),
                       (obj) => {
-                          let buyOrSell = '現在';
+                          let buyOrSell = '　　現在';
                           if (obj.is_sure_sell) {
-                              buyOrSell = '賣';
+                              buyOrSell = '　　賣';
                           } else if (obj.is_sure_buy) {
                               buyOrSell = '買';
                           }

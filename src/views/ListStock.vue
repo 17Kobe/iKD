@@ -1,11 +1,13 @@
 <template>
     <div>
         <el-table :data="stockList" style="width: 100%">
-            <el-table-column fixed label="名稱" width="142" align="center">
+            <el-table-column fixed label="名稱" width="250" align="center">
                 <template #default="scope">
-                    <span style="font-size: 16px; font-weight: bold">
-                        {{ scope.row.name }}
-                    </span>
+                    <el-badge :value="scope.row.badge" class="item" type="danger">
+                        <span style="font-size: 16px; font-weight: bold">
+                            {{ scope.row.name }}
+                        </span>
+                    </el-badge>
                     <br />
                     <span style="color: #cccccc">{{ scope.row.id }}</span>
                     <el-rate v-model="scope.row.star" size="small" @change="onChangeStar($event, scope.row.id)"> </el-rate>
@@ -522,8 +524,10 @@ export default {
 .el-table .el-table__body td
     padding: 0px 0
 // 為了解決table內cell要/n換行的問題
+// 用badge會被裁缺的解決
 .el-table .el-table__body .cell
     white-space: pre-line
+    overflow: visible
 // 隱藏 input 若有屬性 type="number" 會出現上下箭頭的問題, 寫在各別vue用 scoped不行，不加scoped又會報錯，所以寫在global
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button
