@@ -616,7 +616,7 @@ const stock = {
                 foundEarn = _.find(foundStock.policy.settings.sell, ['method', 'earn']);
             }
 
-            // 最後一天強制再多塞入一個isLatest來計算最新的報酬率
+            // 最後一天強制再多塞入一個is_latest來計算最新的報酬率
             if (foundStock.policy.result.length > 0) {
                 const lastDate = moment(foundStock.policy.result.at(-1).date);
                 const currentDate = moment(foundStock.data.daily.at(-1)[0]);
@@ -624,7 +624,7 @@ const stock = {
                 if (currentDate.isAfter(lastDate)) {
                     foundStock.policy.result.push({
                         date: currentDate.format('YYYY-MM-DD'),
-                        isLatest: true,
+                        is_latest: true,
                         price: foundStock.data.daily.at(-1)[4],
                         reason: ['latest'],
                     });
@@ -662,7 +662,7 @@ const stock = {
                         obj.is_sure_buy = true;
                         isReadyToSell = true;
                     }
-                } else if (isReadyToSell && ((obj.is_sell && !obj.is_buy && !obj.is_sell_cancel) || obj.isLatest)) {
+                } else if (isReadyToSell && ((obj.is_sell && !obj.is_buy && !obj.is_sell_cancel) || obj.is_latest)) {
                     // 不能同時當天有買也有賣，這樣也會取消
                     // 去累加買入訊號單位
                     const rateOfReturn = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
@@ -674,12 +674,12 @@ const stock = {
                         obj.is_sell_cancel = true;
                         obj.reason.push('earn');
                     }
-                    if (!isCancelToSell || obj.isLatest) {
+                    if (!isCancelToSell || obj.is_latest) {
                         // 就算是取消賣，最後一天也是要去算最新報酬喔
                         obj.rate_of_return = rateOfReturn;
                         obj.number_of_buy = numberOfBuy;
                         obj.date_of_first_buy = dateOfFirstBuy;
-                        obj.is_sure_sell = true;
+                        if (obj.is_sell) obj.is_sure_sell = true; // 最後一個日期如果真的是賣才會有確定賣，
                         dateOfFirstBuy = '';
                         numberOfBuy = 0;
                         accPriceOfBuy = 0;
@@ -718,7 +718,7 @@ const stock = {
 
                 foundStock.policy.result.forEach((obj) => {
                     if (moment().diff(obj.date, 'years') <= 9) {
-                        if (obj.is_sure_sell) {
+                        if (obj.is_sure_sell || obj.is_latest) {
                             numberOfSell += 1;
                             // 為了算"計算期間"，第一個買入的日期要知道
                             sumOfReturns += obj.rate_of_return;
@@ -842,15 +842,25 @@ const stock = {
                       _.reverse(
                           _.filter(
                               found.policy.result,
-                              (obj) => moment().diff(obj.date, 'years') <= 9 && (obj.is_sure_buy || obj.is_sure_sell)
+                              (obj) =>
+                                  moment().diff(obj.date, 'years') <= 9 && (obj.is_sure_buy || obj.is_sure_sell || obj.is_latest)
                           )
                       ),
-                      (obj) => ({
-                          date: obj.date,
-                          buy_or_sell: obj.is_sure_buy ? '買' : '賣',
-                          price: obj.price,
-                          rate_of_return: obj.rate_of_return ? `${Number((obj.rate_of_return * 100).toFixed(1))}%` : '',
-                      })
+                      (obj) => {
+                          console.log('454');
+                          let buyOrSell = '現在';
+                          if (obj.is_sure_sell) {
+                              buyOrSell = '賣';
+                          } else if (obj.is_sure_buy) {
+                              buyOrSell = '買';
+                          }
+                          return {
+                              date: obj.date,
+                              buy_or_sell: buyOrSell,
+                              price: obj.price,
+                              rate_of_return: obj.rate_of_return ? `${Number((obj.rate_of_return * 100).toFixed(1))}%` : '',
+                          };
+                      }
                   )
                 : [];
         },
