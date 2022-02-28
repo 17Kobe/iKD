@@ -235,7 +235,7 @@
                                         >
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><span style="color: #4386f5; font-size: 14px">{{
-                                                Number(scope.row.policy.stats.diiff_years.toFixed(1))
+                                                Number(scope.row.policy.stats.diff_years.toFixed(1))
                                             }}</span>
                                             年
                                         </el-col>

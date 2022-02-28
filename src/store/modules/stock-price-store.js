@@ -746,6 +746,9 @@ const stock = {
                 console.log(sumOfReturns);
                 console.log(numberOfSell);
                 let diffYearsFloat = 0;
+
+                foundStock.policy.stats.diff_years = 0;
+                foundStock.policy.stats.diff_remaining_days = 0;
                 if (dateOfFirstBuy !== '') {
                     const diffDays = moment().diff(moment(dateOfFirstBuy), 'days');
                     console.log(dateOfFirstBuy);
@@ -753,8 +756,8 @@ const stock = {
                     console.log(diffDays / 365);
                     const diffYears = diffDays / 365 > 0 ? diffDays / 365 : 0;
                     const diffRemainingDays = diffDays % 365 > 0 ? diffDays % 365 : 0;
-                    foundStock.policy.stats.diiff_years = diffYears;
-                    foundStock.policy.stats.diiff_remaining_days = diffRemainingDays;
+                    foundStock.policy.stats.diff_years = diffYears;
+                    foundStock.policy.stats.diff_remaining_days = diffRemainingDays;
                     diffYearsFloat = diffDays / 365;
                 }
 
@@ -762,12 +765,16 @@ const stock = {
                 foundStock.policy.stats.average_of_returns = numberOfSell === 0 ? 0 : sumOfReturns / numberOfSell;
                 foundStock.policy.stats.average_hold_days = numberOfSell === 0 ? 0 : Math.floor(holdDays / numberOfSell);
                 foundStock.policy.stats.average_buy_number = numberOfSell === 0 ? 0 : sumOfBuyNumber / numberOfSell;
+
+                // 若真的都沒有買賣，則顯示為0
+                if (maxEarn === -999999) maxEarn = 0;
+                if (maxLose === 999999) maxLose = 0;
                 foundStock.policy.stats.max_earn = maxEarn;
                 foundStock.policy.stats.max_lose = maxLose;
                 foundStock.policy.stats.number_of_sell = numberOfSell;
                 // foundStock.policy.stats.average_annual_return = (compoundOfReturns - 1) / diffYearsFloat;
                 foundStock.policy.stats.average_annual_return = sumOfReturns / diffYearsFloat;
-                foundStock.policy.stats.internal_of_return = compoundOfReturns ** (1 / diffYearsFloat) - 1;
+                foundStock.policy.stats.internal_of_return = diffYearsFloat===0 ? 0: compoundOfReturns ** (1 / diffYearsFloat) - 1;
             } else if (_.has(foundStock, 'policy.stats')) {
                 delete foundStock.policy.stats;
             }
