@@ -667,6 +667,7 @@ const stock = {
                             obj.date_of_first_buy = dateOfFirstBuy;
                             obj.rate_of_return = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
                             obj.number_of_buy = numberOfBuy;
+                            obj.badge = '買訊'; // 必定買
                         }
                     }
                 } else if (isReadyToSell && ((obj.is_sell && !obj.is_buy && !obj.is_sell_cancel) || obj.is_latest)) {
@@ -691,6 +692,11 @@ const stock = {
                         numberOfBuy = 0;
                         accPriceOfBuy = 0;
                         isReadyToSell = false;
+
+                        // 如果最後一天剛好也是賣
+                        if (obj.is_sure_sell && dataDailyLastDate.isSame(moment(obj.date))) {
+                            obj.badge = '賣訊'; // 必定賣
+                        }
 
                         // 如果是最後一個日期，且也不是賣，並且之前有買，這時要算一下最新狀態，有可能是要買入或賣出或都沒有，
                         // if (obj.is_latest)
