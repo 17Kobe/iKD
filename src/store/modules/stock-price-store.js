@@ -685,6 +685,9 @@ const stock = {
                         accPriceOfBuy = 0;
                         isReadyToSell = false;
                     }
+                } else if (!isReadyToSell && obj.is_latest) {
+                    // 如果最新日期，但是前面沒有買，代表也不用算現在報酬率，所以要取消
+                    foundStock.policy.result.pop(); // 移除最後一個元素
                 }
             });
 
@@ -847,7 +850,6 @@ const stock = {
                           )
                       ),
                       (obj) => {
-                          console.log('454');
                           let buyOrSell = '現在';
                           if (obj.is_sure_sell) {
                               buyOrSell = '賣';

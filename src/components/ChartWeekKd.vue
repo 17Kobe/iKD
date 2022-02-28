@@ -70,9 +70,10 @@ export default {
             return (
                 (this.stockData.policy &&
                     this.stockData.policy.result &&
-                    _.filter(this.stockData.policy.result, (o) => moment().diff(moment(o.date), 'days') <= 365 && o.is_buy).map(
-                        (obj) => [moment(obj.date).valueOf(), obj.k]
-                    )) ||
+                    _.filter(
+                        this.stockData.policy.result,
+                        (o) => moment().diff(moment(o.date), 'days') <= 365 && o.is_sure_buy
+                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
                 []
             );
         },
@@ -84,9 +85,25 @@ export default {
             return (
                 (this.stockData.policy &&
                     this.stockData.policy.result &&
-                    _.filter(this.stockData.policy.result, (o) => moment().diff(moment(o.date), 'days') <= 365 && o.is_sell).map(
-                        (obj) => [moment(obj.date).valueOf(), obj.k]
-                    )) ||
+                    _.filter(
+                        this.stockData.policy.result,
+                        (o) => moment().diff(moment(o.date), 'days') <= 365 && o.is_sure_sell
+                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
+                []
+            );
+        },
+        stockDataOfPolicyResultBuyOrSellCancel() {
+            console.log('stockDataOfPolicyResultBuy');
+            // console.log(this.stockDataOfPolicy);
+            // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            // 需要小於365天，1年
+            return (
+                (this.stockData.policy &&
+                    this.stockData.policy.result &&
+                    _.filter(
+                        this.stockData.policy.result,
+                        (o) => moment().diff(moment(o.date), 'days') <= 365 && (o.is_buy_cancel || o.is_sell_cancel)
+                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
                 []
             );
         },
@@ -394,6 +411,18 @@ export default {
                         // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
                         data: this.stockDataOfPolicyResultSell,
+                    },
+                    {
+                        type: 'scatter',
+
+                        color: 'rgba(153, 153, 153, 0.9',
+
+                        marker: {
+                            symbol: 'circle',
+                        },
+                        // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
+                        enableMouseTracking: false,
+                        data: this.stockDataOfPolicyResultBuyOrSellCancel,
                     },
                 ],
             };
