@@ -592,7 +592,7 @@ const stock = {
 
                 foundStock.policy.result = [];
                 foundStock.policy.result.push(...policyResult);
-
+                console.log(foundStock);
                 // save to localstorage
                 localStorage.setItem('stockList', JSON.stringify(state.stockList));
 
@@ -636,6 +636,7 @@ const stock = {
             let numberOfBuy = 0;
             let accPriceOfBuy = 0;
             let dateOfFirstBuy = '';
+            foundStock.badge = null;
             foundStock.policy.result.forEach((obj) => {
                 // 必需有買才要在第一次賣時算報酬率
                 if (obj.is_buy && !obj.is_sell && !obj.is_buy_cancel) {
@@ -667,7 +668,7 @@ const stock = {
                             obj.date_of_first_buy = dateOfFirstBuy;
                             obj.rate_of_return = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
                             obj.number_of_buy = numberOfBuy;
-                            obj.badge = '買訊'; // 必定買
+                            foundStock.badge = '買訊'; // 必定買
                         }
                     }
                 } else if (isReadyToSell && ((obj.is_sell && !obj.is_buy && !obj.is_sell_cancel) || obj.is_latest)) {
@@ -695,11 +696,10 @@ const stock = {
 
                         // 如果最後一天剛好也是賣
                         if (obj.is_sure_sell && dataDailyLastDate.isSame(moment(obj.date))) {
-                            obj.badge = '賣訊'; // 必定賣
+                            foundStock.badge = '賣訊'; // 必定賣
                         }
 
                         // 如果是最後一個日期，且也不是賣，並且之前有買，這時要算一下最新狀態，有可能是要買入或賣出或都沒有，
-                        // if (obj.is_latest)
                     }
                 } else if (!isReadyToSell && obj.is_latest) {
                     // 如果最新日期，但是前面沒有買，而且也沒有賣，代表也不用算現在報酬率，所以要取消
@@ -796,6 +796,54 @@ const stock = {
                 delete foundStock.policy.stats;
             }
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            this.commit('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE', stockId);
+        },
+        SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE(state, stockId) {
+            console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE');
+
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            // 如果是最後一個日期，且也不是賣，並且之前有買，這時要算一下最新狀態，有可能是要買入或賣出或都沒有，
+            if (!foundStock.badge && _.has(foundStock, 'policy.result') && foundStock.policy.result.length >= 1) {
+                // 代表沒有確定買跟確定賣，需要確定之前有買才有預測賣，若是預測買就不用看了
+                // 預測買看KD黃金交叉跟黃金轉折
+                // 預測賣看KD死亡交叉跟死亡轉折，停利停損之後再看
+                if (_.has(foundStock, 'policy.settings.buy')) {
+                    let foundKdGold = false;
+                    let foundKdTurnUp = false;
+                    foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
+                    foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
+                    if (foundKdGold) {
+                        const lastestK = foundStock.data.weekly_kd.at(-1)[1];
+                        if (lastestK <= foundKdGold.limit) foundStock.badge = '將有買訊';
+                    }
+                    if (foundKdTurnUp) {
+                        const lastestK = foundStock.data.weekly_kd.at(-1)[1];
+                        if (lastestK <= foundKdTurnUp.limit) foundStock.badge = '將有買訊';
+                    }
+                }
+
+                if (foundStock.policy.result.at(-1).date === foundStock.data.daily.at(-1)[0]) {
+                    // 等於代表沒pop，可預測賣
+                    if (_.has(foundStock, 'policy.settings.sell')) {
+                        let foundKdDead = false;
+                        let foundKdTurnDown = false;
+                        foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
+                        foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
+                        if (foundKdDead) {
+                            const lastestK = foundStock.data.weekly_kd.at(-1)[1];
+                            console.log(lastestK);
+                            console.log(foundKdDead.limit);
+
+                            if (lastestK >= foundKdDead.limit) foundStock.badge = '將有賣訊';
+                        }
+                        if (foundKdTurnDown) {
+                            const lastestK = foundStock.data.weekly_kd.at(-1)[1];
+                            if (lastestK >= foundKdTurnDown.limit) foundStock.badge = '將有賣訊';
+                        }
+                    }
+                }
+            }
+            console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE OK');
         },
     },
     getters: {

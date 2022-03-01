@@ -1,9 +1,13 @@
 <template>
     <div>
         <el-table :data="stockList" style="width: 100%">
-            <el-table-column fixed label="名稱" width="250" align="center">
+            <el-table-column fixed label="名稱" width="230" align="center">
                 <template #default="scope">
-                    <el-badge :value="scope.row.badge" class="item" type="danger">
+                    <el-badge
+                        :value="scope.row.badge"
+                        class="item"
+                        :type="scope.row.badge === '買訊' || scope.row.badge === '將有買訊' ? 'danger' : 'success'"
+                    >
                         <span style="font-size: 16px; font-weight: bold">
                             {{ scope.row.name }}
                         </span>
@@ -13,7 +17,7 @@
                     <el-rate v-model="scope.row.star" size="small" @change="onChangeStar($event, scope.row.id)"> </el-rate>
                 </template>
             </el-table-column>
-            <el-table-column label="股價" width="85" align="right">
+            <el-table-column label="股價" width="65" align="right">
                 <template #default="scope">
                     <span v-if="scope.row.data && scope.row.data.daily && scope.row.data.daily.length >= 2">
                         <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
@@ -63,7 +67,7 @@
                     <ChartWeekK :parentData="scope.row.id" />
                 </template>
             </el-table-column>
-            <el-table-column label="成本" width="220" align="center">
+            <el-table-column label="成本" width="200" align="center">
                 <template #default="scope">
                     <el-button
                         size="small"
@@ -140,7 +144,7 @@
                     </el-button>
                 </template>
             </el-table-column>
-            <el-table-column label="買賣策略" width="270" align="center">
+            <el-table-column label="買賣策略" width="240" align="center">
                 <template #default="scope">
                     <el-button
                         size="small"
@@ -151,7 +155,7 @@
                             scope.row.policy.settings.buy &&
                             scope.row.policy.settings.sell &&
                             (scope.row.policy.settings.buy.length >= 1 || scope.row.policy.settings.sell.length >= 1)
-                                ? { width: '220px' }
+                                ? { width: '235px' }
                                 : {},
                             { 'text-align': 'left', 'line-height': '18px' },
                         ]"
@@ -222,7 +226,7 @@
                         <template #reference>
                             <div>
                                 <div v-if="scope.row.policy && scope.row.policy.stats" style="font-size: 13px">
-                                    <el-row :gutter="20">
+                                    <el-row :gutter="0">
                                         <el-col :span="7" style="padding: 0"><span>賣出次數</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
@@ -244,7 +248,7 @@
                                             >
                                         </el-col>
                                     </el-row>
-                                    <el-row :gutter="20">
+                                    <el-row :gutter="0">
                                         <el-col :span="7" style="padding: 0"><span>每回天數</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><el-tag type="warning" class="ml-2" size="small" style="margin: 1px 0px"
@@ -272,7 +276,7 @@
                                             %</el-col
                                         > -->
                                     </el-row>
-                                    <el-row :gutter="20">
+                                    <el-row :gutter="0">
                                         <el-col :span="7" style="padding: 0"><span>最大賺幅</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><el-tag type="danger" class="ml-2" size="small" style="margin: 1px 0px"
@@ -292,7 +296,7 @@
                                             %</el-col
                                         >
                                     </el-row>
-                                    <el-row :gutter="20">
+                                    <el-row :gutter="0">
                                         <el-col :span="7" style="padding: 0"><span>最大賠幅</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><el-tag type="success" class="ml-2" size="small" style="margin: 1px 0px"
@@ -528,6 +532,8 @@ export default {
 .el-table .el-table__body .cell
     white-space: pre-line
     overflow: visible
+    padding-left: 0
+    padding-right: 0
 // 隱藏 input 若有屬性 type="number" 會出現上下箭頭的問題, 寫在各別vue用 scoped不行，不加scoped又會報錯，所以寫在global
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button
