@@ -259,9 +259,8 @@
                                 &nbsp;&nbsp;<span
                                     :style="[
                                         item.rate_of_return.includes('-') ? { color: '#01aa00' } : { color: '#ee3333' },
-                                        { 'font-size': '14px', display: 'inline-block', width: '40px', 'text-align': 'right' },
+                                        { 'font-size': '14px', display: 'inline-block', width: '50px', 'text-align': 'right' },
                                     ]"
-                                    style="font-size: 14px; display: inline-block; width: 40px; text-align: right"
                                     >{{ item.rate_of_return }}</span
                                 >
                             </div>
