@@ -211,23 +211,68 @@
                     <el-popover
                         placement="left-start"
                         title="策略歷史記錄"
-                        width="200"
+                        width="500"
                         trigger="hover"
                         :hide-after="0"
                         :ref="`popover-${scope.row.id}`"
-                        @show="doShowHistory($event, scope.row.id)"
                     >
-                        <el-table :data="historyData" :ref="`popover-child-${scope.row.id}`">
+                        <!-- <el-table
+                            :data="scope.row.policy && scope.row.policy.history ? scope.row.policy.history : []"
+                            :ref="`popover-child-${scope.row.id}`"
+                        >
                             <el-table-column width="130" property="date" label="日期"></el-table-column>
-                            <el-table-column width="80" property="buy_or_sell" label="買賣"> </el-table-column>
+                            <el-table-column width="80" label="買賣">
+                                {{ scope.row.buy_or_sell }}
+                            </el-table-column>
                             <el-table-column width="80" property="price" label="股價"></el-table-column>
                             <el-table-column width="80" property="rate_of_return" label="報酬"></el-table-column>
-                        </el-table>
+                        </el-table> -->
+                        <div v-if="scope.row.policy && scope.row.policy.history && scope.row.policy.history.length >= 1">
+                            <div v-for="(item, index) in scope.row.policy.history" :key="index">
+                                <span
+                                    :style="[
+                                        parseInt(item.date) % 2 === 0
+                                            ? { 'background-color': '#eeeeee' }
+                                            : { 'background-color': '#ffffff' },
+                                        { 'font-size': '14px', display: 'inline-block', width: '100px', 'text-align': 'center' },
+                                    ]"
+                                    >{{ item.date }}</span
+                                >&nbsp;&nbsp;
+                                <span style="font-size: 14px; display: inline-block; width: 40px">
+                                    <el-tag
+                                        class="ml-2"
+                                        :type="item.buy_or_sell === '買' ? 'danger' : 'success'"
+                                        size="small"
+                                        style="margin: 1px 0px"
+                                        ><span style="font-size: 14px; font-weight: bold">{{ item.buy_or_sell }}</span></el-tag
+                                    ></span
+                                >
+                                &nbsp;&nbsp;<span
+                                    :style="[
+                                        parseInt(item.date) % 2 === 0
+                                            ? { 'background-color': '#eeeeee' }
+                                            : { 'background-color': '#ffffff' },
+                                        { 'font-size': '14px', display: 'inline-block', width: '60px', 'text-align': 'center' },
+                                    ]"
+                                    >{{ item.price }}</span
+                                >
+                                &nbsp;&nbsp;<span
+                                    :style="[
+                                        item.rate_of_return.includes('-') ? { color: '#01aa00' } : { color: '#ee3333' },
+                                        { 'font-size': '14px', display: 'inline-block', width: '40px', 'text-align': 'right' },
+                                    ]"
+                                    style="font-size: 14px; display: inline-block; width: 40px; text-align: right"
+                                    >{{ item.rate_of_return }}</span
+                                >
+                            </div>
+                        </div>
                         <template #reference>
                             <div>
                                 <div v-if="scope.row.policy && scope.row.policy.stats" style="font-size: 13px">
-                                    <el-row :gutter="0">
-                                        <el-col :span="7" style="padding: 0"><span>賣出次數</span></el-col>
+                                    <el-row>
+                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
+                                            ><span>賣出次數</span></el-col
+                                        >
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
@@ -236,7 +281,7 @@
                                                 次</el-tag
                                             ></el-col
                                         >
-                                        <el-col :span="7" style="padding: 0; text-align: left"
+                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
                                             ><span>&nbsp;年化報酬率</span></el-col
                                         >
                                         <el-col :span="5" style="padding: 0; text-align: right"
@@ -248,8 +293,10 @@
                                             >
                                         </el-col>
                                     </el-row>
-                                    <el-row :gutter="0">
-                                        <el-col :span="7" style="padding: 0"><span>每回天數</span></el-col>
+                                    <el-row>
+                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
+                                            ><span>每回天數</span></el-col
+                                        >
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><el-tag type="warning" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
@@ -259,7 +306,7 @@
                                             >
                                         </el-col>
 
-                                        <el-col :span="7" style="padding: 0; text-align: left"
+                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
                                             ><span>&nbsp;每回報酬率</span></el-col
                                         >
                                         <el-col :span="5" style="padding: 0; text-align: right"
@@ -276,8 +323,10 @@
                                             %</el-col
                                         > -->
                                     </el-row>
-                                    <el-row :gutter="0">
-                                        <el-col :span="7" style="padding: 0"><span>最大賺幅</span></el-col>
+                                    <el-row>
+                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
+                                            ><span>最大賺幅</span></el-col
+                                        >
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><el-tag type="danger" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
@@ -286,7 +335,7 @@
                                                 %</el-tag
                                             >
                                         </el-col>
-                                        <el-col :span="7" style="padding: 0; text-align: left"
+                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
                                             ><span>&nbsp;累積報酬率</span></el-col
                                         >
                                         <el-col :span="5" style="padding: 0; text-align: right"
@@ -296,8 +345,10 @@
                                             %</el-col
                                         >
                                     </el-row>
-                                    <el-row :gutter="0">
-                                        <el-col :span="7" style="padding: 0"><span>最大賠幅</span></el-col>
+                                    <el-row>
+                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
+                                            ><span>最大賠幅</span></el-col
+                                        >
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><el-tag type="success" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
@@ -306,7 +357,7 @@
                                                 %</el-tag
                                             ></el-col
                                         >
-                                        <el-col :span="7" style="padding: 0; text-align: left"
+                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
                                             ><span>&nbsp;計算期間</span></el-col
                                         >
                                         <el-col :span="5" style="padding: 0; text-align: right"
@@ -427,53 +478,6 @@ export default {
         },
         doShowExport() {
             this.$refs.childFormExport.onInit();
-        },
-        doShowHistory(e, id) {
-            console.log(e, id);
-
-            this.historyData = this.$store.getters.getStockPolicyResultHistory(id);
-            // if (id === '0056') {
-            //     this.historyData = [
-            //         {
-            //             date: '2016-05-02',
-            //             name: '王力宏',
-            //             address: '上海市普陀区金沙江路 1518 弄',
-            //         },
-            //         {
-            //             date: '2016-05-04',
-            //             name: '王小虎',
-            //             address: '上海市普陀区金沙江路 1518 弄',
-            //         },
-            //         {
-            //             date: '2016-05-01',
-            //             name: '王小虎',
-            //             address: '上海市普陀区金沙江路 1518 弄',
-            //         },
-            //         {
-            //             date: '2016-05-03',
-            //             name: '王小虎',
-            //             address: '上海市普陀区金沙江路 1518 弄',
-            //         },
-            //     ];
-            // } else {
-            //     this.historyData = [
-            //         {
-            //             date: '2016-05-04',
-            //             name: '王小虎',
-            //             address: '上海市普陀区金沙江路 1518 弄',
-            //         },
-            //         {
-            //             date: '2016-05-01',
-            //             name: '王小虎',
-            //             address: '上海市普陀区金沙江路 1518 弄',
-            //         },
-            //         {
-            //             date: '2016-05-03',
-            //             name: '王小虎',
-            //             address: '上海市普陀区金沙江路 1518 弄',
-            //         },
-            //     ];
-            // }
         },
         getReturn(sum, close, total) {
             return Number((close * total - sum).toFixed(2)).toLocaleString('en-US');

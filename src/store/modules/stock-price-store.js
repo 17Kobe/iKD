@@ -708,6 +708,35 @@ const stock = {
                 }
             });
 
+            // 算歷史報酬列表
+            foundStock.policy.history =
+                foundStock.policy && foundStock.policy.result
+                    ? _.map(
+                          _.reverse(
+                              _.filter(
+                                  foundStock.policy.result,
+                                  (obj) =>
+                                      moment().diff(obj.date, 'years') <= 9 &&
+                                      (obj.is_sure_buy || obj.is_sure_sell || obj.is_latest)
+                              )
+                          ),
+                          (obj) => {
+                              let buyOrSell = '現在';
+                              if (obj.is_sure_sell) {
+                                  buyOrSell = '賣';
+                              } else if (obj.is_sure_buy) {
+                                  buyOrSell = '買';
+                              }
+                              return {
+                                  date: obj.date,
+                                  buy_or_sell: buyOrSell,
+                                  price: obj.price,
+                                  rate_of_return: obj.rate_of_return ? `${Number((obj.rate_of_return * 100).toFixed(1))}%` : '',
+                              };
+                          }
+                      )
+                    : [];
+
             foundStock.policy.stats = {};
 
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
@@ -908,36 +937,6 @@ const stock = {
                 if (maSell) ret.ma_sell_limit = maSell.limit;
             }
             return ret;
-        },
-        getStockPolicyResultHistory: (state, getters) => (id) => {
-            console.log('getStockPolicyResultHistory');
-            // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
-            const found = getters.getStock(id);
-            return found.policy && found.policy.result
-                ? _.map(
-                      _.reverse(
-                          _.filter(
-                              found.policy.result,
-                              (obj) =>
-                                  moment().diff(obj.date, 'years') <= 9 && (obj.is_sure_buy || obj.is_sure_sell || obj.is_latest)
-                          )
-                      ),
-                      (obj) => {
-                          let buyOrSell = '　　現在';
-                          if (obj.is_sure_sell) {
-                              buyOrSell = '　　賣';
-                          } else if (obj.is_sure_buy) {
-                              buyOrSell = '買';
-                          }
-                          return {
-                              date: obj.date,
-                              buy_or_sell: buyOrSell,
-                              price: obj.price,
-                              rate_of_return: obj.rate_of_return ? `${Number((obj.rate_of_return * 100).toFixed(1))}%` : '',
-                          };
-                      }
-                  )
-                : [];
         },
         getProgressMultiple: (state) => () => {
             console.log('getProgressMultiple');
