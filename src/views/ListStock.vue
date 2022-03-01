@@ -195,7 +195,7 @@
                                     <span
                                         style="
                                             font-size: 14px;
-                                            color: #12c343;
+
                                             background-color: #ccff90;
                                             padding: 5px;
                                             border-radius: 10px 100px / 120px;
