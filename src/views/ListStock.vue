@@ -171,9 +171,16 @@
                             style="font-size: 13px"
                         >
                             <div v-for="(item, index) in scope.row.policy.settings.buy" :key="index">
-                                <div>
-                                    <el-tag class="ml-2" type="danger" size="small" style="margin: 1px 0px"
-                                        ><span style="font-size: 14px; font-weight: bold">買</span></el-tag
+                                <div style="line-height: 24px">
+                                    <span
+                                        style="
+                                            font-size: 14px;
+                                            color: white;
+                                            background-color: #f28b82;
+                                            padding: 5px;
+                                            border-radius: 10px 100px / 120px;
+                                        "
+                                        >買</span
                                     >
                                     <span>
                                         &nbsp;{{ item.label }}&nbsp;<span style="color: #4386f5; font-size: 14px">{{
@@ -184,9 +191,16 @@
                                 </div>
                             </div>
                             <div v-for="(item, index) in scope.row.policy.settings.sell" :key="index">
-                                <div>
-                                    <el-tag class="ml-2" type="success" size="small" style="margin: 1px 0px"
-                                        ><span style="font-size: 14px; font-weight: bold">賣</span></el-tag
+                                <div style="line-height: 24px">
+                                    <span
+                                        style="
+                                            font-size: 14px;
+                                            color: #12c343;
+                                            background-color: #ccff90;
+                                            padding: 5px;
+                                            border-radius: 10px 100px / 120px;
+                                        "
+                                        >賣</span
                                     >
                                     <span>
                                         &nbsp;{{ item.label }}&nbsp;<span style="color: #4386f5; font-size: 14px">{{
