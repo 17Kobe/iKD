@@ -127,7 +127,6 @@ export default {
                 const found = _.find(this.stockData.policy.settings.buy, ['method', 'kd_turn_up']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
-            console.log(ret);
             return ret;
         },
         kdDeadLimit() {
@@ -138,7 +137,6 @@ export default {
                 const found = _.find(this.stockData.policy.settings.sell, ['method', 'kd_dead']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
-            console.log(ret);
             return ret;
         },
         kdTurnDownLmit() {
@@ -149,7 +147,6 @@ export default {
                 const found = _.find(this.stockData.policy.settings.sell, ['method', 'kd_turn_down']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
-            console.log(ret);
             return ret;
         },
 
@@ -254,7 +251,6 @@ export default {
                     formatter() {
                         let str = '<div>';
                         const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
-                        console.log(this.points);
                         // 在畫買賣訊號有可能沒有 points，是 undefined
                         this.points.forEach((point, index) => {
                             // const fontColor = point.y > point.point.open ? '#ee3333' : '#01aa00';
@@ -268,8 +264,6 @@ export default {
                                     point.y.toFixed(2)
                                 )} `;
                             } else if (index === 1) {
-                                console.log(point.point.index);
-
                                 const found = _.find(
                                     component.stockData.data.weekly,
                                     (array) => array[0] === moment(point.x).format('YYYY-MM-DD')

@@ -168,9 +168,7 @@ export default {
             const { form } = this;
             this.buyOptions.some((item, index) => {
                 // 如果沒找到就用
-                console.log(item.value);
                 if (_.findLastIndex(form.buy, { method: item.value }) === -1) {
-                    console.log(foundIndex);
                     foundIndex = index;
                     return true;
                 }
@@ -183,7 +181,6 @@ export default {
                 limit: this.buyOptions[foundIndex].default_limit,
                 limit_desc: this.buyOptions[foundIndex].default_limit_desc,
             });
-            console.log(index);
             // nextTick()會在DOM已掛載、渲染完成後，執行nextTick()內的程式碼
             // https://stackoverflow.com/questions/59749325/vue-set-focus-to-dynamic-input-box
             // this.$nextTick(() => {
@@ -201,9 +198,7 @@ export default {
             const { form } = this;
             this.sellOptions.some((item, index) => {
                 // 如果沒找到就用
-                console.log(item.value);
                 if (_.findLastIndex(form.sell, { method: item.value }) === -1) {
-                    console.log(foundIndex);
                     foundIndex = index;
                     return true;
                 }
@@ -234,8 +229,6 @@ export default {
             console.log(index);
             // 用選到的 method 先找到 value，再去看其它值設進去
             const found = _.find(this.buyOptions, ['value', selValue]);
-            console.log(found);
-            console.log(this.form.buy);
             this.form.buy[index].label = found.label;
             this.form.buy[index].limit = found.default_limit;
             this.form.buy[index].limit_desc = found.default_limit_desc;
@@ -245,8 +238,6 @@ export default {
             console.log(index);
             // 用選到的 method 先找到 value，再去看其它值設進去
             const found = _.find(this.sellOptions, ['value', selValue]);
-            console.log(found);
-            console.log(this.form.sell);
             this.form.sell[index].label = found.label;
             this.form.sell[index].limit = found.default_limit;
             this.form.sell[index].limit_desc = found.default_limit_desc;
@@ -260,20 +251,15 @@ export default {
             // eslint-disable-next-line prefer-destructuring
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定買賣策略`;
 
-            console.log(this.stockData);
-
             // 深拷貝，不然一直畫KD的橫線
             if (_.has(this.stockData, 'policy.settings')) this.form = _.cloneDeep(this.stockData.policy.settings);
             else this.form = { buy: [], sell: [] };
 
-            console.log(this.stockData);
-            console.log(stockId);
             // this.$nextTick(() => {
             // this.$refs.cost0[0].focus();
             // });
         },
         onClosed() {
-            console.log(this.form);
             this.$store.commit('SAVE_STOCK_POLICY', {
                 stockId: this.stockId,
                 policyList: this.form,

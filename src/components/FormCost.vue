@@ -92,7 +92,6 @@ export default {
                 cost: this.defaultCost,
                 number: 1000,
             });
-            console.log(index);
             // nextTick()會在DOM已掛載、渲染完成後，執行nextTick()內的程式碼
             // https://stackoverflow.com/questions/59749325/vue-set-focus-to-dynamic-input-box
             this.$nextTick(() => {
@@ -124,18 +123,14 @@ export default {
             this.defaultCost = this.stockData.data.daily.at(-1)[4];
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定成本`;
 
-            console.log(this.stockData.cost);
             if (_.has(this.stockData, 'cost.settings')) this.form = _.cloneDeep(this.stockData.cost.settings);
             else this.form = [];
 
-            console.log(this.stockData);
-            console.log(stockId);
             // this.$nextTick(() => {
             // this.$refs.cost0[0].focus();
             // });
         },
         onClosed() {
-            console.log(this.form);
             this.$store.commit('SAVE_STOCK_COST', {
                 stockId: this.stockId,
                 costList: this.form,

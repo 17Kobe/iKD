@@ -141,13 +141,10 @@ const stock = {
         MOVE_A_STOCK(state, { stockId, direction }) {
             // data 是 object {name: XXX, id: XXX}
             console.log('MOVE_A_STOCK');
-            console.log(stockId);
-            console.log(direction);
             const index = _.findIndex(state.stockList, ['id', stockId]);
             console.log(index);
 
             const tmpStock = state.stockList.splice(index, 1)[0]; // 找出來是[{}]，所以要加[0]
-            console.log(tmpStock);
             if (direction === 'bottom') {
                 state.stockList.splice(index + 1, 0, tmpStock);
             }
@@ -165,9 +162,6 @@ const stock = {
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         SAVE_STOCK_STAR(state, { stockId, star }) {
-            console.log(stockId);
-            console.log(star);
-
             // object of array 去 find 並 update
             const found = state.stockList.find((v) => v.id === stockId);
             found.star = 0;
@@ -177,9 +171,6 @@ const stock = {
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
-            console.log(stockId);
-            console.log(costList);
-
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
 
@@ -189,7 +180,6 @@ const stock = {
                 foundStock.cost = {};
                 foundStock.cost.settings = [];
                 foundStock.cost.settings = costList; // 複製數據複本
-                console.log(foundStock.cost.cost_list);
                 foundStock.cost.total = totalOfShares || 0; // null 則指定為0
                 foundStock.cost.avg = averageCost || 0; // null 則指定為0
                 foundStock.cost.sum = sumCost || 0; // null 則指定為0
@@ -201,9 +191,6 @@ const stock = {
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         SAVE_STOCK_POLICY(state, { stockId, policyList }) {
-            console.log(stockId);
-            console.log(policyList);
-
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
             if (
@@ -428,7 +415,6 @@ const stock = {
             // 黃金交叉、死亡交叉
             const policyResult = [];
 
-            console.log(foundStock);
             if (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell')) {
                 console.log('SAVE_STOCK_POLICY_RESULT foundStock');
                 let foundKdGold = false;
@@ -558,7 +544,6 @@ const stock = {
                         }
                     }
                     preK = k;
-                    console.log(item);
                 });
 
                 // 搭配 MA 均線 日均線之上
@@ -593,7 +578,6 @@ const stock = {
 
                 foundStock.policy.result = [];
                 foundStock.policy.result.push(...policyResult);
-                console.log(foundStock);
                 // save to localstorage
                 localStorage.setItem('stockList', JSON.stringify(state.stockList));
 
@@ -606,7 +590,6 @@ const stock = {
 
             const foundStock = state.stockList.find((v) => v.id === stockId);
             // 一定有 policy.settings.buy 及 sell 因為前面SAVE_STOCK_POLICYRESULT 已經判斷過了
-            console.log(foundStock);
 
             let foundCostDown = false;
             let foundEarn = false;
@@ -774,8 +757,6 @@ const stock = {
                             if (numberOfSell === 1) {
                                 // 賣的第一個要計時間
                                 dateOfFirstBuy = obj.date_of_first_buy;
-                                console.log(obj.date);
-                                console.log(obj.date_of_first_buy);
                             }
                             holdDays += moment(obj.date).diff(moment(obj.date_of_first_buy), 'days');
                             sumOfBuyNumber += obj.number_of_buy;
@@ -789,17 +770,12 @@ const stock = {
                         // 如今天是2022-02-25，則會算到2012-02-26。2012-02-25就不算了
                     }
                 });
-                console.log(sumOfReturns);
-                console.log(numberOfSell);
                 let diffYearsFloat = 0;
 
                 foundStock.policy.stats.diff_years = 0;
                 foundStock.policy.stats.diff_remaining_days = 0;
                 if (dateOfFirstBuy !== '') {
                     const diffDays = moment().diff(moment(dateOfFirstBuy), 'days');
-                    console.log(dateOfFirstBuy);
-                    console.log(diffDays);
-                    console.log(diffDays / 365);
                     const diffYears = diffDays / 365 > 0 ? diffDays / 365 : 0;
                     const diffRemainingDays = diffDays % 365 > 0 ? diffDays % 365 : 0;
                     foundStock.policy.stats.diff_years = diffYears;
@@ -861,8 +837,6 @@ const stock = {
                         foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
                         if (foundKdDead) {
                             const lastestK = foundStock.data.weekly_kd.at(-1)[1];
-                            console.log(lastestK);
-                            console.log(foundKdDead.limit);
 
                             if (lastestK >= foundKdDead.limit) foundStock.badge = '準賣訊';
                         }
@@ -954,7 +928,6 @@ const stock = {
             );
             let progressMultiple = 1; // 預設值
             //* 4 則最大值為25%。 * 2 則最大值為50%。 * 1 則最大值為100%。 0.6%最大值為166% 0.5最大值為200%  0.2 最大值為500% 0.1 最大值為1000%  0.05最大值為2000  0.01 最大值為10000%
-            console.log(maxEarnOrLoseRate);
             if (maxEarnOrLoseRate <= 25) progressMultiple = 4;
             else if (maxEarnOrLoseRate <= 50) progressMultiple = 2;
             else if (maxEarnOrLoseRate <= 100) progressMultiple = 1;
@@ -964,7 +937,6 @@ const stock = {
             else if (maxEarnOrLoseRate <= 2000) progressMultiple = 0.05;
             else if (maxEarnOrLoseRate <= 10000) progressMultiple = 0.01;
             // state.progressMultiple = progressMultiple;
-            console.log(progressMultiple);
             return progressMultiple;
         },
     },

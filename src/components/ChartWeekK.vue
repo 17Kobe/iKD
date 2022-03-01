@@ -227,18 +227,13 @@ export default {
                             // 一開始時 dataMax 及 dataMin會是null，然後再用 toFixed就會有錯，所以加 if 來避免
                             if (this.dataMin && this.dataMax) {
                                 let tick = 0;
-                                console.log(`dataMax=${this.dataMax}`);
-                                console.log(`dataMin=${this.dataMin}`);
                                 let increment = (this.dataMax - this.dataMin) / 2;
-                                console.log(increment);
                                 // const max = this.dataMax;
                                 const min = this.dataMin;
                                 if (increment > 1) {
                                     increment = Math.ceil(increment);
                                     tick = Math.floor(this.dataMin);
-                                    console.log('=====');
                                     for (tick; tick <= this.dataMax + increment / 2; tick += increment) {
-                                        console.log(tick);
                                         // let tmpTick = tick;
                                         // if (tick > this.dataMax) tmpTick = this.dataMax + increment / 10;
                                         // positions.push(tmpTick);

@@ -443,7 +443,6 @@ export default {
         this.$store.commit('SAVE_STOCK_LIST', localStockList);
     },
     mounted() {
-        console.log('mounted');
         // 在 mounted() 事件時就可以發送，因為此時不須 data 及 computed 資料都準備好(因為沒有要data 參數，在create())
 
         this.$store.dispatch('GET_STOCK_PRICE');
@@ -453,7 +452,6 @@ export default {
             return array1.filter((object1) => !array2.some((object2) => object1.id === object2.id));
         },
         doShowCost(id) {
-            console.log(id);
             // console.log(this.$refs);
             // 父改子去顯示 drawer 變數 不好，子要被改值
             // 父傳一堆變數給子也不太好
@@ -461,7 +459,6 @@ export default {
             this.$refs.childFormCost.onInit(id);
         },
         doShowPolicy(id) {
-            console.log(id);
             // console.log(this.$refs);
             // 父改子去顯示 drawer 變數 不好，子要被改值
             // 父傳一堆變數給子也不太好
@@ -492,8 +489,6 @@ export default {
             return Math.abs(Number((((close * total - sum) * 100) / sum).toFixed(2))) * this.progressMultiple;
         },
         onChangeStar(selValue, index) {
-            console.log(selValue);
-            console.log(index);
             this.$store.commit('SAVE_STOCK_STAR', { stockId: index, star: selValue });
         },
         // buyOrSellFormatter(row, column, cellValue) {
