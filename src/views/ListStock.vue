@@ -209,7 +209,7 @@
             <el-table-column prop="city" label="策略歷史報酬" width="290" align="center">
                 <template #default="scope">
                     <el-popover
-                        placement="bottom-start"
+                        placement="left-start"
                         title="策略歷史記錄"
                         width="200"
                         trigger="hover"
