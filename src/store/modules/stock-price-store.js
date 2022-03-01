@@ -835,11 +835,11 @@ const stock = {
                             console.log(lastestK);
                             console.log(foundKdDead.limit);
 
-                            if (lastestK >= foundKdDead.limit) foundStock.badge = '將有賣訊';
+                            if (lastestK >= foundKdDead.limit) foundStock.badge = '準賣訊';
                         }
                         if (foundKdTurnDown) {
                             const lastestK = foundStock.data.weekly_kd.at(-1)[1];
-                            if (lastestK >= foundKdTurnDown.limit) foundStock.badge = '將有賣訊';
+                            if (lastestK >= foundKdTurnDown.limit) foundStock.badge = '準賣訊';
                         }
                     }
                 }
