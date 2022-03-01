@@ -815,11 +815,11 @@ const stock = {
                     foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
                     if (foundKdGold) {
                         const lastestK = foundStock.data.weekly_kd.at(-1)[1];
-                        if (lastestK <= foundKdGold.limit) foundStock.badge = '將有買訊';
+                        if (lastestK <= foundKdGold.limit) foundStock.badge = '準買訊';
                     }
                     if (foundKdTurnUp) {
                         const lastestK = foundStock.data.weekly_kd.at(-1)[1];
-                        if (lastestK <= foundKdTurnUp.limit) foundStock.badge = '將有買訊';
+                        if (lastestK <= foundKdTurnUp.limit) foundStock.badge = '準尸買訊';
                     }
                 }
 

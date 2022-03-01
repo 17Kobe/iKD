@@ -6,7 +6,7 @@
                     <el-badge
                         :value="scope.row.badge"
                         class="item"
-                        :type="scope.row.badge === '買訊' || scope.row.badge === '將有買訊' ? 'danger' : 'success'"
+                        :type="scope.row.badge === '買訊' || scope.row.badge === '準買訊' ? 'danger' : 'success'"
                     >
                         <span style="font-size: 16px; font-weight: bold">
                             {{ scope.row.name }}
