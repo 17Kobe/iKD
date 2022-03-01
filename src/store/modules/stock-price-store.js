@@ -819,7 +819,7 @@ const stock = {
                     }
                     if (foundKdTurnUp) {
                         const lastestK = foundStock.data.weekly_kd.at(-1)[1];
-                        if (lastestK <= foundKdTurnUp.limit) foundStock.badge = '準尸買訊';
+                        if (lastestK <= foundKdTurnUp.limit) foundStock.badge = '準買訊';
                     }
                 }
 
