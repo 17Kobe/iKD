@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-table :data="stockList" style="width: 100%">
-            <el-table-column fixed label="名稱" width="230" align="center">
+            <el-table-column fixed label="名稱" width="100" align="center">
                 <template #default="scope">
                     <el-badge
                         :value="scope.row.badge"
@@ -113,12 +113,12 @@
                                 :percentage="
                                     getRateOfReturnPercent(
                                         scope.row.cost.sum,
-                                        scope.row.data.daily.at(-1)[4],
+                                        scope.row.data.daily[scope.row.data.daily.length-1][4],
                                         scope.row.cost.total
                                     )
                                 "
                                 :color="
-                                    getRateOfReturn(scope.row.cost.sum, scope.row.data.daily.at(-1)[4], scope.row.cost.total) <= 0
+                                    getRateOfReturn(scope.row.cost.sum, scope.row.data.daily[scope.row.data.daily.length-1][4], scope.row.cost.total) <= 0
                                         ? '#ccff90'
                                         : '#f28b82'
                                 "
@@ -126,10 +126,10 @@
                                 <!-- '#fef0f0' #f690a9 -->
                                 <span style="color: #222326; font-size: 12px">
                                     <span style="font-size: 14px; font-weight: bold">{{
-                                        getReturn(scope.row.cost.sum, scope.row.data.daily.at(-1)[4], scope.row.cost.total)
+                                        getReturn(scope.row.cost.sum, scope.row.data.daily[scope.row.data.daily.length-1][4], scope.row.cost.total)
                                     }}</span>
                                     元&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 13px; font-weight: bold; color: #999999">{{
-                                        getRateOfReturn(scope.row.cost.sum, scope.row.data.daily.at(-1)[4], scope.row.cost.total)
+                                        getRateOfReturn(scope.row.cost.sum, scope.row.data.daily[scope.row.data.daily.length-1][4], scope.row.cost.total)
                                     }}</span
                                     >&nbsp;%</span
                                 >
@@ -195,8 +195,8 @@
                                     <span
                                         style="
                                             font-size: 14px;
-
-                                            background-color: #ccff90;
+                                            color: white;
+                                            background-color: #82d125;
                                             padding: 5px;
                                             border-radius: 10px 100px / 120px;
                                         "
@@ -252,14 +252,22 @@
                                     ]"
                                     >{{ item.date }}</span
                                 >&nbsp;&nbsp;
-                                <span style="font-size: 14px; display: inline-block; width: 40px">
-                                    <el-tag
-                                        class="ml-2"
-                                        :type="item.buy_or_sell === '買' ? 'danger' : 'success'"
-                                        size="small"
-                                        style="margin: 1px 0px"
-                                        ><span style="font-size: 14px; font-weight: bold">{{ item.buy_or_sell }}</span></el-tag
-                                    ></span
+                                <span
+                                    :style="[
+                                        item.buy_or_sell === '買'
+                                            ? { 'background-color': '#f28b82' }
+                                            : { 'background-color': '#82d125' },
+                                        {
+                                            'font-size': '14px',
+                                            display: 'inline-block',
+                                            width: '30px',
+                                            'text-align': 'center',
+                                            color: 'white',
+                                            'border-radius': '10px 100px / 120px',
+                                            padding: '5px',
+                                        },
+                                    ]"
+                                    >{{ item.buy_or_sell }}</span
                                 >
                                 &nbsp;&nbsp;<span
                                     :style="[
@@ -444,6 +452,7 @@ export default {
         // 空時，或沒資料(有可能刪光)，就載入預設清單
         if (_.isEmpty(localStockList)) {
             localStockList.push(...this.stockList); // 新增 append 預設到 localStockList
+            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(localStockList)); // 將 localStockList 從 object 轉 string 後塞到 localstorage
             // console.log(diffLocal);
             // console.log(diffDefault);
@@ -551,4 +560,7 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button
     -webkit-appearance: none
     margin: 0
+.el-badge__content.is-fixed
+    top: -5px
+    right: calc(27px + var(--el-badge-size)/ 2)
 </style>

@@ -70,7 +70,7 @@ const stock = {
     },
     actions: {
         GET_STOCK_PRICE(context) {
-            console.log('GET_STOCK_PRICE');
+            console.log('GET_STOCK_PRICE 0');
 
             context.state.stockList.forEach((stcokObj) => {
                 // 為了修改，所以多加 index 及 theArray 參數
@@ -78,12 +78,17 @@ const stock = {
 
                 // console.log(currStock[index]);
 
+                console.log('GET_STOCK_PRICE 1');
                 const stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
+                console.log(stockDataDaily);
                 // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
                 const stockStartDate = moment(
-                    stockDataDaily.length === 0 ? '2010-01-01' : moment(stockDataDaily.at(-1)[0]).add(1, 'days')
+                    stockDataDaily.length === 0
+                        ? '2010-01-01'
+                        : moment(stockDataDaily[stockDataDaily.length - 1][0]).add(1, 'days')
                 ).format('YYYY-MM-DD');
 
+                console.log('GET_STOCK_PRICE 2');
                 // 按照網站存在的日期才發出API需求
                 // https://stackoverflow.com/questions/36197031/how-to-use-moment-js-to-check-whether-the-current-time-is-between-2-times
                 const currentTime = moment();
@@ -100,6 +105,7 @@ const stock = {
 
                 // 因為我有將 stockStartDate + 1天，所以有 Same
                 if (moment(siteExistsLatestDate).isSameOrAfter(stockStartDate)) {
+                    console.log('GET_STOCK_PRICE 3');
                     axios
                         .get('https://api.finmindtrade.com/api/v4/data', {
                             params: {
@@ -111,10 +117,12 @@ const stock = {
                         })
                         // 成功
                         .then((res) => {
+                            console.log('GET_STOCK_PRICE 4');
                             context.commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: res.data });
                         })
                         // 失敗
                         .catch((err) => {
+                            console.log('GET_STOCK_PRICE error');
                             console.log(err);
                         });
                 }
@@ -135,6 +143,7 @@ const stock = {
             // console.log(data);
             state.stockList.push(data);
             // console.log(state.currStockDayData);
+            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.dispatch('GET_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
@@ -152,6 +161,7 @@ const stock = {
                 state.stockList.splice(index - 1, 0, tmpStock);
             }
             // console.log(state.currStockDayData);
+            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         DEL_A_STOCK(state, data) {
@@ -159,6 +169,7 @@ const stock = {
             console.log('DEL_A_STOCK');
             // 移除某個自選股
             _.remove(state.stockList, (obj) => obj.id === data);
+            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         SAVE_STOCK_STAR(state, { stockId, star }) {
@@ -168,9 +179,11 @@ const stock = {
             found.star = star; // 複製數據複本
 
             // save to localstorage
+            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
+            console.log('SAVE_STOCK_COST');
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
 
@@ -188,6 +201,7 @@ const stock = {
             }
 
             // save to localstorage
+            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         SAVE_STOCK_POLICY(state, { stockId, policyList }) {
@@ -206,7 +220,14 @@ const stock = {
 
                 // save to localstorage
             }
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // alert(JSON.stringify(state.stockList));
+            try {
+                localStorage.removeItem('stockList');
+                localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+            } catch (err) {
+                alert(err);
+            }
+
             this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線, 看console.log會依序執行commit，一個一個執行完才執行下個，看起來沒問題
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
         },
@@ -239,17 +260,22 @@ const stock = {
                         // element.Trading_Volume,
                     ]);
                 });
+                console.log(state.stockList[index].data.daily);
                 state.stockList[index].data.daily.push(...values);
+                console.log(state.stockList[index].data.daily);
+                console.log(values);
 
                 // theArray[index].data.daily.push(...res.data.data); // 塞入股價資料
 
                 // 塞入漲跌幅、最後股價
-                const v1 = state.stockList[index].data.daily.at(-1)[4];
-                const v2 = state.stockList[index].data.daily.at(-2)[4];
+                const v1 = state.stockList[index].data.daily[state.stockList[index].data.daily.length - 1][4];
+                const v2 = state.stockList[index].data.daily[state.stockList[index].data.daily.length - 2][4];
                 state.stockList[index].last_price = v1;
 
                 const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
-                const currStockLastDate = moment(state.stockList[index].data.daily.at(-1)[0]);
+                const currStockLastDate = moment(
+                    state.stockList[index].data.daily[state.stockList[index].data.daily.length - 1][0]
+                );
                 state.stockList[index].last_price_date = `${currStockLastDate.format('M/DD')}(${
                     dayOfWeek[currStockLastDate.day()]
                 })`;
@@ -342,6 +368,7 @@ const stock = {
                 state.stockList[index].data.weekly_kd = resData;
 
                 // ===================塞入localstorage===================
+                localStorage.removeItem('stockList');
                 localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
                 this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線
                 this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
@@ -403,6 +430,7 @@ const stock = {
             }
 
             // ===================塞入localstorage===================
+            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
             console.log('SAVE_STOCK_MA OK');
         },
@@ -579,6 +607,7 @@ const stock = {
                 foundStock.policy.result = [];
                 foundStock.policy.result.push(...policyResult);
                 // save to localstorage
+                localStorage.removeItem('stockList');
                 localStorage.setItem('stockList', JSON.stringify(state.stockList));
 
                 this.commit('SAVE_STOCK_POLICY_RETURN_RESULT', stockId); // 計算policy且有關報酬率的結果
@@ -603,14 +632,14 @@ const stock = {
             // 最後一天強制再多塞入一個is_latest來計算最新的報酬率
             let dataDailyLastDate = null;
             if (foundStock.policy.result.length > 0) {
-                const policyResultLastDate = moment(foundStock.policy.result.at(-1).date);
-                dataDailyLastDate = moment(foundStock.data.daily.at(-1)[0]);
+                const policyResultLastDate = moment(foundStock.policy.result[foundStock.policy.result.length - 1].date);
+                dataDailyLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
 
                 if (dataDailyLastDate.isAfter(policyResultLastDate)) {
                     foundStock.policy.result.push({
                         date: dataDailyLastDate.format('YYYY-MM-DD'),
                         is_latest: true,
-                        price: foundStock.data.daily.at(-1)[4],
+                        price: foundStock.data.daily[foundStock.data.daily.length - 1][4],
                         reason: ['latest'],
                     });
                 }
@@ -722,6 +751,7 @@ const stock = {
 
             foundStock.policy.stats = {};
 
+            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.commit('SAVE_STOCK_POLICY_RETURN_STATS', stockId);
 
@@ -801,6 +831,7 @@ const stock = {
             } else if (_.has(foundStock, 'policy.stats')) {
                 delete foundStock.policy.stats;
             }
+            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.commit('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE', stockId);
         },
@@ -819,16 +850,19 @@ const stock = {
                     foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
                     foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
                     if (foundKdGold) {
-                        const lastestK = foundStock.data.weekly_kd.at(-1)[1];
+                        const lastestK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1][1];
                         if (lastestK <= foundKdGold.limit) foundStock.badge = '準買訊';
                     }
                     if (foundKdTurnUp) {
-                        const lastestK = foundStock.data.weekly_kd.at(-1)[1];
+                        const lastestK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1][1];
                         if (lastestK <= foundKdTurnUp.limit) foundStock.badge = '準買訊';
                     }
                 }
 
-                if (foundStock.policy.result.at(-1).date === foundStock.data.daily.at(-1)[0]) {
+                if (
+                    foundStock.policy.result[foundStock.policy.result.length - 1].date ===
+                    foundStock.data.daily[foundStock.data.daily.length - 1][0]
+                ) {
                     // 等於代表沒pop，可預測賣
                     if (_.has(foundStock, 'policy.settings.sell')) {
                         let foundKdDead = false;
@@ -836,12 +870,12 @@ const stock = {
                         foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
                         foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
                         if (foundKdDead) {
-                            const lastestK = foundStock.data.weekly_kd.at(-1)[1];
+                            const lastestK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1][1];
 
                             if (lastestK >= foundKdDead.limit) foundStock.badge = '準賣訊';
                         }
                         if (foundKdTurnDown) {
-                            const lastestK = foundStock.data.weekly_kd.at(-1)[1];
+                            const lastestK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1][1];
                             if (lastestK >= foundKdTurnDown.limit) foundStock.badge = '準賣訊';
                         }
                     }

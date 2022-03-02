@@ -8,8 +8,8 @@
         >
         </highcharts>
         <div style="position: absolute; top: 83px; left: 97px; font-size: 12px" v-if="k && k.length > 0">
-            <span style="color: #4286f5">K</span>: {{ k.at(-1)[1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
-            {{ d.at(-1)[1].toFixed(2) }}
+            <span style="color: #4286f5">K</span>: {{ k[k.length-1][1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
+            {{ d[d.length-1][1].toFixed(2) }}
         </div>
 
         <!-- :updateArgs="[true, true, true]" -->
