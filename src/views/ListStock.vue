@@ -195,8 +195,8 @@
                                     <span
                                         style="
                                             font-size: 14px;
-
-                                            background-color: #ccff90;
+                                            color: white;
+                                            background-color: #82d125;
                                             padding: 5px;
                                             border-radius: 10px 100px / 120px;
                                         "
@@ -252,14 +252,22 @@
                                     ]"
                                     >{{ item.date }}</span
                                 >&nbsp;&nbsp;
-                                <span style="font-size: 14px; display: inline-block; width: 40px">
-                                    <el-tag
-                                        class="ml-2"
-                                        :type="item.buy_or_sell === '買' ? 'danger' : 'success'"
-                                        size="small"
-                                        style="margin: 1px 0px"
-                                        ><span style="font-size: 14px; font-weight: bold">{{ item.buy_or_sell }}</span></el-tag
-                                    ></span
+                                <span
+                                    :style="[
+                                        item.buy_or_sell === '買'
+                                            ? { 'background-color': '#f28b82' }
+                                            : { 'background-color': '#82d125' },
+                                        {
+                                            'font-size': '14px',
+                                            display: 'inline-block',
+                                            width: '30px',
+                                            'text-align': 'center',
+                                            color: 'white',
+                                            'border-radius': '10px 100px / 120px',
+                                            padding: '5px',
+                                        },
+                                    ]"
+                                    >{{ item.buy_or_sell }}</span
                                 >
                                 &nbsp;&nbsp;<span
                                     :style="[
