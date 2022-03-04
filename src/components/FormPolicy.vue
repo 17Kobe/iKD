@@ -4,24 +4,31 @@
             <div style="font-size: 24px; margin: 0px 10px 10px">買進</div>
 
             <el-row v-for="(item, index) in form.buy" :key="index">
-                <el-col :xs="3" :sm="6" :md="4" :lg="5" :xl="3">
+                <el-col :xs="22" :sm="6" :md="4" :lg="5" :xl="3">
                     <el-form-item label="策略">
-                        <el-select v-model="item.method" @change="onChangeBuyMethod($event, index)">
+                        <el-select size="small" v-model="item.method" @change="onChangeBuyMethod($event, index)">
                             <el-option v-for="item in buyOptions" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
-                <el-col :xs="4" :sm="6" :md="5" :lg="4" :xl="2">
+                <el-col :xs="10" :sm="6" :md="5" :lg="4" :xl="2">
                     <el-form-item label="限制">
-                        <el-input v-model="item.limit" placeholder="ex: 33.43" :ref="`method_buy_${index}`" type="number" />
+                        <el-input
+                            size="small"
+                            v-model="item.limit"
+                            placeholder="ex: 33.43"
+                            :ref="`method_buy_${index}`"
+                            type="number"
+                        />
                     </el-form-item>
                 </el-col>
-                <el-col :xs="4" :sm="6" :md="5" :lg="5" :xl="3" style="margin: 9px 2px">
+                <el-col :xs="12" :sm="6" :md="5" :lg="5" :xl="3" style="margin: 9px 2px">
                     {{ item.limit_desc }}
                 </el-col>
-                <el-col :xs="1" :sm="6" :md="3" :lg="2" :xl="1">
-                    &nbsp;&nbsp;<el-button type="danger" @click="onDelBuy(index)"><i class="el-icon-minus"></i></el-button
+                <el-col :xs="24" :sm="6" :md="3" :lg="2" :xl="1">
+                    &nbsp;&nbsp;<el-button size="small" type="danger" @click="onDelBuy(index)"
+                        ><i class="el-icon-minus"></i></el-button
                 ></el-col>
             </el-row>
 
@@ -34,24 +41,31 @@
             <div style="font-size: 24px; margin: 0px 10px 10px">賣出</div>
 
             <el-row v-for="(item, index) in form.sell" :key="index">
-                <el-col :xs="3" :sm="6" :md="4" :lg="5" :xl="3">
+                <el-col :xs="22" :sm="6" :md="4" :lg="5" :xl="3">
                     <el-form-item label="策略">
-                        <el-select v-model="item.method" @change="onChangeSellMethod($event, index)">
+                        <el-select size="small" v-model="item.method" @change="onChangeSellMethod($event, index)">
                             <el-option v-for="item in sellOptions" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
-                <el-col :xs="4" :sm="6" :md="5" :lg="4" :xl="2">
+                <el-col :xs="10" :sm="6" :md="5" :lg="4" :xl="2">
                     <el-form-item label="限制">
-                        <el-input v-model="item.limit" placeholder="ex: 33.43" :ref="`method_buy_${index}`" type="number" />
+                        <el-input
+                            size="small"
+                            v-model="item.limit"
+                            placeholder="ex: 33.43"
+                            :ref="`method_buy_${index}`"
+                            type="number"
+                        />
                     </el-form-item>
                 </el-col>
-                <el-col :xs="4" :sm="6" :md="5" :lg="5" :xl="3" style="margin: 9px 2px">
+                <el-col :xs="12" :sm="6" :md="5" :lg="5" :xl="3" style="margin: 9px 2px">
                     {{ item.limit_desc }}
                 </el-col>
-                <el-col :xs="1" :sm="6" :md="3" :lg="2" :xl="1">
-                    &nbsp;&nbsp;<el-button type="danger" @click="onDelSell(index)"><i class="el-icon-minus"></i></el-button
+                <el-col :xs="24" :sm="6" :md="3" :lg="2" :xl="1">
+                    &nbsp;&nbsp;<el-button size="small" type="danger" @click="onDelSell(index)"
+                        ><i class="el-icon-minus"></i></el-button
                 ></el-col>
             </el-row>
 
@@ -269,3 +283,8 @@ export default {
 };
 // 父傳子參考 https://its201.com/article/weixin_49035434/119852222 方法1，的emit似乎 vue 3有改語法而不行了。但方法2沒用 emit仍正常
 </script>
+
+<style lang="sass" scoped>
+.el-form-item
+    margin-bottom: 0px
+</style>

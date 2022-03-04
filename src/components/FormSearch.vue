@@ -37,16 +37,16 @@
             </el-table-column>
             <el-table-column fixed label="名稱">
                 <template #default="scope">
-                    <el-button type="danger" size="small" @click="onDel(scope.row.id, scope.row.name)"
+                    <el-button size="small" type="danger" @click="onDel(scope.row.id, scope.row.name)"
                         ><i class="el-icon-minus"></i
                     ></el-button>
-                    <el-button type="info" :disabled="scope.$index === 0" size="small" @click="onMove(scope.row.id, 'top')"
+                    <el-button size="small" type="info" :disabled="scope.$index === 0" @click="onMove(scope.row.id, 'top')"
                         ><i class="el-icon-caret-top"></i
                     ></el-button>
                     <el-button
+                        size="small"
                         type="info"
                         :disabled="scope.$index === customStockList.length - 1"
-                        size="small"
                         @click="onMove(scope.row.id, 'bottom')"
                         ><i class="el-icon-caret-bottom"></i
                     ></el-button>
@@ -201,3 +201,8 @@ export default {
 };
 // 父傳子參考 https://its201.com/article/weixin_49035434/119852222 方法1，的emit似乎 vue 3有改語法而不行了。但方法2沒用 emit仍正常
 </script>
+
+<style lang="sass" scoped>
+.el-button+.el-button
+    margin-left: 5px
+</style>

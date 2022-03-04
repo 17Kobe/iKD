@@ -6,13 +6,16 @@
         <el-upload class="upload-demo" action="" :auto-upload="false" :on-change="openFile" :limit="1">
             &nbsp;&nbsp;<el-button type="primary"><i class="el-icon-upload2"></i> 匯入設定檔</el-button>
         </el-upload>
+        <br />
+        &nbsp;&nbsp;<el-button type="danger" @click="onClear"><i class="el-icon-download"></i> 清除設定檔</el-button>
+
         <!-- <el-button type="primary" @click="onImport"><i class="el-icon-upload2"></i> 匯入設定檔</el-button> -->
     </el-drawer>
 </template>
 
 <script>
 // import _ from 'lodash';
-import { ElMessage } from 'element-plus';
+import { ElMessageBox, ElMessage } from 'element-plus';
 
 export default {
     name: 'component-form-search',
@@ -46,6 +49,26 @@ export default {
             a.href = URL.createObjectURL(file);
             a.download = 'iKD.txt';
             a.click();
+        },
+        onClear() {
+            ElMessageBox.confirm(`將要刪除所有自行設定內容，包括成本及買賣策略?`, '刪除', {
+                confirmButtonText: '刪除',
+                cancelButtonText: '取消',
+                type: 'warning',
+            })
+                .then(() => {
+                    localStorage.removeItem('stockList');
+                    ElMessage({
+                        type: 'success',
+                        message: '完成刪除設定檔!',
+                    });
+                })
+                .catch(() => {
+                    ElMessage({
+                        type: 'info',
+                        message: '取消刪除設定檔!',
+                    });
+                });
         },
 
         // 讀檔參考 https://blog.csdn.net/qq_40729514/article/details/109677411

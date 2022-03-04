@@ -6,7 +6,7 @@
                     <el-badge
                         :value="scope.row.badge"
                         class="item"
-                        :type="scope.row.badge === '買訊' || scope.row.badge === '準買訊' ? 'danger' : 'success'"
+                        :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
                     >
                         <span style="font-size: 16px; font-weight: bold">
                             {{ scope.row.name }}
@@ -18,7 +18,7 @@
                     </el-rate>
                 </template>
             </el-table-column>
-            <el-table-column label="股價" width="65" align="right">
+            <el-table-column fixed label="股價" width="75" align="right">
                 <template #default="scope">
                     <span v-if="scope.row.data && scope.row.data.daily && scope.row.data.daily.length >= 2">
                         <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
@@ -58,12 +58,12 @@
                 </template>
             </el-table-column>
 
-            <el-table-column prop="city" label="週KD" width="220" align="center">
+            <el-table-column prop="city" label="週KD" width="230" align="center">
                 <template #default="scope">
                     <ChartWeekKd :parentData="scope.row.id" />
                 </template>
             </el-table-column>
-            <el-table-column label="週K線" width="220" align="center">
+            <el-table-column label="週K線" width="230" align="center">
                 <template #default="scope">
                     <ChartWeekK :parentData="scope.row.id" />
                 </template>
@@ -125,7 +125,7 @@
                                         scope.row.cost.total
                                     ) <= 0
                                         ? '#ccff90'
-                                        : '#f28b82'
+                                        : '#ffc2bd'
                                 "
                             >
                                 <!-- '#fef0f0' #f690a9 -->
@@ -564,6 +564,8 @@ export default {
 .el-table__header tr, .el-table__header th
     padding: 0
     height: 15px
+.el-table .el-table__body .el-table_1_column_2
+    padding-right: 10px
 .el-table .el-table__body td
     padding: 0px 0
 // 為了解決table內cell要/n換行的問題
@@ -579,6 +581,6 @@ input::-webkit-inner-spin-button
     -webkit-appearance: none
     margin: 0
 .el-badge__content.is-fixed
-    top: -5px
-    right: calc(27px + var(--el-badge-size)/ 2)
+    top: -2px
+    right: calc(28px + var(--el-badge-size) / 2)
 </style>
