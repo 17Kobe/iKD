@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-tabs type="border-card" class="demo-tabs" @tab-click="handleClick">
+        <el-tabs type="border-card" class="demo-tabs" @tab-click="handleClick" tab-position="bottom">
             <!-- el-tab 使用 vue-router https://www.jb51.net/article/147774.htm -->
             <el-tab-pane>
                 <template #label>

@@ -481,6 +481,14 @@ export default {
         // 在 mounted() 事件時就可以發送，因為此時不須 data 及 computed 資料都準備好(因為沒有要data 參數，在create())
 
         this.$store.dispatch('GET_STOCK_PRICE');
+        // 欄位設成fixed然後table又設成header在最上方，會造成欄位自行多加 Is-hidden而使得看不到欄位名稱
+        this.$nextTick(() => {
+            const elems = document.querySelectorAll('.is-hidden');
+
+            [].forEach.call(elems, (el) => {
+                el.classList.remove('is-hidden');
+            });
+        });
     },
     methods: {
         getDifference(array1, array2) {
@@ -555,13 +563,23 @@ export default {
     color: black !important
     border-radius: 3px
     // box-shadow: 0 2px 4px 0 rgb(0 0 0 / 12%), 0 0 6px 0 rgb(0 0 0 / 4%)
-
 .el-menu-item.is-active [class*="el-icon-"]
     color: #F56C6C
+.el-table__header-wrapper
+    z-index: 100
+    position: fixed
+    top: 0
+
+// Neede to show the first row in the table
+.el-table__body-wrapper
+    margin-top: 50px
+
+
 // 為了讓highchart圖更不會佔td
 .el-tabs--border-card>.el-tabs__content
     padding: 0px
-
+    height: calc(100vh - 51px)
+    overflow-y: auto
 .el-table__header tr, .el-table__header th
     padding: 0
     height: 15px
