@@ -610,4 +610,7 @@ input::-webkit-inner-spin-button
 .el-badge__content.is-fixed
     top: 0px
     right: calc(0px + var(--el-badge-size) / 2)
+// group button padding 左右小一點
+.el-input-group__prepend
+    padding: 0 10px
 </style>
