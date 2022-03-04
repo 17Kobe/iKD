@@ -4,10 +4,10 @@
         <highcharts
             :constructorType="'stockChart'"
             :options="chartOptions"
-            style="position: relative; top: 8px; background: transparent"
+            style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 83px; left: 97px; font-size: 12px" v-if="k && k.length > 0">
+        <div style="position: absolute; top: 80px; left: 97px; font-size: 12px" v-if="k && k.length > 0">
             <span style="color: #4286f5">K</span>: {{ k[k.length - 1][1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
             {{ d[d.length - 1][1].toFixed(2) }}
         </div>

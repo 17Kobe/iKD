@@ -4,10 +4,10 @@
         <highcharts
             :constructorType="'stockChart'"
             :options="chartOptions"
-            style="position: relative; top: 8px; background: transparent"
+            style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 83px; right: 14px; font-size: 12px" v-if="ohlc && ohlc.length > 0">
+        <div style="position: absolute; top: 80px; right: 14px; font-size: 12px" v-if="ohlc && ohlc.length > 0">
             <!-- <span style="color: #834beb">P</span>: {{ Number(ohlc.at(-1)[3].toFixed(2)) }} -->
             <span v-if="ma_buy && ma_buy.length > 0"
                 ><span style="color: #834beb">&nbsp;MA({{ ma_policy.ma_buy_limit }})</span>:
