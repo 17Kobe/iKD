@@ -3,17 +3,18 @@
         <el-table :data="stockList" style="width: 100%">
             <el-table-column fixed label="名稱" width="100" align="center">
                 <template #default="scope">
+                    <span style="font-size: 16px; font-weight: bold">
+                        {{ scope.row.name }}
+                    </span>
+
+                    <br />
                     <el-badge
                         :value="scope.row.badge"
                         class="item"
                         :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
                     >
-                        <span style="font-size: 16px; font-weight: bold">
-                            {{ scope.row.name }}
-                        </span>
+                        <span style="color: #cccccc">{{ scope.row.id }}</span>
                     </el-badge>
-                    <br />
-                    <span style="color: #cccccc">{{ scope.row.id }}</span>
                     <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
                     </el-rate>
                 </template>
@@ -581,6 +582,6 @@ input::-webkit-inner-spin-button
     -webkit-appearance: none
     margin: 0
 .el-badge__content.is-fixed
-    top: -2px
-    right: calc(28px + var(--el-badge-size) / 2)
+    top: 0px
+    right: calc(0px + var(--el-badge-size) / 2)
 </style>
