@@ -583,11 +583,11 @@ export default {
 
 // .el-tab-pane
     // height: calc(100vh - 51px)
-.el-tabs--border-card
-    height: calc(100vh - 51px)
-.el-tab-pane
-    height: calc(100vh - 51px)
-    overflow-y: auto
+// .el-tabs--border-card
+//     height: calc(100% - 51px)
+// .el-tab-pane
+//     height: calc(100% - 51px)
+//     overflow-y: auto
 .el-table__header tr, .el-table__header th
     padding: 0
     height: 15px

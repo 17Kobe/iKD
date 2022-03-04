@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-tabs type="border-card" class="demo-tabs" @tab-click="handleClick" tab-position="bottom">
+        <el-tabs type="border-card" class="demo-tabs" @tab-click="handleClick">
             <!-- el-tab 使用 vue-router https://www.jb51.net/article/147774.htm -->
             <el-tab-pane>
                 <template #label>
@@ -31,3 +31,8 @@ export default {
     },
 };
 </script>
+<style lang="sass">
+.el-tabs .el-tabs__content
+    max-height: calc(100vh - 51px)
+    overflow: auto
+</style>
