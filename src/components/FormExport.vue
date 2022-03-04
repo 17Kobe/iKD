@@ -54,7 +54,6 @@ export default {
             const store = this.$store;
             reader.onload = function () {
                 if (reader.result) {
-                    localStorage.removeItem('stockList');
                     localStorage.setItem('stockList', reader.result);
                     const localStockList = JSON.parse(reader.result) || [];
                     store.commit('SAVE_STOCK_LIST', localStockList); // 在這裡就不能用 this，所以寫在外頭

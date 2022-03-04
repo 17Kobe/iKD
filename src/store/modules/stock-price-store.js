@@ -143,7 +143,6 @@ const stock = {
             // console.log(data);
             state.stockList.push(data);
             // console.log(state.currStockDayData);
-            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.dispatch('GET_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
@@ -161,7 +160,6 @@ const stock = {
                 state.stockList.splice(index - 1, 0, tmpStock);
             }
             // console.log(state.currStockDayData);
-            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         DEL_A_STOCK(state, data) {
@@ -169,7 +167,6 @@ const stock = {
             console.log('DEL_A_STOCK');
             // 移除某個自選股
             _.remove(state.stockList, (obj) => obj.id === data);
-            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         SAVE_STOCK_STAR(state, { stockId, star }) {
@@ -179,7 +176,6 @@ const stock = {
             found.star = star; // 複製數據複本
 
             // save to localstorage
-            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
@@ -201,7 +197,6 @@ const stock = {
             }
 
             // save to localstorage
-            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         SAVE_STOCK_POLICY(state, { stockId, policyList }) {
@@ -222,7 +217,6 @@ const stock = {
             }
             // alert(JSON.stringify(state.stockList));
             try {
-                localStorage.removeItem('stockList');
                 localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
             } catch (err) {
                 alert(err);
@@ -368,7 +362,6 @@ const stock = {
                 state.stockList[index].data.weekly_kd = resData;
 
                 // ===================塞入localstorage===================
-                localStorage.removeItem('stockList');
                 localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
                 this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線
                 this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
@@ -430,7 +423,6 @@ const stock = {
             }
 
             // ===================塞入localstorage===================
-            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
             console.log('SAVE_STOCK_MA OK');
         },
@@ -607,7 +599,6 @@ const stock = {
                 foundStock.policy.result = [];
                 foundStock.policy.result.push(...policyResult);
                 // save to localstorage
-                localStorage.removeItem('stockList');
                 localStorage.setItem('stockList', JSON.stringify(state.stockList));
 
                 this.commit('SAVE_STOCK_POLICY_RETURN_RESULT', stockId); // 計算policy且有關報酬率的結果
@@ -751,7 +742,6 @@ const stock = {
 
             foundStock.policy.stats = {};
 
-            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.commit('SAVE_STOCK_POLICY_RETURN_STATS', stockId);
 
@@ -831,7 +821,6 @@ const stock = {
             } else if (_.has(foundStock, 'policy.stats')) {
                 delete foundStock.policy.stats;
             }
-            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.commit('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE', stockId);
         },

@@ -14,7 +14,8 @@
                     </el-badge>
                     <br />
                     <span style="color: #cccccc">{{ scope.row.id }}</span>
-                    <el-rate v-model="scope.row.star" size="small" @change="onChangeStar($event, scope.row.id)"> </el-rate>
+                    <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
+                    </el-rate>
                 </template>
             </el-table-column>
             <el-table-column label="股價" width="65" align="right">
@@ -113,12 +114,16 @@
                                 :percentage="
                                     getRateOfReturnPercent(
                                         scope.row.cost.sum,
-                                        scope.row.data.daily[scope.row.data.daily.length-1][4],
+                                        scope.row.data.daily[scope.row.data.daily.length - 1][4],
                                         scope.row.cost.total
                                     )
                                 "
                                 :color="
-                                    getRateOfReturn(scope.row.cost.sum, scope.row.data.daily[scope.row.data.daily.length-1][4], scope.row.cost.total) <= 0
+                                    getRateOfReturn(
+                                        scope.row.cost.sum,
+                                        scope.row.data.daily[scope.row.data.daily.length - 1][4],
+                                        scope.row.cost.total
+                                    ) <= 0
                                         ? '#ccff90'
                                         : '#f28b82'
                                 "
@@ -126,10 +131,18 @@
                                 <!-- '#fef0f0' #f690a9 -->
                                 <span style="color: #222326; font-size: 12px">
                                     <span style="font-size: 14px; font-weight: bold">{{
-                                        getReturn(scope.row.cost.sum, scope.row.data.daily[scope.row.data.daily.length-1][4], scope.row.cost.total)
+                                        getReturn(
+                                            scope.row.cost.sum,
+                                            scope.row.data.daily[scope.row.data.daily.length - 1][4],
+                                            scope.row.cost.total
+                                        )
                                     }}</span>
                                     元&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 13px; font-weight: bold; color: #999999">{{
-                                        getRateOfReturn(scope.row.cost.sum, scope.row.data.daily[scope.row.data.daily.length-1][4], scope.row.cost.total)
+                                        getRateOfReturn(
+                                            scope.row.cost.sum,
+                                            scope.row.data.daily[scope.row.data.daily.length - 1][4],
+                                            scope.row.cost.total
+                                        )
                                     }}</span
                                     >&nbsp;%</span
                                 >
@@ -452,7 +465,6 @@ export default {
         // 空時，或沒資料(有可能刪光)，就載入預設清單
         if (_.isEmpty(localStockList)) {
             localStockList.push(...this.stockList); // 新增 append 預設到 localStockList
-            localStorage.removeItem('stockList');
             localStorage.setItem('stockList', JSON.stringify(localStockList)); // 將 localStockList 從 object 轉 string 後塞到 localstorage
             // console.log(diffLocal);
             // console.log(diffDefault);
@@ -546,6 +558,12 @@ export default {
 .el-menu-item.is-active [class*="el-icon-"]
     color: #F56C6C
 // 為了讓highchart圖更不會佔td
+.el-tabs--border-card>.el-tabs__content
+    padding: 0px
+
+.el-table__header tr, .el-table__header th
+    padding: 0
+    height: 15px
 .el-table .el-table__body td
     padding: 0px 0
 // 為了解決table內cell要/n換行的問題
