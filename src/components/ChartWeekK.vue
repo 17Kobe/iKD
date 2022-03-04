@@ -11,11 +11,11 @@
             <!-- <span style="color: #834beb">P</span>: {{ Number(ohlc.at(-1)[3].toFixed(2)) }} -->
             <span v-if="ma_buy && ma_buy.length > 0"
                 ><span style="color: #834beb">&nbsp;MA({{ ma_policy.ma_buy_limit }})</span>:
-                {{ Number(ma_buy.at(-1)[1].toFixed(2)) }}</span
+                {{ Number(ma_buy[ma_buy.length-1][1].toFixed(2)) }}</span
             >
             <span v-if="ma_sell && ma_sell.length > 0"
                 ><span style="color: #e6a23c">&nbsp;MA({{ ma_policy.ma_sell_limit }})</span>:
-                {{ Number(ma_sell.at(-1)[1].toFixed(2)) }}</span
+                {{ Number(ma_sell[ma_sell.length-1][1].toFixed(2)) }}</span
             >
         </div>
         <!-- :updateArgs="[true, true, true]" -->
