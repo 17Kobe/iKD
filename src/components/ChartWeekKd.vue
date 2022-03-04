@@ -156,7 +156,9 @@ export default {
             return {
                 chart: {
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
-                    zoomType: '', // x, y不能在放大縮小，避免手滑在移動時間又動到放大縮小
+                    // zoomType: '', // x, y不能在放大縮小，避免手滑在移動時間又動到放大縮小
+                    zoomType: null,
+                    panning: true,
                     height: 100,
                     events: {
                         // 這裡指定後 就可以用
@@ -312,6 +314,8 @@ export default {
                 },
                 yAxis: [
                     {
+                        min: 0,
+                        max: 100,
                         plotLines: [
                             {
                                 color: '#ff9494', // 黃金交叉
@@ -357,6 +361,8 @@ export default {
                                     increment = Math.ceil(increment);
                                     tick = Math.floor(this.dataMin);
                                     for (tick; tick - increment <= this.dataMax; tick += increment) {
+                                        if (tick > 100) tick = 100;
+                                        else if (tick < 0) tick = 0;
                                         positions.push(tick);
                                     }
                                 } else {

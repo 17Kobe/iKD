@@ -11,11 +11,11 @@
             <!-- <span style="color: #834beb">P</span>: {{ Number(ohlc.at(-1)[3].toFixed(2)) }} -->
             <span v-if="ma_buy && ma_buy.length > 0"
                 ><span style="color: #834beb">&nbsp;MA({{ ma_policy.ma_buy_limit }})</span>:
-                {{ Number(ma_buy[ma_buy.length-1][1].toFixed(2)) }}</span
+                {{ Number(ma_buy[ma_buy.length - 1][1].toFixed(2)) }}</span
             >
             <span v-if="ma_sell && ma_sell.length > 0"
                 ><span style="color: #e6a23c">&nbsp;MA({{ ma_policy.ma_sell_limit }})</span>:
-                {{ Number(ma_sell[ma_sell.length-1][1].toFixed(2)) }}</span
+                {{ Number(ma_sell[ma_sell.length - 1][1].toFixed(2)) }}</span
             >
         </div>
         <!-- :updateArgs="[true, true, true]" -->
@@ -55,7 +55,9 @@ export default {
             return {
                 chart: {
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
-                    zoomType: '', // x, y不能在放大縮小，避免手滑在移動時間又動到放大縮小
+                    zoomType: null, // x, y不能在放大縮小，避免手滑在移動時間又動到放大縮小
+                    panning: false, // x, y不能在放大縮小，避免手滑在移動時間又動到放大縮小
+                    // pinchType: 'x',
                     height: 100,
                     events: {
                         // 這裡指定後 就可以用
