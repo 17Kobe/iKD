@@ -1,6 +1,7 @@
 import { createStore } from 'vuex';
 import price from './modules/stock-price-store';
 import taiwan from './modules/taiwan-stock-list-store';
+import asset from './modules/asset-store';
 
 const defaultState = {};
 
@@ -11,6 +12,7 @@ export default createStore({
         // .vue 檔案若要使用時，是用 name，即 a，在這裡就用 stock
         price,
         taiwan,
+        asset,
     },
 
     // vue3 的 state 要用() 變是 func

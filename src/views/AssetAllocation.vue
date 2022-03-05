@@ -11,14 +11,14 @@
 
         <!-- <chart v-if="loaded" :chartdata="chartdata" :options="options"> </chart> -->
         <br /><br /><br />
-        <el-row>
+        <el-row v-for="(item, index) in assetList" :key="index">
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                <el-input size="small" placeholder="">
+                <el-input size="small" placeholder="" v-model="item.account" @keyup="onChangeAccount($event, index)">
                     <template #prepend>帳戶</template>
                 </el-input>
             </el-col>
             <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                <el-input size="small" placeholder="">
+                <el-input size="small" placeholder="" v-model="item.amount" @keyup="onChangeAmount($event, index)">
                     <template #prepend>金額</template>
                 </el-input>
             </el-col>
@@ -28,7 +28,7 @@
         </el-row>
         <el-row>
             <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
-                <el-button type="primary" size="small"><i class="el-icon-plus"></i></el-button>
+                <el-button type="primary" size="small" @click="onAddAsset"><i class="el-icon-plus"></i></el-button>
             </el-col>
         </el-row>
     </div>
@@ -49,6 +49,7 @@ export default {
     components: { DoughnutChart, BarChart, PieChart },
     data() {
         return {
+            // assetList: [],
             barData: {
                 labels: ['Paris', 'Nîmes', 'Toulon'],
                 datasets: [
@@ -117,6 +118,37 @@ export default {
 
     //     return { testData };
     // },
+    computed: {
+        assetList() {
+            return this.$store.state.asset.assetList;
+        },
+    },
+    created() {
+        console.log('created');
+        // 取得 localstorage 自選股，最先開始是 null 時，會給予預設值空矩陣
+        const assetList = JSON.parse(localStorage.getItem('assetList')) || [];
+        this.$store.commit('SAVE_ASSET', assetList);
+    },
+    methods: {
+        onAddAsset() {
+            console.log('onAddAsset');
+
+            this.assetList.push({
+                account: '',
+                amount: 0,
+            });
+        },
+        onChangeAccount(e, index) {
+            console.log('onChangeAccount');
+            this.assetList[index].account = e.target.value;
+            this.$store.commit('SAVE_ASSET', this.assetList);
+        },
+        onChangeAmount(e, index) {
+            console.log('onChangeAmount');
+            this.assetList[index].amount = e.target.value;
+            this.$store.commit('SAVE_ASSET', this.assetList);
+        },
+    },
 };
 </script>
 

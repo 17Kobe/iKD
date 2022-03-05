@@ -1,12 +1,11 @@
 import axios from 'axios';
-import moment from 'moment';
 import _ from 'lodash';
 
 const defaultState = {
     taiwanStockList: [],
 };
 
-const stock = {
+const taiwan = {
     // vue3 的 state 要用() 變是 func
     state() {
         return defaultState;
@@ -44,4 +43,4 @@ const stock = {
     getters: {},
 };
 
-export default stock;
+export default taiwan;
