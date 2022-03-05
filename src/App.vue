@@ -33,6 +33,6 @@ export default {
 </script>
 <style lang="sass">
 .el-tabs .el-tabs__content
-    max-height: calc(100vh - 51px)
+    max-height: calc(100% - 51px)
     overflow: auto
 </style>
