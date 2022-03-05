@@ -418,6 +418,7 @@
         <el-button style="margin-top: 10px" @click="doShowSearch()"><i class="el-icon-edit"></i>&nbsp;新增自選股</el-button>
         <el-button style="margin-top: 10px" @click="doShowExport()"><i class="el-icon-download"></i>&nbsp;匯出設定檔</el-button>
         <br /><br />
+        <br /><br />
         <FormCost ref="childFormCost" />
         <FormPolicy ref="childFormPolicy" />
         <FormSearch ref="childFormSearch" />
@@ -551,21 +552,21 @@ export default {
     color: #2c3e50
     /* margin-top: 60px; */
 
-.el-menu-item,
-.el-submenu__title
-    height: 40px !important
-    line-height: 40px !important
+// .el-menu-item,
+// .el-submenu__title
+//     height: 40px !important
+//     line-height: 40px !important
 
-.el-menu-item.is-active
-    /* font-size: 16px; */
-    /* background-color: #f28b82 !important; */
-    /* background-color: #ffcc9c !important; */
-    background-color: #e5e5e5 !important
-    color: black !important
-    border-radius: 3px
-    // box-shadow: 0 2px 4px 0 rgb(0 0 0 / 12%), 0 0 6px 0 rgb(0 0 0 / 4%)
-.el-menu-item.is-active [class*="el-icon-"]
-    color: #F56C6C
+// .el-menu-item.is-active
+//     /* font-size: 16px; */
+//     /* background-color: #f28b82 !important; */
+//     /* background-color: #ffcc9c !important; */
+//     background-color: #e5e5e5 !important
+//     color: black !important
+//     border-radius: 3px
+//     // box-shadow: 0 2px 4px 0 rgb(0 0 0 / 12%), 0 0 6px 0 rgb(0 0 0 / 4%)
+// .el-menu-item.is-active [class*="el-icon-"]
+    // color: #F56C6C
 // .el-table__header-wrapper
 //     z-index: 100
 //     position: fixed
@@ -591,6 +592,10 @@ export default {
 .el-table__header tr, .el-table__header th
     padding: 0
     height: 15px
+//標題字往下移一點
+.el-table th>.cell
+    top: 1px
+    position: relative
 .el-table .el-table__body .el-table_1_column_2
     padding-right: 10px
 .el-table .el-table__body td

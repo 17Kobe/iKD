@@ -41,7 +41,7 @@ import { DoughnutChart, BarChart, PieChart } from 'vue-chart-3';
 Chart.register(...registerables);
 
 // Chart options
-Chart.defaults.global.legend.display = false;
+// Chart.defaults.global.legend.display = false;
 //   Chart.defaults.global.tooltips.enabled = false;
 
 export default {
