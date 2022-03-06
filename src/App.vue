@@ -1,5 +1,5 @@
 <template>
-    <container>
+    <div>
         <main class="main">
             <router-view v-show="routerName === 'default'" /><router-view name="asset" v-show="routerName === 'asset'" />
         </main>
@@ -7,15 +7,15 @@
             <el-menu default-active="default" :router="false" mode="horizontal" active-text-color="#409EFF">
                 <el-menu-item index="default" @click="onMenuItemClick('default')">
                     <i class="el-icon-star-on"></i>
-                    <template #title>自選股</template>
+                    自選股
                 </el-menu-item>
                 <el-menu-item index="asset" @click="onMenuItemClick('asset')">
                     <i class="el-icon-s-data"></i>
-                    <template #title>資產配置</template>
+                    資產配置
                 </el-menu-item>
             </el-menu>
         </footer>
-    </container>
+    </div>
 </template>
 
 <script>
