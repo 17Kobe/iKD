@@ -25,7 +25,6 @@
 <script>
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
-import _ from 'lodash';
 
 export default {
     components: { highcharts: Chart },

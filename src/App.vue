@@ -1,7 +1,9 @@
 <template>
     <div>
         <main class="main">
-            <router-view v-show="routerName === 'default'" /><router-view name="asset" v-show="routerName === 'asset'" />
+            <router-view v-show="routerName === 'default'" />
+            <!-- 要用 v-if 則 chartjs才有動畫算是重載入。用 v-show 是避免重載入，只是隱藏然後顯示 -->
+            <router-view name="asset" v-if="routerName === 'asset'" />
         </main>
         <footer class="footer">
             <el-menu default-active="default" :router="false" mode="horizontal" active-text-color="#409EFF">
