@@ -3,18 +3,18 @@
         <el-table :data="stockList" style="width: 100%">
             <el-table-column fixed label="名稱" width="100" align="center">
                 <template #default="scope">
-                    <span style="font-size: 16px; font-weight: bold">
-                        {{ scope.row.name }}
-                    </span>
-
-                    <br />
                     <el-badge
                         :value="scope.row.badge"
                         class="item"
                         :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
                     >
-                        <span style="color: #cccccc">{{ scope.row.id }}</span>
+                        <span style="font-size: 16px; font-weight: bold">
+                            {{ scope.row.name }}
+                        </span>
                     </el-badge>
+                    <br />
+
+                    <span style="color: #cccccc">{{ scope.row.id }}</span>
                     <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
                     </el-rate>
                     <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="padding: 0 8px">
@@ -41,8 +41,8 @@
                             "
                         >
                             <!-- '#fef0f0' #f690a9 -->
-                            <span style="color: #222326; font-size: 12px">
-                                <span style="font-size: 14px; font-weight: bold">{{
+                            <span style="color: #222326; font-size: 9px">
+                                <span style="font-size: 13px; font-weight: bold">{{
                                     getReturn(
                                         scope.row.cost.sum,
                                         scope.row.data.daily[scope.row.data.daily.length - 1][4],
@@ -50,14 +50,14 @@
                                         10000
                                     )
                                 }}</span
-                                >萬&nbsp;<span style="font-size: 13px; font-weight: bold; color: #999999">{{
+                                >萬&nbsp;&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
                                     getRateOfReturn(
                                         scope.row.cost.sum,
                                         scope.row.data.daily[scope.row.data.daily.length - 1][4],
                                         scope.row.cost.total
                                     )
                                 }}</span
-                                >%</span
+                                ><span style="color: #999999">%</span></span
                             >
                         </el-progress>
                     </div>
@@ -641,6 +641,8 @@ export default {
 .el-table th>.cell
     top: 1px
     position: relative
+.el-table .el-table__body .el-table_1_column_1 .cell
+    line-height: normal
 .el-table .el-table__body .el-table_1_column_2
     padding-right: 10px
 .el-table .el-table__body td
@@ -652,14 +654,15 @@ export default {
     overflow: visible
     padding-left: 0
     padding-right: 0
+
 // 隱藏 input 若有屬性 type="number" 會出現上下箭頭的問題, 寫在各別vue用 scoped不行，不加scoped又會報錯，所以寫在global
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button
     -webkit-appearance: none
     margin: 0
 .el-badge__content.is-fixed
-    top: 0px
-    right: calc(0px + var(--el-badge-size) / 2)
+    top: 1px
+    right: calc(2px + var(--el-badge-size) / 2)
 // group button padding 左右小一點
 .el-input-group__prepend
     padding: 0 10px

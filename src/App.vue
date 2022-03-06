@@ -14,7 +14,7 @@
                     <i class="el-icon-s-data" style="position: relative; top: -2px"></i>資產配置
                 </el-menu-item>
                 <el-menu-item index="dividend" @click="onMenuItemClick('dividend')">
-                    <i class="el-icon-s-finance" style="position: relative; top: -2px"></i>配息預估
+                    <i class="el-icon-s-promotion" style="position: relative; top: -2px"></i>配息預估
                 </el-menu-item>
             </el-menu>
         </footer>
