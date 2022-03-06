@@ -17,6 +17,50 @@
                     </el-badge>
                     <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
                     </el-rate>
+                    <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="padding: 0 8px">
+                        <el-progress
+                            v-if="scope.row.data && scope.row.data.daily && scope.row.data.daily.length >= 1"
+                            :width="30"
+                            :text-inside="true"
+                            :stroke-width="20"
+                            :percentage="
+                                getRateOfReturnPercent(
+                                    scope.row.cost.sum,
+                                    scope.row.data.daily[scope.row.data.daily.length - 1][4],
+                                    scope.row.cost.total
+                                )
+                            "
+                            :color="
+                                getRateOfReturn(
+                                    scope.row.cost.sum,
+                                    scope.row.data.daily[scope.row.data.daily.length - 1][4],
+                                    scope.row.cost.total
+                                ) <= 0
+                                    ? '#ccff90'
+                                    : '#ffc2bd'
+                            "
+                        >
+                            <!-- '#fef0f0' #f690a9 -->
+                            <span style="color: #222326; font-size: 12px">
+                                <span style="font-size: 14px; font-weight: bold">{{
+                                    getReturn(
+                                        scope.row.cost.sum,
+                                        scope.row.data.daily[scope.row.data.daily.length - 1][4],
+                                        scope.row.cost.total,
+                                        10000
+                                    )
+                                }}</span
+                                >萬&nbsp;<span style="font-size: 13px; font-weight: bold; color: #999999">{{
+                                    getRateOfReturn(
+                                        scope.row.cost.sum,
+                                        scope.row.data.daily[scope.row.data.daily.length - 1][4],
+                                        scope.row.cost.total
+                                    )
+                                }}</span
+                                >%</span
+                            >
+                        </el-progress>
+                    </div>
                 </template>
             </el-table-column>
             <el-table-column fixed label="股價" width="75" align="right">
@@ -521,8 +565,9 @@ export default {
         doShowExport() {
             this.$refs.childFormExport.onInit();
         },
-        getReturn(sum, close, total) {
-            return Number((close * total - sum).toFixed(2)).toLocaleString('en-US');
+        getReturn(sum, close, total, unit = 1) {
+            if (unit === 1) return Number((close * total - sum).toFixed(2)).toLocaleString('en-US');
+            return Number(((close * total - sum) / unit).toFixed(1)).toLocaleString('en-US');
         },
         getRateOfReturn(sum, close, total) {
             if (!sum || sum === 0) return 0; // sum 等於0不能做為除法

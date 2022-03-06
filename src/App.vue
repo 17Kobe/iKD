@@ -8,12 +8,13 @@
         <footer class="footer">
             <el-menu default-active="default" :router="false" mode="horizontal" active-text-color="#409EFF">
                 <el-menu-item index="default" @click="onMenuItemClick('default')">
-                    <i class="el-icon-star-on"></i>
-                    自選股
+                    <i class="el-icon-star-on" style="position: relative; top: -2px"></i>自選股　
                 </el-menu-item>
                 <el-menu-item index="asset" @click="onMenuItemClick('asset')">
-                    <i class="el-icon-s-data"></i>
-                    資產配置
+                    <i class="el-icon-s-data" style="position: relative; top: -2px"></i>資產配置
+                </el-menu-item>
+                <el-menu-item index="dividend" @click="onMenuItemClick('dividend')">
+                    <i class="el-icon-s-finance" style="position: relative; top: -2px"></i>配息預估
                 </el-menu-item>
             </el-menu>
         </footer>
