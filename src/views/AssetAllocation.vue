@@ -52,9 +52,24 @@
                 </el-input>
             </el-col>
             <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                <el-input size="small" placeholder="" v-model="item.amount" @keyup="onChangeAmount($event, index)">
-                    <template #prepend>金額</template>
-                </el-input>
+                <ElCurrencyInput
+                    size="small"
+                    placeholder=""
+                    v-model="item.amount"
+                    @keyup="onChangeAmount($event, index)"
+                    :options="{
+                        locale: 'en-US',
+                        currency: 'USD',
+                        currencyDisplay: 'hidden',
+                        hideCurrencySymbolOnFocus: true,
+                        hideGroupingSeparatorOnFocus: true,
+                        hideNegligibleDecimalDigitsOnFocus: true,
+                        autoDecimalDigits: false,
+                        autoSign: true,
+                        useGrouping: true,
+                        accountingSign: false,
+                    }"
+                />
             </el-col>
             <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
                 <el-button type="danger" size="small" @click="onDelAsset(index)" round><i class="el-icon-minus"></i></el-button>
@@ -76,6 +91,7 @@ import _ from 'lodash';
 import { Chart, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { BarChart, PieChart } from 'vue-chart-3';
+import ElCurrencyInput from '../components/ElCurrencyInput.vue';
 
 Chart.register(...registerables);
 // Register the plugin to all charts:
@@ -84,11 +100,12 @@ Chart.register(ChartDataLabels);
 export default {
     name: 'component-asset',
     // components: { highcharts: Chart },
-    components: { BarChart, PieChart },
+    components: { ElCurrencyInput, BarChart, PieChart },
+
     data() {
         return {
             // assetList: [],
-
+            value: 1234,
             barOptions: {
                 scales: {
                     y: {
