@@ -8,7 +8,9 @@
                 </el-card>
             </el-col>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
-                <el-card> <PieChart :chartData="pieData" /> </el-card>
+                <el-card>
+                    <PieChart :chartData="pieData" :options="pieOptions" />
+                </el-card>
             </el-col>
         </el-row>
 
@@ -63,11 +65,16 @@ export default {
                     title: {
                         display: true,
                         text: '資產負債表',
+                        align: 'start',
+                        color: 'blue',
                     },
                     datalabels: {
                         anchor: 'end', // remove this line to get label in middle of the bar
-                        align: 'start',
-                        formatter: (val) => `$ ${Number((val / 10000).toFixed(1))} 萬`,
+                        align: 'end',
+                        formatter: (val) => {
+                            if (!val || val === 0) return '';
+                            return `$ ${Number((val / 10000).toFixed(1))} 萬`;
+                        },
                         labels: {
                             // value: {
                             //     color: 'blue',
@@ -76,22 +83,68 @@ export default {
                     },
                 },
             },
-            pieData: {
-                labels: ['Paris', 'Nîmes', 'Toulon'],
-                datasets: [
-                    {
-                        data: [30, 40, 60],
-                        backgroundColor: [
-                            // 背景色
-                            'rgba(255, 99, 132, 0.5)',
-                            'rgba(255, 205, 86, 0.5)',
-                            'rgba(54, 162, 235, 0.5)',
-                            'rgba(153, 102, 255, 0.5)',
-                            'rgba(255, 159, 64, 0.5)',
-                        ],
-                        borderWidth: 2, // 外框寬度
+            pieOptions: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '資產配置表',
+                        align: 'start',
+                        color: 'blue',
                     },
-                ],
+                    datalabels: {
+                        formatter: (value, ctx) => {
+                            console.log(ctx);
+
+                            let sum = 0;
+                            const dataArr = ctx.chart.data.datasets[0].data;
+                            dataArr.map((data) => {
+                                sum += data;
+                            });
+                            const percentage = `${((value * 100) / sum).toFixed(2)}%`;
+                            return percentage;
+                        },
+                        // color: '#fff',
+                    },
+                    // layout: {
+                    //     padding: {
+                    //         left: 15,
+                    //         right: 15,
+                    //         top: 15,
+                    //         bottom: 15,
+                    //     },
+                    // },
+
+                    // tooltips: {
+                    //     callbacks: {
+                    //         label(tooltipItem, data) {
+                    //             const value = data.datasets[0].data[tooltipItem.index];
+                    //             // if (parseInt(value) >= 1000) {
+                    //             return [
+                    //                 `${data.labels[tooltipItem.index]}: $ ${value
+                    //                     .toString()
+                    //                     .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
+                    //             ];
+                    //         },
+                    //     }, // end callbacks:
+                    // },
+                    legend: {
+                        display: false,
+                    },
+                    // labels: [
+                    //     {
+                    //         render: 'label',
+                    //         position: 'outside',
+                    //         fontStyle: 'bold',
+                    //         textMargin: 0,
+                    //     },
+                    //     {
+                    //         render: 'percentage',
+                    //         fontColor: 'black',
+                    //         precision: 0,
+                    //         overlap: true,
+                    //     },
+                    // ],
+                },
             },
         };
     },
@@ -108,6 +161,20 @@ export default {
         liabilities() {
             return this.assetList.reduce((acc, { amount }) => {
                 if (amount < 0) return acc + Math.abs(amount);
+                return acc;
+            }, 0);
+        },
+        demandDeposit() {
+            // 活存 sum
+            return this.assetList.reduce((acc, { account, amount }) => {
+                if (account.includes('活存')) return acc + Math.abs(amount);
+                return acc;
+            }, 0);
+        },
+        FixedDeposit() {
+            // 定存 sum
+            return this.assetList.reduce((acc, { account, amount }) => {
+                if (account.includes('定存')) return acc + Math.abs(amount);
                 return acc;
             }, 0);
         },
@@ -129,6 +196,25 @@ export default {
                                 display: false,
                             },
                         },
+                    },
+                ],
+            };
+        },
+        pieData() {
+            return {
+                labels: ['活存', '定存', '股票'],
+                datasets: [
+                    {
+                        data: [this.demandDeposit, this.FixedDeposit, 60],
+                        backgroundColor: [
+                            // 背景色
+                            'rgba(255, 159, 64, 0.5)',
+                            'rgba(255, 205, 86, 0.5)',
+                            'rgba(153, 102, 255, 0.5)',
+                            'rgba(75, 192, 192, 0.2)',
+                        ],
+                        // borderColor: ['rgb(66, 66, 66)'],
+                        borderWidth: 2, // 外框寬度
                     },
                 ],
             };
@@ -161,7 +247,7 @@ export default {
         },
         onChangeAmount(e, index) {
             console.log('onChangeAmount');
-            this.assetList[index].amount = parseInt(e.target.value, 10);
+            this.assetList[index].amount = e.target.value ? parseInt(e.target.value, 10) : 0;
             this.$store.commit('SAVE_ASSET', this.assetList);
         },
     },
