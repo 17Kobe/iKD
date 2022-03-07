@@ -1,22 +1,34 @@
 <template>
     <div>
         <el-row>
-            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
+            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 2px 0 4px">
                 <el-card>
                     <BarChart :chartData="barData" :options="barOptions" />
                     <!-- <highcharts :options="chartOptions" style="background: transparent"> </highcharts> -->
                 </el-card>
             </el-col>
-            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
+            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
                 <el-card>
                     <PieChart :chartData="pieData" :options="pieOptions" />
                 </el-card>
             </el-col>
         </el-row>
-
+        <el-row>
+            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 2px 0 4px">
+                <el-card>
+                    <BarChart :chartData="barData" :options="barOptions" />
+                    <!-- <highcharts :options="chartOptions" style="background: transparent"> </highcharts> -->
+                </el-card>
+            </el-col>
+            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
+                <el-card>
+                    <PieChart :chartData="pieData" :options="pieOptions" />
+                </el-card>
+            </el-col>
+        </el-row>
         <!-- <chart v-if="loaded" :chartdata="chartdata" :options="options"> </chart> -->
         <br />
-        <el-row v-for="(item, index) in assetList" :key="index" style="margin: 1px 0">
+        <el-row v-for="(item, index) in assetList" :key="index">
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
                 <el-input size="small" placeholder="" v-model="item.account" @keyup="onChangeAccount($event, index)">
                     <template #prepend>帳戶</template>
@@ -35,9 +47,9 @@
             <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
                 <el-button type="primary" size="small" @click="onAddAsset" round><i class="el-icon-plus"></i></el-button>
             </el-col>
-            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
+            <!-- <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
                 <el-button type="primary" size="small" @click="onResetAsset" round><i class="el-icon-minus"></i></el-button>
-            </el-col>
+            </el-col> -->
         </el-row>
     </div>
 </template>
@@ -61,6 +73,16 @@ export default {
             // assetList: [],
 
             barOptions: {
+                scales: {
+                    y: {
+                        ticks: {
+                            // Include a dollar sign in the ticks
+                            callback(value, index, ticks) {
+                                return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                            },
+                        },
+                    },
+                },
                 plugins: {
                     legend: {
                         display: false,
@@ -68,8 +90,12 @@ export default {
                     title: {
                         display: true,
                         text: '資產負債表',
-                        align: 'start',
-                        color: 'blue',
+                        // align: 'start',
+                        padding: {
+                            top: 5,
+                            bottom: 20,
+                        },
+                        // color: 'blue',
                     },
                     datalabels: {
                         anchor: 'end', // remove this line to get label in middle of the bar
@@ -91,8 +117,12 @@ export default {
                     title: {
                         display: true,
                         text: '資產配置表',
-                        align: 'start',
-                        color: 'blue',
+                        // align: 'start',
+                        padding: {
+                            top: 5,
+                            bottom: 10,
+                        },
+                        // color: 'blue',
                     },
                     datalabels: {
                         formatter: (value, ctx) => {
@@ -103,7 +133,10 @@ export default {
                             dataArr.map((data) => {
                                 sum += data;
                             });
-                            const percentage = `${((value * 100) / sum).toFixed(2)}%`;
+                            const itemName = ['活存', '定存', '股票', '其它'];
+                            console.log(value);
+                            if (value === 0) return '';
+                            const percentage = `  ${itemName[ctx.dataIndex]}\n${((value * 100) / sum).toFixed(2)} %`;
                             return percentage;
                         },
                         // color: '#fff',
@@ -174,10 +207,24 @@ export default {
                 return acc;
             }, 0);
         },
-        FixedDeposit() {
+        fixedDeposit() {
             // 定存 sum
             return this.assetList.reduce((acc, { account, amount }) => {
                 if (account.includes('定存')) return acc + Math.abs(amount);
+                return acc;
+            }, 0);
+        },
+        stockDeposit() {
+            // 定存 sum
+            return this.$store.state.price.stockList.reduce((acc, { cost }) => {
+                if (cost && cost.sum) return acc + cost.sum;
+                return acc;
+            }, 0);
+        },
+        otherDeposit() {
+            // 定存 sum
+            return this.assetList.reduce((acc, { account, amount }) => {
+                if (!account.includes('定存') && !account.includes('活存') && amount >= 0) return acc + Math.abs(amount);
                 return acc;
             }, 0);
         },
@@ -205,10 +252,10 @@ export default {
         },
         pieData() {
             return {
-                labels: ['活存', '定存', '股票'],
+                labels: ['活存', '定存', '股票', '其它'],
                 datasets: [
                     {
-                        data: [this.demandDeposit, this.FixedDeposit, 60],
+                        data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.otherDeposit],
                         backgroundColor: [
                             // 背景色
                             'rgba(255, 159, 64, 0.5)',
