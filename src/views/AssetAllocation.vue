@@ -2,27 +2,44 @@
     <div>
         <el-row>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 2px 0 4px">
-                <el-card>
+                <el-card shadow="hover">
                     <BarChart :chartData="barData" :options="barOptions" />
-                    <!-- <highcharts :options="chartOptions" style="background: transparent"> </highcharts> -->
                 </el-card>
             </el-col>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
-                <el-card>
-                    <PieChart :chartData="pieData" :options="pieOptions" />
+                <el-card shadow="hover" style="height: 201px">
+                    <el-tag class="ml-2" size="small" style="margin: 1px 0px"
+                        >資產 <span style="font-size: 32px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
+                    </el-tag>
+                    <!-- <el-tag class="ml-2" size="small" style="margin: 1px 0px"
+                        >股票損益 <span style="font-size: 20px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
+                    </el-tag> -->
+                    <br />
+                    <br />
+                    <el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                        >活存總額
+                        <span style="font-size: 15px; font-weight: bold">$ {{ demandDeposit.toLocaleString('en-US') }}</span>
+                    </el-tag>
+                    <el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                        >定存總額
+                        <span style="font-size: 15px; font-weight: bold">$ {{ fixedDeposit.toLocaleString('en-US') }}</span>
+                    </el-tag>
+                    <el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                        >股票總額
+                        <span style="font-size: 15px; font-weight: bold">$ {{ stockDeposit.toLocaleString('en-US') }}</span>
+                    </el-tag>
                 </el-card>
             </el-col>
         </el-row>
         <el-row>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 2px 0 4px">
-                <el-card>
-                    <BarChart :chartData="barData" :options="barOptions" />
-                    <!-- <highcharts :options="chartOptions" style="background: transparent"> </highcharts> -->
+                <el-card shadow="hover">
+                    <PieChart :chartData="pieData" :options="pieOptions" />
                 </el-card>
             </el-col>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
-                <el-card>
-                    <PieChart :chartData="pieData" :options="pieOptions" />
+                <el-card shadow="hover">
+                    <BarChart :chartData="horizontalBarData" :options="horizontalBarOptions" />
                 </el-card>
             </el-col>
         </el-row>
@@ -182,6 +199,38 @@ export default {
                     // ],
                 },
             },
+            horizontalBarOptions: {
+                indexAxis: 'y',
+
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    title: {
+                        display: true,
+                        text: '股票損益表',
+                        // align: 'start',
+                        padding: {
+                            top: 5,
+                            bottom: 20,
+                        },
+                        // color: 'blue',
+                    },
+                    datalabels: {
+                        anchor: 'end', // remove this line to get label in middle of the bar
+                        align: 'start',
+                        formatter: (val) => {
+                            if (!val || val === 0) return '';
+                            return `$ ${Number((val / 10000).toFixed(1))} 萬`;
+                        },
+                        labels: {
+                            // value: {
+                            //     color: 'blue',
+                            // },
+                        },
+                    },
+                },
+            },
         };
     },
     computed: {
@@ -228,6 +277,20 @@ export default {
                 return acc;
             }, 0);
         },
+        stockCostExistOfName() {
+            // 定存 sum
+            return this.$store.state.price.stockList.reduce((acc, { name, cost }) => {
+                if (cost && cost.sum) acc.push(name);
+                return acc;
+            }, []);
+        },
+        stockCostExistOfSum() {
+            // 定存 sum
+            return this.$store.state.price.stockList.reduce((acc, { cost }) => {
+                if (cost && cost.sum) acc.push(cost.sum);
+                return acc;
+            }, []);
+        },
         barData() {
             return {
                 labels: ['資產', '負債'],
@@ -240,6 +303,37 @@ export default {
                             'rgba(255, 99, 132, 0.2)',
                         ],
                         borderColor: ['rgb(54, 162, 235)', 'rgb(255, 99, 132)'],
+                        borderWidth: 2, // 外框寬度
+                        options: {
+                            legend: {
+                                display: false,
+                            },
+                        },
+                    },
+                ],
+            };
+        },
+        horizontalBarData() {
+            return {
+                labels: this.stockCostExistOfName,
+                datasets: [
+                    {
+                        data: this.stockCostExistOfSum,
+                        backgroundColor: [
+                            // 背景色
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(201, 203, 207, 0.2)',
+                            'rgba(255, 205, 86, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)',
+                        ],
+                        borderColor: [
+                            'rgb(75, 192, 192)',
+                            'rgb(201, 203, 207)',
+                            'rgb(255, 205, 86)',
+                            'rgb(153, 102, 255)',
+                            'rgb(255, 159, 64)',
+                        ],
                         borderWidth: 2, // 外框寬度
                         options: {
                             legend: {
