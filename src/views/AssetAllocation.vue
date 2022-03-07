@@ -16,7 +16,7 @@
 
         <!-- <chart v-if="loaded" :chartdata="chartdata" :options="options"> </chart> -->
         <br />
-        <el-row v-for="(item, index) in assetList" :key="index">
+        <el-row v-for="(item, index) in assetList" :key="index" style="margin: 1px 0">
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
                 <el-input size="small" placeholder="" v-model="item.account" @keyup="onChangeAccount($event, index)">
                     <template #prepend>帳戶</template>
@@ -28,12 +28,15 @@
                 </el-input>
             </el-col>
             <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                <el-button type="danger" size="small"><i class="el-icon-minus"></i></el-button>
+                <el-button type="danger" size="small" @click="onDelAsset(index)" round><i class="el-icon-minus"></i></el-button>
             </el-col>
         </el-row>
         <el-row>
             <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
-                <el-button type="primary" size="small" @click="onAddAsset"><i class="el-icon-plus"></i></el-button>
+                <el-button type="primary" size="small" @click="onAddAsset" round><i class="el-icon-plus"></i></el-button>
+            </el-col>
+            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
+                <el-button type="primary" size="small" @click="onResetAsset" round><i class="el-icon-minus"></i></el-button>
             </el-col>
         </el-row>
     </div>
@@ -239,6 +242,13 @@ export default {
                 account: '',
                 amount: 0,
             });
+        },
+        onDelAsset(index) {
+            this.assetList.splice(index, 1);
+            this.$store.commit('SAVE_ASSET', this.assetList);
+        },
+        onResetAsset() {
+            localStorage.removeItem('assetList');
         },
         onChangeAccount(e, index) {
             console.log('onChangeAccount');
