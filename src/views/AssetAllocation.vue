@@ -13,7 +13,7 @@
                         >資產
                         <span style="font-size: 24px"> $ </span>
                         <span style="font-size: 28px; font-weight: bold">
-                            <number :from="0" :to="assets" :format="assetsFormat" :duration="2" :delay="0" />
+                            <number :from="0" :to="assets" :format="assetsFormat" :duration="1" :delay="0" />
                         </span>
                     </el-tag>
                     <!-- <el-tag class="ml-2" size="small" style="margin: 1px 0px"
@@ -101,6 +101,8 @@
             <div>【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、 定存)時，將會統計至「資產配置表」</div>
             <div>【$】請輸入帳戶目前金額，若輸入正值(或 負值)時，將會累計金額至「資產負債表」的資產(或 負債)。」</div>
         </div>
+        <br /><br />
+        <br /><br />
     </div>
 </template>
 
@@ -458,25 +460,31 @@ export default {
             });
         },
         onDelAsset(index, assetName) {
-            ElMessageBox.confirm(`將要刪除[${assetName}]?`, '刪除', {
-                confirmButtonText: '刪除',
-                cancelButtonText: '取消',
-                type: 'warning',
-            })
-                .then(() => {
-                    this.assetList.splice(index, 1);
-                    this.$store.commit('SAVE_ASSET', this.assetList);
-                    ElMessage({
-                        type: 'success',
-                        message: '完成刪除!',
-                    });
+            if (assetName) {
+                ElMessageBox.confirm(`將要刪除[${assetName}]?`, '刪除', {
+                    confirmButtonText: '刪除',
+                    cancelButtonText: '取消',
+                    type: 'warning',
                 })
-                .catch(() => {
-                    ElMessage({
-                        type: 'info',
-                        message: '取消刪除!',
+                    .then(() => {
+                        this.assetList.splice(index, 1);
+                        this.$store.commit('SAVE_ASSET', this.assetList);
+                        ElMessage({
+                            type: 'success',
+                            message: '完成刪除!',
+                        });
+                    })
+                    .catch(() => {
+                        ElMessage({
+                            type: 'info',
+                            message: '取消刪除!',
+                        });
                     });
-                });
+            } else {
+                // 沒有名稱，可能剛新增就想刪，就直接刪
+                this.assetList.splice(index, 1);
+                this.$store.commit('SAVE_ASSET', this.assetList);
+            }
         },
         onResetAsset() {
             localStorage.removeItem('assetList');
