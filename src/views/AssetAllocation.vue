@@ -10,7 +10,11 @@
                 <el-card shadow="hover" style="height: 201px">
                     <br />
                     <el-tag class="ml-2" size="large" style="margin: 1px 0px"
-                        >資產 <span style="font-size: 28px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
+                        >資產
+                        <span style="font-size: 24px"> $ </span>
+                        <span style="font-size: 28px; font-weight: bold">
+                            <number :from="0" :to="assets" :format="assetsFormat" :duration="2" :delay="0" />
+                        </span>
                     </el-tag>
                     <!-- <el-tag class="ml-2" size="small" style="margin: 1px 0px"
                         >股票損益 <span style="font-size: 20px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
@@ -489,6 +493,9 @@ export default {
         },
         onClickSelectAll(index) {
             this.$refs[`amount${index}`][0].select();
+        },
+        assetsFormat(number) {
+            return Number(number.toFixed(0)).toLocaleString('en-US');
         },
     },
 };

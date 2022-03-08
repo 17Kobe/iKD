@@ -15,8 +15,10 @@ import loadStock from 'highcharts/modules/stock';
 import loadIndicatorsAll from 'highcharts/indicators/indicators-all';
 // 在這裡一定要用大括號，不然會錯，因為highcharts-vue.js中有命名為 Chart 的export
 
+import VueNumber from 'vue-number-animation';
 import store from './store/store';
 import router from './router/router';
+
 import App from './App.vue';
 
 // 因為 series 是股票圖，所以要導入 stock 模組，才能有 type: 'candlestick'
@@ -40,6 +42,7 @@ const app = createApp(App);
 app.use(store);
 app.use(router);
 app.use(ElementPlus);
+app.use(VueNumber);
 
 // 掛載 monut 至指定網頁(index.html) 中的 #app 節點上
 app.mount('#app');
