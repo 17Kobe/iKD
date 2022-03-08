@@ -58,7 +58,7 @@
         <!-- <chart v-if="loaded" :chartdata="chartdata" :options="options"> </chart> -->
         <br />
         <el-row v-for="(item, index) in assetList" :key="index">
-            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3">
                 <el-input
                     size="small"
                     placeholder=""
@@ -69,7 +69,7 @@
                     <template #prepend>帳戶</template>
                 </el-input>
             </el-col>
-            <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+            <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3">
                 <ElCurrencyInput
                     size="small"
                     placeholder=""
@@ -89,7 +89,7 @@
                     }"
                 />
             </el-col>
-            <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+            <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3">
                 <el-button type="danger" size="small" @click="onDelAsset(index, item.account)" round plain
                     ><i class="el-icon-minus"></i
                 ></el-button>

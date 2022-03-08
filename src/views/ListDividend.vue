@@ -2,10 +2,10 @@
     <div>
         <el-table style="width: 100%">
             <el-table-column fixed label="名稱" width="100" align="center"> </el-table-column>
-            <el-table-column label="除息日" width="75" align="right"> </el-table-column>
-            <el-table-column label="現金股利" width="120" align="right"> </el-table-column>
-            <el-table-column label="累積股數" width="100" align="right"> </el-table-column>
-            <el-table-column label="股利所得" width="100" align="right"> </el-table-column>
+            <el-table-column label="除息日" width="70" align="right"> </el-table-column>
+            <el-table-column label="現金股利" width="80" align="right"> </el-table-column>
+            <el-table-column label="累積股數" width="80" align="right"> </el-table-column>
+            <el-table-column label="股利所得" width="80" align="right"> </el-table-column>
             <el-table-column label="現金發放日" width="120" align="right"> </el-table-column>
         </el-table>
         <br /><br />
