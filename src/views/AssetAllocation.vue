@@ -8,7 +8,8 @@
             </el-col>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
                 <el-card shadow="hover" style="height: 201px">
-                    <el-tag class="ml-2" size="small" style="margin: 1px 0px"
+                    <br />
+                    <el-tag class="ml-2" size="large" style="margin: 1px 0px"
                         >資產 <span style="font-size: 28px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
                     </el-tag>
                     <!-- <el-tag class="ml-2" size="small" style="margin: 1px 0px"
@@ -47,7 +48,13 @@
         <br />
         <el-row v-for="(item, index) in assetList" :key="index">
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                <el-input size="small" placeholder="" v-model="item.account" @keyup="onChangeAccount($event, index)">
+                <el-input
+                    size="small"
+                    placeholder=""
+                    v-model="item.account"
+                    :ref="`asset${index}`"
+                    @keyup="onChangeAccount($event, index)"
+                >
                     <template #prepend>帳戶</template>
                 </el-input>
             </el-col>
@@ -72,7 +79,9 @@
                 />
             </el-col>
             <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                <el-button type="danger" size="small" @click="onDelAsset(index)" round><i class="el-icon-minus"></i></el-button>
+                <el-button type="danger" size="small" @click="onDelAsset(index, item.account)" round
+                    ><i class="el-icon-minus"></i
+                ></el-button>
             </el-col>
         </el-row>
         <el-row>
@@ -83,6 +92,11 @@
                 <el-button type="primary" size="small" @click="onResetAsset" round><i class="el-icon-minus"></i></el-button>
             </el-col> -->
         </el-row>
+        <br />
+        <div style="font-size: 14px; color: #999; margin: 20px">
+            <div>【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、 定存)時，將會統計至「資產配置表」</div>
+            <div>【$】請輸入帳戶目前金額，若輸入正值(或 負值)時，將會累計金額至「資產負債表」的資產(或 負債)。」</div>
+        </div>
     </div>
 </template>
 
@@ -91,6 +105,7 @@ import _ from 'lodash';
 import { Chart, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { BarChart, PieChart } from 'vue-chart-3';
+import { ElMessageBox, ElMessage } from 'element-plus';
 import ElCurrencyInput from '../components/ElCurrencyInput.vue';
 
 Chart.register(...registerables);
@@ -144,6 +159,21 @@ export default {
                             // },
                         },
                     },
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                let label = context.dataset.label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += `$ ${context.parsed.y.toLocaleString('en-US')}`;
+                                }
+                                return label;
+                            },
+                        },
+                    },
                 },
             },
             pieOptions: {
@@ -174,6 +204,21 @@ export default {
                             return percentage;
                         },
                         // color: '#fff',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                console.log(context);
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += `$ ${context.parsed.toLocaleString('en-US')}`;
+                                }
+                                return label;
+                            },
+                        },
                     },
                     // layout: {
                     //     padding: {
@@ -222,6 +267,9 @@ export default {
                 plugins: {
                     legend: {
                         display: false,
+                    },
+                    tooltip: {
+                        enabled: false,
                     },
                     title: {
                         display: true,
@@ -396,14 +444,35 @@ export default {
         onAddAsset() {
             console.log('onAddAsset');
 
-            this.assetList.push({
+            const index = this.assetList.push({
                 account: '',
                 amount: 0,
             });
+
+            this.$nextTick(() => {
+                this.$refs[`asset${index - 1}`][0].focus();
+            });
         },
-        onDelAsset(index) {
-            this.assetList.splice(index, 1);
-            this.$store.commit('SAVE_ASSET', this.assetList);
+        onDelAsset(index, assetName) {
+            ElMessageBox.confirm(`將要刪除[${assetName}]?`, '刪除', {
+                confirmButtonText: '刪除',
+                cancelButtonText: '取消',
+                type: 'warning',
+            })
+                .then(() => {
+                    this.assetList.splice(index, 1);
+                    this.$store.commit('SAVE_ASSET', this.assetList);
+                    ElMessage({
+                        type: 'success',
+                        message: '完成刪除!',
+                    });
+                })
+                .catch(() => {
+                    ElMessage({
+                        type: 'info',
+                        message: '取消刪除!',
+                    });
+                });
         },
         onResetAsset() {
             localStorage.removeItem('assetList');
@@ -417,6 +486,9 @@ export default {
             console.log('onChangeAmount');
             this.assetList[index].amount = e.target.value ? parseInt(e.target.value, 10) : 0;
             this.$store.commit('SAVE_ASSET', this.assetList);
+        },
+        onClickSelectAll(index) {
+            this.$refs[`amount${index}`][0].select();
         },
     },
 };

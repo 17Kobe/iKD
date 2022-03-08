@@ -28,9 +28,8 @@
                         >
                             <!-- '#fef0f0' #f690a9 -->
                             <span style="color: #222326; font-size: 9px">
-                                <span style="font-size: 13px; font-weight: bold">{{
-                                    Number((scope.row.cost.return / 10000).toFixed(1)).toLocaleString('en-US')
-                                }}</span
+                                <span style="font-size: 13px; font-weight: bold"
+                                    >$ {{ Number((scope.row.cost.return / 10000).toFixed(1)).toLocaleString('en-US') }}</span
                                 >萬&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
                                     Number(scope.row.cost.rate_of_return.toFixed(1))
                                 }}</span
@@ -138,9 +137,9 @@
                             >
                                 <!-- '#fef0f0' #f690a9 -->
                                 <span style="color: #222326; font-size: 12px">
-                                    <span style="font-size: 14px; font-weight: bold">{{
-                                        Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US')
-                                    }}</span>
+                                    <span style="font-size: 14px; font-weight: bold"
+                                        >$ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
+                                    >
                                     元&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 13px; font-weight: bold; color: #999999">{{
                                         Number(scope.row.cost.rate_of_return.toFixed(1))
                                     }}</span
