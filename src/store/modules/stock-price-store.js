@@ -524,6 +524,29 @@ const stock = {
 
             // save to localstorage
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId);
+        },
+        SAVE_STOCK_COST_RETURN(state, stockId) {
+            console.log('SAVE_STOCK_COST_RETURN');
+            // object of array 去 find 並 update
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+
+            if (_.has(foundStock, 'cost') && _.has(foundStock, 'data.daily') && foundStock.data.daily.length > 0) {
+                const close = foundStock.data.daily[foundStock.data.daily.length - 1][4];
+                console.log(close);
+                console.log(foundStock.cost.sum);
+
+                foundStock.cost.return = 0;
+                foundStock.cost.rate_of_return = 0;
+                if (foundStock.cost.sum !== 0) {
+                    foundStock.cost.return = Number((close * foundStock.cost.total - foundStock.cost.sum).toFixed(2));
+                    foundStock.cost.rate_of_return =
+                        ((close * foundStock.cost.total - foundStock.cost.sum) * 100) / foundStock.cost.sum;
+                }
+
+                // save to localstorage
+                localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            }
         },
         SAVE_STOCK_POLICY(state, { stockId, policyList }) {
             // object of array 去 find 並 update

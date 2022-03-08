@@ -23,39 +23,16 @@
                             :width="30"
                             :text-inside="true"
                             :stroke-width="20"
-                            :percentage="
-                                getRateOfReturnPercent(
-                                    scope.row.cost.sum,
-                                    scope.row.data.daily[scope.row.data.daily.length - 1][4],
-                                    scope.row.cost.total
-                                )
-                            "
-                            :color="
-                                getRateOfReturn(
-                                    scope.row.cost.sum,
-                                    scope.row.data.daily[scope.row.data.daily.length - 1][4],
-                                    scope.row.cost.total
-                                ) <= 0
-                                    ? '#ccff90'
-                                    : '#ffc2bd'
-                            "
+                            :percentage="scope.row.cost.rate_of_return * progressMultiple"
+                            :color="scope.row.cost.rate_of_return <= 0 ? '#ccff90' : '#ffc2bd'"
                         >
                             <!-- '#fef0f0' #f690a9 -->
                             <span style="color: #222326; font-size: 9px">
                                 <span style="font-size: 13px; font-weight: bold">{{
-                                    getReturn(
-                                        scope.row.cost.sum,
-                                        scope.row.data.daily[scope.row.data.daily.length - 1][4],
-                                        scope.row.cost.total,
-                                        10000
-                                    )
+                                    Number((scope.row.cost.return / 10000).toFixed(1)).toLocaleString('en-US')
                                 }}</span
-                                >萬&nbsp;&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
-                                    getRateOfReturn(
-                                        scope.row.cost.sum,
-                                        scope.row.data.daily[scope.row.data.daily.length - 1][4],
-                                        scope.row.cost.total
-                                    )
+                                >萬&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
+                                    Number(scope.row.cost.rate_of_return.toFixed(1))
                                 }}</span
                                 ><span style="color: #999999">%</span></span
                             >
@@ -156,38 +133,16 @@
                                 v-if="scope.row.data && scope.row.data.daily && scope.row.data.daily.length >= 1"
                                 :text-inside="true"
                                 :stroke-width="20"
-                                :percentage="
-                                    getRateOfReturnPercent(
-                                        scope.row.cost.sum,
-                                        scope.row.data.daily[scope.row.data.daily.length - 1][4],
-                                        scope.row.cost.total
-                                    )
-                                "
-                                :color="
-                                    getRateOfReturn(
-                                        scope.row.cost.sum,
-                                        scope.row.data.daily[scope.row.data.daily.length - 1][4],
-                                        scope.row.cost.total
-                                    ) <= 0
-                                        ? '#ccff90'
-                                        : '#ffc2bd'
-                                "
+                                :percentage="scope.row.cost.rate_of_return * progressMultiple"
+                                :color="scope.row.cost.rate_of_return <= 0 ? '#ccff90' : '#ffc2bd'"
                             >
                                 <!-- '#fef0f0' #f690a9 -->
                                 <span style="color: #222326; font-size: 12px">
                                     <span style="font-size: 14px; font-weight: bold">{{
-                                        getReturn(
-                                            scope.row.cost.sum,
-                                            scope.row.data.daily[scope.row.data.daily.length - 1][4],
-                                            scope.row.cost.total
-                                        )
+                                        Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US')
                                     }}</span>
                                     元&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 13px; font-weight: bold; color: #999999">{{
-                                        getRateOfReturn(
-                                            scope.row.cost.sum,
-                                            scope.row.data.daily[scope.row.data.daily.length - 1][4],
-                                            scope.row.cost.total
-                                        )
+                                        Number(scope.row.cost.rate_of_return.toFixed(1))
                                     }}</span
                                     >&nbsp;%</span
                                 >
@@ -564,19 +519,6 @@ export default {
         },
         doShowExport() {
             this.$refs.childFormExport.onInit();
-        },
-        getReturn(sum, close, total, unit = 1) {
-            if (unit === 1) return Number((close * total - sum).toFixed(2)).toLocaleString('en-US');
-            return Number(((close * total - sum) / unit).toFixed(1)).toLocaleString('en-US');
-        },
-        getRateOfReturn(sum, close, total) {
-            if (!sum || sum === 0) return 0; // sum 等於0不能做為除法
-            return Number((((close * total - sum) * 100) / sum).toFixed(2));
-        },
-        getRateOfReturnPercent(sum, close, total) {
-            if (!sum || sum === 0) return 0; // sum 等於0不能做為除法
-            //* 4 則最大值為25%。 * 2 則最大值為50%。 * 1 則最大值為100%。 0.6%最大值為166% 0.5最大值為200%  0.2 最大值為500% 0.1 最大值為1000%
-            return Math.abs(Number((((close * total - sum) * 100) / sum).toFixed(2))) * this.progressMultiple;
         },
         onChangeStar(selValue, index) {
             this.$store.commit('SAVE_STOCK_STAR', { stockId: index, star: selValue });

@@ -9,7 +9,7 @@
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
                 <el-card shadow="hover" style="height: 201px">
                     <el-tag class="ml-2" size="small" style="margin: 1px 0px"
-                        >資產 <span style="font-size: 32px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
+                        >資產 <span style="font-size: 28px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
                     </el-tag>
                     <!-- <el-tag class="ml-2" size="small" style="margin: 1px 0px"
                         >股票損益 <span style="font-size: 20px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
@@ -229,7 +229,7 @@ export default {
                         // align: 'start',
                         padding: {
                             top: 5,
-                            bottom: 20,
+                            bottom: 10,
                         },
                         // color: 'blue',
                     },
@@ -238,7 +238,7 @@ export default {
                         align: 'start',
                         formatter: (val) => {
                             if (!val || val === 0) return '';
-                            return `$ ${Number((val / 10000).toFixed(1))} 萬`;
+                            return `${Number(val.toFixed(1))} %`;
                         },
                         labels: {
                             // value: {
@@ -301,10 +301,10 @@ export default {
                 return acc;
             }, []);
         },
-        stockCostExistOfSum() {
+        stockCostExistOfRateReturn() {
             // 定存 sum
             return this.$store.state.price.stockList.reduce((acc, { cost }) => {
-                if (cost && cost.sum) acc.push(cost.sum);
+                if (cost && cost.rate_of_return) acc.push(cost.rate_of_return);
                 return acc;
             }, []);
         },
@@ -335,7 +335,7 @@ export default {
                 labels: this.stockCostExistOfName,
                 datasets: [
                     {
-                        data: this.stockCostExistOfSum,
+                        data: this.stockCostExistOfRateReturn,
                         backgroundColor: [
                             // 背景色
                             'rgba(75, 192, 192, 0.2)',
