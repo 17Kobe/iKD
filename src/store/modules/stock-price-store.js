@@ -712,6 +712,7 @@ const stock = {
 
                 // ===================塞入localstorage===================
                 localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+                if (_.has(state.stockList[index], 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId); // 有新值就要更新成本的報酬率
                 this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線
                 this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
                 console.log('SAVE_STOCK_PRICE OK');

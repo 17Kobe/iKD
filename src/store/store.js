@@ -2,6 +2,7 @@ import { createStore } from 'vuex';
 import price from './modules/stock-price-store';
 import taiwan from './modules/taiwan-stock-list-store';
 import asset from './modules/asset-store';
+import dividend from './modules/dividend-store';
 
 const defaultState = {};
 
@@ -13,6 +14,7 @@ export default createStore({
         price,
         taiwan,
         asset,
+        dividend,
     },
 
     // vue3 的 state 要用() 變是 func
