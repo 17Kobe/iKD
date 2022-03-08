@@ -13,7 +13,14 @@
                         >資產
                         <span style="font-size: 24px"> $ </span>
                         <span style="font-size: 28px; font-weight: bold">
-                            <number :from="0" :to="assets" :format="assetsFormat" :duration="1" :delay="0" />
+                            <number
+                                :from="0"
+                                :to="assets"
+                                :format="assetsFormat"
+                                :duration="1"
+                                :delay="0"
+                                easing="Power1.easeOut"
+                            />
                         </span>
                     </el-tag>
                     <!-- <el-tag class="ml-2" size="small" style="margin: 1px 0px"
@@ -226,85 +233,17 @@ export default {
                             },
                         },
                     },
-                    // layout: {
-                    //     padding: {
-                    //         left: 15,
-                    //         right: 15,
-                    //         top: 15,
-                    //         bottom: 15,
-                    //     },
-                    // },
-
-                    // tooltips: {
-                    //     callbacks: {
-                    //         label(tooltipItem, data) {
-                    //             const value = data.datasets[0].data[tooltipItem.index];
-                    //             // if (parseInt(value) >= 1000) {
-                    //             return [
-                    //                 `${data.labels[tooltipItem.index]}: $ ${value
-                    //                     .toString()
-                    //                     .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`,
-                    //             ];
-                    //         },
-                    //     }, // end callbacks:
-                    // },
                     legend: {
                         display: false,
-                    },
-                    // labels: [
-                    //     {
-                    //         render: 'label',
-                    //         position: 'outside',
-                    //         fontStyle: 'bold',
-                    //         textMargin: 0,
-                    //     },
-                    //     {
-                    //         render: 'percentage',
-                    //         fontColor: 'black',
-                    //         precision: 0,
-                    //         overlap: true,
-                    //     },
-                    // ],
-                },
-            },
-            horizontalBarOptions: {
-                indexAxis: 'y',
-
-                plugins: {
-                    legend: {
-                        display: false,
-                    },
-                    tooltip: {
-                        enabled: false,
-                    },
-                    title: {
-                        display: true,
-                        text: '股票損益表',
-                        // align: 'start',
-                        padding: {
-                            top: 5,
-                            bottom: 10,
-                        },
-                        // color: 'blue',
-                    },
-                    datalabels: {
-                        anchor: 'end', // remove this line to get label in middle of the bar
-                        align: 'start',
-                        formatter: (val) => {
-                            if (!val || val === 0) return '';
-                            return `${Number(val.toFixed(1))} %`;
-                        },
-                        labels: {
-                            // value: {
-                            //     color: 'blue',
-                            // },
-                        },
                     },
                 },
             },
         };
     },
     computed: {
+        stockList() {
+            return this.$store.state.price.stockList;
+        },
         assetList() {
             return this.$store.state.asset.assetList;
         },
@@ -413,6 +352,65 @@ export default {
                         },
                     },
                 ],
+            };
+        },
+        horizontalBarOptions() {
+            const { stockList } = this;
+            return {
+                indexAxis: 'y',
+
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                console.log(context);
+                                console.log(stockList);
+                                console.log(this.stockList);
+                                // 用股票名稱去找
+                                const foundStock = _.find(stockList, { name: context.label });
+                                console.log(foundStock);
+
+                                let label = context.dataset.label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += ` 成本：$ ${foundStock.cost.sum.toLocaleString(
+                                        'en-US'
+                                    )} (+$ ${foundStock.cost.return.toLocaleString('en-US')})`;
+                                }
+                                return label;
+                            },
+                        },
+                    },
+                    title: {
+                        display: true,
+                        text: '股票損益表',
+                        // align: 'start',
+                        padding: {
+                            top: 5,
+                            bottom: 10,
+                        },
+                        // color: 'blue',
+                    },
+                    datalabels: {
+                        anchor: 'end', // remove this line to get label in middle of the bar
+                        align: 'start',
+                        formatter: (val) => {
+                            if (!val || val === 0) return '';
+                            return `${Number(val.toFixed(1))} %`;
+                        },
+                        labels: {
+                            // value: {
+                            //     color: 'blue',
+                            // },
+                        },
+                    },
+                },
             };
         },
         pieData() {
