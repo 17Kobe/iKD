@@ -90,14 +90,14 @@
                 />
             </el-col>
             <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                <el-button type="danger" size="small" @click="onDelAsset(index, item.account)" round
+                <el-button type="danger" size="small" @click="onDelAsset(index, item.account)" round plain
                     ><i class="el-icon-minus"></i
                 ></el-button>
             </el-col>
         </el-row>
         <el-row>
             <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
-                <el-button type="primary" size="small" @click="onAddAsset" round><i class="el-icon-plus"></i></el-button>
+                <el-button type="primary" size="small" @click="onAddAsset" round plain><i class="el-icon-plus"></i></el-button>
             </el-col>
             <!-- <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
                 <el-button type="primary" size="small" @click="onResetAsset" round><i class="el-icon-minus"></i></el-button>
