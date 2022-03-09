@@ -45,7 +45,6 @@ const dividend = {
                                 context.commit('SAVE_DIVIDEND', {
                                     stockId: stcokObj.id,
                                     stockName: stcokObj.name,
-                                    numberOfShares: stcokObj.cost.total,
                                     data: res.data,
                                 });
                                 localStorage.setItem('crawlerDividendLastDate', moment().format('YYYY-MM-DD'));
@@ -68,7 +67,7 @@ const dividend = {
             state.dividendList = data;
             // console.log(state.currStockDayData);
         },
-        SAVE_DIVIDEND(state, { stockId, stockName, numberOfShares, data }) {
+        SAVE_DIVIDEND(state, { stockId, stockName, data }) {
             console.log('SAVE_DIVIDEND');
             // 會清掉再全部重加
             _.remove(state.dividendList, (obj) => obj.id === stockId);
@@ -84,7 +83,6 @@ const dividend = {
                     state.dividendList.push({
                         id: stockId,
                         name: stockName,
-                        number_of_shares: numberOfShares,
                         payment_date: dividendObj.CashDividendPaymentDate,
                         trading_date: dividendObj.CashExDividendTradingDate,
                         earnings_distribution: dividendObj.CashEarningsDistribution,
@@ -106,7 +104,6 @@ const dividend = {
                     state.dividendList.push({
                         id: stockId,
                         name: stockName,
-                        number_of_shares: numberOfShares,
                         payment_date: moment(dividendObj.CashDividendPaymentDate).add(1, 'years').format('YYYY-MM-DD'),
                         trading_date: moment(dividendObj.CashExDividendTradingDate).add(1, 'years').format('YYYY-MM-DD'),
                         earnings_distribution: dividendObj.CashEarningsDistribution, // 此值用二年的預估比較準
@@ -118,7 +115,18 @@ const dividend = {
             console.log('SAVE_DIVIDEND OVER');
         },
     },
-    getters: {},
+    getters: {
+        // 該股票的股數，是另外再去撈的，如此才能當股數改變時又能即時反應
+        getDividendList: (state, getters, rootState) => () => {
+            console.log('getDividendList');
+            const { dividendList } = state;
+            dividendList.forEach((obj, index) => {
+                const foundStock = _.find(rootState.price.stockList, ['id', obj.id]);
+                dividendList[index].number_of_shares = foundStock.cost.total;
+            });
+            return dividendList;
+        },
+    },
 };
 
 export default dividend;

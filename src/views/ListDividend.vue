@@ -57,7 +57,7 @@ export default {
     },
     computed: {
         dividendList() {
-            return this.$store.state.dividend.dividendList;
+            return this.$store.getters.getDividendList();
         },
         total() {
             return this.dividendList.reduce(
