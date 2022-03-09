@@ -4,7 +4,8 @@
             <router-view v-show="routerName === 'default'" />
             <!-- 要用 v-if 則 chartjs才有動畫算是重載入。用 v-show 是避免重載入，只是隱藏然後顯示 -->
             <router-view name="asset" v-if="routerName === 'asset'" />
-            <router-view name="dividend" v-if="routerName === 'dividend'" />
+            <!-- 有2個 v-if 在切換的時候手機會有出現 null is not an object evaluating t.insertBefore，所以改成 v-show -->
+            <router-view name="dividend" v-show="routerName === 'dividend'" />
         </main>
         <footer class="footer">
             <el-menu default-active="default" :router="false" mode="horizontal" active-text-color="#409EFF">
@@ -31,9 +32,9 @@ export default {
     },
 
     methods: {
-        handleClick() {
-            this.$router.push(`/`);
-        },
+        // handleClick() {
+        //     this.$router.push(`/`);
+        // },
         onMenuItemClick(page) {
             this.routerName = page;
         },

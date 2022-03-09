@@ -14,8 +14,8 @@ const dividend = {
     actions: {
         GET_DIVIDEND(context) {
             console.log('GET_DIVIDEND');
-            console.log(context);
-            console.log(context.rootState.price.stockList);
+            // console.log(context);
+            // console.log(context.rootState.price.stockList);
 
             const theYearBeforeLast = moment().subtract(2, 'years').format('YYYY'); // 前年的日期
 
@@ -40,6 +40,7 @@ const dividend = {
                             })
                             // 成功
                             .then((res) => {
+                                console.log('GET_DIVIDEND PROCESS');
                                 // 要傳那麼多主要是因為 stockList是rootState
                                 context.commit('SAVE_DIVIDEND', {
                                     stockId: stcokObj.id,
@@ -49,6 +50,7 @@ const dividend = {
                                 });
                                 localStorage.setItem('crawlerDividendLastDate', moment().format('YYYY-MM-DD'));
                                 // 因為同一公司，可能屬不同產業，但同一個代碼，所以要過濾掉
+                                console.log('GET_DIVIDEND OVER');
                             })
                             // 失敗
                             .catch((err) => {
@@ -67,6 +69,7 @@ const dividend = {
             // console.log(state.currStockDayData);
         },
         SAVE_DIVIDEND(state, { stockId, stockName, numberOfShares, data }) {
+            console.log('SAVE_DIVIDEND');
             // 會清掉再全部重加
             _.remove(state.dividendList, (obj) => obj.id === stockId);
 
@@ -110,8 +113,9 @@ const dividend = {
                         isSure: false,
                     });
                 });
+                localStorage.setItem('dividendList', JSON.stringify(state.dividendList));
             }
-            localStorage.setItem('dividendList', JSON.stringify(state.dividendList));
+            console.log('SAVE_DIVIDEND OVER');
         },
     },
     getters: {},

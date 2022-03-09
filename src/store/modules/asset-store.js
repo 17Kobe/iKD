@@ -31,8 +31,11 @@ const asset = {
     actions: {},
     mutations: {
         SAVE_ASSET(state, assetList) {
+            console.log('SAVE_ASSET');
+            console.log(assetList);
             state.assetList = assetList;
             localStorage.setItem('assetList', JSON.stringify(state.assetList));
+            console.log('SAVE_ASSET OVER');
         },
     },
     getters: {},

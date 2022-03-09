@@ -434,15 +434,17 @@ export default {
         },
     },
     created() {
-        console.log('created');
+        console.log('created asset');
         // 取得 localstorage 自選股，最先開始是 null 時，會給予預設值空矩陣
         const localAssetList = JSON.parse(localStorage.getItem('assetList')) || [];
+        console.log(localAssetList);
         if (_.isEmpty(localAssetList)) {
             localAssetList.push(...this.assetList); // 新增 append 預設到 localStockList
             localStorage.setItem('assetList', JSON.stringify(localAssetList)); // 將 localStockList 從 object 轉 string 後塞到 localstorage
         }
 
         this.$store.commit('SAVE_ASSET', localAssetList);
+        console.log('created asset over');
     },
     methods: {
         onAddAsset() {
@@ -486,6 +488,8 @@ export default {
         },
         onResetAsset() {
             localStorage.removeItem('assetList');
+            localStorage.removeItem('dividendList');
+            localStorage.removeItem('crawlerDividendLastDate');
         },
         onChangeAccount(e, index) {
             console.log('onChangeAccount');

@@ -53,10 +53,7 @@
 export default {
     name: 'component-dividend',
     data() {
-        return {
-            rateOfReturn: 0,
-            historyData: [],
-        };
+        return {};
     },
     computed: {
         dividendList() {
@@ -70,11 +67,12 @@ export default {
         },
     },
     created() {
-        console.log('created');
+        console.log('created dividend');
         const localdividendList = JSON.parse(localStorage.getItem('dividendList')) || [];
-
+        console.log(localdividendList);
         // localStockList 有可能是本地資料，或是預設資料。然後再呼叫載入 this.stockList
         this.$store.commit('SAVE_DIVIDEND_LIST', localdividendList);
+        console.log('created dividend over');
     },
     mounted() {
         this.$store.dispatch('GET_DIVIDEND');
@@ -86,5 +84,3 @@ export default {
     },
 };
 </script>
-
-<style lang="sass"></style>
