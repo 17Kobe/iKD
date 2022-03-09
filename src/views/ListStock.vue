@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-table :data="stockList" style="width: 100%">
+        <el-table :data="stockList" style="width: 100%" empty-text="無資料">
             <el-table-column fixed label="名稱" width="100" align="center">
                 <template #default="scope">
                     <el-badge

@@ -8,7 +8,7 @@
             </span>
         </el-tag>
 
-        <el-table :data="dividendList" style="width: 100%">
+        <el-table :data="dividendList" style="width: 100%" empty-text="無資料">
             <el-table-column fixed label="名稱" prop="name" width="90" align="center"> </el-table-column>
             <el-table-column label="除息日" prop="trading_date" width="75" align="center"> </el-table-column>
             <el-table-column label="現金股利" width="80" align="right" header-align="right">
