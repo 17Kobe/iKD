@@ -1,9 +1,28 @@
 <template>
     <div>
+        <el-tag class="ml-2" size="large" style="margin: 5px 5px"
+            >股利總計
+            <span style="font-size: 24px"> $ </span>
+            <span style="font-size: 28px; font-weight: bold">
+                <number :from="0" :to="total" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" />
+            </span>
+        </el-tag>
+
         <el-table :data="dividendList" style="width: 100%">
             <el-table-column fixed label="名稱" prop="name" width="90" align="center"> </el-table-column>
             <el-table-column label="除息日" prop="trading_date" width="75" align="center"> </el-table-column>
-            <el-table-column label="現金股利" prop="earnings_distribution" width="80" align="right" header-align="right">
+            <el-table-column label="現金股利" width="80" align="right" header-align="right">
+                <template #default="scope">
+                    <el-badge
+                        value="估"
+                        class="item"
+                        type="warning"
+                        style="position: relative; top: 4px"
+                        v-if="!scope.row.isSure"
+                    >
+                    </el-badge>
+                    {{ scope.row.earnings_distribution }}
+                </template>
             </el-table-column>
             <el-table-column label="累積股數" width="80" align="right" header-align="right">
                 <template #default="scope"> {{ scope.row.number_of_shares.toLocaleString('en-US') }} 股 </template>
@@ -43,36 +62,27 @@ export default {
         dividendList() {
             return this.$store.state.dividend.dividendList;
         },
+        total() {
+            return this.dividendList.reduce(
+                (acc, { number_of_shares, earnings_distribution }) => acc + number_of_shares * earnings_distribution,
+                0
+            );
+        },
     },
     created() {
         console.log('created');
+        const localdividendList = JSON.parse(localStorage.getItem('dividendList')) || [];
+
+        // localStockList 有可能是本地資料，或是預設資料。然後再呼叫載入 this.stockList
+        this.$store.commit('SAVE_DIVIDEND_LIST', localdividendList);
     },
     mounted() {
         this.$store.dispatch('GET_DIVIDEND');
     },
     methods: {
-        // getSummaries(param) {
-        //     const { columns, data } = param;
-        //     const sums = [];
-        //     columns.forEach((column, index) => {
-        //         // if (index === 0) {
-        //         //     sums[index] = 'Total Cost';
-        //         // }
-        //         // const values = data.map((item) => Number(item[column.property]))
-        //         // if (!values.every((value) => isNaN(value))) {
-        //         //     sums[index] = `$ ${values.reduce((prev, curr) => {
-        //         //         const value = Number(curr)
-        //         //         if (!isNaN(value)) {
-        //         //         return prev + curr
-        //         //         } else {
-        //         //         return prev
-        //         //         }
-        //         //     }, 0)}`;
-        //         // } else {
-        //         //     sums[index] = 'N/A';
-        //         // }
-        //     });
-        // },
+        currencyFormat(number) {
+            return Number(number.toFixed(0)).toLocaleString('en-US');
+        },
     },
 };
 </script>

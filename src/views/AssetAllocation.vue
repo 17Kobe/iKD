@@ -16,7 +16,7 @@
                             <number
                                 :from="0"
                                 :to="assets"
-                                :format="assetsFormat"
+                                :format="currencyFormat"
                                 :duration="1"
                                 :delay="0"
                                 easing="Power1.easeOut"
@@ -500,7 +500,7 @@ export default {
         onClickSelectAll(index) {
             this.$refs[`amount${index}`][0].select();
         },
-        assetsFormat(number) {
+        currencyFormat(number) {
             return Number(number.toFixed(0)).toLocaleString('en-US');
         },
     },
