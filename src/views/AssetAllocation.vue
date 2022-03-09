@@ -248,10 +248,13 @@ export default {
             return this.$store.state.asset.assetList;
         },
         assets() {
-            return this.assetList.reduce((acc, { amount }) => {
-                if (amount >= 0) return acc + amount;
-                return acc;
-            }, 0);
+            return (
+                this.stockDeposit +
+                this.assetList.reduce((acc, { amount }) => {
+                    if (amount >= 0) return acc + amount;
+                    return acc;
+                }, 0)
+            );
         },
         liabilities() {
             return this.assetList.reduce((acc, { amount }) => {
