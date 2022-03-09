@@ -530,51 +530,12 @@ export default {
 </script>
 
 <style lang="sass">
-#app
-    font-family: Avenir, Helvetica, Arial, sans-serif
-    -webkit-font-smoothing: antialiased
-    -moz-osx-font-smoothing: grayscale
-    /* text-align: center; */
-    color: #2c3e50
-    /* margin-top: 60px; */
-
-// .el-menu-item,
-// .el-submenu__title
-//     height: 40px !important
-//     line-height: 40px !important
-
-// .el-menu-item.is-active
-//     /* font-size: 16px; */
-//     /* background-color: #f28b82 !important; */
-//     /* background-color: #ffcc9c !important; */
-//     background-color: #e5e5e5 !important
-//     color: black !important
-//     border-radius: 3px
-//     // box-shadow: 0 2px 4px 0 rgb(0 0 0 / 12%), 0 0 6px 0 rgb(0 0 0 / 4%)
-// .el-menu-item.is-active [class*="el-icon-"]
-    // color: #F56C6C
-// .el-table__header-wrapper
-//     z-index: 100
-//     position: fixed
-//     top: 0
-
-// // Neede to show the first row in the table
-// .el-table__body-wrapper
-//     margin-top: 50px
-
 
 // 為了讓highchart圖更不會佔td
 .el-tabs--border-card>.el-tabs__content
     padding: 0px
     // height: calc(100vh - 51px)
 
-// .el-tab-pane
-    // height: calc(100vh - 51px)
-// .el-tabs--border-card
-//     height: calc(100% - 51px)
-// .el-tab-pane
-//     height: calc(100% - 51px)
-//     overflow-y: auto
 .el-table__header tr, .el-table__header th
     padding: 0
     height: 15px

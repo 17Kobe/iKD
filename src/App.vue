@@ -32,9 +32,6 @@ export default {
     },
 
     methods: {
-        // handleClick() {
-        //     this.$router.push(`/`);
-        // },
         onMenuItemClick(page) {
             this.routerName = page;
         },
@@ -42,43 +39,21 @@ export default {
 };
 </script>
 <style lang="sass">
-// .main
-//     height: calc(100vh - 40px - 48px)
-//     overflow-y: scroll
+#app
+    font-family: Avenir, Helvetica, Arial, sans-serif
+    -webkit-font-smoothing: antialiased
+    -moz-osx-font-smoothing: grayscale
+    /* text-align: center; */
+    color: #2c3e50
+    /* margin-top: 60px; */
+
 .footer
     position: fixed
     bottom: 0
     z-index: 100
     width: 100%
-// .el-tabs .el-tabs__content
-//     max-height: calc(100% - 51px)
-//     overflow: auto
 
-// body
-//     height: 100%
-// #app
-//     height: 100%
-//     position: absolute
-// .el-container
-//     height: 100%
-//     // display:flex
-// //     position: relative
-// .el-main
-//     height: 100%
-//     padding: 0
-//     // overflow: hidden
-// //     padding-bottom: 50px
-// .el-footer
-//     display: flex
-//     width: 100%
-//     height: 41px
-//     display: flex
-//     margin-top: -50px
-    // position: relative
-    // top: -100px
-    // position: absolute
-    // top: calc(100% - 40px)
-.el-menu--horizontal>.el-menu-item.is-active
+.el-menu--horizontal > .el-menu-item.is-active
     border-bottom: none
     border-top: 2px solid var(--el-color-primary)
 </style>
