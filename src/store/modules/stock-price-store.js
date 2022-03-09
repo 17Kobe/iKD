@@ -463,6 +463,15 @@ const stock = {
             state.stockList = data;
             // console.log(state.currStockDayData);
         },
+        SAVE_STOCK_LIST_WITH_DIVIDEND_LAST_DATE(state, { stockId, lastDate }) {
+            console.log('SAVE_STOCK_LIST_WITH_DIVIDEND_LAST_DATE');
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            console.log(lastDate);
+            if (lastDate) foundStock.crawler_dividend_last_date = lastDate;
+            else delete foundStock.crawler_dividend_last_date;
+            console.log(foundStock);
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+        },
         SAVE_A_STOCK(state, data) {
             // data 是 object {name: XXX, id: XXX}
             console.log('SAVE_A_STOCK');
@@ -524,7 +533,9 @@ const stock = {
 
             // save to localstorage
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // 因為有可能是刪除的
             if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId);
+            this.dispatch('GET_DIVIDEND');
         },
         SAVE_STOCK_COST_RETURN(state, stockId) {
             console.log('SAVE_STOCK_COST_RETURN');

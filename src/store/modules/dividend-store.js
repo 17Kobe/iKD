@@ -21,43 +21,49 @@ const dividend = {
 
             // 一天應該只要呼叫一次API就好了
             const today = moment().format('YYYY-MM-DD');
-            const localcrawlerDividendLastDate =
-                localStorage.getItem('crawlerDividendLastDate') || moment().subtract(1, 'days').format('YYYY-MM-DD');
+
             // 用字串比日期就好了
-            if (today !== localcrawlerDividendLastDate) {
-                context.rootState.price.stockList.forEach((stcokObj) => {
-                    // 必須是有買的才要去抓未來配息
-                    if (_.has(stcokObj, 'cost.settings')) {
-                        // 為了只下一次API，但還要抓二年的資料回來算平均
-                        axios
-                            .get('https://api.finmindtrade.com/api/v4/data', {
-                                params: {
-                                    dataset: 'TaiwanStockDividend',
-                                    data_id: stcokObj.id,
-                                    start_date: `${theYearBeforeLast}-01-01`,
-                                    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
-                                },
-                            })
-                            // 成功
-                            .then((res) => {
-                                console.log('GET_DIVIDEND PROCESS');
-                                // 要傳那麼多主要是因為 stockList是rootState
-                                context.commit('SAVE_DIVIDEND', {
-                                    stockId: stcokObj.id,
-                                    stockName: stcokObj.name,
-                                    data: res.data,
-                                });
-                                localStorage.setItem('crawlerDividendLastDate', moment().format('YYYY-MM-DD'));
-                                // 因為同一公司，可能屬不同產業，但同一個代碼，所以要過濾掉
-                                console.log('GET_DIVIDEND OVER');
-                            })
-                            // 失敗
-                            .catch((err) => {
-                                console.log(err);
+            context.rootState.price.stockList.forEach((stcokObj) => {
+                const localcrawlerDividendLastDate =
+                    stcokObj.crawler_dividend_last_date || moment().subtract(1, 'days').format('YYYY-MM-DD');
+                // 必須是有買的才要去抓未來配息
+                if (_.has(stcokObj, 'cost.settings') && today !== localcrawlerDividendLastDate) {
+                    // 為了只下一次API，但還要抓二年的資料回來算平均
+                    axios
+                        .get('https://api.finmindtrade.com/api/v4/data', {
+                            params: {
+                                dataset: 'TaiwanStockDividend',
+                                data_id: stcokObj.id,
+                                start_date: `${theYearBeforeLast}-01-01`,
+                                token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
+                            },
+                        })
+                        // 成功
+                        .then((res) => {
+                            console.log('GET_DIVIDEND PROCESS');
+                            // 要傳那麼多主要是因為 stockList是rootState
+                            context.commit('SAVE_DIVIDEND', {
+                                stockId: stcokObj.id,
+                                stockName: stcokObj.name,
+                                data: res.data,
                             });
-                    }
-                });
-            }
+
+                            // 因為同一公司，可能屬不同產業，但同一個代碼，所以要過濾掉
+                            console.log('GET_DIVIDEND OVER');
+                        })
+                        // 失敗
+                        .catch((err) => {
+                            console.log(err);
+                        });
+                } else if (!_.has(stcokObj, 'cost.settings')) {
+                    // 都沒有股數時，要刪除
+                    context.commit('SAVE_DIVIDEND', {
+                        stockId: stcokObj.id,
+                        stockName: stcokObj.name,
+                        data: [],
+                    });
+                }
+            });
         },
     },
     mutations: {
@@ -98,7 +104,7 @@ const dividend = {
                     data.data,
                     (o) =>
                         moment(o.CashDividendPaymentDate).isSameOrAfter(thisDayLastYearAddOneMonth) &&
-                        moment(o.CashDividendPaymentDate).isSameOrBefore(theLastDayOfLastYear)
+                        moment(o.CashExDividendTradingDate).isSameOrBefore(theLastDayOfLastYear) // 像台積電會少算12月配息日，因為拿到錢是1月份
                 );
                 filterNotSureDividend.forEach((dividendObj) => {
                     state.dividendList.push({
@@ -110,8 +116,23 @@ const dividend = {
                         isSure: false,
                     });
                 });
-                localStorage.setItem('dividendList', JSON.stringify(state.dividendList));
+
+                // const index = _.findIndex(state.stockList, ['id', stockId]);
+
+                this.commit('SAVE_STOCK_LIST_WITH_DIVIDEND_LAST_DATE', {
+                    stockId,
+                    lastDate: moment().format('YYYY-MM-DD'),
+                });
+                // rootState.price.stockList[index].crawler_dividend_last_date = moment().format('YYYY-MM-DD');
+                // localStorage.setItem('stockList', JSON.stringify(rootState.price.stockList));
+            } else {
+                // 沒資料代表 cost.settings 刪掉了
+                this.commit('SAVE_STOCK_LIST_WITH_DIVIDEND_LAST_DATE', {
+                    stockId,
+                    lastDate: null,
+                });
             }
+            localStorage.setItem('dividendList', JSON.stringify(state.dividendList));
             console.log('SAVE_DIVIDEND OVER');
         },
     },
@@ -124,7 +145,7 @@ const dividend = {
                 const foundStock = _.find(rootState.price.stockList, ['id', obj.id]);
                 dividendList[index].number_of_shares = foundStock.cost.total;
             });
-            return dividendList;
+            return _.orderBy(dividendList, ['trading_date'], ['asc']);
         },
     },
 };
