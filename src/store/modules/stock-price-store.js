@@ -475,7 +475,7 @@ const stock = {
                 delete foundStock.crawler_dividend_last_date;
                 localStorage.setItem('stockList', JSON.stringify(state.stockList));
             }
-            console.log(foundStock);
+            // console.log(foundStock);
         },
         SAVE_A_STOCK(state, data) {
             // data 是 object {name: XXX, id: XXX}
@@ -1246,7 +1246,9 @@ const stock = {
         getStockDataWeekly: (state, getters) => (id) => {
             console.log('getStockDataWeekly');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
+            // const found = _.find(state.stockList, ['id', id]);
             const found = getters.getStock(id);
+            // const found = getters.getStock(id);
             return found.data && found.data.weekly
                 ? _.slice(found.data.weekly, -26).map((value) => [
                       moment(value[0]).valueOf(),
@@ -1261,7 +1263,7 @@ const stock = {
             // _.has(_.find(state.stockList, ['id', id]), 'policy') ? _.find(state.stockList, ['id', id]).policy : null,
         },
         getStockDataWeeklyKd: (state, getters) => (id) => {
-            console.log('getStockDataWeekly');
+            console.log('getStockDataWeeklyKd');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
             return found.data && found.data.weekly_kd

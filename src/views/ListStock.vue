@@ -512,7 +512,7 @@ export default {
             //     // localStockList = tmpLocalStockList;
         }
         // localStockList 有可能是本地資料，或是預設資料。然後再呼叫載入 this.stockList
-        console.log(localStockList);
+        // console.log(localStockList);
         this.$store.commit('SAVE_STOCK_LIST', localStockList);
     },
     mounted() {

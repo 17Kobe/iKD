@@ -116,7 +116,7 @@ export default {
                 const found = _.find(this.stockData.policy.settings.buy, ['method', 'kd_gold']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
-            console.log(ret);
+            // console.log(ret);
             return ret;
         },
         kdTurnUpLmit() {
