@@ -442,10 +442,15 @@ export default {
         return {
             rateOfReturn: 0,
             historyData: [],
+            firstRender: true,
         };
     },
     computed: {
         stockList() {
+            console.log('======stockList');
+            console.log(this.firstRender);
+            // 先畫6筆，符合iphone XR一次可以看到的數量，之後再畫全部
+            if (this.firstRender) return this.$store.state.price.stockList.slice(0, 6);
             return this.$store.state.price.stockList;
         },
         progressMultiple() {
@@ -454,6 +459,10 @@ export default {
     },
     created() {
         console.log('created');
+        // 8秒後再畫全部
+        setTimeout(() => {
+            this.firstRender = false;
+        }, 8000);
         // 取得 localstorage 自選股，最先開始是 null 時，會給予預設值空矩陣
         const localStockList = JSON.parse(localStorage.getItem('stockList')) || [];
         // console.log(localStockList);
