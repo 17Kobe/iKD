@@ -76,7 +76,12 @@ const dividend = {
         SAVE_DIVIDEND(state, { stockId, stockName, data }) {
             console.log('SAVE_DIVIDEND');
             // 會清掉再全部重加
-            _.remove(state.dividendList, (obj) => obj.id === stockId);
+            let isSaveToLocalStorage = false;
+            if (_.findIndex(state.dividendList, { id: stockId }) !== -1) {
+                // 必需要有找到，才要改localstorage
+                _.remove(state.dividendList, (obj) => obj.id === stockId);
+                isSaveToLocalStorage = true;
+            }
 
             const today = moment().startOf('day');
 
@@ -125,6 +130,7 @@ const dividend = {
                 });
                 // rootState.price.stockList[index].crawler_dividend_last_date = moment().format('YYYY-MM-DD');
                 // localStorage.setItem('stockList', JSON.stringify(rootState.price.stockList));
+                isSaveToLocalStorage = true;
             } else {
                 // 沒資料代表 cost.settings 刪掉了。也可代表從來就沒有 cost.settings
                 this.commit('SAVE_STOCK_LIST_WITH_DIVIDEND_LAST_DATE', {
@@ -132,8 +138,10 @@ const dividend = {
                     lastDate: null,
                 });
             }
-            localStorage.setItem('dividendList', JSON.stringify(state.dividendList));
-            console.log('SAVE_DIVIDEND OVER');
+            if (isSaveToLocalStorage) {
+                localStorage.setItem('dividendList', JSON.stringify(state.dividendList));
+                console.log('SAVE_DIVIDEND OK');
+            }
         },
     },
     getters: {
