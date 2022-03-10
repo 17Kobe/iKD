@@ -80,12 +80,14 @@
 
             <el-table-column prop="city" label="週KD" width="230" align="center">
                 <template #default="scope">
-                    <ChartWeekKd :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" />
+                    <ChartWeekKd :parentData="scope.row.id" />
+                    <!-- <ChartWeekKd :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
                 </template>
             </el-table-column>
             <el-table-column label="週K線" width="230" align="center">
                 <template #default="scope">
-                    <ChartWeekK :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" />
+                    <ChartWeekK :parentData="scope.row.id" />
+                    <!-- <ChartWeekK :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
                 </template>
             </el-table-column>
             <el-table-column label="成本" width="200" align="center">
@@ -441,7 +443,7 @@ export default {
         return {
             rateOfReturn: 0,
             historyData: [],
-            renderStockCount: 0,
+            // renderStockCount: 0,
         };
     },
     computed: {
@@ -469,9 +471,9 @@ export default {
     created() {
         console.log('created');
         // 8秒後再畫全部
-        setInterval(() => {
-            this.renderStockCount += 1;
-        }, 400);
+        // setInterval(() => {
+        //     this.renderStockCount += 1;
+        // }, 400);
         // 取得 localstorage 自選股，最先開始是 null 時，會給予預設值空矩陣
         const localStockList = JSON.parse(localStorage.getItem('stockList')) || [];
         // console.log(localStockList);
