@@ -86,7 +86,7 @@
             </el-table-column>
             <el-table-column label="週K線" width="230" align="center">
                 <template #default="scope">
-                    <ChartWeekK :parentData="scope.row.id" />
+                    <ChartWeekK :parentData="scope.row.id" v-if="!firstRender" />
                 </template>
             </el-table-column>
             <el-table-column label="成本" width="200" align="center">
