@@ -11,8 +11,8 @@
                     <br />
                     <el-tag class="ml-2" size="large" style="margin: 1px 0px"
                         >資產
-                        <span style="font-size: 24px"> $ </span>
-                        <span style="font-size: 28px; font-weight: bold">
+                        <span style="font-size: 20px"> $ </span>
+                        <span style="font-size: 24px; font-weight: bold">
                             <number
                                 :from="0"
                                 :to="assets"
@@ -402,7 +402,7 @@ export default {
                     },
                     datalabels: {
                         anchor: 'end', // remove this line to get label in middle of the bar
-                        align: 'start',
+                        align: 'end',
                         formatter: (val) => {
                             if (!val || val === 0) return '';
                             return `${Number(val.toFixed(1))} %`;

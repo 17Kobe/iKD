@@ -157,23 +157,12 @@ export default {
                 chart: {
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
                     // zoomType: '', // x, y不能在放大縮小，避免手滑在移動時間又動到放大縮小
-                    zoomType: null,
+                    zoomType: undefined,
                     panning: true,
                     height: 100,
                     events: {
                         // 這裡指定後 就可以用
                         // 參考：https://codesandbox.io/s/vue-template-nutgx?file=/src/components/Chart.vue:598-660
-                        load: (function (self) {
-                            return function () {
-                                // console.log('---------------------------------------');
-
-                                // 預設顯示的時間範圍是6個月
-                                self.chart = this;
-                                const end = moment().unix() * 1000;
-                                const start = moment().subtract(6, 'months').unix() * 1000;
-                                self.chart.xAxis[0].setExtremes(start, end);
-                            };
-                        })(this),
                     },
                 },
                 plotOptions: {

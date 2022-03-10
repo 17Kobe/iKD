@@ -39,7 +39,7 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column fixed label="股價" width="75" align="right">
+            <el-table-column fixed label="股價" width="67" align="right">
                 <template #default="scope">
                     <span v-if="scope.row.data && scope.row.data.daily && scope.row.data.daily.length >= 2">
                         <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
@@ -555,7 +555,9 @@ export default {
 .el-table .el-table__body .el-table_1_column_1 .cell
     line-height: normal
 .el-table .el-table__body .el-table_1_column_2
-    padding-right: 10px
+    padding-right: 5px
+.el-table .el-table__body .el-table_1_column_4
+    padding: 0 8px
 .el-table .el-table__body td
     padding: 0px 0
 // 為了解決table內cell要/n換行的問題

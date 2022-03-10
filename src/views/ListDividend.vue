@@ -1,34 +1,39 @@
 <template>
     <div>
-        <el-tag class="ml-2" size="large" style="margin: 5px 5px"
+        <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right"
             >股利總計
             <span style="font-size: 24px"> $ </span>
             <span style="font-size: 28px; font-weight: bold">
-                <number :from="0" :to="total" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" />
+                <!-- <number :from="0" :to="total" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
+                {{ total.toLocaleString('en-US') }}
             </span>
         </el-tag>
 
         <el-table :data="dividendList" style="width: 100%" empty-text="無資料">
             <el-table-column fixed label="名稱" prop="name" width="90" align="center"> </el-table-column>
-            <el-table-column label="除息日" prop="trading_date" width="75" align="center"> </el-table-column>
-            <el-table-column label="現金股利" width="80" align="right" header-align="right">
+            <el-table-column label="除息日" width="42" align="center">
+                <template #default="scope">
+                    {{ scope.row.trading_date.substr(5, 5).replace('-', '/') }}
+                </template>
+            </el-table-column>
+            <el-table-column label="現金股利" width="65" align="right" header-align="right">
                 <template #default="scope">
                     <el-badge
                         value="估"
                         class="item"
                         type="warning"
-                        style="position: relative; top: 4px"
+                        style="position: relative; top: 6px"
                         v-if="!scope.row.isSure"
                     >
                     </el-badge>
                     {{ scope.row.earnings_distribution }}
                 </template>
             </el-table-column>
-            <el-table-column label="累積股數" width="80" align="right" header-align="right">
+            <el-table-column label="累積股數" width="70" align="right" header-align="right">
                 <template #default="scope"> {{ scope.row.number_of_shares.toLocaleString('en-US') }} 股 </template>
             </el-table-column>
 
-            <el-table-column label="股利所得" width="80" align="right" header-align="right">
+            <el-table-column label="股利所得" width="80" align="right" header-align="center">
                 <template #default="scope">
                     <el-tag class="ml-2" size="small" style="margin: 1px 0px"
                         ><span style="font-size: 14px; font-weight: bold">
@@ -37,7 +42,11 @@
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column label="現金發放日" prop="payment_date" width="90" align="center"> </el-table-column>
+            <el-table-column label="發放日" width="42" align="center">
+                <template #default="scope">
+                    {{ scope.row.payment_date.substr(5, 5).replace('-', '/') }}
+                </template>
+            </el-table-column>
         </el-table>
         <br /><br />
         <br /><br />
@@ -84,3 +93,7 @@ export default {
     },
 };
 </script>
+<style lang="sass">
+.el-table .cell
+    padding: 0
+</style>
