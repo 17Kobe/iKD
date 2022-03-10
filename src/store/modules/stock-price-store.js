@@ -406,7 +406,7 @@ const stock = {
 
                 console.log('GET_STOCK_PRICE 1');
                 const stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
-                console.log(stockDataDaily);
+                // console.log(stockDataDaily);
                 // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
                 const stockStartDate = moment(
                     stockDataDaily.length === 0
@@ -467,10 +467,15 @@ const stock = {
             console.log('SAVE_STOCK_LIST_WITH_DIVIDEND_LAST_DATE');
             const foundStock = state.stockList.find((v) => v.id === stockId);
             console.log(lastDate);
-            if (lastDate) foundStock.crawler_dividend_last_date = lastDate;
-            else delete foundStock.crawler_dividend_last_date;
+            if (lastDate) {
+                foundStock.crawler_dividend_last_date = lastDate;
+                localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            } else if (_.has(foundStock, 'crawler_dividend_last_date')) {
+                // 有存在才去刪，避免初始還要去呼叫 setItem
+                delete foundStock.crawler_dividend_last_date;
+                localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            }
             console.log(foundStock);
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         SAVE_A_STOCK(state, data) {
             // data 是 object {name: XXX, id: XXX}

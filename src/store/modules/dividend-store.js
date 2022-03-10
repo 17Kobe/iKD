@@ -126,7 +126,7 @@ const dividend = {
                 // rootState.price.stockList[index].crawler_dividend_last_date = moment().format('YYYY-MM-DD');
                 // localStorage.setItem('stockList', JSON.stringify(rootState.price.stockList));
             } else {
-                // 沒資料代表 cost.settings 刪掉了
+                // 沒資料代表 cost.settings 刪掉了。也可代表從來就沒有 cost.settings
                 this.commit('SAVE_STOCK_LIST_WITH_DIVIDEND_LAST_DATE', {
                     stockId,
                     lastDate: null,

@@ -493,8 +493,26 @@ export default {
             // console.log(this.stockList);
 
             // 將 localstorage 重塞回到 vuex 的 stockList
+            // } else {
+            //     // 若已有資料時則先去除 data資料，用 setInterval來載入資料比較好
+            //     localStockList = localStockList.reduce((acc, obj) => {
+            //         if (obj.data) {
+            //             // console.log(obj);
+            //             // const removeDateObj = ;
+            //             // console.log(removeDateObj);
+            //             // const objDataDaily = _.pick(obj.data, ['daily']);
+            //             obj.data = { daily: obj.data.daily };
+            //             // -_.omit(obj, ['data']);
+            //             // acc.push(_.omit(obj, ['data']));
+            //             acc.push(obj);
+            //         }
+            //         return acc;
+            //     }, []);
+            //     // console.log(tmpLocalStockList);
+            //     // localStockList = tmpLocalStockList;
         }
         // localStockList 有可能是本地資料，或是預設資料。然後再呼叫載入 this.stockList
+        console.log(localStockList);
         this.$store.commit('SAVE_STOCK_LIST', localStockList);
     },
     mounted() {
