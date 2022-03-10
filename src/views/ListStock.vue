@@ -24,12 +24,13 @@
                             :stroke-width="20"
                             :percentage="scope.row.cost.rate_of_return * progressMultiple"
                             :color="scope.row.cost.rate_of_return <= 0 ? '#ccff90' : '#ffc2bd'"
+                            style="width: 158px; z-index: 999; top: 3px"
                         >
                             <!-- '#fef0f0' #f690a9 -->
                             <span style="color: #222326; font-size: 9px">
                                 <span style="font-size: 13px; font-weight: bold"
-                                    >$ {{ Number((scope.row.cost.return / 10000).toFixed(1)).toLocaleString('en-US') }}</span
-                                >萬&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
+                                    >$ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
+                                >元&nbsp;&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
                                     Number(scope.row.cost.rate_of_return.toFixed(1))
                                 }}</span
                                 ><span style="color: #999999">%</span></span
@@ -73,6 +74,7 @@
                                 {{ scope.row.last_price_spread !== null ? scope.row.last_price_spread + '%' : '' }}
                             </span>
                             <div style="color: #cccccc; font-size: 14px">{{ scope.row.last_price_date }}</div>
+                            <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="padding: 0 8px">&nbsp;</div>
                         </span>
                     </span>
                 </template>
@@ -129,24 +131,6 @@
                                     元</el-tag
                                 >
                             </div>
-                            <el-progress
-                                v-if="scope.row.cost && scope.row.cost.settings.length >= 1"
-                                :text-inside="true"
-                                :stroke-width="20"
-                                :percentage="scope.row.cost.rate_of_return * progressMultiple"
-                                :color="scope.row.cost.rate_of_return <= 0 ? '#ccff90' : '#ffc2bd'"
-                            >
-                                <!-- '#fef0f0' #f690a9 -->
-                                <span style="color: #222326; font-size: 12px">
-                                    <span style="font-size: 14px; font-weight: bold"
-                                        >$ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
-                                    >
-                                    元&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 13px; font-weight: bold; color: #999999">{{
-                                        Number(scope.row.cost.rate_of_return.toFixed(1))
-                                    }}</span
-                                    >&nbsp;%</span
-                                >
-                            </el-progress>
 
                             <!-- {{ parseFloat((scope.row.cost.total / 1000).toFixed(2)) }} 張) -->
                         </div>
@@ -582,6 +566,8 @@ export default {
     top: 1px
     position: relative
 .el-table .el-table__body .el-table_1_column_1 .cell
+    line-height: normal
+.el-table .el-table__body .el-table_1_column_2 .cell
     line-height: normal
 .el-table .el-table__body .el-table_1_column_2
     padding-right: 5px
