@@ -471,7 +471,7 @@ export default {
         // 8秒後再畫全部
         setInterval(() => {
             this.renderStockCount += 1;
-        }, 600);
+        }, 400);
         // 取得 localstorage 自選股，最先開始是 null 時，會給予預設值空矩陣
         const localStockList = JSON.parse(localStorage.getItem('stockList')) || [];
         // console.log(localStockList);
