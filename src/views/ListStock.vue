@@ -19,7 +19,6 @@
                     </el-rate>
                     <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="padding: 0 8px">
                         <el-progress
-                            v-if="scope.row.data && scope.row.data.daily && scope.row.data.daily.length >= 1"
                             :width="30"
                             :text-inside="true"
                             :stroke-width="20"
@@ -41,7 +40,7 @@
             </el-table-column>
             <el-table-column fixed label="股價" width="67" align="right">
                 <template #default="scope">
-                    <span v-if="scope.row.data && scope.row.data.daily && scope.row.data.daily.length >= 2">
+                    <span v-if="scope.row.last_price">
                         <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
                         <span
                             :style="[
@@ -81,12 +80,12 @@
 
             <el-table-column prop="city" label="週KD" width="230" align="center">
                 <template #default="scope">
-                    <ChartWeekKd :parentData="scope.row.id" />
+                    <ChartWeekKd :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" />
                 </template>
             </el-table-column>
             <el-table-column label="週K線" width="230" align="center">
                 <template #default="scope">
-                    <ChartWeekK :parentData="scope.row.id" v-if="!firstRender" />
+                    <ChartWeekK :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" />
                 </template>
             </el-table-column>
             <el-table-column label="成本" width="200" align="center">
@@ -129,7 +128,7 @@
                                 >
                             </div>
                             <el-progress
-                                v-if="scope.row.data && scope.row.data.daily && scope.row.data.daily.length >= 1"
+                                v-if="scope.row.cost && scope.row.cost.settings.length >= 1"
                                 :text-inside="true"
                                 :stroke-width="20"
                                 :percentage="scope.row.cost.rate_of_return * progressMultiple"
@@ -442,16 +441,26 @@ export default {
         return {
             rateOfReturn: 0,
             historyData: [],
-            firstRender: true,
+            renderStockCount: 0,
         };
     },
     computed: {
         stockList() {
-            console.log('======stockList');
-            console.log(this.firstRender);
-            // 先畫6筆，符合iphone XR一次可以看到的數量，之後再畫全部
-            if (this.firstRender) return this.$store.state.price.stockList.slice(0, 6);
+            // console.log('======stockList');
+            // console.log(this.firstRender);
+            // // 先畫6筆，符合iphone XR一次可以看到的數量，之後再畫全部
+            // if (this.firstRender) return this.$store.state.price.stockList.slice(0, 6);
             return this.$store.state.price.stockList;
+
+            // return this.$store.state.price.stockList.reduce((acc, obj) => {
+            //     if (obj.data) {
+            //         // console.log(obj);
+            //         // const removeDateObj = ;
+            //         // console.log(removeDateObj);
+            //         acc.push(_.omit(obj, ['data']));
+            //     }
+            //     return acc;
+            // }, []);
         },
         progressMultiple() {
             return this.$store.getters.getProgressMultiple();
@@ -460,9 +469,9 @@ export default {
     created() {
         console.log('created');
         // 8秒後再畫全部
-        setTimeout(() => {
-            this.firstRender = false;
-        }, 8000);
+        setInterval(() => {
+            this.renderStockCount += 1;
+        }, 600);
         // 取得 localstorage 自選股，最先開始是 null 時，會給予預設值空矩陣
         const localStockList = JSON.parse(localStorage.getItem('stockList')) || [];
         // console.log(localStockList);

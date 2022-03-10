@@ -589,16 +589,17 @@ const stock = {
             console.log('SAVE_STOCK_PRICE');
             if (data.data.length > 0) {
                 // 預設值
-                const index = _.findIndex(state.stockList, ['id', stockId]);
-                state.stockList[index].data = state.stockList[index].data || {};
-                state.stockList[index].data.daily = state.stockList[index].data.daily || []; // 有可能是 null 就變成 []
-                state.stockList[index].data.weekly = state.stockList[index].data.weekly || []; // 有可能是 null 就變成 []
-                state.stockList[index].data.weekly_kd = state.stockList[index].data.weekly_kd || []; // 有可能是 null 就變成 []
-                state.stockList[index].data.ma_buy = state.stockList[index].data.ma_buy || []; // 有可能是 null 就變成 [] 第一條MA線
-                state.stockList[index].data.ma_sell = state.stockList[index].data.ma_sell || []; // 有可能是 null 就變成 [] 第二條MA線
-                state.stockList[index].last_price = state.stockList[index].last_price || null;
-                state.stockList[index].last_price_date = state.stockList[index].last_price_date || null;
-                state.stockList[index].last_price_spread = state.stockList[index].last_price_spread || null;
+                // const index = _.findIndex(state.stockList, ['id', stockId]);
+                const foundStock = state.stockList.find((v) => v.id === stockId);
+                foundStock.data = foundStock.data || {};
+                foundStock.data.daily = foundStock.data.daily || []; // 有可能是 null 就變成 []
+                foundStock.data.weekly = foundStock.data.weekly || []; // 有可能是 null 就變成 []
+                foundStock.data.weekly_kd = foundStock.data.weekly_kd || []; // 有可能是 null 就變成 []
+                foundStock.data.ma_buy = foundStock.data.ma_buy || []; // 有可能是 null 就變成 [] 第一條MA線
+                foundStock.data.ma_sell = foundStock.data.ma_sell || []; // 有可能是 null 就變成 [] 第二條MA線
+                foundStock.last_price = foundStock.last_price || null;
+                foundStock.last_price_date = foundStock.last_price_date || null;
+                foundStock.last_price_spread = foundStock.last_price_spread || null;
 
                 // 塞入股價日線資料
                 // console.log(res.data.data);
@@ -614,27 +615,23 @@ const stock = {
                         // element.Trading_Volume,
                     ]);
                 });
-                console.log(state.stockList[index].data.daily);
-                state.stockList[index].data.daily.push(...values);
-                console.log(state.stockList[index].data.daily);
-                console.log(values);
+                // console.log(foundStock.data.daily);
+                foundStock.data.daily.push(...values);
+                // console.log(foundStock.data.daily);
+                // console.log(values);
 
                 // theArray[index].data.daily.push(...res.data.data); // 塞入股價資料
 
                 // 塞入漲跌幅、最後股價
-                const v1 = state.stockList[index].data.daily[state.stockList[index].data.daily.length - 1][4];
-                const v2 = state.stockList[index].data.daily[state.stockList[index].data.daily.length - 2][4];
-                state.stockList[index].last_price = v1;
+                const v1 = foundStock.data.daily[foundStock.data.daily.length - 1][4];
+                const v2 = foundStock.data.daily[foundStock.data.daily.length - 2][4];
+                foundStock.last_price = v1;
 
                 const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
-                const currStockLastDate = moment(
-                    state.stockList[index].data.daily[state.stockList[index].data.daily.length - 1][0]
-                );
-                state.stockList[index].last_price_date = `${currStockLastDate.format('M/DD')}(${
-                    dayOfWeek[currStockLastDate.day()]
-                })`;
+                const currStockLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
+                foundStock.last_price_date = `${currStockLastDate.format('M/DD')}(${dayOfWeek[currStockLastDate.day()]})`;
 
-                state.stockList[index].last_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
+                foundStock.last_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
 
                 // 塞入股價週線資料
                 // const firstStockDate = moment(_.first(currStock[index].data.daily)[0]); // [] 不可能 undefined。因為是二維陣列，還要取第二維[0]代表date
@@ -648,30 +645,30 @@ const stock = {
                 // 這裡要用 -6 才能最後面的資料也都算進去，不過可能實際因沒有資料而加上也沒到完整一週都有資料，
                 let resData = [];
 
-                let i = state.stockList[index].data.daily.length - 1;
+                let i = foundStock.data.daily.length - 1;
                 let j = i;
-                const lastStockDate = moment(_.last(state.stockList[index].data.daily)[0]);
+                const lastStockDate = moment(_.last(foundStock.data.daily)[0]);
                 let firstDayOfWeek = lastStockDate.startOf('isoWeek');
                 while (i >= 0) {
                     // console.log(i);
                     // console.log(moment(currStock[index].data.daily[i][0]).format('YYYY-MM-DD'));
                     // console.log(firstDayOfWeek.format('YYYY-MM-DD'));
                     // 不能用 isSame 因為有可能那週沒資料，或那週星期一也放假，所以要用 isBefore
-                    if (moment(state.stockList[index].data.daily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
+                    if (moment(foundStock.data.daily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
                         // console.log('isBefore');
                         // 0最後一個也要跑進來
 
                         // startIndex 值要小於等於 endIndex，for 是由大到小, i<j
                         const startIndex = i + 1; // 因為是找到前一個才算後面1個
                         const endIndex = j; // 因為外層array 是從日期最現在，往以前日期去掃。endIndex應該是最現在日期. i比n大
-                        const range2dArray = _.slice(state.stockList[index].data.daily, startIndex, endIndex + 1);
+                        const range2dArray = _.slice(foundStock.data.daily, startIndex, endIndex + 1);
                         const rangeHighArray = _.map(range2dArray, (v) => v[2]);
                         const rangeLowArray = _.map(range2dArray, (v) => v[3]);
                         // const rangeVolumeArray = _.map(range2dArray, (v) => v[5]);
 
-                        const date = state.stockList[index].data.daily[endIndex][0];
-                        const open = state.stockList[index].data.daily[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
-                        const close = state.stockList[index].data.daily[endIndex][4]; // 之前的i，還沒i=n是下一個
+                        const date = foundStock.data.daily[endIndex][0];
+                        const open = foundStock.data.daily[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
+                        const close = foundStock.data.daily[endIndex][4]; // 之前的i，還沒i=n是下一個
                         const low = _.min(rangeLowArray);
                         const high = _.max(rangeHighArray);
                         // const volume = _.sum(rangeVolumeArray);
@@ -680,7 +677,7 @@ const stock = {
                         j = startIndex - 1;
 
                         // 要採用下個i值的該週第一天，不能用firstDayOfWeek-7天，因為有可能該週都沒值
-                        firstDayOfWeek = moment(state.stockList[index].data.daily[i][0]).startOf('isoWeek');
+                        firstDayOfWeek = moment(foundStock.data.daily[i][0]).startOf('isoWeek');
                     }
                     i -= 1;
                 }
@@ -688,9 +685,9 @@ const stock = {
                 // console.log(resData);
                 // 必需要反轉，最小的值在最前面，最大的值在最後面，否則highcharts會只畫1個點
                 // currStock[index].data.weekly = _.reverse(resData);
-                // Vue.set(state.stockList[index].data, 'weekly', _.reverse(resData));
-                state.stockList[index].data.weekly = _.reverse(resData);
-                // this.$set(state.stockList[index].data, 'weekly', _.reverse(resData));
+                // Vue.set(foundStock.data, 'weekly', _.reverse(resData));
+                foundStock.data.weekly = _.reverse(resData);
+                // this.$set(foundStock.data, 'weekly', _.reverse(resData));
 
                 // ===================塞入股價週線KD資料===================
                 resData = [];
@@ -701,29 +698,29 @@ const stock = {
                 let todayD = 0;
 
                 // 從最早日期開始算，因為公式有用昨天
-                for (let k = 0; k <= state.stockList[index].data.weekly.length - 1; k += 1) {
+                for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
                     const startIndex = k - 8 < 0 ? 0 : k - 8; // 如果減完小於0，就=0。正常寫法是-9+1，但我寫-8就好了
                     const endIndex = k;
-                    const range2dArray = _.slice(state.stockList[index].data.weekly, startIndex, endIndex + 1);
+                    const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
                     const rangeHighArray = _.map(range2dArray, (v) => v[2]);
                     const rangeLowArray = _.map(range2dArray, (v) => v[3]);
                     const low = _.min(rangeLowArray);
                     const high = _.max(rangeHighArray);
 
-                    rsv = ((state.stockList[index].data.weekly[k][4] - low) / (high - low)) * 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
+                    rsv = ((foundStock.data.weekly[k][4] - low) / (high - low)) * 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
                     todayK = (2 / 3) * preK + (1 / 3) * rsv; // k=2/3 * 昨日的k值 + 1/3*今日的RSV
                     todayD = (2 / 3) * preD + (1 / 3) * todayK; // d=2/3 * 昨日的d值 + 1/3*今日的k值
                     preK = todayK;
                     preD = todayD;
-                    const date = state.stockList[index].data.weekly[endIndex][0];
+                    const date = foundStock.data.weekly[endIndex][0];
 
                     resData.push([date, todayK, todayD]);
                 }
-                state.stockList[index].data.weekly_kd = resData;
+                foundStock.data.weekly_kd = resData;
 
                 // ===================塞入localstorage===================
                 localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
-                if (_.has(state.stockList[index], 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId); // 有新值就要更新成本的報酬率
+                if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId); // 有新值就要更新成本的報酬率
                 this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線
                 this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
                 console.log('SAVE_STOCK_PRICE OK');
@@ -732,53 +729,54 @@ const stock = {
         SAVE_STOCK_MA(state, stockId) {
             console.log('SAVE_STOCK_MA');
 
-            const index = _.findIndex(state.stockList, ['id', stockId]);
-            state.stockList[index].data.ma_buy = [];
-            state.stockList[index].data.ma_sell = [];
+            // const index = _.findIndex(state.stockList, ['id', stockId]);
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            foundStock.data.ma_buy = [];
+            foundStock.data.ma_sell = [];
             let resData = [];
             let preMaLimit = 0; // 先前的MA參數值，不可能為0，所以設為0
             // ===================塞入股價週線MA1資料===================
-            if (_.has(state.stockList[index], 'policy.settings.buy')) {
-                const foundMaBuy = _.find(state.stockList[index].policy.settings.buy, ['method', 'ma_buy']);
+            if (_.has(foundStock, 'policy.settings.buy')) {
+                const foundMaBuy = _.find(foundStock.policy.settings.buy, ['method', 'ma_buy']);
                 if (foundMaBuy) {
                     resData = [];
                     const maBuyLimit = foundMaBuy.limit;
                     preMaLimit = maBuyLimit;
-                    for (let k = 0; k <= state.stockList[index].data.weekly.length - 1; k += 1) {
+                    for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
                         const startIndex = k - maBuyLimit - 1 < 0 ? 0 : k - maBuyLimit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
                         const endIndex = k;
-                        const range2dArray = _.slice(state.stockList[index].data.weekly, startIndex, endIndex + 1);
+                        const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
                         const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
                         const average = _.mean(rangeCloseArray);
 
-                        const date = state.stockList[index].data.weekly[endIndex][0];
+                        const date = foundStock.data.weekly[endIndex][0];
 
                         resData.push([date, average]);
                     }
-                    state.stockList[index].data.ma_buy = resData;
+                    foundStock.data.ma_buy = resData;
                 }
             }
             // ===================塞入股價週線MA BUY資料(有可能最後是塞MA1，若MA1沒資料的話)===================
-            if (_.has(state.stockList[index], 'policy.settings.sell')) {
-                const foundMaSell = _.find(state.stockList[index].policy.settings.sell, ['method', 'ma_sell']);
+            if (_.has(foundStock, 'policy.settings.sell')) {
+                const foundMaSell = _.find(foundStock.policy.settings.sell, ['method', 'ma_sell']);
                 if (foundMaSell && preMaLimit !== foundMaSell.limit) {
                     resData = [];
                     const maSellLimit = foundMaSell.limit;
-                    for (let k = 0; k <= state.stockList[index].data.weekly.length - 1; k += 1) {
+                    for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
                         const startIndex = k - maSellLimit - 1 < 0 ? 0 : k - maSellLimit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
                         const endIndex = k;
-                        const range2dArray = _.slice(state.stockList[index].data.weekly, startIndex, endIndex + 1);
+                        const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
                         const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
                         const average = _.mean(rangeCloseArray);
 
-                        const date = state.stockList[index].data.weekly[endIndex][0];
+                        const date = foundStock.data.weekly[endIndex][0];
 
                         resData.push([date, average]);
                     }
-                    // if (_.has(state.stockList[index], 'data.ma1') && _.isEmpty(state.stockList[index].data.ma1)) {
-                    //     state.stockList[index].data.ma1 = resData;
+                    // if (_.has(foundStock, 'data.ma1') && _.isEmpty(foundStock.data.ma1)) {
+                    //     foundStock.data.ma1 = resData;
                     // } else {
-                    state.stockList[index].data.ma_sell = resData;
+                    foundStock.data.ma_sell = resData;
                     // }
                 }
             }
