@@ -13,7 +13,9 @@
                             @keyup="onChangeCost($event, index)"
                             type="number"
                             style="width: 130px"
-                        />
+                        >
+                            <template #suffix>元</template>
+                        </el-input>
                     </el-form-item>
                 </el-col>
                 <el-col :xs="22" :sm="10" :md="7" :lg="5" :xl="4">
