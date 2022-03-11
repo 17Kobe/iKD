@@ -46,7 +46,7 @@
                 </el-card>
             </el-col>
         </el-row>
-        <el-row>
+        <el-row style="margin-bottom: 4px">
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 2px 0 4px">
                 <el-card shadow="hover">
                     <PieChart :chartData="pieData" :options="pieOptions" />
@@ -59,7 +59,6 @@
             </el-col>
         </el-row>
         <!-- <chart v-if="loaded" :chartdata="chartdata" :options="options"> </chart> -->
-        <br />
         <el-row v-for="(item, index) in assetList" :key="index">
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
                 <el-input
