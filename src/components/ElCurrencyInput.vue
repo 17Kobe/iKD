@@ -1,6 +1,7 @@
 <template>
     <el-input ref="inputRef" :modelValue="formattedValue">
         <template #prepend>$</template>
+        <template #suffix><span style="position: relative; top: 6px">元</span> </template>
     </el-input>
 </template>
 
