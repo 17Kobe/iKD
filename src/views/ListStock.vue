@@ -101,6 +101,8 @@
                 <template #default="scope">
                     <el-button
                         size="small"
+                        type="info"
+                        plain
                         @click="doShowCost(scope.row.id)"
                         :style="[
                             scope.row.cost && scope.row.cost.settings.length >= 1 ? { width: '190px' } : {},
@@ -113,6 +115,7 @@
                                     :type="scope.row.cost.avg <= scope.row.last_price ? 'danger' : 'success'"
                                     class="ml-2"
                                     size="small"
+                                    effect="plain"
                                     style="margin: 1px 0px"
                                     ><span style="font-size: 14px; font-weight: bold">{{
                                         scope.row.cost.avg.toLocaleString('en-US')
@@ -121,7 +124,12 @@
                                 >
                             </div>
                             <div>
-                                累積股數&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                                累積股數&nbsp;&nbsp;<el-tag
+                                    type="info"
+                                    effect="plain"
+                                    class="ml-2"
+                                    size="small"
+                                    style="margin: 1px 0px"
                                     ><span style="font-size: 14px; font-weight: bold">{{
                                         scope.row.cost.total.toLocaleString('en-US')
                                     }}</span>
@@ -129,7 +137,7 @@
                                 >
                             </div>
                             <div>
-                                本　　金&nbsp;&nbsp;<el-tag class="ml-2" size="small" style="margin: 1px 0px"
+                                本　　金&nbsp;&nbsp;<el-tag class="ml-2" size="small" effect="plain" style="margin: 1px 0px"
                                     ><span style="font-size: 14px; font-weight: bold">{{
                                         scope.row.cost.sum.toLocaleString('en-US')
                                     }}</span>
@@ -150,6 +158,8 @@
                 <template #default="scope">
                     <el-button
                         size="small"
+                        type="info"
+                        plain
                         @click="doShowPolicy(scope.row.id)"
                         :style="[
                             scope.row.policy &&
