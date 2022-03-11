@@ -403,8 +403,12 @@
                 <el-table-column prop="city" label="本益比" width="120" />
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
-        <el-button style="margin-top: 10px" @click="doShowSearch()"><i class="el-icon-edit"></i>&nbsp;新增自選股</el-button>
-        <el-button style="margin-top: 10px" @click="doShowExport()"><i class="el-icon-download"></i>&nbsp;匯出設定檔</el-button>
+        <el-button style="margin-top: 10px" type="info" plain @click="doShowSearch()"
+            ><i class="el-icon-edit"></i>&nbsp;新增自選股</el-button
+        >
+        <el-button style="margin-top: 10px" type="info" plain @click="doShowExport()"
+            ><i class="el-icon-download"></i>&nbsp;匯出設定檔</el-button
+        >
         <br /><br />
         <br /><br />
         <FormCost ref="childFormCost" />

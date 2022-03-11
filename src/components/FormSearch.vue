@@ -6,7 +6,7 @@
         v-model="isShow"
         :show-close="true"
         direction="rtl"
-        size="70%"
+        size="85%"
     >
         <el-form ref="formSearchRef" :rules="rules" :model="form" label-width="60px">
             <el-form-item prop="stockId">
@@ -25,17 +25,17 @@
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="onAdd"><i class="el-icon-plus"></i></el-button>
+                <el-button type="primary" @click="onAdd" style="margin-top: 10px"><i class="el-icon-plus"></i></el-button>
             </el-form-item>
         </el-form>
         <el-table :data="customStockList" :show-header="false" :stripe="true" style="width: 100%">
-            <el-table-column fixed label="名稱">
+            <el-table-column fixed label="名稱" width="200">
                 <template #default="scope">
-                    <span style="font-size: 16px; font-weight: bold"> {{ scope.row.name }} </span>&nbsp;
+                    <span style="font-size: 16px; font-weight: bold; margin-left: 8px"> {{ scope.row.name }} </span>&nbsp;
                     <span style="color: #cccccc">{{ scope.row.id }}</span>
                 </template>
             </el-table-column>
-            <el-table-column fixed label="名稱">
+            <el-table-column fixed label="功能">
                 <template #default="scope">
                     <el-button size="small" type="danger" @click="onDel(scope.row.id, scope.row.name)"
                         ><i class="el-icon-minus"></i
