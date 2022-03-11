@@ -523,9 +523,12 @@ const stock = {
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
 
-            if (costList.length === 0 && _.has(foundStock, 'cost.settings')) {
-                delete foundStock.cost;
+            if (costList.length === 0) {
+                console.log('costList.length === 0');
+                if (_.has(foundStock, 'cost.settings')) delete foundStock.cost;
             } else {
+                console.log('costList.length> 0');
+                console.log(costList);
                 foundStock.cost = {};
                 foundStock.cost.settings = [];
                 foundStock.cost.settings = costList; // 複製數據複本
