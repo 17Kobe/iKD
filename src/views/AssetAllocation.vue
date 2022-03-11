@@ -415,7 +415,7 @@ export default {
                         align: 'end',
                         formatter: (val) => {
                             if (!val || val === 0) return '';
-                            return `$ ${Number(val.toFixed(1)).toLocaleString('en-US')} 元`;
+                            return `$ ${Number(val.toFixed(1)).toLocaleString('en-US')}`;
                         },
                         labels: {
                             // value: {
