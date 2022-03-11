@@ -20,8 +20,8 @@
                                 :duration="1"
                                 :delay="0"
                                 easing="Power1.easeOut"
-                            />
-                        </span>
+                            /> </span
+                        >&nbsp;元
                     </el-tag>
                     <!-- <el-tag class="ml-2" size="small" style="margin: 1px 0px"
                         >股票損益 <span style="font-size: 20px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
@@ -30,15 +30,18 @@
                     <br />
                     <el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                         >活存總額
-                        <span style="font-size: 15px; font-weight: bold">$ {{ demandDeposit.toLocaleString('en-US') }}</span>
+                        <span style="font-size: 15px; font-weight: bold">$ {{ demandDeposit.toLocaleString('en-US') }}</span
+                        ><span style="font-size: 10px"> 元</span>
                     </el-tag>
                     <el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                         >定存總額
-                        <span style="font-size: 15px; font-weight: bold">$ {{ fixedDeposit.toLocaleString('en-US') }}</span>
+                        <span style="font-size: 15px; font-weight: bold">$ {{ fixedDeposit.toLocaleString('en-US') }}</span
+                        ><span style="font-size: 10px"> 元</span>
                     </el-tag>
                     <el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                         >股票總額
-                        <span style="font-size: 15px; font-weight: bold">$ {{ stockDeposit.toLocaleString('en-US') }}</span>
+                        <span style="font-size: 15px; font-weight: bold">$ {{ stockDeposit.toLocaleString('en-US') }}</span
+                        ><span style="font-size: 10px"> 元</span>
                     </el-tag>
                 </el-card>
             </el-col>

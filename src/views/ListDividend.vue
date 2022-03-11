@@ -5,8 +5,8 @@
             <span style="font-size: 24px"> $ </span>
             <span style="font-size: 28px; font-weight: bold">
                 <!-- <number :from="0" :to="total" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
-                {{ total.toLocaleString('en-US') }}
-            </span>
+                {{ total.toLocaleString('en-US') }} </span
+            >&nbsp;元
         </el-tag>
 
         <el-table :data="dividendList" style="width: 100%" empty-text="無資料">
