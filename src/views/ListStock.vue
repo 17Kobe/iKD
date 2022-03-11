@@ -9,7 +9,7 @@
                 header-align="left"
             >
                 <template #default="scope">
-                    <div style="width: 103px; display: inline-block">
+                    <div style="width: 95px; display: inline-block">
                         <el-badge
                             :value="scope.row.badge"
                             class="item"
@@ -25,7 +25,7 @@
                         <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
                         </el-rate>
                     </div>
-                    <div style="width: 65px; display: inline-block; text-align: right">
+                    <div style="width: 73px; display: inline-block; text-align: right">
                         <span v-if="scope.row.last_price">
                             <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
                             <span
@@ -572,11 +572,9 @@ export default {
     position: relative
 .el-table .el-table__body .el-table_1_column_1 .cell
     line-height: normal
-.el-table .el-table__body .el-table_1_column_2 .cell
-    line-height: normal
-.el-table .el-table__body .el-table_1_column_2
     padding-right: 5px
-.el-table .el-table__body .el-table_1_column_4
+
+.el-table .el-table__body .el-table_1_column_3
     padding: 0 8px
 .el-table .el-table__body td
     padding: 0px 0

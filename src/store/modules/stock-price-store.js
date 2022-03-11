@@ -335,7 +335,7 @@ const defaultState = {
             },
         },
         {
-            name: '期元大 S&P 黃金',
+            name: '期元大S&P黃金',
             id: '00635U',
             policy: {
                 settings: {
