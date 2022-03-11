@@ -1,35 +1,80 @@
 <template>
     <div>
         <el-table :data="stockList" style="width: 100%" empty-text="無資料">
-            <el-table-column fixed label="名稱" width="100" align="center">
+            <el-table-column
+                fixed
+                label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名稱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;股價"
+                width="167"
+                align="center"
+                header-align="left"
+            >
                 <template #default="scope">
-                    <el-badge
-                        :value="scope.row.badge"
-                        class="item"
-                        :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
-                    >
-                        <span style="font-size: 16px; font-weight: bold">
-                            {{ scope.row.name }}
-                        </span>
-                    </el-badge>
-                    <br />
+                    <div style="width: 100px; display: inline-block">
+                        <el-badge
+                            :value="scope.row.badge"
+                            class="item"
+                            :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
+                        >
+                            <span style="font-size: 16px; font-weight: bold">
+                                {{ scope.row.name }}
+                            </span>
+                        </el-badge>
+                        <br />
 
-                    <span style="color: #cccccc">{{ scope.row.id }}</span>
-                    <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
-                    </el-rate>
-                    <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="padding: 0 8px">
+                        <span style="color: #cccccc">{{ scope.row.id }}</span>
+                        <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
+                        </el-rate>
+                    </div>
+                    <div style="width: 62px; display: inline-block; text-align: right">
+                        <span v-if="scope.row.last_price">
+                            <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
+                            <span
+                                :style="[
+                                    scope.row.last_price_spread < 0
+                                        ? { color: '#01aa00' }
+                                        : scope.row.last_price_spread > 0
+                                        ? { color: '#ee3333' }
+                                        : { color: '#495057' },
+                                    { 'font-size': '16px' },
+                                ]"
+                            >
+                                <div style="font-weight: bold">{{ scope.row.last_price }}</div>
+                                <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
+                                <i
+                                    :class="[
+                                        scope.row.last_price_spread < 0
+                                            ? 'el-icon-caret-bottom'
+                                            : scope.row.last_price_spread > 0
+                                            ? 'el-icon-caret-top'
+                                            : '',
+                                    ]"
+                                    :style="[
+                                        scope.row.last_price_spread > 0
+                                            ? { position: 'relative', top: '2px' }
+                                            : { position: 'relative', top: '1px' },
+                                    ]"
+                                ></i>
+                                <!-- 漲跌幅 如，2.53% -->
+                                <span style="font-size: 14px">
+                                    {{ scope.row.last_price_spread !== null ? scope.row.last_price_spread + '%' : '' }}
+                                </span>
+                                <div style="color: #cccccc; font-size: 14px">{{ scope.row.last_price_date }}</div>
+                            </span>
+                        </span>
+                    </div>
+                    <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1">
                         <el-progress
-                            :width="30"
                             :text-inside="true"
                             :stroke-width="20"
                             :percentage="scope.row.cost.rate_of_return * progressMultiple"
                             :color="scope.row.cost.rate_of_return <= 0 ? '#ccff90' : '#ffc2bd'"
-                            style="width: 158px; z-index: 999; top: 3px"
+                            style="padding: 0 2px 0 18px"
                         >
+                            <!-- style="width: 158px; z-index: 999; top: 3px" -->
                             <!-- '#fef0f0' #f690a9 -->
                             <span style="color: #222326; font-size: 9px">
                                 <span style="font-size: 13px; font-weight: bold"
-                                    >$ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
+                                    >損益 $ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
                                 >元&nbsp;&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
                                     Number(scope.row.cost.rate_of_return.toFixed(1))
                                 }}</span
@@ -37,46 +82,6 @@
                             >
                         </el-progress>
                     </div>
-                </template>
-            </el-table-column>
-            <el-table-column fixed label="股價" width="67" align="right">
-                <template #default="scope">
-                    <span v-if="scope.row.last_price">
-                        <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
-                        <span
-                            :style="[
-                                scope.row.last_price_spread < 0
-                                    ? { color: '#01aa00' }
-                                    : scope.row.last_price_spread > 0
-                                    ? { color: '#ee3333' }
-                                    : { color: '#495057' },
-                                { 'font-size': '16px' },
-                            ]"
-                        >
-                            <div style="font-weight: bold">{{ scope.row.last_price }}</div>
-                            <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
-                            <i
-                                :class="[
-                                    scope.row.last_price_spread < 0
-                                        ? 'el-icon-caret-bottom'
-                                        : scope.row.last_price_spread > 0
-                                        ? 'el-icon-caret-top'
-                                        : '',
-                                ]"
-                                :style="[
-                                    scope.row.last_price_spread > 0
-                                        ? { position: 'relative', top: '2px' }
-                                        : { position: 'relative', top: '1px' },
-                                ]"
-                            ></i>
-                            <!-- 漲跌幅 如，2.53% -->
-                            <span style="font-size: 14px">
-                                {{ scope.row.last_price_spread !== null ? scope.row.last_price_spread + '%' : '' }}
-                            </span>
-                            <div style="color: #cccccc; font-size: 14px">{{ scope.row.last_price_date }}</div>
-                            <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="padding: 0 8px">&nbsp;</div>
-                        </span>
-                    </span>
                 </template>
             </el-table-column>
 
