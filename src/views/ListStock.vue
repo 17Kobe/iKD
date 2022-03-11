@@ -4,7 +4,7 @@
             <el-table-column
                 fixed
                 label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名稱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;股價"
-                width="173"
+                width="160"
                 align="center"
                 header-align="left"
             >
@@ -25,7 +25,7 @@
                         <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
                         </el-rate>
                     </div>
-                    <div style="width: 73px; display: inline-block; text-align: right">
+                    <div style="width: 60px; display: inline-block; text-align: right">
                         <span v-if="scope.row.last_price">
                             <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
                             <span
@@ -85,13 +85,13 @@
                 </template>
             </el-table-column>
 
-            <el-table-column prop="city" label="週KD" width="230" align="center">
+            <el-table-column label="週KD" width="230" align="center">
                 <template #default="scope">
                     <ChartWeekKd :parentData="scope.row.id" />
                     <!-- <ChartWeekKd :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
                 </template>
             </el-table-column>
-            <el-table-column label="週K線" width="230" align="center">
+            <el-table-column label="週K線" width="250" align="center">
                 <template #default="scope">
                     <ChartWeekK :parentData="scope.row.id" />
                     <!-- <ChartWeekK :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
@@ -575,7 +575,7 @@ export default {
     padding-right: 5px
 
 .el-table .el-table__body .el-table_1_column_3
-    padding: 0 8px
+    padding: 0 0 0 14px
 .el-table .el-table__body td
     padding: 0px 0
 // 為了解決table內cell要/n換行的問題

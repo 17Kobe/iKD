@@ -412,7 +412,7 @@ export default {
                     },
                     datalabels: {
                         anchor: 'start', // remove this line to get label in middle of the bar
-                        align: 'centor',
+                        align: 'end',
                         formatter: (val) => {
                             if (!val || val === 0) return '';
                             return `$ ${Number(val.toFixed(1)).toLocaleString('en-US')} 元`;
