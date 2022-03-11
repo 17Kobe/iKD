@@ -4,12 +4,12 @@
             <el-table-column
                 fixed
                 label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名稱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;股價"
-                width="167"
+                width="173"
                 align="center"
                 header-align="left"
             >
                 <template #default="scope">
-                    <div style="width: 100px; display: inline-block">
+                    <div style="width: 103px; display: inline-block">
                         <el-badge
                             :value="scope.row.badge"
                             class="item"
@@ -25,7 +25,7 @@
                         <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
                         </el-rate>
                     </div>
-                    <div style="width: 62px; display: inline-block; text-align: right">
+                    <div style="width: 65px; display: inline-block; text-align: right">
                         <span v-if="scope.row.last_price">
                             <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
                             <span
@@ -66,16 +66,16 @@
                         <el-progress
                             :text-inside="true"
                             :stroke-width="20"
-                            :percentage="scope.row.cost.rate_of_return * progressMultiple"
+                            :percentage="Math.abs(scope.row.cost.rate_of_return) * progressMultiple"
                             :color="scope.row.cost.rate_of_return <= 0 ? '#ccff90' : '#ffc2bd'"
                             style="padding: 0 2px 0 18px"
                         >
                             <!-- style="width: 158px; z-index: 999; top: 3px" -->
                             <!-- '#fef0f0' #f690a9 -->
                             <span style="color: #222326; font-size: 9px">
-                                <span style="font-size: 13px; font-weight: bold"
-                                    >損益 $ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
-                                >元&nbsp;&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
+                                損益&nbsp;&nbsp;<span style="font-size: 13px; font-weight: bold"
+                                    >$ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
+                                >&nbsp;&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
                                     Number(scope.row.cost.rate_of_return.toFixed(1))
                                 }}</span
                                 ><span style="color: #999999">%</span></span
@@ -594,7 +594,7 @@ input::-webkit-inner-spin-button
     -webkit-appearance: none
     margin: 0
 .el-badge__content.is-fixed
-    top: 1px
+    top: -2px
     right: calc(2px + var(--el-badge-size) / 2)
 // group button padding 左右小一點
 .el-input-group__prepend

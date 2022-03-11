@@ -291,16 +291,23 @@ export default {
             }, 0);
         },
         stockCostExistOfName() {
-            // 定存 sum
+            // 存在 cost 設定的股票名稱
             return this.$store.state.price.stockList.reduce((acc, { name, cost }) => {
                 if (cost && cost.sum) acc.push(name);
                 return acc;
             }, []);
         },
-        stockCostExistOfRateReturn() {
-            // 定存 sum
+        // stockCostExistOfRateReturn() {
+        //     // 存在 cost 設定的股票回報率
+        //     return this.$store.state.price.stockList.reduce((acc, { cost }) => {
+        //         if (cost && cost.rate_of_return) acc.push(cost.rate_of_return);
+        //         return acc;
+        //     }, []);
+        // },
+        stockCostExistOfReturn() {
+            // 存在 cost 設定的股票回報金額
             return this.$store.state.price.stockList.reduce((acc, { cost }) => {
-                if (cost && cost.rate_of_return) acc.push(cost.rate_of_return);
+                if (cost && cost.return) acc.push(cost.return);
                 return acc;
             }, []);
         },
@@ -331,7 +338,7 @@ export default {
                 labels: this.stockCostExistOfName,
                 datasets: [
                     {
-                        data: this.stockCostExistOfRateReturn,
+                        data: this.stockCostExistOfReturn,
                         backgroundColor: [
                             // 背景色
                             'rgba(75, 192, 192, 0.2)',
@@ -382,9 +389,9 @@ export default {
                                     label += ': ';
                                 }
                                 if (context.parsed.y !== null) {
-                                    label += ` 成本：$ ${foundStock.cost.sum.toLocaleString(
-                                        'en-US'
-                                    )} (+$ ${foundStock.cost.return.toLocaleString('en-US')})`;
+                                    label += ` 成本：$ ${foundStock.cost.sum.toLocaleString('en-US')} (${Number(
+                                        foundStock.cost.rate_of_return.toFixed(1)
+                                    )} %)`;
                                 }
                                 return label;
                             },
@@ -401,11 +408,11 @@ export default {
                         // color: 'blue',
                     },
                     datalabels: {
-                        anchor: 'end', // remove this line to get label in middle of the bar
-                        align: 'end',
+                        anchor: 'start', // remove this line to get label in middle of the bar
+                        align: 'centor',
                         formatter: (val) => {
                             if (!val || val === 0) return '';
-                            return `${Number(val.toFixed(1))} %`;
+                            return `$ ${Number(val.toFixed(1)).toLocaleString('en-US')} 元`;
                         },
                         labels: {
                             // value: {
