@@ -1,5 +1,5 @@
 <template>
-    <el-input ref="inputRef" :modelValue="formattedValue">
+    <el-input ref="inputRef" :modelValue="formattedValue" @focus="selectAll()">
         <template #prepend>$</template>
         <template #suffix><span style="position: relative; top: 8px; font-size: 10px">元</span> </template>
     </el-input>
@@ -16,8 +16,14 @@ export default {
     },
     setup(props) {
         const { inputRef, formattedValue } = useCurrencyInput(props.options);
-
         return { inputRef, formattedValue };
+    },
+    methods: {
+        selectAll() {
+            setTimeout(() => {
+                this.$refs.inputRef.select();
+            }, 200);
+        },
     },
 };
 </script>

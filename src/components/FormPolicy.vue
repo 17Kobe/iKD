@@ -1,76 +1,95 @@
 <template>
-    <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="70%">
-        <el-form ref="formPolicyBuyRef" :model="form.buy" label-width="60px">
+    <el-drawer
+        :title="title"
+        @closed="onClosed()"
+        v-model="isShow"
+        :show-close="true"
+        direction="rtl"
+        size="85%"
+        id="drawer-policy"
+    >
+        <el-form ref="formPolicyBuyRef" :model="form.buy">
             <div style="font-size: 24px; margin: 0px 10px 10px">買進</div>
 
             <el-row v-for="(item, index) in form.buy" :key="index">
-                <el-col :xs="22" :sm="6" :md="4" :lg="5" :xl="3">
-                    <el-form-item label="策略">
+                <el-col :xs="12" :sm="6" :md="4" :lg="5" :xl="3" style="padding-left: 3px">
+                    <el-form-item>
                         <el-select size="small" v-model="item.method" @change="onChangeBuyMethod($event, index)">
                             <el-option v-for="item in buyOptions" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
-                <el-col :xs="10" :sm="6" :md="5" :lg="4" :xl="2">
-                    <el-form-item label="限制">
+                <el-col :xs="8" :sm="6" :md="5" :lg="4" :xl="2" style="padding-left: 3px; position: relative; top: 4px">
+                    <el-form-item>
                         <el-input
                             size="small"
                             v-model="item.limit"
                             placeholder="ex: 33.43"
                             :ref="`method_buy_${index}`"
                             type="number"
-                        />
+                            @focus="$event.target.select()"
+                        >
+                            <template #suffix
+                                ><span style="font-size: 10px; position: relative; left: 2px; top: 8px">{{
+                                    item.limit_desc
+                                }}</span></template
+                            >
+                            <template #prepend>限制</template>
+                        </el-input>
                     </el-form-item>
                 </el-col>
-                <el-col :xs="12" :sm="6" :md="5" :lg="5" :xl="3" style="margin: 9px 2px">
-                    {{ item.limit_desc }}
-                </el-col>
-                <el-col :xs="24" :sm="6" :md="3" :lg="2" :xl="1">
-                    &nbsp;&nbsp;<el-button size="small" type="danger" @click="onDelBuy(index)"
-                        ><i class="el-icon-minus"></i></el-button
+                <!-- <el-col :xs="2" :sm="6" :md="5" :lg="5" :xl="3" style="margin: 9px 2px">
+                    
+                </el-col> -->
+                <el-col :xs="4" :sm="6" :md="3" :lg="2" :xl="1" style="display: flex; align-items: center; padding-left: 7px">
+                    <el-button size="small" type="danger" @click="onDelBuy(index)"><i class="el-icon-minus"></i></el-button
                 ></el-col>
             </el-row>
 
             <el-form-item>
-                <el-button type="primary" @click="onAddBuy"><i class="el-icon-plus"></i></el-button>
+                <el-button type="primary" size="small" @click="onAddBuy"><i class="el-icon-plus"></i></el-button>
             </el-form-item>
         </el-form>
 
-        <el-form ref="formPolicySellRef" :model="form.sell" label-width="60px">
+        <el-form ref="formPolicySellRef" :model="form.sell">
             <div style="font-size: 24px; margin: 0px 10px 10px">賣出</div>
 
             <el-row v-for="(item, index) in form.sell" :key="index">
-                <el-col :xs="22" :sm="6" :md="4" :lg="5" :xl="3">
-                    <el-form-item label="策略">
+                <el-col :xs="12" :sm="6" :md="4" :lg="5" :xl="3" style="padding-left: 3px">
+                    <el-form-item>
                         <el-select size="small" v-model="item.method" @change="onChangeSellMethod($event, index)">
                             <el-option v-for="item in sellOptions" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>
                     </el-form-item>
                 </el-col>
-                <el-col :xs="10" :sm="6" :md="5" :lg="4" :xl="2">
-                    <el-form-item label="限制">
+                <el-col :xs="8" :sm="6" :md="5" :lg="4" :xl="2" style="padding-left: 3px; position: relative; top: 4px">
+                    <el-form-item>
                         <el-input
                             size="small"
                             v-model="item.limit"
                             placeholder="ex: 33.43"
                             :ref="`method_buy_${index}`"
                             type="number"
-                        />
+                            @focus="$event.target.select()"
+                        >
+                            <template #suffix
+                                ><span style="font-size: 10px; position: relative; left: 2px; top: 8px">{{
+                                    item.limit_desc
+                                }}</span></template
+                            >
+                            <template #prepend>限制</template>
+                        </el-input>
                     </el-form-item>
                 </el-col>
-                <el-col :xs="12" :sm="6" :md="5" :lg="5" :xl="3" style="margin: 9px 2px">
-                    {{ item.limit_desc }}
-                </el-col>
-                <el-col :xs="24" :sm="6" :md="3" :lg="2" :xl="1">
-                    &nbsp;&nbsp;<el-button size="small" type="danger" @click="onDelSell(index)"
-                        ><i class="el-icon-minus"></i></el-button
+                <el-col :xs="4" :sm="6" :md="3" :lg="2" :xl="1" style="display: flex; align-items: center; padding-left: 7px">
+                    <el-button size="small" type="danger" @click="onDelSell(index)"><i class="el-icon-minus"></i></el-button
                 ></el-col>
             </el-row>
 
             <el-form-item>
-                <el-button type="primary" @click="onAddSell"><i class="el-icon-plus"></i></el-button>
+                <el-button type="primary" size="small" @click="onAddSell"><i class="el-icon-plus"></i></el-button>
             </el-form-item>
         </el-form>
     </el-drawer>
@@ -239,8 +258,8 @@ export default {
             this.form.sell.splice(index, 1);
         },
         onChangeBuyMethod(selValue, index) {
-            console.log(selValue);
-            console.log(index);
+            // console.log(selValue);
+            // console.log(index);
             // 用選到的 method 先找到 value，再去看其它值設進去
             const found = _.find(this.buyOptions, ['value', selValue]);
             this.form.buy[index].label = found.label;
@@ -248,8 +267,8 @@ export default {
             this.form.buy[index].limit_desc = found.default_limit_desc;
         },
         onChangeSellMethod(selValue, index) {
-            console.log(selValue);
-            console.log(index);
+            // console.log(selValue);
+            // console.log(index);
             // 用選到的 method 先找到 value，再去看其它值設進去
             const found = _.find(this.sellOptions, ['value', selValue]);
             this.form.sell[index].label = found.label;
@@ -284,7 +303,11 @@ export default {
 // 父傳子參考 https://its201.com/article/weixin_49035434/119852222 方法1，的emit似乎 vue 3有改語法而不行了。但方法2沒用 emit仍正常
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
 .el-form-item
     margin-bottom: 0px
+.el-select .el-input--small .el-input__inner
+    padding: 0 17px 0 4px
+#drawer-policy .el-input-group__prepend
+    padding: 0 2px !important
 </style>

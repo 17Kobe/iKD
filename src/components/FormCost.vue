@@ -1,24 +1,24 @@
 <template>
-    <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="70%">
-        <el-form ref="formCostRef" :model="form" label-width="60px">
+    <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="85%">
+        <el-form ref="formCostRef" :model="form">
             <el-row v-for="(item, index) in form" :key="index">
-                <el-col :xs="22" :sm="10" :md="7" :lg="4" :xl="3">
+                <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 3px">
                     <el-form-item label="成交價">
                         <el-input
-                            clearable
                             v-model="item.cost"
                             placeholder="ex: 33.43"
                             size="small"
                             :ref="`cost${index}`"
                             @keyup="onChangeCost($event, index)"
                             type="number"
-                            style="width: 130px"
+                            style="margin-left: 2px"
+                            @focus="$event.target.select()"
                         >
                             <template #suffix>元</template>
                         </el-input>
                     </el-form-item>
                 </el-col>
-                <el-col :xs="22" :sm="10" :md="7" :lg="5" :xl="4">
+                <el-col :xs="11" :sm="10" :md="7" :lg="5" :xl="4" style="padding-left: 6px">
                     <el-form-item label="股數">
                         <el-input-number
                             type="number"
@@ -26,17 +26,21 @@
                             :step="1000"
                             size="small"
                             @keyup="onChangeNumber($event, index)"
+                            style="margin-left: 2px"
+                            @focus="$event.target.select()"
                         />
                     </el-form-item>
                 </el-col>
-                <el-col :xs="24" :sm="4" :md="3" :lg="3" :xl="2">
+                <el-col :xs="4" :sm="4" :md="3" :lg="3" :xl="2" style="display: flex; align-items: center">
                     &nbsp;&nbsp;<el-button type="danger" size="small" @click="onDel(index)"
                         ><i class="el-icon-minus"></i></el-button
                 ></el-col>
             </el-row>
 
             <el-form-item>
-                <el-button type="primary" @click="onAdd"><i class="el-icon-plus"></i></el-button>
+                <el-button type="primary" size="small" @click="onAdd" style="margin-left: 5px"
+                    ><i class="el-icon-plus"></i
+                ></el-button>
             </el-form-item>
         </el-form>
         總金額 {{ sumCost.toLocaleString('en-US') }} 元<br />
@@ -150,7 +154,11 @@ export default {
 // 父傳子參考 https://its201.com/article/weixin_49035434/119852222 方法1，的emit似乎 vue 3有改語法而不行了。但方法2沒用 emit仍正常
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
 .el-form-item
     margin-bottom: 0px
+.el-form-item__label
+    padding: 0
+.el-input--small .el-input__inner
+    padding: 0 17px 0 8px
 </style>
