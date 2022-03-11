@@ -48,7 +48,9 @@
             </el-row>
 
             <el-form-item>
-                <el-button type="primary" size="small" @click="onAddBuy"><i class="el-icon-plus"></i></el-button>
+                <el-button type="primary" size="small" @click="onAddBuy" style="margin-left: 5px"
+                    ><i class="el-icon-plus"></i
+                ></el-button>
             </el-form-item>
         </el-form>
 
@@ -89,7 +91,9 @@
             </el-row>
 
             <el-form-item>
-                <el-button type="primary" size="small" @click="onAddSell"><i class="el-icon-plus"></i></el-button>
+                <el-button type="primary" size="small" @click="onAddSell" style="margin-left: 5px"
+                    ><i class="el-icon-plus"></i
+                ></el-button>
             </el-form-item>
         </el-form>
     </el-drawer>

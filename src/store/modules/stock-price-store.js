@@ -570,13 +570,15 @@ const stock = {
         SAVE_STOCK_POLICY(state, { stockId, policyList }) {
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
+
+            // console.log(policyList);
+            // console.log(policyList.buy.length);
+            // console.log(policyList.sell.length);
             if (
-                _.has(foundStock, 'policy.settings') &&
-                (!_.has(policyList, 'buy') ||
-                    !_.has(policyList, 'sell') ||
-                    (policyList.buy.length === 0 && policyList.sell.length === 0))
+                (!_.has(policyList, 'buy') || (_.has(policyList, 'buy') && policyList.buy.length === 0)) &&
+                (!_.has(policyList, 'sell') || (_.has(policyList, 'sell') && policyList.sell.length === 0))
             ) {
-                delete foundStock.policy;
+                if (_.has(foundStock, 'policy')) delete foundStock.policy;
             } else {
                 foundStock.policy = { settings: { buy: [], sell: [] } };
                 foundStock.policy.settings = policyList; // 複製數據複本
