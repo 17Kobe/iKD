@@ -7,8 +7,10 @@
             &nbsp;&nbsp;<el-button type="primary"><i class="el-icon-upload2"></i> 匯入設定檔</el-button>
         </el-upload>
         <br />
-        &nbsp;&nbsp;<el-button type="danger" @click="onClear"><i class="el-icon-download"></i> 清除設定檔</el-button>
-
+        &nbsp;&nbsp;<el-button type="danger" @click="onClear"><i class="el-icon-download"></i> 清除設定檔</el-button><br /><br />
+        &nbsp;&nbsp;<el-button type="success" @click="onForceRefresh"
+            ><i class="el-icon-refresh-right"></i> 立即更新股價</el-button
+        >
         <!-- <el-button type="primary" @click="onImport"><i class="el-icon-upload2"></i> 匯入設定檔</el-button> -->
     </el-drawer>
 </template>
@@ -68,6 +70,8 @@ export default {
             })
                 .then(() => {
                     localStorage.removeItem('stockList');
+                    localStorage.removeItem('assetList');
+                    localStorage.removeItem('dividendList');
                     ElMessage({
                         type: 'success',
                         message: '完成刪除設定檔!',
@@ -81,6 +85,14 @@ export default {
                 });
         },
 
+        onForceRefresh() {
+            this.$store.dispatch('GET_STOCK_PRICE', true);
+
+            ElMessage({
+                type: 'success',
+                message: '完成立即更新股價!',
+            });
+        },
         // 讀檔參考 https://blog.csdn.net/qq_40729514/article/details/109677411
         openFile(file) {
             const reader = new FileReader();

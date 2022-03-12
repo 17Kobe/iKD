@@ -417,7 +417,7 @@
             ><i class="el-icon-edit"></i>&nbsp;新增自選股</el-button
         >
         <el-button style="margin-top: 10px" type="info" plain @click="doShowExport()"
-            ><i class="el-icon-download"></i>&nbsp;匯出設定檔</el-button
+            ><i class="el-icon-download"></i>&nbsp;進階設定</el-button
         >
         <br /><br />
         <br /><br />

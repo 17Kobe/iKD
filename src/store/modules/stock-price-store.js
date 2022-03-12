@@ -45,7 +45,7 @@ const stock = {
         return defaultState;
     },
     actions: {
-        GET_STOCK_PRICE(context) {
+        GET_STOCK_PRICE(context, force = false) {
             console.log('GET_STOCK_PRICE 0');
 
             context.state.stockList.forEach((stcokObj) => {
@@ -67,10 +67,21 @@ const stock = {
                 console.log('GET_STOCK_PRICE 2');
                 // 按照網站存在的日期才發出API需求
                 // https://stackoverflow.com/questions/36197031/how-to-use-moment-js-to-check-whether-the-current-time-is-between-2-times
-                const currentTime = moment();
+                const currentTime = moment(); // 目前時間
                 const stockMarketCloseTime = moment('13:30:00', 'hh:mm:ss');
                 let siteExistsLatestDate = moment().format('YYYY-MM-DD');
-                if (currentTime.isBefore(stockMarketCloseTime))
+                console.log(currentTime.day());
+                if (currentTime.day() === 6)
+                    // 星期六，不算了，就減一天
+                    siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
+                else if (currentTime.day() === 0)
+                    // 星期日，不算了，就減二天
+                    siteExistsLatestDate = moment().subtract(2, 'days').format('YYYY-MM-DD');
+                else if (currentTime.day() === 1 && currentTime.isBefore(stockMarketCloseTime))
+                    // 星期一且還沒交易結束時間，不算了，就減三天
+                    siteExistsLatestDate = moment().subtract(3, 'days').format('YYYY-MM-DD');
+                else if (currentTime.isBefore(stockMarketCloseTime))
+                    // 如果目前時間少於交易結束時間，則要減一天
                     siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
                 // console.log(currentTime.format('YYYY-MM-DD hh:mm:ss'));
                 // console.log(stockMarketCloseTime.format('YYYY-MM-DD hh:mm:ss'));
@@ -80,7 +91,7 @@ const stock = {
                 // console.log(stockStartDate);
 
                 // 因為我有將 stockStartDate + 1天，所以有 Same
-                if (moment(siteExistsLatestDate).isSameOrAfter(stockStartDate)) {
+                if (moment(siteExistsLatestDate).isSameOrAfter(stockStartDate) || force) {
                     console.log('GET_STOCK_PRICE 3');
                     axios
                         .get('https://api.finmindtrade.com/api/v4/data', {
@@ -249,9 +260,14 @@ const stock = {
         SAVE_STOCK_PRICE(state, { stockId, data }) {
             console.log('SAVE_STOCK_PRICE');
             if (data.data.length > 0) {
+                // 在此其實不用"避免重覆"的資料，因我的我 start_date 已是控制好我的DB沒有的日期，若強制抓回只是 data.data=[] 沒有資料而已
                 // 預設值
                 // const index = _.findIndex(state.stockList, ['id', stockId]);
                 const foundStock = state.stockList.find((v) => v.id === stockId);
+                // console.log(data.data);
+                // console.log(foundStock.data.daily);
+                // console.log(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
+                // return;
                 foundStock.data = foundStock.data || {};
                 foundStock.data.daily = foundStock.data.daily || []; // 有可能是 null 就變成 []
                 foundStock.data.weekly = foundStock.data.weekly || []; // 有可能是 null 就變成 []
