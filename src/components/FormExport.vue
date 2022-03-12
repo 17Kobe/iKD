@@ -45,7 +45,17 @@ export default {
         onExport() {
             console.log('onExport');
             const a = document.createElement('a');
-            const file = new Blob([localStorage.getItem('stockList')], { type: 'text/plain' });
+            const exportData = {};
+            const localStockList = localStorage.getItem('stockList');
+            const localAssetList = localStorage.getItem('assetList');
+            const localDividendList = localStorage.getItem('dividendList');
+
+            //! = null
+            if (localStockList) exportData.stockList = JSON.parse(localStockList);
+            if (localAssetList) exportData.assetList = JSON.parse(localAssetList);
+            if (localDividendList) exportData.dividendList = JSON.parse(localDividendList);
+
+            const file = new Blob([JSON.stringify(exportData)], { type: 'text/plain' });
             a.href = URL.createObjectURL(file);
             a.download = 'iKD.txt';
             a.click();
@@ -77,9 +87,23 @@ export default {
             const store = this.$store;
             reader.onload = function () {
                 if (reader.result) {
-                    localStorage.setItem('stockList', reader.result);
-                    const localStockList = JSON.parse(reader.result) || [];
-                    store.commit('SAVE_STOCK_LIST', localStockList); // 在這裡就不能用 this，所以寫在外頭
+                    const obj = JSON.parse(reader.result);
+
+                    if (obj.stockList) {
+                        localStorage.setItem('stockList', JSON.stringify(obj.stockList));
+                        const localStockList = obj.stockList || [];
+                        store.commit('SAVE_STOCK_LIST', localStockList);
+                    }
+                    if (obj.assetList) {
+                        localStorage.setItem('assetList', JSON.stringify(obj.assetList));
+                        const localAssetList = obj.assetList || [];
+                        store.commit('SAVE_ASSET', localAssetList);
+                    }
+                    if (obj.dividendList) {
+                        localStorage.setItem('dividendList', JSON.stringify(obj.dividendList));
+                        const localDividendList = obj.dividendList || [];
+                        store.commit('SAVE_DIVIDEND_LIST', localDividendList);
+                    }
                     ElMessage({
                         type: 'success',
                         message: '完成匯入設定檔!',
