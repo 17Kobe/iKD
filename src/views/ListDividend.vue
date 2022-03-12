@@ -10,7 +10,7 @@
         </el-tag>
 
         <el-table :data="dividendList" style="width: 100%" empty-text="無資料">
-            <el-table-column fixed label="名稱" prop="name" width="90" align="center"> </el-table-column>
+            <el-table-column label="名稱" prop="name" width="90" align="center"> </el-table-column>
             <el-table-column label="除息日" width="42" align="center">
                 <template #default="scope">
                     {{ scope.row.trading_date.substr(5, 5).replace('-', '/') }}

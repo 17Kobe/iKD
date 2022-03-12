@@ -414,10 +414,10 @@
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
         <el-button style="margin-top: 10px" type="info" plain @click="doShowSearch()"
-            ><i class="el-icon-edit"></i>&nbsp;新增自選股</el-button
+            ><i class="el-icon-plus"></i>&nbsp;新增自選股</el-button
         >
         <el-button style="margin-top: 10px" type="info" plain @click="doShowExport()"
-            ><i class="el-icon-download"></i>&nbsp;進階設定</el-button
+            ><i class="el-icon-place"></i>&nbsp;進階設定</el-button
         >
         <br /><br />
         <br /><br />
