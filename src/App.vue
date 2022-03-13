@@ -1,6 +1,7 @@
 <template>
     <div>
         <main class="main">
+            <audio ref="audio" :src="menuWav" preload></audio>
             <router-view v-show="routerName === 'default'" />
             <!-- 要用 v-if 則 chartjs才有動畫算是重載入。用 v-show 是避免重載入，只是隱藏然後顯示 -->
             <router-view name="asset" v-if="routerName === 'asset'" />
@@ -24,15 +25,20 @@
 </template>
 
 <script>
+import menuWav from './assets/menu.wav';
+
 export default {
     data() {
         return {
             routerName: 'default',
+            menuWav,
         };
     },
 
     methods: {
         onMenuItemClick(page) {
+            const { audio } = this.$refs;
+            audio.play();
             this.routerName = page;
         },
     },
