@@ -281,7 +281,7 @@ export default {
         stockDeposit() {
             // 定存 sum
             return this.$store.state.price.stockList.reduce((acc, { cost }) => {
-                if (cost && cost.sum) return acc + cost.sum;
+                if (cost && cost.sum) return acc + cost.sum + cost.return;
                 return acc;
             }, 0);
         },
