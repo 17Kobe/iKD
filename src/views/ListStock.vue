@@ -55,7 +55,7 @@
                                     ]"
                                 ></i>
                                 <!-- 漲跌幅 如，2.53% -->
-                                <span style="font-size: 14px">
+                                <span style="font-size: 13px">
                                     {{ scope.row.last_price_spread !== null ? scope.row.last_price_spread + '%' : '' }}
                                 </span>
                                 <div style="color: #cccccc; font-size: 14px">{{ scope.row.last_price_date }}</div>
