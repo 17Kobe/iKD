@@ -308,19 +308,19 @@ export default {
                         plotLines: [
                             {
                                 color: '#ff9494', // 黃金交叉
-                                dashStyle: 'LongDash',
+                                dashStyle: 'Dot',
                                 value: this.kdGoldLimit,
                                 width: 1,
                             },
                             {
-                                color: 'red', // 黃金轉折
+                                color: '#ff9494', // 黃金轉折
                                 dashStyle: 'LongDash',
                                 value: this.kdTurnUpLmit,
                                 width: 1,
                             },
                             {
-                                color: 'green', // 死亡交叉
-                                dashStyle: 'LongDash',
+                                color: '#76dc43', // 死亡交叉
+                                dashStyle: 'Dot',
                                 value: this.kdDeadLimit,
                                 width: 1,
                             },
