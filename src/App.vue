@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import menuWav from './assets/menu.wav';
+import menuWav from '@/assets/menu.wav';
 
 export default {
     data() {

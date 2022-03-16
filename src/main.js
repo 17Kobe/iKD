@@ -6,7 +6,7 @@ import { createApp } from 'vue';
 import ElementPlus from 'element-plus';
 
 import 'element-plus/lib/theme-chalk/index.css';
-import './index.css';
+import '@/index.css';
 
 // 這裡是用局部註冊，而非寫在 main.js 是全局註冊
 import Highcharts from 'highcharts';
@@ -16,10 +16,10 @@ import loadIndicatorsAll from 'highcharts/indicators/indicators-all';
 // 在這裡一定要用大括號，不然會錯，因為highcharts-vue.js中有命名為 Chart 的export
 
 import VueNumber from 'vue-number-animation';
-import store from './store/store';
-import router from './router/router';
+import store from '@/store/store';
+import router from '@/router/router';
 
-import App from './App.vue';
+import App from '@/App.vue';
 
 // 因為 series 是股票圖，所以要導入 stock 模組，才能有 type: 'candlestick'
 loadStock(Highcharts);

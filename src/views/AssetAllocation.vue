@@ -121,7 +121,7 @@ import { Chart, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { BarChart, PieChart } from 'vue-chart-3';
 import { ElMessageBox, ElMessage } from 'element-plus';
-import ElCurrencyInput from '../components/ElCurrencyInput.vue';
+import ElCurrencyInput from '@/components/ElCurrencyInput.vue';
 
 Chart.register(...registerables);
 // Register the plugin to all charts:

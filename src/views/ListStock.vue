@@ -430,12 +430,12 @@
 
 <script>
 import _ from 'lodash';
-import ChartWeekKd from '../components/ChartWeekKd.vue';
-import ChartWeekK from '../components/ChartWeekK.vue';
-import FormCost from '../components/FormCost.vue';
-import FormPolicy from '../components/FormPolicy.vue';
-import FormSearch from '../components/FormSearch.vue';
-import FormExport from '../components/FormExport.vue';
+import ChartWeekKd from '@/components/ChartWeekKd.vue';
+import ChartWeekK from '@/components/ChartWeekK.vue';
+import FormCost from '@/components/FormCost.vue';
+import FormPolicy from '@/components/FormPolicy.vue';
+import FormSearch from '@/components/FormSearch.vue';
+import FormExport from '@/components/FormExport.vue';
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 

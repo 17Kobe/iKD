@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
-import ListStock from '../views/ListStock.vue';
-import AssetAllocation from '../views/AssetAllocation.vue';
-import ListDividend from '../views/ListDividend.vue';
+import ListStock from '@/views/ListStock.vue';
+import AssetAllocation from '@/views/AssetAllocation.vue';
+import ListDividend from '@/views/ListDividend.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),

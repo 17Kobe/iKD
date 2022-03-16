@@ -17,6 +17,19 @@
         "vue",
         "prettier"
     ],
+    // 參考 https://stackoverflow.com/questions/67835072/vue-3-on-vite-js-with-eslint-unable-to-resolve-path-to-module-eslintimport-no
+    "settings": {
+        "import/resolver": {
+            "alias": {
+                "map": [
+                    [
+                        "@",
+                        "./src"
+                    ],
+                ],
+            },
+        },
+    },
     "rules": {
         // 參考 https://blog.csdn.net/weixin_43459866/article/details/114629507
         "no-param-reassign": [
