@@ -59,56 +59,112 @@
             </el-col>
         </el-row>
         <!-- <chart v-if="loaded" :chartdata="chartdata" :options="options"> </chart> -->
-        <el-row v-for="(item, index) in assetList" :key="index">
-            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                <el-input
-                    size="small"
-                    placeholder=""
-                    v-model="item.account"
-                    :ref="`asset${index}`"
-                    @keyup="onChangeAccount($event, index)"
-                >
-                    <template #prepend>帳戶</template>
-                </el-input>
-            </el-col>
-            <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                <ElCurrencyInput
-                    size="small"
-                    placeholder=""
-                    v-model="item.amount"
-                    @keyup="onChangeAmount($event, index)"
-                    :options="{
-                        locale: 'en-US',
-                        currency: 'USD',
-                        currencyDisplay: 'hidden',
-                        hideCurrencySymbolOnFocus: true,
-                        hideGroupingSeparatorOnFocus: true,
-                        hideNegligibleDecimalDigitsOnFocus: true,
-                        autoDecimalDigits: false,
-                        autoSign: true,
-                        useGrouping: true,
-                        accountingSign: false,
-                    }"
-                />
-            </el-col>
-            <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                <el-button type="danger" size="small" @click="onDelAsset(index, item.account)" round plain
-                    ><i class="el-icon-minus"></i
-                ></el-button>
-            </el-col>
-        </el-row>
+        <template v-for="(item, index) in assetList" :key="index">
+            <el-row v-if="item.isPositive">
+                <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                    <el-input
+                        size="small"
+                        placeholder=""
+                        v-model="item.account"
+                        :ref="`deposit${index}`"
+                        @change="onChangeAccount($event, index)"
+                    >
+                        <template #prepend>帳戶</template>
+                    </el-input>
+                </el-col>
+                <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                    <ElCurrencyInput
+                        size="small"
+                        placeholder=""
+                        v-model="item.amount"
+                        @change="onChangeAmount($event, index)"
+                        :options="{
+                            locale: 'en-US',
+                            currency: 'USD',
+                            currencyDisplay: 'hidden',
+                            hideCurrencySymbolOnFocus: true,
+                            hideGroupingSeparatorOnFocus: true,
+                            hideNegligibleDecimalDigitsOnFocus: true,
+                            autoDecimalDigits: false,
+                            autoSign: true,
+                            useGrouping: true,
+                            accountingSign: false,
+                        }"
+                    />
+                </el-col>
+                <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                    <el-button type="danger" size="small" @click="onDelAsset(index, item.account)" round plain
+                        ><i class="el-icon-minus"></i
+                    ></el-button>
+                </el-col>
+            </el-row>
+        </template>
         <el-row>
-            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
-                <el-button type="primary" size="small" @click="onAddAsset" round plain><i class="el-icon-plus"></i></el-button>
+            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding: 4px 0">
+                <el-button type="primary" size="small" @click="onAddDeposit" round plain
+                    ><i class="el-icon-plus"></i> 新增存款</el-button
+                >
             </el-col>
             <!-- <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
                 <el-button type="primary" size="small" @click="onResetAsset" round><i class="el-icon-minus"></i></el-button>
             </el-col> -->
         </el-row>
+
+        <template v-for="(item, index) in assetList" :key="index">
+            <el-row v-if="!item.isPositive">
+                <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                    <el-input
+                        size="small"
+                        placeholder=""
+                        v-model="item.account"
+                        :ref="`deposit${index}`"
+                        @change="onChangeAccount($event, index)"
+                    >
+                        <template #prepend>帳戶</template>
+                    </el-input>
+                </el-col>
+                <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                    <ElCurrencyInput
+                        size="small"
+                        placeholder=""
+                        v-model="item.amount"
+                        @change="onChangeAmount($event, index)"
+                        :options="{
+                            locale: 'en-US',
+                            currency: 'USD',
+                            currencyDisplay: 'hidden',
+                            hideCurrencySymbolOnFocus: true,
+                            hideGroupingSeparatorOnFocus: true,
+                            hideNegligibleDecimalDigitsOnFocus: true,
+                            autoDecimalDigits: false,
+                            autoSign: true,
+                            useGrouping: true,
+                            accountingSign: false,
+                        }"
+                    />
+                </el-col>
+                <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                    <el-button type="danger" size="small" @click="onDelAsset(index, item.account)" round plain
+                        ><i class="el-icon-minus"></i
+                    ></el-button>
+                </el-col>
+            </el-row>
+        </template>
+        <el-row>
+            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding: 4px 0">
+                <el-button type="primary" size="small" @click="onAddDebt" round plain
+                    ><i class="el-icon-plus"></i> 新增負債</el-button
+                >
+            </el-col>
+            <!-- <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
+                <el-button type="primary" size="small" @click="onResetAsset" round><i class="el-icon-minus"></i></el-button>
+            </el-col> -->
+        </el-row>
+
         <br />
         <div style="font-size: 14px; color: #999; margin: 20px">
             <div>【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、 定存)時，將會統計至「資產配置表」</div>
-            <div>【$】請輸入帳戶目前金額，若輸入正值(或 負值)時，將會累計金額至「資產負債表」的資產(或 負債)。」</div>
+            <div>【$】請輸入帳戶目前金額。</div>
         </div>
         <br /><br />
         <br /><br />
@@ -134,7 +190,7 @@ export default {
 
     data() {
         return {
-            // assetList: [],
+            assetList: [],
             value: 1234,
             barOptions: {
                 scales: {
@@ -246,7 +302,7 @@ export default {
         stockList() {
             return this.$store.state.price.stockList;
         },
-        assetList() {
+        storeAssetList() {
             return this.$store.state.asset.assetList;
         },
         assets() {
@@ -451,27 +507,46 @@ export default {
         const localAssetList = JSON.parse(localStorage.getItem('assetList')) || [];
         console.log(localAssetList);
         if (_.isEmpty(localAssetList)) {
-            localAssetList.push(...this.assetList); // 新增 append 預設到 localStockList
+            localAssetList.push(...this.storeAssetList); // 新增 append 預設到 localStockList
             localStorage.setItem('assetList', JSON.stringify(localAssetList)); // 將 localStockList 從 object 轉 string 後塞到 localstorage
         }
 
         this.$store.commit('SAVE_ASSET', localAssetList);
-        console.log('created asset over');
+        this.assetList = localAssetList.reduce((acc, { account, amount }) => {
+            acc.push({ account: account, amount: Math.abs(amount), isPositive: amount >= 0 });
+            return acc;
+        }, []);
+        console.log('created asset over!');
     },
     methods: {
-        onAddAsset() {
+        onAddDeposit() {
             console.log('onAddAsset');
 
             const index = this.assetList.push({
                 account: '',
                 amount: 0,
+                isPositive: true,
             });
 
             this.$nextTick(() => {
-                this.$refs[`asset${index - 1}`][0].focus();
+                this.$refs[`deposit${index - 1}`][0].focus();
+            });
+        },
+        onAddDebt() {
+            console.log('onAddAsset');
+
+            const index = this.assetList.push({
+                account: '',
+                amount: 0,
+                isPositive: false,
+            });
+
+            this.$nextTick(() => {
+                this.$refs[`debt${index - 1}`][0].focus();
             });
         },
         onDelAsset(index, assetName) {
+            console.log(index);
             if (assetName) {
                 ElMessageBox.confirm(`將要刪除[${assetName}]?`, '刪除', {
                     confirmButtonText: '刪除',
@@ -480,7 +555,7 @@ export default {
                 })
                     .then(() => {
                         this.assetList.splice(index, 1);
-                        this.$store.commit('SAVE_ASSET', this.assetList);
+                        this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
                         ElMessage({
                             type: 'success',
                             message: '完成刪除!',
@@ -495,7 +570,7 @@ export default {
             } else {
                 // 沒有名稱，可能剛新增就想刪，就直接刪
                 this.assetList.splice(index, 1);
-                this.$store.commit('SAVE_ASSET', this.assetList);
+                this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
             }
         },
         onResetAsset() {
@@ -505,19 +580,42 @@ export default {
         },
         onChangeAccount(e, index) {
             console.log('onChangeAccount');
-            this.assetList[index].account = e.target.value;
-            this.$store.commit('SAVE_ASSET', this.assetList);
+            console.log(index);
+            console.log(e);
+            // console.log(e.target.value);
+            this.assetList[index].account = e;
+            this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
         },
         onChangeAmount(e, index) {
             console.log('onChangeAmount');
-            this.assetList[index].amount = e.target.value ? parseInt(e.target.value, 10) : 0;
-            this.$store.commit('SAVE_ASSET', this.assetList);
+            console.log(index);
+            this.assetList[index].amount = e ? parseInt(e, 10) : 0;
+            this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
         },
+        // onChangeDepositAmount(e, index) {
+        //     console.log('onChangeAmount');
+        //     console.log(index);
+        //     // this.assetList[index].amount = e.target.value ? parseInt(e.target.value, 10) : 0;
+        //     // this.$store.commit('SAVE_ASSET', this.assetList);
+        // },
+        // onChangeDebtAmount(e, index) {
+        //     console.log('onChangeAmount');
+        //     console.log(e);
+        //     this.assetList[index].amount = e.target.value ? -parseInt(e.target.value, 10) : -1000;
+        //     this.$store.commit('SAVE_ASSET', this.assetList);
+        // },
         onClickSelectAll(index) {
             this.$refs[`amount${index}`][0].select();
         },
         currencyFormat(number) {
             return Number(number.toFixed(0)).toLocaleString('en-US');
+        },
+        chgAssetListBrief(assetList) {
+            return assetList.reduce((acc, { account, amount, isPositive }) => {
+                if (isPositive) acc.push({ account: account, amount: amount });
+                else acc.push({ account: account, amount: -amount });
+                return acc;
+            }, []);
         },
     },
 };
