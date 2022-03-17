@@ -1,13 +1,5 @@
 <template>
-    <el-drawer
-        :title="title"
-        @closed="onClosed()"
-        v-model="isShow"
-        :show-close="true"
-        direction="rtl"
-        size="85%"
-        id="drawer-policy"
-    >
+    <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="85%">
         <el-form ref="formPolicyBuyRef" :model="form.buy">
             <div style="font-size: 24px; margin: 0px 10px 10px">買進</div>
 
@@ -312,6 +304,6 @@ export default {
     margin-bottom: 0px
 .el-select .el-input--small .el-input__inner
     padding: 0 17px 0 4px
-#drawer-policy .el-input-group__prepend
+.el-input-group__prepend
     padding: 0 2px !important
 </style>
