@@ -643,6 +643,11 @@ const stock = {
                     ]);
                 });
                 // console.log(foundStock.data.daily);
+                // 怕一次重啟2個API呼叫(如2個分頁都在執行)，values 的 array 要去掉現有<=最後日期
+                const currStockLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
+                _.remove(values, function(array) {
+                    return moment(array[0]).isSameOrBefore(currStockLastDate);
+                    });
                 foundStock.data.daily.push(...values);
                 // console.log(foundStock.data.daily);
                 // console.log(values);
@@ -655,7 +660,7 @@ const stock = {
                 foundStock.last_price = v1;
 
                 const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
-                const currStockLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
+                currStockLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
                 foundStock.last_price_date = `${currStockLastDate.format('M/DD')}(${dayOfWeek[currStockLastDate.day()]})`;
 
                 foundStock.last_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
