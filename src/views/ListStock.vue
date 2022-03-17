@@ -520,8 +520,12 @@ export default {
     },
     mounted() {
         // 在 mounted() 事件時就可以發送，因為此時不須 data 及 computed 資料都準備好(因為沒有要data 參數，在create())
-
-        this.$store.dispatch('GET_STOCK_PRICE');
+        
+        setTimeout(() => {
+            // 加這個確定是2秒後才會去 dispatch
+            this.$store.dispatch('GET_STOCK_PRICE');
+        }, 3000);
+        
         // 欄位設成fixed然後table又設成header在最上方，會造成欄位自行多加 Is-hidden而使得看不到欄位名稱
         // this.$nextTick(() => {
         //     const elems = document.querySelectorAll('.is-hidden');
