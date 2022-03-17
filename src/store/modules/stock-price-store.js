@@ -644,10 +644,14 @@ const stock = {
                 });
                 // console.log(foundStock.data.daily);
                 // 怕一次重啟2個API呼叫(如2個分頁都在執行)，values 的 array 要去掉現有<=最後日期
-                let currStockLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
-                _.remove(values, function(array) {
-                    return moment(array[0]).isSameOrBefore(currStockLastDate);
+                let currStockLastDate = null;
+                if (foundStock.data.daily.length > 0) {
+                    //一開始可能都無資料
+                    moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
+                    _.remove(values, function (array) {
+                        return moment(array[0]).isSameOrBefore(currStockLastDate);
                     });
+                }
                 foundStock.data.daily.push(...values);
                 // console.log(foundStock.data.daily);
                 // console.log(values);
