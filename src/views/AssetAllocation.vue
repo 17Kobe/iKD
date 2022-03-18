@@ -308,8 +308,8 @@ export default {
         assets() {
             return (
                 this.stockDeposit +
-                this.assetList.reduce((acc, { amount }) => {
-                    if (amount >= 0) return acc + amount;
+                this.assetList.reduce((acc, { amount, isPositive }) => {
+                    if (isPositive) return acc + amount;
                     return acc;
                 }, 0)
             );
