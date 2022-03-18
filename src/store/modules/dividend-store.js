@@ -102,14 +102,17 @@ const dividend = {
                 });
                 // 計算去年，>現在日期以後，可能會發的股利
                 const lastYearStartDate = thisYearLastCashDividendPaymentDate || today;
-                const thisDayLastYearAddOneMonth = lastYearStartDate.subtract(1, 'years').add(30, 'days');
+                const thisDayLastYearAddOneMonth = lastYearStartDate.clone().subtract(1, 'years').add(30, 'days'); // 在此若沒加clone 會改變today值
                 const theLastDayOfLastYear = moment().subtract(1, 'years').endOf('year').startOf('day'); // 去年的最後一天
 
+                // 曾經出現預估報酬率，去年的2021出現2筆tradingDate相同，PaymentDate也相同，但 date是未來2027日期的(現在是2022)
                 const filterNotSureDividend = _.filter(
                     data.data,
-                    (o) =>
-                        moment(o.CashDividendPaymentDate).isSameOrAfter(thisDayLastYearAddOneMonth) &&
-                        moment(o.CashExDividendTradingDate).isSameOrBefore(theLastDayOfLastYear) // 像台積電會少算12月配息日，因為拿到錢是1月份
+                    (o) => {
+                        return moment(o.CashDividendPaymentDate).isSameOrAfter(thisDayLastYearAddOneMonth) &&
+                        moment(o.CashExDividendTradingDate).isSameOrBefore(theLastDayOfLastYear) && // 像台積電會少算12月配息日，因為拿到錢是1月份
+                        moment(o.date).isBefore(today); // date 不能是未來日期
+                    }
                 );
                 filterNotSureDividend.forEach((dividendObj) => {
                     state.dividendList.push({
