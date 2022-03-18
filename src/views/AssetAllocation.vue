@@ -10,7 +10,7 @@
                 <el-card shadow="hover" style="height: 201px">
                     <br />
                     <el-tag class="ml-2" size="large" style="margin: 1px 0px"
-                        >資產
+                        >存款
                         <span style="font-size: 20px"> $ </span>
                         <span style="font-size: 24px; font-weight: bold">
                             <number
@@ -77,7 +77,7 @@
                         size="small"
                         placeholder=""
                         v-model="item.amount"
-                        @change="onChangeAmount($event, index)"
+                        @keyup="onChangeAmount($event, index)"
                         :options="{
                             locale: 'en-US',
                             currency: 'USD',
@@ -128,7 +128,7 @@
                         size="small"
                         placeholder=""
                         v-model="item.amount"
-                        @change="onChangeAmount($event, index)"
+                        @keyup="onChangeAmount($event, index)"
                         :options="{
                             locale: 'en-US',
                             currency: 'USD',
@@ -163,7 +163,7 @@
 
         <br />
         <div style="font-size: 14px; color: #999; margin: 20px">
-            <div>【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、 定存)時，將會統計至「資產配置表」</div>
+            <div>【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、 定存)時，將會統計至「存款配置表」</div>
             <div>【$】請輸入帳戶目前金額。</div>
         </div>
         <br /><br />
@@ -209,7 +209,7 @@ export default {
                     },
                     title: {
                         display: true,
-                        text: '資產負債表',
+                        text: '存款負債表',
                         // align: 'start',
                         padding: {
                             top: 5,
@@ -251,7 +251,7 @@ export default {
                 plugins: {
                     title: {
                         display: true,
-                        text: '資產配置表',
+                        text: '存款配置表',
                         // align: 'start',
                         padding: {
                             top: 5,
@@ -308,15 +308,15 @@ export default {
         assets() {
             return (
                 this.stockDeposit +
-                this.assetList.reduce((acc, { amount }) => {
-                    if (amount >= 0) return acc + amount;
+                this.assetList.reduce((acc, { amount, isPositive }) => {
+                    if (isPositive) return acc + amount;
                     return acc;
                 }, 0)
             );
         },
         liabilities() {
-            return this.assetList.reduce((acc, { amount }) => {
-                if (amount < 0) return acc + Math.abs(amount);
+            return this.assetList.reduce((acc, { amount, isPositive }) => {
+                if (!isPositive) return acc + Math.abs(amount);
                 return acc;
             }, 0);
         },
@@ -343,8 +343,8 @@ export default {
         },
         otherDeposit() {
             // 定存 sum
-            return this.assetList.reduce((acc, { account, amount }) => {
-                if (!account.includes('定存') && !account.includes('活存') && amount >= 0) return acc + Math.abs(amount);
+            return this.assetList.reduce((acc, { account, amount, isPositive }) => {
+                if (!account.includes('定存') && !account.includes('活存') && isPositive) return acc + Math.abs(amount);
                 return acc;
             }, 0);
         },
@@ -371,7 +371,7 @@ export default {
         },
         barData() {
             return {
-                labels: ['資產', '負債'],
+                labels: ['存款', '負債'],
                 datasets: [
                     {
                         data: [this.assets, this.liabilities],
@@ -589,7 +589,8 @@ export default {
         onChangeAmount(e, index) {
             console.log('onChangeAmount');
             console.log(index);
-            this.assetList[index].amount = e ? parseInt(e, 10) : 0;
+            console.log(e.target.value);
+            this.assetList[index].amount = e.target.value ? parseInt(e.target.value, 10) : 0;
             this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
         },
         // onChangeDepositAmount(e, index) {
