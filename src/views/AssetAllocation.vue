@@ -28,17 +28,17 @@
                     </el-tag> -->
                     <br />
                     <br />
-                    <el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                    &nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                         >活存總額
                         <span style="font-size: 15px; font-weight: bold">$ {{ demandDeposit.toLocaleString('en-US') }}</span
                         ><span style="font-size: 10px"> 元</span>
                     </el-tag>
-                    <el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                    <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                         >定存總額
                         <span style="font-size: 15px; font-weight: bold">$ {{ fixedDeposit.toLocaleString('en-US') }}</span
                         ><span style="font-size: 10px"> 元</span>
                     </el-tag>
-                    <el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                    <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                         >股票總額
                         <span style="font-size: 15px; font-weight: bold">$ {{ stockDeposit.toLocaleString('en-US') }}</span
                         ><span style="font-size: 10px"> 元</span>
