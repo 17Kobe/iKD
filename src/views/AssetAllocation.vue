@@ -77,7 +77,7 @@
                         size="small"
                         placeholder=""
                         v-model="item.amount"
-                        @change="onChangeAmount($event, index)"
+                        @keyup="onChangeAmount($event, index)"
                         :options="{
                             locale: 'en-US',
                             currency: 'USD',
@@ -128,7 +128,7 @@
                         size="small"
                         placeholder=""
                         v-model="item.amount"
-                        @change="onChangeAmount($event, index)"
+                        @keyup="onChangeAmount($event, index)"
                         :options="{
                             locale: 'en-US',
                             currency: 'USD',
@@ -589,7 +589,8 @@ export default {
         onChangeAmount(e, index) {
             console.log('onChangeAmount');
             console.log(index);
-            this.assetList[index].amount = e ? parseInt(e, 10) : 0;
+            console.log(e.target.value);
+            this.assetList[index].amount = e.target.value ? parseInt(e.target.value, 10) : 0;
             this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
         },
         // onChangeDepositAmount(e, index) {
