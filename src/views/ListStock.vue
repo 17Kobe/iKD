@@ -444,9 +444,10 @@ export default {
     components: { ChartWeekKd, ChartWeekK, FormCost, FormPolicy, FormSearch, FormExport },
     data() {
         return {
-            rateOfReturn: 0,
-            historyData: [],
+            // rateOfReturn: 0,
+            // historyData: [],
             // renderStockCount: 0,
+            queueStockDataList: [],
         };
     },
     computed: {
@@ -478,7 +479,7 @@ export default {
         //     this.renderStockCount += 1;
         // }, 400);
         // 取得 localstorage 自選股，最先開始是 null 時，會給予預設值空矩陣
-        const localStockList = JSON.parse(localStorage.getItem('stockList')) || [];
+        let localStockList = JSON.parse(localStorage.getItem('stockList')) || [];
         // console.log(localStockList);
 
         // 將 stockList 預設的塞進到 localstorage
@@ -496,23 +497,15 @@ export default {
             // console.log(this.stockList);
 
             // 將 localstorage 重塞回到 vuex 的 stockList
-            // } else {
-            //     // 若已有資料時則先去除 data資料，用 setInterval來載入資料比較好
-            //     localStockList = localStockList.reduce((acc, obj) => {
-            //         if (obj.data) {
-            //             // console.log(obj);
-            //             // const removeDateObj = ;
-            //             // console.log(removeDateObj);
-            //             // const objDataDaily = _.pick(obj.data, ['daily']);
-            //             obj.data = { daily: obj.data.daily };
-            //             // -_.omit(obj, ['data']);
-            //             // acc.push(_.omit(obj, ['data']));
-            //             acc.push(obj);
-            //         }
-            //         return acc;
-            //     }, []);
-            //     // console.log(tmpLocalStockList);
-            //     // localStockList = tmpLocalStockList;
+        } else {
+            // 若已有資料時則先去除 data, policy(因為policy也會畫KD圖訊號)資料，用 setInterval來載入資料比較好
+            localStockList = localStockList.reduce((acc, obj) => {
+                acc.push(_.omit(obj, ['data', 'policy']));
+                if (obj.data) this.queueStockDataList.push(_.pick(obj, ['id', 'data', 'policy']));
+                return acc;
+            }, []);
+            // console.log(tmpLocalStockList);
+            // localStockList = tmpLocalStockList;
         }
         // localStockList 有可能是本地資料，或是預設資料。然後再呼叫載入 this.stockList
         // console.log(localStockList);
@@ -520,16 +513,40 @@ export default {
     },
     mounted() {
         // 在 mounted() 事件時就可以發送，因為此時不須 data 及 computed 資料都準備好(因為沒有要data 參數，在create())
-        
-        setTimeout(() => {
-            // 加這個確定是2秒後才會去 dispatch
-            this.$store.dispatch('GET_STOCK_PRICE');
-        }, 3000);
-        
+
+        // 看起來此timer會 commit裡面一個一個都跑完，才進行下一個，所以不用擔心 dispatch是還沒commit
+        var timerIdOfSetStockData = setInterval(() => {
+            // 判斷0在前面做可以下個100後，或是安全判斷會有
+            if (this.queueStockDataList.length === 0) {
+                // console.log('GET_STOCK_PRICE');
+                this.$store.dispatch('GET_STOCK_PRICE');
+                clearInterval(timerIdOfSetStockData);
+                // console.log('commit real over');
+            }
+            // console.log('timerIdOfSetStockData');
+            const stockDataAndPolicy = this.queueStockDataList.shift();
+            // console.log('commit begin');
+            // console.log(stockDataAndPolicy);
+            if (stockDataAndPolicy)
+                // 最後1個沒有資料時 stockDataAndPolicy = undefined
+                this.$store.commit('SAVE_STOCK_DATA_AND_POLICY', {
+                    stockId: stockDataAndPolicy.id,
+                    data: stockDataAndPolicy.data,
+                    policy: stockDataAndPolicy.policy,
+                });
+            // console.log('commit over');
+
+            // console.log(this.queueStockDataList.length);
+
+            // console.log('commit 1 over');
+        }, 10);
+        // setTimeout(() => {
+        //     // 加這個確定是2秒後才會去 dispatch
+        //     this.$store.dispatch('GET_STOCK_PRICE');
+        // }, 3000);
         // 欄位設成fixed然後table又設成header在最上方，會造成欄位自行多加 Is-hidden而使得看不到欄位名稱
         // this.$nextTick(() => {
         //     const elems = document.querySelectorAll('.is-hidden');
-
         //     [].forEach.call(elems, (el) => {
         //         el.classList.remove('is-hidden');
         //     });

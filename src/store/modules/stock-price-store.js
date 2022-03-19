@@ -36,356 +36,356 @@ const defaultState = {
                 },
             },
         },
-        // {
-        //     name: '台積電',
-        //     id: '2330',
-        //     star: 3,
-        //     policy: {
-        //         settings: {
-        //             buy: [
-        //                 {
-        //                     method: 'kd_gold',
-        //                     label: '週 KD 黃金交叉',
-        //                     limit: '50',
-        //                     limit_desc: '以下',
-        //                 },
-        //                 {
-        //                     method: 'kd_turn_up',
-        //                     label: '週 KD 往上轉折',
-        //                     limit: '30',
-        //                     limit_desc: '以下',
-        //                 },
-        //             ],
-        //             sell: [
-        //                 {
-        //                     method: 'kd_dead',
-        //                     label: '週 KD 死亡交叉',
-        //                     limit: '85',
-        //                     limit_desc: '以上',
-        //                 },
-        //             ],
-        //         },
-        //     },
-        // },
-        // {
-        //     name: '統一FANG+',
-        //     id: '00757',
-        //     star: 3,
-        //     policy: {
-        //         settings: {
-        //             buy: [
-        //                 {
-        //                     method: 'kd_gold',
-        //                     label: '週 KD 黃金交叉',
-        //                     limit: '50',
-        //                     limit_desc: '以下',
-        //                 },
-        //                 {
-        //                     method: 'kd_turn_up',
-        //                     label: '週 KD 往上轉折',
-        //                     limit: '40',
-        //                     limit_desc: '以下',
-        //                 },
-        //             ],
-        //             sell: [
-        //                 {
-        //                     method: 'kd_dead',
-        //                     label: '週 KD 死亡交叉',
-        //                     limit: '70',
-        //                     limit_desc: '以上',
-        //                 },
-        //             ],
-        //         },
-        //     },
-        // },
-        // {
-        //     name: '台達電',
-        //     id: '2308',
-        //     star: 2,
-        //     policy: {
-        //         settings: {
-        //             buy: [
-        //                 {
-        //                     method: 'kd_gold',
-        //                     label: '週 KD 黃金交叉',
-        //                     limit: '25',
-        //                     limit_desc: '以下',
-        //                 },
-        //             ],
-        //             sell: [
-        //                 {
-        //                     method: 'kd_dead',
-        //                     label: '週 KD 死亡交叉',
-        //                     limit: '80',
-        //                     limit_desc: '以上',
-        //                 },
-        //                 {
-        //                     method: 'earn',
-        //                     label: '搭配 絕對正報酬',
-        //                     limit: 0,
-        //                     limit_desc: '% 以上',
-        //                 },
-        //             ],
-        //         },
-        //     },
-        // },
-        // {
-        //     name: '聯發科',
-        //     id: '2454',
-        //     star: 2,
-        //     policy: {
-        //         settings: {
-        //             buy: [
-        //                 {
-        //                     method: 'kd_gold',
-        //                     label: '週 KD 黃金交叉',
-        //                     limit: '50',
-        //                     limit_desc: '以下',
-        //                 },
-        //                 {
-        //                     method: 'kd_turn_up',
-        //                     label: '週 KD 往上轉折',
-        //                     limit: '27',
-        //                     limit_desc: '以下',
-        //                 },
-        //             ],
-        //             sell: [
-        //                 {
-        //                     method: 'kd_dead',
-        //                     label: '週 KD 死亡交叉',
-        //                     limit: '60',
-        //                     limit_desc: '以上',
-        //                 },
-        //                 {
-        //                     method: 'earn',
-        //                     label: '搭配 絕對正報酬',
-        //                     limit: 0,
-        //                     limit_desc: '% 以上',
-        //                 },
-        //             ],
-        //         },
-        //     },
-        // },
-        // {
-        //     name: '大立光',
-        //     id: '3008',
-        //     star: 2,
-        //     policy: {
-        //         settings: {
-        //             buy: [
-        //                 {
-        //                     method: 'kd_gold',
-        //                     label: '週 KD 黃金交叉',
-        //                     limit: '30',
-        //                     limit_desc: '以下',
-        //                 },
-        //             ],
-        //             sell: [
-        //                 {
-        //                     method: 'kd_dead',
-        //                     label: '週 KD 死亡交叉',
-        //                     limit: '60',
-        //                     limit_desc: '以上',
-        //                 },
-        //                 {
-        //                     method: 'earn',
-        //                     label: '搭配 絕對正報酬',
-        //                     limit: 0,
-        //                     limit_desc: '% 以上',
-        //                 },
-        //             ],
-        //         },
-        //     },
-        // },
-        // {
-        //     name: '富邦越南',
-        //     id: '00885',
-        //     star: 2,
-        //     policy: {
-        //         settings: {
-        //             buy: [
-        //                 {
-        //                     method: 'kd_gold',
-        //                     label: '週 KD 黃金交叉',
-        //                     limit: '40',
-        //                     limit_desc: '以下',
-        //                 },
-        //             ],
-        //             sell: [
-        //                 {
-        //                     method: 'kd_dead',
-        //                     label: '週 KD 死亡交叉',
-        //                     limit: '70',
-        //                     limit_desc: '以上',
-        //                 },
-        //             ],
-        //         },
-        //     },
-        // },
-        // {
-        //     name: '富邦金',
-        //     id: '2881',
-        //     star: 2,
-        //     policy: {
-        //         settings: {
-        //             buy: [
-        //                 {
-        //                     method: 'kd_gold',
-        //                     label: '週 KD 黃金交叉',
-        //                     limit: '20',
-        //                     limit_desc: '以下',
-        //                 },
-        //             ],
-        //             sell: [
-        //                 {
-        //                     method: 'kd_dead',
-        //                     label: '週 KD 死亡交叉',
-        //                     limit: '80',
-        //                     limit_desc: '以上',
-        //                 },
-        //             ],
-        //         },
-        //     },
-        // },
-        // {
-        //     name: '元大金',
-        //     id: '2885',
-        //     star: 1,
-        //     policy: {
-        //         settings: {
-        //             buy: [
-        //                 {
-        //                     method: 'kd_gold',
-        //                     label: '週 KD 黃金交叉',
-        //                     limit: '50',
-        //                     limit_desc: '以下',
-        //                 },
-        //             ],
-        //             sell: [
-        //                 {
-        //                     method: 'kd_dead',
-        //                     label: '週 KD 死亡交叉',
-        //                     limit: '70',
-        //                     limit_desc: '以上',
-        //                 },
-        //                 {
-        //                     method: 'earn',
-        //                     label: '搭配 絕對正報酬',
-        //                     limit: 0,
-        //                     limit_desc: '% 以上',
-        //                 },
-        //             ],
-        //         },
-        //     },
-        // },
-        // {
-        //     name: '玉山金',
-        //     id: '2884',
-        //     star: 1,
-        //     policy: {
-        //         settings: {
-        //             buy: [
-        //                 {
-        //                     method: 'kd_gold',
-        //                     label: '週 KD 黃金交叉',
-        //                     limit: '50',
-        //                     limit_desc: '以下',
-        //                 },
-        //             ],
-        //             sell: [
-        //                 {
-        //                     method: 'kd_dead',
-        //                     label: '週 KD 死亡交叉',
-        //                     limit: '70',
-        //                     limit_desc: '以上',
-        //                 },
-        //             ],
-        //         },
-        //     },
-        // },
-        // {
-        //     name: '卜蜂',
-        //     id: '1215',
-        //     star: 1,
-        //     policy: {
-        //         settings: {
-        //             buy: [
-        //                 {
-        //                     method: 'kd_gold',
-        //                     label: '週 KD 黃金交叉',
-        //                     limit: '40',
-        //                     limit_desc: '以下',
-        //                 },
-        //             ],
-        //             sell: [
-        //                 {
-        //                     method: 'kd_dead',
-        //                     label: '週 KD 死亡交叉',
-        //                     limit: '70',
-        //                     limit_desc: '以上',
-        //                 },
-        //                 {
-        //                     method: 'earn',
-        //                     label: '搭配 絕對正報酬',
-        //                     limit: 0,
-        //                     limit_desc: '% 以上',
-        //                 },
-        //             ],
-        //         },
-        //     },
-        // },
-        // {
-        //     name: '期元大S&P黃金',
-        //     id: '00635U',
-        //     policy: {
-        //         settings: {
-        //             buy: [
-        //                 {
-        //                     method: 'kd_gold',
-        //                     label: '週 KD 黃金交叉',
-        //                     limit: '30',
-        //                     limit_desc: '以下',
-        //                 },
-        //             ],
-        //             sell: [
-        //                 {
-        //                     method: 'kd_dead',
-        //                     label: '週 KD 死亡交叉',
-        //                     limit: '80',
-        //                     limit_desc: '以上',
-        //                 },
-        //             ],
-        //         },
-        //     },
-        // },
-        // {
-        //     name: '統一',
-        //     id: '1216',
-        //     policy: {
-        //         settings: {
-        //             buy: [
-        //                 {
-        //                     method: 'kd_gold',
-        //                     label: '週 KD 黃金交叉',
-        //                     limit: '40',
-        //                     limit_desc: '以下',
-        //                 },
-        //             ],
-        //             sell: [
-        //                 {
-        //                     method: 'kd_dead',
-        //                     label: '週 KD 死亡交叉',
-        //                     limit: '80',
-        //                     limit_desc: '以上',
-        //                 },
-        //             ],
-        //         },
-        //     },
-        // },
-        // {
-        //     name: '中華電',
-        //     id: '2412',
-        // },
+        {
+            name: '台積電',
+            id: '2330',
+            star: 3,
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '50',
+                            limit_desc: '以下',
+                        },
+                        {
+                            method: 'kd_turn_up',
+                            label: '週 KD 往上轉折',
+                            limit: '30',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '85',
+                            limit_desc: '以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '統一FANG+',
+            id: '00757',
+            star: 3,
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '50',
+                            limit_desc: '以下',
+                        },
+                        {
+                            method: 'kd_turn_up',
+                            label: '週 KD 往上轉折',
+                            limit: '40',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '70',
+                            limit_desc: '以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '台達電',
+            id: '2308',
+            star: 2,
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '25',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '80',
+                            limit_desc: '以上',
+                        },
+                        {
+                            method: 'earn',
+                            label: '搭配 絕對正報酬',
+                            limit: 0,
+                            limit_desc: '% 以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '聯發科',
+            id: '2454',
+            star: 2,
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '50',
+                            limit_desc: '以下',
+                        },
+                        {
+                            method: 'kd_turn_up',
+                            label: '週 KD 往上轉折',
+                            limit: '27',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '60',
+                            limit_desc: '以上',
+                        },
+                        {
+                            method: 'earn',
+                            label: '搭配 絕對正報酬',
+                            limit: 0,
+                            limit_desc: '% 以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '大立光',
+            id: '3008',
+            star: 2,
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '30',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '60',
+                            limit_desc: '以上',
+                        },
+                        {
+                            method: 'earn',
+                            label: '搭配 絕對正報酬',
+                            limit: 0,
+                            limit_desc: '% 以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '富邦越南',
+            id: '00885',
+            star: 2,
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '40',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '70',
+                            limit_desc: '以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '富邦金',
+            id: '2881',
+            star: 2,
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '20',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '80',
+                            limit_desc: '以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '元大金',
+            id: '2885',
+            star: 1,
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '50',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '70',
+                            limit_desc: '以上',
+                        },
+                        {
+                            method: 'earn',
+                            label: '搭配 絕對正報酬',
+                            limit: 0,
+                            limit_desc: '% 以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '玉山金',
+            id: '2884',
+            star: 1,
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '50',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '70',
+                            limit_desc: '以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '卜蜂',
+            id: '1215',
+            star: 1,
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '40',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '70',
+                            limit_desc: '以上',
+                        },
+                        {
+                            method: 'earn',
+                            label: '搭配 絕對正報酬',
+                            limit: 0,
+                            limit_desc: '% 以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '期元大S&P黃金',
+            id: '00635U',
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '30',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '80',
+                            limit_desc: '以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '統一',
+            id: '1216',
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '40',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '80',
+                            limit_desc: '以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '中華電',
+            id: '2412',
+        },
     ],
 };
 
@@ -473,6 +473,18 @@ const stock = {
             console.log(data);
             console.log(typeof data);
             state.stockList = data;
+            // console.log(state.currStockDayData);
+        },
+        SAVE_STOCK_DATA_AND_POLICY(state, { stockId, data, policy }) {
+            // console.log(stockId);
+            // console.log(data);
+            // console.log(policy);
+            // console.log('SAVE_STOCK_LIST');
+            // console.log(data);
+            // console.log(typeof data);
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            if (data) foundStock.data = data; // if是判斷有可能 undefined
+            if (policy) foundStock.policy = policy; // if是判斷有可能 undefined
             // console.log(state.currStockDayData);
         },
         SAVE_STOCK_LIST_WITH_DIVIDEND_LAST_DATE(state, { stockId, lastDate }) {
