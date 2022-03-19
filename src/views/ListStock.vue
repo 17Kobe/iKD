@@ -58,7 +58,7 @@
                                 <span style="font-size: 13px">
                                     {{ scope.row.last_price_spread !== null ? scope.row.last_price_spread + '%' : '' }}
                                 </span>
-                                <div style="color: #cccccc; font-size: 14px">{{ scope.row.last_price_date }}</div>
+                                <div style="color: #cccccc; font-size: 14px">{{ fmtDate(scope.row.last_price_date) }}</div>
                             </span>
                         </span>
                     </div>
@@ -430,6 +430,7 @@
 
 <script>
 import _ from 'lodash';
+import moment from 'moment';
 import ChartWeekKd from '@/components/ChartWeekKd.vue';
 import ChartWeekK from '@/components/ChartWeekK.vue';
 import FormCost from '@/components/FormCost.vue';
@@ -549,6 +550,12 @@ export default {
         // });
     },
     methods: {
+        fmtDate(timestamp) {
+            // (${dayOfWeek[currStockLastDate.day()]})`;
+            const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+            const dt = moment(timestamp);
+            return dt.format('M/DD') + '(' + dayOfWeek[dt.day()] + ')';
+        },
         getDifference(array1, array2) {
             return array1.filter((object1) => !array2.some((object2) => object1.id === object2.id));
         },

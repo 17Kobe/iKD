@@ -460,8 +460,11 @@ const stock = {
                         // 失敗
                         .catch((err) => {
                             console.log('GET_STOCK_PRICE error');
+                            context.commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                             console.log(err);
                         });
+                } else {
+                    context.commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                 }
             });
         },
@@ -599,6 +602,7 @@ const stock = {
                 (!_.has(policyList, 'sell') || (_.has(policyList, 'sell') && policyList.sell.length === 0))
             ) {
                 if (_.has(foundStock, 'policy')) delete foundStock.policy;
+                delete foundStock.calc_policy_date;
             } else {
                 foundStock.policy = { settings: { buy: [], sell: [] } };
                 foundStock.policy.settings = policyList; // 複製數據複本
@@ -673,7 +677,7 @@ const stock = {
 
                 const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
                 currStockLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
-                foundStock.last_price_date = `${currStockLastDate.format('M/DD')}(${dayOfWeek[currStockLastDate.day()]})`;
+                foundStock.last_price_date = `${currStockLastDate.format('YYYY-MM-DD')}`;
 
                 foundStock.last_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
 
@@ -766,9 +770,10 @@ const stock = {
                 localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
                 if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId); // 有新值就要更新成本的報酬率
                 this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線
-                this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
                 console.log('SAVE_STOCK_PRICE OK');
             }
+            this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
+            // 有可能有policy設定，有/無淨值，上回沒算完就關了，需要於 SAVE_STOCK_POLICY_RESULT 內部去確認有無算完
         },
         SAVE_STOCK_MA(state, stockId) {
             console.log('SAVE_STOCK_MA');
@@ -838,7 +843,10 @@ const stock = {
             // 黃金交叉、死亡交叉
             const policyResult = [];
 
-            if (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell')) {
+            if (
+                (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell')) &&
+                foundStock.calc_policy_date !== foundStock.last_price_date // 日期判斷是有可能上回有淨值(此回沒有)，上回卻沒有計算完policy
+            ) {
                 console.log('SAVE_STOCK_POLICY_RESULT foundStock');
                 let foundKdGold = false;
                 let foundKdTurnUp = false;
@@ -1273,6 +1281,8 @@ const stock = {
                     }
                 }
             }
+            foundStock.calc_policy_date = foundStock.last_price_date; // 設成一樣，之後判斷有無相同來知道是否當天真的計算完成
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
             console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE OK');
         },
     },
