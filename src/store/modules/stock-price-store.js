@@ -475,16 +475,12 @@ const stock = {
             state.stockList = data;
             // console.log(state.currStockDayData);
         },
-        SAVE_STOCK_DATA_AND_POLICY(state, { stockId, data, policy }) {
-            // console.log(stockId);
-            // console.log(data);
-            // console.log(policy);
-            // console.log('SAVE_STOCK_LIST');
-            // console.log(data);
-            // console.log(typeof data);
-            const foundStock = state.stockList.find((v) => v.id === stockId);
-            if (data) foundStock.data = data; // if是判斷有可能 undefined
-            if (policy) foundStock.policy = policy; // if是判斷有可能 undefined
+        SAVE_STOCK_DATA_AND_POLICY(state, dataList) {
+            dataList.forEach((obj) => {
+                const foundStock = state.stockList.find((v) => v.id === obj.id);
+                if (obj.data) foundStock.data = obj.data; // if是判斷有可能 undefined
+                if (obj.policy) foundStock.policy = obj.policy; // if是判斷有可能 undefined
+            });
             // console.log(state.currStockDayData);
         },
         SAVE_STOCK_LIST_WITH_DIVIDEND_LAST_DATE(state, { stockId, lastDate }) {

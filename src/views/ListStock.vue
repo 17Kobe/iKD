@@ -524,16 +524,12 @@ export default {
                 // console.log('commit real over');
             }
             // console.log('timerIdOfSetStockData');
-            const stockDataAndPolicy = this.queueStockDataList.shift();
+            const stockDataAndPolicy = this.queueStockDataList.splice(0, 6); // 一次取6個
             // console.log('commit begin');
             // console.log(stockDataAndPolicy);
-            if (stockDataAndPolicy)
+            if (stockDataAndPolicy && !_.isEmpty(stockDataAndPolicy))
                 // 最後1個沒有資料時 stockDataAndPolicy = undefined
-                this.$store.commit('SAVE_STOCK_DATA_AND_POLICY', {
-                    stockId: stockDataAndPolicy.id,
-                    data: stockDataAndPolicy.data,
-                    policy: stockDataAndPolicy.policy,
-                });
+                this.$store.commit('SAVE_STOCK_DATA_AND_POLICY', stockDataAndPolicy);
             // console.log('commit over');
 
             // console.log(this.queueStockDataList.length);
