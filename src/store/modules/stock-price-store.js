@@ -647,7 +647,7 @@ const stock = {
                 let currStockLastDate = null;
                 if (foundStock.data.daily.length > 0) {
                     //一開始可能都無資料
-                    moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
+                    currStockLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
                     _.remove(values, function (array) {
                         return moment(array[0]).isSameOrBefore(currStockLastDate);
                     });
