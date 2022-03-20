@@ -67,8 +67,10 @@ export default {
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 需要小於365天，1年
+            // 因為卜蜂曾經stockDataOfPolicyResultBuy只有一筆買訊在365天內而會出錯，所以加上this.stockData.data 來跟有資料一起才顯示
             return (
-                (this.stockData.policy &&
+                (this.stockData.data &&
+                    this.stockData.policy &&
                     this.stockData.policy.result &&
                     _.filter(
                         this.stockData.policy.result,
@@ -83,7 +85,8 @@ export default {
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 需要小於365天，1年
             return (
-                (this.stockData.policy &&
+                (this.stockData.data &&
+                    this.stockData.policy &&
                     this.stockData.policy.result &&
                     _.filter(
                         this.stockData.policy.result,
@@ -98,7 +101,8 @@ export default {
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 需要小於365天，1年
             return (
-                (this.stockData.policy &&
+                (this.stockData.data &&
+                    this.stockData.policy &&
                     this.stockData.policy.result &&
                     _.filter(
                         this.stockData.policy.result,

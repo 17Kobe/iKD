@@ -501,8 +501,8 @@ export default {
         } else {
             // 若已有資料時則先去除 data, policy(因為policy也會畫KD圖訊號)資料，用 setInterval來載入資料比較好
             localStockList = localStockList.reduce((acc, obj) => {
-                acc.push(_.omit(obj, ['data', 'policy']));
-                if (obj.data) this.queueStockDataList.push(_.pick(obj, ['id', 'data', 'policy']));
+                acc.push(_.omit(obj, ['data']));
+                if (obj.data) this.queueStockDataList.push(_.pick(obj, ['id', 'data']));
                 return acc;
             }, []);
             // console.log(tmpLocalStockList);

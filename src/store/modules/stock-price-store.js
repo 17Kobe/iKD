@@ -482,7 +482,7 @@ const stock = {
             dataList.forEach((obj) => {
                 const foundStock = state.stockList.find((v) => v.id === obj.id);
                 if (obj.data) foundStock.data = obj.data; // if是判斷有可能 undefined
-                if (obj.policy) foundStock.policy = obj.policy; // if是判斷有可能 undefined
+                // if (obj.policy) foundStock.policy = obj.policy; // if是判斷有可能 undefined
             });
             // console.log(state.currStockDayData);
         },
