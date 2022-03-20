@@ -11,6 +11,7 @@
                             :ref="`cost${index}`"
                             @keyup="onChangeCost($event, index)"
                             type="number"
+                            inputmode="numeric"
                             style="margin-left: 2px"
                             @focus="$event.target.select()"
                         >
@@ -22,6 +23,7 @@
                     <el-form-item label="股數">
                         <el-input-number
                             type="number"
+                            inputmode="numeric"
                             v-model="item.number"
                             :step="1000"
                             size="small"

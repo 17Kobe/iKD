@@ -845,7 +845,8 @@ const stock = {
 
             if (
                 (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell')) &&
-                foundStock.calc_policy_date !== foundStock.last_price_date // 日期判斷是有可能上回有淨值(此回沒有)，上回卻沒有計算完policy
+                (foundStock.calc_policy_date !== foundStock.last_price_date || !_.has(foundStock, 'policy.result')) // 日期判斷是有可能上回有淨值(此回沒有)，上回卻沒有計算完policy
+                //曾經發現有policy.settings，但都沒有算 policy.result
             ) {
                 console.log('SAVE_STOCK_POLICY_RESULT foundStock');
                 let foundKdGold = false;

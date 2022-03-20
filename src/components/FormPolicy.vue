@@ -20,6 +20,7 @@
                             placeholder="ex: 33.43"
                             :ref="`method_buy_${index}`"
                             type="number"
+                            inputmode="numeric"
                             @focus="$event.target.select()"
                         >
                             <template #suffix
@@ -66,6 +67,7 @@
                             placeholder="ex: 33.43"
                             :ref="`method_buy_${index}`"
                             type="number"
+                            inputmode="numeric"
                             @focus="$event.target.select()"
                         >
                             <template #suffix
