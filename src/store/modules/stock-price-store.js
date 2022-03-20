@@ -9,6 +9,14 @@ const defaultState = {
             name: '元大高股息',
             id: '0056',
             star: 3,
+            cost: {
+                settings: [{ cost: '33.9', number: 1000 }],
+                total: 1000,
+                avg: 33.9,
+                sum: 33900,
+                return: 0,
+                rate_of_return: 0,
+            },
             policy: {
                 settings: {
                     buy: [
@@ -99,37 +107,6 @@ const defaultState = {
             },
         },
         {
-            name: '台達電',
-            id: '2308',
-            star: 2,
-            policy: {
-                settings: {
-                    buy: [
-                        {
-                            method: 'kd_gold',
-                            label: '週 KD 黃金交叉',
-                            limit: '25',
-                            limit_desc: '以下',
-                        },
-                    ],
-                    sell: [
-                        {
-                            method: 'kd_dead',
-                            label: '週 KD 死亡交叉',
-                            limit: '80',
-                            limit_desc: '以上',
-                        },
-                        {
-                            method: 'earn',
-                            label: '搭配 絕對正報酬',
-                            limit: 0,
-                            limit_desc: '% 以上',
-                        },
-                    ],
-                },
-            },
-        },
-        {
             name: '聯發科',
             id: '2454',
             star: 2,
@@ -185,6 +162,37 @@ const defaultState = {
                             method: 'kd_dead',
                             label: '週 KD 死亡交叉',
                             limit: '60',
+                            limit_desc: '以上',
+                        },
+                        {
+                            method: 'earn',
+                            label: '搭配 絕對正報酬',
+                            limit: 0,
+                            limit_desc: '% 以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
+            name: '台達電',
+            id: '2308',
+            star: 2,
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '25',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '80',
                             limit_desc: '以上',
                         },
                         {
