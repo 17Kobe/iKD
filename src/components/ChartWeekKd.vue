@@ -240,6 +240,7 @@ export default {
                     shadow: false,
                     // borderWidth: 0,
                     borderColor: '#999999',
+                    followTouchMove: false,
                     split: false,
                     shared: true,
                     useHTML: true,

@@ -367,6 +367,30 @@ const defaultState = {
             },
         },
         {
+            name: '期元大S&P石油',
+            id: '00642U',
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '30',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '70',
+                            limit_desc: '以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
             name: '統一',
             id: '1216',
             policy: {
