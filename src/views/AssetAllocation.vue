@@ -196,9 +196,11 @@ export default {
                 scales: {
                     y: {
                         ticks: {
-                            // Include a dollar sign in the ticks
                             callback(value, index, ticks) {
-                                return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                if (value >= 10000)
+                                    return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                else
+                                    return `$ ${value}`;
                             },
                         },
                     },
@@ -426,7 +428,18 @@ export default {
             const { stockList } = this;
             return {
                 indexAxis: 'y',
-
+                scales: {
+                    x: {
+                        ticks: {
+                            callback(value, index, ticks) {
+                                if (value >= 10000)
+                                    return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                else
+                                    return `$ ${value}`;
+                            },
+                        },
+                    },
+                },
                 plugins: {
                     legend: {
                         display: false,
