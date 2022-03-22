@@ -8,8 +8,7 @@
             </el-col>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
                 <el-card shadow="hover" style="height: 201px">
-                    <br />
-                    <el-tag class="ml-2" size="large" style="margin: 1px 0px"
+                    <el-tag class="ml-2" size="large" style="margin: 13px 0 20px 0"
                         >存款
                         <span style="font-size: 20px"> $ </span>
                         <span style="font-size: 24px; font-weight: bold">
@@ -27,7 +26,6 @@
                         >股票損益 <span style="font-size: 20px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
                     </el-tag> -->
                     <br />
-                    <br />
                     &nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                         >活存總額
                         <span style="font-size: 15px; font-weight: bold">$ {{ demandDeposit.toLocaleString('en-US') }}</span
@@ -36,6 +34,11 @@
                     <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                         >定存總額
                         <span style="font-size: 15px; font-weight: bold">$ {{ fixedDeposit.toLocaleString('en-US') }}</span
+                        ><span style="font-size: 10px"> 元</span>
+                    </el-tag>
+                    <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                        >基金總額
+                        <span style="font-size: 15px; font-weight: bold">$ {{ fundDeposit.toLocaleString('en-US') }}</span
                         ><span style="font-size: 10px"> 元</span>
                     </el-tag>
                     <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
@@ -163,7 +166,7 @@
 
         <br />
         <div style="font-size: 14px; color: #999; margin: 20px">
-            <div>【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、 定存)時，將會統計至「存款配置表」</div>
+            <div>【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、 定存、基金)時，將會統計至「存款配置表」</div>
             <div>【$】請輸入帳戶目前金額。</div>
         </div>
         <br /><br />
@@ -196,9 +199,9 @@ export default {
                 scales: {
                     y: {
                         ticks: {
-                            // Include a dollar sign in the ticks
                             callback(value, index, ticks) {
-                                return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                else return `$ ${value}`;
                             },
                         },
                     },
@@ -268,7 +271,7 @@ export default {
                             dataArr.map((data) => {
                                 sum += data;
                             });
-                            const itemName = ['活存', '定存', '股票', '其它'];
+                            const itemName = ['活存', '定存', '股票', '基金', '其它'];
                             console.log(value);
                             if (value === 0) return '';
                             const percentage = `  ${itemName[ctx.dataIndex]}\n${((value * 100) / sum).toFixed(2)} %`;
@@ -341,10 +344,18 @@ export default {
                 return acc;
             }, 0);
         },
-        otherDeposit() {
+        fundDeposit() {
             // 定存 sum
+            return this.assetList.reduce((acc, { account, amount }) => {
+                if (account.includes('基金')) return acc + Math.abs(amount);
+                return acc;
+            }, 0);
+        },
+        otherDeposit() {
+            // 其它 sum
             return this.assetList.reduce((acc, { account, amount, isPositive }) => {
-                if (!account.includes('定存') && !account.includes('活存') && isPositive) return acc + Math.abs(amount);
+                if (!account.includes('定存') && !account.includes('活存') && !account.includes('基金') && isPositive)
+                    return acc + Math.abs(amount);
                 return acc;
             }, 0);
         },
@@ -426,7 +437,16 @@ export default {
             const { stockList } = this;
             return {
                 indexAxis: 'y',
-
+                scales: {
+                    x: {
+                        ticks: {
+                            callback(value, index, ticks) {
+                                if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                else return `$ ${value}`;
+                            },
+                        },
+                    },
+                },
                 plugins: {
                     legend: {
                         display: false,
@@ -486,12 +506,13 @@ export default {
                 labels: ['活存', '定存', '股票', '其它'],
                 datasets: [
                     {
-                        data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.otherDeposit],
+                        data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.fundDeposit, this.otherDeposit],
                         backgroundColor: [
                             // 背景色
                             'rgba(255, 159, 64, 0.5)',
                             'rgba(255, 205, 86, 0.5)',
                             'rgba(153, 102, 255, 0.5)',
+                            'rgba(204, 255, 144, 0.5)',
                             'rgba(75, 192, 192, 0.2)',
                         ],
                         // borderColor: ['rgb(66, 66, 66)'],
