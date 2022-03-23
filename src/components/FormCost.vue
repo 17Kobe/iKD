@@ -10,7 +10,8 @@
                             size="small"
                             :ref="`cost${index}`"
                             @keyup="onChangeCost($event, index)"
-                            inputmode="numeric"
+                            type="number"
+                            inputmode="decimal"
                             style="margin-left: 2px"
                             @focus="$event.target.select()"
                         >
