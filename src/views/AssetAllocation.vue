@@ -8,7 +8,8 @@
             </el-col>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
                 <el-card shadow="hover" style="height: 201px">
-                    <el-tag class="ml-2" size="large" style="margin: 13px 0 20px 0"
+                    <div style="font-size: 12px; text-align: center; font-weight:bold; margin-top: 2px">存款總計</div>
+                    <el-tag class="ml-2" size="large" style="margin: 5px 0 11px 0"
                         >存款
                         <span style="font-size: 20px"> $ </span>
                         <span style="font-size: 24px; font-weight: bold">
@@ -28,28 +29,28 @@
                     <br />
                     <span v-if="demandDeposit > 0">
                     &nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
-                        >活存，共
+                        >活存
                         <span style="font-size: 15px; font-weight: bold">$ {{ demandDeposit.toLocaleString('en-US') }}</span
                         ><span style="font-size: 10px"> 元</span>
                     </el-tag>
                     </span>
                     <span v-if="fixedDeposit > 0">
                     <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
-                        >定存，共
+                        >定存
                         <span style="font-size: 15px; font-weight: bold">$ {{ fixedDeposit.toLocaleString('en-US') }}</span
                         ><span style="font-size: 10px"> 元</span>
                     </el-tag>
                     </span>
                     <span v-if="fundDeposit > 0">
                     <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
-                        >基金，共
+                        >基金
                         <span style="font-size: 15px; font-weight: bold">$ {{ fundDeposit.toLocaleString('en-US') }}</span
                         ><span style="font-size: 10px"> 元</span>
                     </el-tag>
                     </span>
                     <span v-if="stockDeposit > 0">
                     <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
-                        >股票，共
+                        >股票
                         <span style="font-size: 15px; font-weight: bold">$ {{ stockDeposit.toLocaleString('en-US') }}</span
                         ><span style="font-size: 10px"> 元</span>
                     </el-tag>
@@ -174,7 +175,7 @@
 
         <br />
         <div style="font-size: 14px; color: #999; margin: 20px">
-            <div>【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、 定存、基金)時，將會統計至「存款配置表」。另外，股票則是從自選股有設定成本自動同步過來。</div>
+            <div>【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、 定存、基金)時，將會統計至「存款配置表」。另外，股票則是從自選股中有設定成本會自動同步過來。</div>
             <div>【$】請輸入帳戶目前金額。</div>
         </div>
         <br /><br />
@@ -449,7 +450,7 @@ export default {
                     x: {
                         ticks: {
                             callback(value, index, ticks) {
-                                if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                if (value >= 10000 || value <= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
                                 else return `$ ${value}`;
                             },
                         },
