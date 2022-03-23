@@ -54,7 +54,7 @@
                     {{ scope.row.trading_date.substr(5, 5).replace('-', '/') }}
                 </template>
             </el-table-column>
-            <el-table-column label="現金股利" width="65" align="right" header-align="right">
+            <el-table-column label="現金股利&nbsp;" width="65" align="right" header-align="right">
                 <template #default="scope">
                     <el-badge
                         value="估"
@@ -67,13 +67,13 @@
                     {{ scope.row.earnings_distribution }}
                 </template>
             </el-table-column>
-            <el-table-column label="累積股數&nbsp;" width="70" align="right" header-align="right">
-                <template #default="scope"> {{ scope.row.number_of_shares.toLocaleString('en-US') }} 股 </template>
-            </el-table-column>
             <el-table-column label="發放日" width="42" align="center">
                 <template #default="scope">
                     {{ scope.row.payment_date.substr(5, 5).replace('-', '/') }}
                 </template>
+            </el-table-column>
+            <el-table-column label="累積股數" width="70" align="right" header-align="right">
+                <template #default="scope"> {{ scope.row.number_of_shares.toLocaleString('en-US') }} 股 </template>
             </el-table-column>
             <el-table-column label="股利所得&nbsp;&nbsp;" width="80" align="right" header-align="right">
                 <template #default="scope">
