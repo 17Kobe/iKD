@@ -1410,6 +1410,12 @@ const stock = {
             // state.progressMultiple = progressMultiple;
             return progressMultiple;
         },
+        getSpreadList: (state) => () => {
+            console.log('getSpreadList');
+            return _.filter(state.stockList, function (obj) {
+                return obj.cost;
+            });
+        },
     },
 };
 

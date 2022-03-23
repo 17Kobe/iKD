@@ -13,11 +13,11 @@
                 <el-menu-item index="default" @click="onMenuItemClick('default')">
                     <i class="el-icon-star-off" style="position: relative; top: -2px"></i>自選股　
                 </el-menu-item>
+                <el-menu-item index="dividend" @click="onMenuItemClick('dividend')">
+                    <i class="el-icon-sugar" style="position: relative; top: -2px"></i>價差股利
+                </el-menu-item>
                 <el-menu-item index="asset" @click="onMenuItemClick('asset')">
                     <i class="el-icon-pie-chart" style="position: relative; top: -2px"></i>資產配置
-                </el-menu-item>
-                <el-menu-item index="dividend" @click="onMenuItemClick('dividend')">
-                    <i class="el-icon-sugar" style="position: relative; top: -2px"></i>股利預估
                 </el-menu-item>
             </el-menu>
         </footer>

@@ -1,11 +1,49 @@
 <template>
     <div>
+        <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right" :type="totalSpread >= 0 ? 'danger' : 'success'"
+            >價差總計
+            <span style="font-size: 24px"> $ </span>
+            <span style="font-size: 28px; font-weight: bold">
+                <!-- <number :from="0" :to="totalSpread" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
+                {{ totalSpread.toLocaleString('en-US') }} </span
+            >&nbsp;元
+        </el-tag>
+
+        <el-table :data="spreadList" style="width: 100%" empty-text="無資料">
+            <el-table-column label="名稱" prop="name" width="90" align="center"> </el-table-column>
+            <el-table-column label="成本價" prop="cost.avg" width="45" align="center"> </el-table-column>
+            <el-table-column label="現價" prop="last_price" width="45" align="right" header-align="right"> </el-table-column>
+            <el-table-column label="本金&nbsp;&nbsp;&nbsp;" width="75" align="right" header-align="right">
+                <template #default="scope">
+                    <span> $ {{ scope.row.cost.sum.toLocaleString('en-US') }} </span>
+                </template>
+            </el-table-column>
+            <el-table-column label="報酬率" width="53" align="right" header-align="right">
+                <template #default="scope">
+                    <span>{{ Number(scope.row.cost.rate_of_return.toFixed(1)) }} %</span>
+                </template>
+            </el-table-column>
+            <el-table-column label="價差&nbsp;&nbsp;" width="81" align="right" header-align="right">
+                <template #default="scope">
+                    <el-tag
+                        class="ml-2"
+                        size="small"
+                        style="margin: 1px 0px"
+                        :type="scope.row.cost.return >= 0 ? 'danger' : 'success'"
+                        ><span style="font-size: 14px; font-weight: bold">
+                            $ {{ scope.row.cost.return.toLocaleString('en-US') }}
+                        </span></el-tag
+                    >
+                </template>
+            </el-table-column>
+        </el-table>
+        <br /><br />
         <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right"
             >股利總計
             <span style="font-size: 24px"> $ </span>
             <span style="font-size: 28px; font-weight: bold">
-                <!-- <number :from="0" :to="total" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
-                {{ total.toLocaleString('en-US') }} </span
+                <!-- <number :from="0" :to="totalDividend" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
+                {{ totalDividend.toLocaleString('en-US') }} </span
             >&nbsp;元
         </el-tag>
 
@@ -32,7 +70,11 @@
             <el-table-column label="累積股數" width="70" align="right" header-align="right">
                 <template #default="scope"> {{ scope.row.number_of_shares.toLocaleString('en-US') }} 股 </template>
             </el-table-column>
-
+            <el-table-column label="發放日" width="42" align="center">
+                <template #default="scope">
+                    {{ scope.row.payment_date.substr(5, 5).replace('-', '/') }}
+                </template>
+            </el-table-column>
             <el-table-column label="股利所得&nbsp;" width="80" align="right" header-align="right">
                 <template #default="scope">
                     <el-tag class="ml-2" size="small" style="margin: 1px 0px"
@@ -40,11 +82,6 @@
                             $ {{ (scope.row.number_of_shares * scope.row.earnings_distribution).toLocaleString('en-US') }}
                         </span>
                     </el-tag>
-                </template>
-            </el-table-column>
-            <el-table-column label="發放日" width="42" align="center">
-                <template #default="scope">
-                    {{ scope.row.payment_date.substr(5, 5).replace('-', '/') }}
                 </template>
             </el-table-column>
         </el-table>
@@ -68,11 +105,17 @@ export default {
         dividendList() {
             return this.$store.getters.getDividendList();
         },
-        total() {
+        spreadList() {
+            return this.$store.getters.getSpreadList();
+        },
+        totalDividend() {
             return this.dividendList.reduce(
                 (acc, { number_of_shares, earnings_distribution }) => acc + number_of_shares * earnings_distribution,
                 0
             );
+        },
+        totalSpread() {
+            return this.spreadList.reduce((acc, { cost }) => acc + cost.return, 0);
         },
     },
     created() {
