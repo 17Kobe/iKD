@@ -26,26 +26,34 @@
                         >股票損益 <span style="font-size: 20px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
                     </el-tag> -->
                     <br />
+                    <span v-if="demandDeposit > 0">
                     &nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
-                        >活存總額
+                        >活存，共
                         <span style="font-size: 15px; font-weight: bold">$ {{ demandDeposit.toLocaleString('en-US') }}</span
                         ><span style="font-size: 10px"> 元</span>
                     </el-tag>
+                    </span>
+                    <span v-if="fixedDeposit > 0">
                     <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
-                        >定存總額
+                        >定存，共
                         <span style="font-size: 15px; font-weight: bold">$ {{ fixedDeposit.toLocaleString('en-US') }}</span
                         ><span style="font-size: 10px"> 元</span>
                     </el-tag>
+                    </span>
+                    <span v-if="fundDeposit > 0">
                     <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
-                        >基金總額
+                        >基金，共
                         <span style="font-size: 15px; font-weight: bold">$ {{ fundDeposit.toLocaleString('en-US') }}</span
                         ><span style="font-size: 10px"> 元</span>
                     </el-tag>
+                    </span>
+                    <span v-if="stockDeposit > 0">
                     <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
-                        >股票總額
+                        >股票，共
                         <span style="font-size: 15px; font-weight: bold">$ {{ stockDeposit.toLocaleString('en-US') }}</span
                         ><span style="font-size: 10px"> 元</span>
                     </el-tag>
+                    </span>
                 </el-card>
             </el-col>
         </el-row>
@@ -166,7 +174,7 @@
 
         <br />
         <div style="font-size: 14px; color: #999; margin: 20px">
-            <div>【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、 定存、基金)時，將會統計至「存款配置表」</div>
+            <div>【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、 定存、基金)時，將會統計至「存款配置表」。另外，股票則是從自選股有設定成本自動同步過來。</div>
             <div>【$】請輸入帳戶目前金額。</div>
         </div>
         <br /><br />
@@ -509,8 +517,8 @@ export default {
                         data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.fundDeposit, this.otherDeposit],
                         backgroundColor: [
                             // 背景色
-                            'rgba(255, 159, 64, 0.5)',
                             'rgba(255, 205, 86, 0.5)',
+                            'rgba(255, 159, 64, 0.5)',
                             'rgba(153, 102, 255, 0.5)',
                             'rgba(204, 255, 144, 0.5)',
                             'rgba(75, 192, 192, 0.2)',
