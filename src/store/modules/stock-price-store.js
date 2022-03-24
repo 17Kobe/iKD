@@ -107,6 +107,31 @@ const defaultState = {
             },
         },
         {
+            name: '富邦越南',
+            id: '00885',
+            star: 3,
+            policy: {
+                settings: {
+                    buy: [
+                        {
+                            method: 'kd_gold',
+                            label: '週 KD 黃金交叉',
+                            limit: '50',
+                            limit_desc: '以下',
+                        },
+                    ],
+                    sell: [
+                        {
+                            method: 'kd_dead',
+                            label: '週 KD 死亡交叉',
+                            limit: '70',
+                            limit_desc: '以上',
+                        },
+                    ],
+                },
+            },
+        },
+        {
             name: '聯發科',
             id: '2454',
             star: 2,
@@ -200,31 +225,6 @@ const defaultState = {
                             label: '搭配 絕對正報酬',
                             limit: 0,
                             limit_desc: '% 以上',
-                        },
-                    ],
-                },
-            },
-        },
-        {
-            name: '富邦越南',
-            id: '00885',
-            star: 2,
-            policy: {
-                settings: {
-                    buy: [
-                        {
-                            method: 'kd_gold',
-                            label: '週 KD 黃金交叉',
-                            limit: '40',
-                            limit_desc: '以下',
-                        },
-                    ],
-                    sell: [
-                        {
-                            method: 'kd_dead',
-                            label: '週 KD 死亡交叉',
-                            limit: '70',
-                            limit_desc: '以上',
                         },
                     ],
                 },
