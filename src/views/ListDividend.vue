@@ -1,13 +1,26 @@
 <template>
     <div>
-        <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right" :type="totalSpread >= 0 ? 'danger' : 'success'"
-            >價差總計
-            <span style="font-size: 24px"> $ </span>
-            <span style="font-size: 28px; font-weight: bold">
-                <!-- <number :from="0" :to="totalSpread" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
-                {{ totalSpread.toLocaleString('en-US') }} </span
-            >&nbsp;元
-        </el-tag>
+        <el-row class="row-bg" justify="space-between" style="align-items: center;">
+            <el-col :span="9" style="margin-left: 5px; font-size: 18px; font-weight:bold;">價差</el-col>
+            <el-col :span="9">
+                <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right" :type="totalSpread >= 0 ? 'danger' : 'success'"
+                    >總計
+                    <span style="font-size: 24px"> $ </span>
+                    <span style="font-size: 28px; font-weight: bold">
+                        <!-- <number :from="0" :to="totalSpread" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
+                        <number
+                        :from="0"
+                        :to="totalSpread"
+                        :format="currencyFormat"
+                        :duration="1"
+                        :delay="0"
+                        easing="Power1.easeOut"
+                        ref="totalSpread"
+                    /> 
+                    </span>&nbsp;元
+                </el-tag>
+            </el-col>
+        </el-row>
 
         <el-table :data="spreadList" style="width: 100%" empty-text="無資料">
             <el-table-column label="名稱" prop="name" width="90" align="center"> </el-table-column>
@@ -38,14 +51,27 @@
             </el-table-column>
         </el-table>
         <br /><br />
-        <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right"
-            >股利總計
-            <span style="font-size: 24px"> $ </span>
-            <span style="font-size: 28px; font-weight: bold">
-                <!-- <number :from="0" :to="totalDividend" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
-                {{ totalDividend.toLocaleString('en-US') }} </span
-            >&nbsp;元
-        </el-tag>
+        <el-row class="row-bg" justify="space-between" style="align-items: center;">
+            <el-col :span="9" style="margin-left: 5px; font-size: 18px; font-weight:bold;">股利</el-col>
+            <el-col :span="9">
+                <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right"
+                    >總計
+                    <span style="font-size: 24px"> $ </span>
+                    <span style="font-size: 28px; font-weight: bold">
+                        <!-- <number :from="0" :to="totalSpread" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
+                        <number
+                        :from="0"
+                        :to="totalDividend"
+                        :format="currencyFormat"
+                        :duration="1"
+                        :delay="0"
+                        easing="Power1.easeOut"
+                        ref="totalDividend"
+                    /> 
+                    </span>&nbsp;元
+                </el-tag>
+            </el-col>
+        </el-row>
 
         <el-table :data="dividendList" style="width: 100%" empty-text="無資料">
             <el-table-column label="名稱" prop="name" width="90" align="center"> </el-table-column>
@@ -117,6 +143,17 @@ export default {
         totalSpread() {
             return this.spreadList.reduce((acc, { cost }) => acc + cost.return, 0);
         },
+    },
+    watch: {
+        "$store.state.app.routerName": {
+            handler: function(newValue, oldValue) {
+                if (newValue != oldValue && newValue==='dividend')
+                    console.log(newValue);
+                    this.$refs.totalSpread.restart();
+                    this.$refs.totalDividend.restart();
+            },
+            //   immediate: true // provides initial (not changed yet) state
+        }
     },
     created() {
         console.log('created dividend');

@@ -40,6 +40,7 @@ export default {
             // const { audio } = this.$refs;
             // audio.play();
             this.routerName = page;
+            this.$store.commit('SAVE_ROUTER_NAME', page);
         },
     },
 };

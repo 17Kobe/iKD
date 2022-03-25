@@ -1,4 +1,5 @@
 import { createStore } from 'vuex';
+import app from './modules/app-store';
 import price from './modules/stock-price-store';
 import taiwan from './modules/taiwan-stock-list-store';
 import asset from './modules/asset-store';
@@ -11,6 +12,7 @@ export default createStore({
     modules: {
         // 底下是引用 modules 的寫法，實際應是 stock: stock, 寫成 a: stock也許會比較容易懂
         // .vue 檔案若要使用時，是用 name，即 a，在這裡就用 stock
+        app,
         price,
         taiwan,
         asset,

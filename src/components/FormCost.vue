@@ -23,7 +23,7 @@
                     <el-form-item label="股數">
                         <el-input-number
                             type="number"
-                            inputmode="numeric"
+                            inputmode="decimal"
                             v-model="item.number"
                             :step="1000"
                             size="small"
