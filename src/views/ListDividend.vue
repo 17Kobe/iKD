@@ -1,8 +1,8 @@
 <template>
     <div>
         <el-row class="row-bg" justify="space-between" style="align-items: center;">
-            <el-col :span="9" style="margin-left: 5px; font-size: 18px; font-weight:bold;">價差</el-col>
-            <el-col :span="9">
+            <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight:bold;">價差</el-col>
+            <el-col :span="9" style="margin-right: 17px">
                 <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right" :type="totalSpread >= 0 ? 'danger' : 'success'"
                     >總計
                     <span style="font-size: 24px"> $ </span>
@@ -52,8 +52,8 @@
         </el-table>
         <br /><br />
         <el-row class="row-bg" justify="space-between" style="align-items: center;">
-            <el-col :span="9" style="margin-left: 5px; font-size: 18px; font-weight:bold;">股利</el-col>
-            <el-col :span="9">
+            <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight:bold;">股利</el-col>
+            <el-col :span="9" style="margin-right: 17px;">
                 <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right"
                     >總計
                     <span style="font-size: 24px"> $ </span>
