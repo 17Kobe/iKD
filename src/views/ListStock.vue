@@ -13,6 +13,11 @@
                         <el-badge
                             :value="scope.row.badge"
                             class="item"
+                            :class="[
+                                        scope.row.badge === '買' || scope.row.badge === '賣'
+                                            ? 'shake-base'
+                                            : '',
+                                    , 'item']"
                             :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
                         >
                             <span style="font-size: 16px; font-weight: bold">
@@ -635,4 +640,29 @@ input::-webkit-inner-spin-button
 // group button padding 左右小一點
 .el-input-group__prepend
     padding: 0 10px
+
+.shake-base > .el-badge__content
+    animation-name: shake-base
+    animation-duration: 5s
+    animation-iteration-count: infinite
+    animation-timing-function: ease-in-out
+    animation-delay: 0s
+    animation-play-state: running
+    right: -20px
+    top: -9px
+
+@keyframes shake-base
+    0%, 100%
+        transform: translate3d(-2px, 0, 0)
+    10%, 90%
+        transform: translate3d(+4px, 0, 0)
+    20%, 80% 
+        transform: translate3d(-4px, 0, 0)
+    30%, 70% 
+        transform: translate3d(+4px, 0, 0)
+    40%, 60% 
+        transform: translate3d(-4px, 0, 0)
+    50% 
+        transform: translate3d(+4px, 0, 0)
+
 </style>
