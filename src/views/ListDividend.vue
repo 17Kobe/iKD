@@ -109,7 +109,8 @@
                 <template #default="scope">
                     <el-tag class="ml-2" size="small" style="margin: 1px 0px"
                         ><span style="font-size: 14px; font-weight: bold">
-                            $ {{ (scope.row.number_of_shares * scope.row.earnings_distribution).toLocaleString('en-US') }}
+                            $
+                            {{ Math.round(scope.row.number_of_shares * scope.row.earnings_distribution).toLocaleString('en-US') }}
                         </span>
                     </el-tag>
                 </template>
@@ -140,7 +141,7 @@ export default {
         },
         totalDividend() {
             return this.dividendList.reduce(
-                (acc, { number_of_shares, earnings_distribution }) => acc + number_of_shares * earnings_distribution,
+                (acc, { number_of_shares, earnings_distribution }) => acc + Math.round(number_of_shares * earnings_distribution),
                 0
             );
         },
