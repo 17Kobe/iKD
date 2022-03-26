@@ -370,14 +370,19 @@ export default {
                 return acc;
             }, 0);
         },
-        // stockCostExistAndTop5List() {
-        //     // 存在 cost 設定的股票名稱
-        //     return _.orderBy(this.$store.state.price.stockList, ['cost.sum'], ['desc']);
-        // },
+        stockCostExistAndTop5List() {
+            // 存在 cost 設定的股票名稱
+            return _.orderBy(
+                _.filter(this.$store.state.price.stockList, (o) => o.cost),
+                ['cost.sum'],
+                ['desc']
+            ).slice(0, 5);
+            // return this.$store.state.price.stockList, ['cost.sum'], ['desc']);
+        },
         stockCostExistOfName() {
             // 存在 cost 設定的股票名稱
-            return this.$store.state.price.stockList.reduce((acc, { name, cost }) => {
-                if (cost && cost.sum) acc.push(name);
+            return this.stockCostExistAndTop5List.reduce((acc, { name }) => {
+                acc.push(name);
                 return acc;
             }, []);
         },
@@ -390,8 +395,8 @@ export default {
         // },
         stockCostExistOfReturn() {
             // 存在 cost 設定的股票回報金額
-            return this.$store.state.price.stockList.reduce((acc, { cost }) => {
-                if (cost && cost.return) acc.push(cost.return);
+            return this.stockCostExistAndTop5List.reduce((acc, { cost }) => {
+                acc.push(cost.return);
                 return acc;
             }, []);
         },
@@ -426,16 +431,16 @@ export default {
                         backgroundColor: [
                             // 背景色
                             'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
                             'rgba(201, 203, 207, 0.2)',
                             'rgba(255, 205, 86, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
                             'rgba(255, 159, 64, 0.2)',
                         ],
                         borderColor: [
                             'rgb(75, 192, 192)',
+                            'rgb(153, 102, 255)',
                             'rgb(201, 203, 207)',
                             'rgb(255, 205, 86)',
-                            'rgb(153, 102, 255)',
                             'rgb(255, 159, 64)',
                         ],
                         borderWidth: 2, // 外框寬度
@@ -526,8 +531,8 @@ export default {
                             // 背景色
                             'rgba(255, 205, 86, 0.5)',
                             'rgba(255, 159, 64, 0.5)',
-                            'rgba(153, 102, 255, 0.5)',
                             'rgba(204, 255, 144, 0.5)',
+                            'rgba(153, 102, 255, 0.5)',
                             'rgba(75, 192, 192, 0.2)',
                         ],
                         // borderColor: ['rgb(66, 66, 66)'],
