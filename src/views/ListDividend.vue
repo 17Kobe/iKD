@@ -37,7 +37,9 @@
             </el-table-column>
             <el-table-column label="報酬率" width="53" align="right" header-align="right">
                 <template #default="scope">
-                    <span style="font-weight: bold">{{ Number(scope.row.cost.rate_of_return.toFixed(1)) }}%</span>
+                    <span style="font-weight: bold"
+                        >{{ scope.row.cost.rate_of_return.toFixed(1) }}<span style="margin-left: 2px">%</span></span
+                    >
                 </template>
             </el-table-column>
             <el-table-column label="價差&nbsp;&nbsp;" width="81" align="right" header-align="right">
