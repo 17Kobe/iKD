@@ -507,7 +507,17 @@ export default {
             // 若已有資料時則先去除 data, policy(因為policy也會畫KD圖訊號)資料，用 setInterval來載入資料比較好
             localStockList = localStockList.reduce((acc, obj) => {
                 acc.push(_.omit(obj, ['data']));
-                if (obj.data) this.queueStockDataList.push(_.pick(obj, ['id', 'data']));
+                if (obj.data) {
+                    let tempStockObj = _.pick(obj, ['id', 'data']);
+                    // 若是基金時，在這裡是塞JSON的data.daily資料，因為是可能最新的。但不修改data.weekly資料喔，這部份還是由vuex去算
+                    if (obj.type === 'fund') {
+                        const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
+                        tempStockObj.data.daily = foundStock.data.daily;
+                    }
+                    console.log(tempStockObj);
+                    this.queueStockDataList.push(tempStockObj);
+                }
+
                 return acc;
             }, []);
             // console.log(tmpLocalStockList);
