@@ -32,7 +32,7 @@
             <el-table-column fixed label="名稱" width="200">
                 <template #default="scope">
                     <span style="font-size: 16px; font-weight: bold; margin-left: 8px"> {{ scope.row.name }} </span>&nbsp;
-                    <span style="color: #cccccc">{{ scope.row.id }}</span>
+                    <span style="color: #cccccc" v-if="scope.row.type !== 'fund'">{{ scope.row.id }}</span>
                 </template>
             </el-table-column>
             <el-table-column fixed label="功能">

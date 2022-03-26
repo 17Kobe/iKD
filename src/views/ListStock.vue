@@ -22,7 +22,7 @@
                         </el-badge>
                         <br />
 
-                        <span style="color: #cccccc">{{ scope.row.id }}</span>
+                        <span style="color: #cccccc" v-if="scope.row.type !== 'fund'">{{ scope.row.id }}</span>
                         <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
                         </el-rate>
                     </div>
