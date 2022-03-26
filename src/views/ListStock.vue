@@ -311,8 +311,8 @@
                                             ><el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
                                                     scope.row.policy.stats.number_of_sell
-                                                }}</span>
-                                                次</el-tag
+                                                }}</span
+                                                >次</el-tag
                                             ></el-col
                                         >
                                         <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
@@ -322,8 +322,8 @@
                                             ><el-tag class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
                                                     Number((scope.row.policy.stats.internal_of_return * 100).toFixed(1))
-                                                }}</span>
-                                                %</el-tag
+                                                }}</span
+                                                >%</el-tag
                                             >
                                         </el-col>
                                     </el-row>
@@ -335,8 +335,8 @@
                                             ><el-tag type="warning" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
                                                     scope.row.policy.stats.average_hold_days
-                                                }}</span>
-                                                天</el-tag
+                                                }}</span
+                                                >天</el-tag
                                             >
                                         </el-col>
 
@@ -346,8 +346,8 @@
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><span style="color: #4386f5; font-size: 14px">{{
                                                 Number((scope.row.policy.stats.average_of_returns * 100).toFixed(1))
-                                            }}</span>
-                                            %</el-col
+                                            }}</span
+                                            >%</el-col
                                         >
                                         <!-- <el-col :span="6" style="padding: 0"><span>年均報酬率</span></el-col>
                                         <el-col :span="4" style="padding: 0; text-align: right"
@@ -365,8 +365,8 @@
                                             ><el-tag type="danger" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
                                                     Number((scope.row.policy.stats.max_earn * 100).toFixed(1))
-                                                }}</span>
-                                                %</el-tag
+                                                }}</span
+                                                >%</el-tag
                                             >
                                         </el-col>
                                         <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
@@ -375,8 +375,8 @@
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><span style="color: #4386f5; font-size: 14px">{{
                                                 Number((scope.row.policy.stats.sum_of_returns * 100).toFixed(1))
-                                            }}</span>
-                                            %</el-col
+                                            }}</span
+                                            >%</el-col
                                         >
                                     </el-row>
                                     <el-row>
@@ -387,8 +387,8 @@
                                             ><el-tag type="success" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
                                                     Number((scope.row.policy.stats.max_lose * 100).toFixed(1))
-                                                }}</span>
-                                                %</el-tag
+                                                }}</span
+                                                >%</el-tag
                                             ></el-col
                                         >
                                         <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
@@ -397,8 +397,8 @@
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><span style="color: #4386f5; font-size: 14px">{{
                                                 Number(scope.row.policy.stats.diff_years.toFixed(1))
-                                            }}</span>
-                                            年
+                                            }}</span
+                                            >年
                                         </el-col>
                                     </el-row>
                                 </div>

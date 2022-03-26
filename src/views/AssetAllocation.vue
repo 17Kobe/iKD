@@ -487,9 +487,9 @@ export default {
                                     label += ': ';
                                 }
                                 if (context.parsed.y !== null) {
-                                    label += ` 成本：$ ${foundStock.cost.sum.toLocaleString('en-US')} (${Number(
+                                    label += ` 成本：$ ${foundStock.cost.sum.toLocaleString('en-US')} ( ${Number(
                                         foundStock.cost.rate_of_return.toFixed(1)
-                                    )} %)`;
+                                    )}% )`;
                                 }
                                 return label;
                             },
