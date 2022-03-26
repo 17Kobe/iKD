@@ -660,7 +660,7 @@ const stock = {
                 foundStock.cost.return = 0;
                 foundStock.cost.rate_of_return = 0;
                 if (foundStock.cost.sum !== 0) {
-                    foundStock.cost.return = Number((close * foundStock.cost.total * exchange - foundStock.cost.sum).toFixed(2));
+                    foundStock.cost.return = Math.round(close * foundStock.cost.total * exchange - foundStock.cost.sum);
                     foundStock.cost.rate_of_return =
                         ((close * foundStock.cost.total * exchange - foundStock.cost.sum) * 100) / foundStock.cost.sum;
                 }

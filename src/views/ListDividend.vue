@@ -32,7 +32,7 @@
             <el-table-column label="現價" prop="last_price" width="45" align="right" header-align="right"> </el-table-column>
             <el-table-column label="本金&nbsp;&nbsp;&nbsp;" width="75" align="right" header-align="right">
                 <template #default="scope">
-                    <span> $ {{ Math.round(scope.row.cost.sum).toLocaleString('en-US') }} </span>
+                    <span> $ {{ scope.row.cost.sum.toLocaleString('en-US') }} </span>
                 </template>
             </el-table-column>
             <el-table-column label="報酬率" width="53" align="right" header-align="right">
@@ -48,7 +48,7 @@
                         style="margin: 1px 0px"
                         :type="scope.row.cost.return >= 0 ? 'danger' : 'success'"
                         ><span style="font-size: 14px; font-weight: bold">
-                            $ {{ Math.round(scope.row.cost.return).toLocaleString('en-US') }}
+                            $ {{ scope.row.cost.return.toLocaleString('en-US') }}
                         </span></el-tag
                     >
                 </template>

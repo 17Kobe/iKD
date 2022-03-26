@@ -89,7 +89,7 @@ export default {
         sumCost() {
             console.log('averageCost');
             // 有可能cost 為 null，所以要變更為0
-            return (
+            return Math.round(
                 this.form.reduce((acc, { cost, number }) => acc + (cost || 0) * parseFloat(number, 10), 0) * this.defaultExchange
             );
         },
@@ -137,7 +137,10 @@ export default {
             // eslint-disable-next-line prefer-destructuring
             this.defaultCost = this.stockData.last_price;
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定成本`;
+            // 一定要用 else，不然可能用到上個開的股票了
             if (this.stockData.buy_exchange) this.defaultExchange = this.stockData.buy_exchange;
+            else this.defaultExchange = 1;
+
             if (_.has(this.stockData, 'cost.settings')) this.form = _.cloneDeep(this.stockData.cost.settings);
             else this.form = [];
 
