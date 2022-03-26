@@ -1,5 +1,5 @@
 <template>
-    <el-input ref="inputRef" :modelValue="formattedValue" @focus="selectAll()">
+    <el-input ref="inputRef" class="i-currency" :modelValue="formattedValue" @focus="selectAll()">
         <template #prepend>$</template>
         <template #suffix><span style="position: relative; top: 8px; font-size: 10px">元</span> </template>
     </el-input>
@@ -27,3 +27,8 @@ export default {
     },
 };
 </script>
+
+<style lang="sass">
+.i-currency .el-input__inner
+    text-align: right
+</style>
