@@ -112,7 +112,7 @@
             </el-row>
         </template>
         <el-row>
-            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding: 4px 0">
+            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px">
                 <el-button type="primary" size="small" @click="onAddDeposit" round plain
                     ><i class="el-icon-plus"></i> 新增存款</el-button
                 >
@@ -163,7 +163,7 @@
             </el-row>
         </template>
         <el-row>
-            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding: 4px 0">
+            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px">
                 <el-button type="primary" size="small" @click="onAddDebt" round plain
                     ><i class="el-icon-plus"></i> 新增負債</el-button
                 >
