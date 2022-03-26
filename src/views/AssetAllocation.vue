@@ -177,7 +177,7 @@
         <div style="font-size: 14px; color: #999; margin: 20px">
             <div>
                 【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、
-                定存、基金)時，將會統計至「存款配置表」。另外，股票則是從自選股中有設定成本會自動同步過來。
+                定存)時，將會統計至「存款配置表」。另外，股票則是從自選股中有設定成本會自動同步過來。
             </div>
             <div>【$】請輸入帳戶目前金額。</div>
         </div>
@@ -282,7 +282,7 @@ export default {
                             dataArr.map((data) => {
                                 sum += data;
                             });
-                            const itemName = ['活存', '定存', '股票、基金', '其它'];
+                            const itemName = ['活存', '定存', '股票', '其它'];
                             console.log(value);
                             if (value === 0) return '';
                             const percentage = `  ${itemName[ctx.dataIndex]}\n${((value * 100) / sum).toFixed(2)} %`;
@@ -430,18 +430,18 @@ export default {
                         data: this.stockCostExistOfReturn,
                         backgroundColor: [
                             // 背景色
-                            'rgba(75, 192, 192, 0.2)',
                             'rgba(153, 102, 255, 0.2)',
-                            'rgba(201, 203, 207, 0.2)',
                             'rgba(255, 205, 86, 0.2)',
-                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(201, 203, 207, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 99, 132, 0.2)',
                         ],
                         borderColor: [
-                            'rgb(75, 192, 192)',
                             'rgb(153, 102, 255)',
-                            'rgb(201, 203, 207)',
                             'rgb(255, 205, 86)',
-                            'rgb(255, 159, 64)',
+                            'rgb(201, 203, 207)',
+                            'rgb(54, 162, 235)',
+                            'rgb(255, 99, 132)',
                         ],
                         borderWidth: 2, // 外框寬度
                         options: {
@@ -523,7 +523,7 @@ export default {
         },
         pieData() {
             return {
-                labels: ['活存', '定存', '股票、基金', '其它'],
+                labels: ['活存', '定存', '股票', '其它'],
                 datasets: [
                     {
                         data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.fundDeposit, this.otherDeposit],
@@ -531,9 +531,9 @@ export default {
                             // 背景色
                             'rgba(255, 205, 86, 0.5)',
                             'rgba(255, 159, 64, 0.5)',
-                            'rgba(204, 255, 144, 0.5)',
+                            'rgba(75, 192, 192, 0.4)',
                             'rgba(153, 102, 255, 0.5)',
-                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(204, 255, 144, 0.5)',
                         ],
                         // borderColor: ['rgb(66, 66, 66)'],
                         borderWidth: 2, // 外框寬度

@@ -37,7 +37,7 @@
             </el-table-column>
             <el-table-column label="報酬率" width="53" align="right" header-align="right">
                 <template #default="scope">
-                    <span>{{ Number(scope.row.cost.rate_of_return.toFixed(1)) }} %</span>
+                    <span style="font-weight: bold">{{ Number(scope.row.cost.rate_of_return.toFixed(1)) }} %</span>
                 </template>
             </el-table-column>
             <el-table-column label="價差&nbsp;&nbsp;" width="81" align="right" header-align="right">
@@ -54,8 +54,8 @@
                 </template>
             </el-table-column>
         </el-table>
-        <br /><br />
-        <el-row class="row-bg" justify="space-between" style="align-items: center">
+
+        <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center">
             <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight: bold">預估股利</el-col>
             <el-col :span="9" style="margin-right: 17px">
                 <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right"
@@ -94,7 +94,7 @@
                         v-if="!scope.row.isSure"
                     >
                     </el-badge>
-                    {{ scope.row.earnings_distribution }}
+                    <span style="font-weight: bold">{{ scope.row.earnings_distribution }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="發放日" width="42" align="center">

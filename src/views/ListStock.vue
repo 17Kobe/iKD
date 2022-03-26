@@ -649,6 +649,10 @@ input::-webkit-inner-spin-button
     right: -20px
     top: -9px
 
+// 全部 drawer title 變下面沒那麼多
+.el-drawer__header
+    margin-bottom: 10px
+
 @keyframes shake-base
     0%, 100%
         transform: translate3d(-2px, 0, 0)

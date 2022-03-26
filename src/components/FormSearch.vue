@@ -23,12 +23,12 @@
                     <el-option v-for="item in stockOptions" :key="item.value" :label="item.label" :value="item.value">
                     </el-option>
                 </el-select>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="onAdd" style="margin-top: 10px"><i class="el-icon-plus"></i></el-button>
+                &nbsp;&nbsp;<el-button type="primary" @click="onAdd" style="margin-top: 10px"
+                    ><i class="el-icon-plus"></i
+                ></el-button>
             </el-form-item>
         </el-form>
-        <el-table :data="customStockList" :show-header="false" :stripe="true" style="width: 100%">
+        <el-table :data="customStockList" :show-header="false" :stripe="true" style="width: 100%; margin-top: 5px">
             <el-table-column fixed label="名稱" width="200">
                 <template #default="scope">
                     <span style="font-size: 16px; font-weight: bold; margin-left: 8px"> {{ scope.row.name }} </span>&nbsp;
