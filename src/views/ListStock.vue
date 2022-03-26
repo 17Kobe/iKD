@@ -13,11 +13,7 @@
                         <el-badge
                             :value="scope.row.badge"
                             class="item"
-                            :class="[
-                                        scope.row.badge === '買' || scope.row.badge === '賣'
-                                            ? 'shake-base'
-                                            : '',
-                                    , 'item']"
+                            :class="[scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '', , 'item']"
                             :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
                         >
                             <span style="font-size: 16px; font-weight: bold">
@@ -442,6 +438,7 @@ import FormCost from '@/components/FormCost.vue';
 import FormPolicy from '@/components/FormPolicy.vue';
 import FormSearch from '@/components/FormSearch.vue';
 import FormExport from '@/components/FormExport.vue';
+import DefaultStockList from '../store/data/default-stock-list.json';
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 
@@ -495,7 +492,8 @@ export default {
 
         // 空時，或沒資料(有可能刪光)，就載入預設清單
         if (_.isEmpty(localStockList)) {
-            localStockList.push(...this.stockList); // 新增 append 預設到 localStockList
+            // this.$store.commit('SAVE_STOCK_LIST', DefaultStockList);
+            localStockList.push(...DefaultStockList); // 新增 append 預設到 localStockList
             localStorage.setItem('stockList', JSON.stringify(localStockList)); // 將 localStockList 從 object 轉 string 後塞到 localstorage
             // console.log(diffLocal);
             // console.log(diffDefault);
@@ -656,13 +654,12 @@ input::-webkit-inner-spin-button
         transform: translate3d(-2px, 0, 0)
     10%, 90%
         transform: translate3d(+4px, 0, 0)
-    20%, 80% 
+    20%, 80%
         transform: translate3d(-4px, 0, 0)
-    30%, 70% 
+    30%, 70%
         transform: translate3d(+4px, 0, 0)
-    40%, 60% 
+    40%, 60%
         transform: translate3d(-4px, 0, 0)
-    50% 
+    50%
         transform: translate3d(+4px, 0, 0)
-
 </style>

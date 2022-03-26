@@ -5,51 +5,51 @@ import _ from 'lodash';
 const defaultState = {
     // progressMultiple: 0.5, //* 4 則最大值為25%。 * 2 則最大值為50%。 * 1 則最大值為100%。 0.6%最大值為166% 0.5最大值為200%  0.2 最大值為500% 0.1 最大值為1000%
     stockList: [
-        {
-            name: '元大高股息',
-            id: '0056',
-            star: 3,
-            cost: {
-                settings: [{ cost: '33.9', number: 1000 }],
-                total: 1000,
-                avg: 33.9,
-                sum: 33900,
-                return: 0,
-                rate_of_return: 0,
-            },
-            policy: {
-                settings: {
-                    buy: [
-                        {
-                            method: 'kd_gold',
-                            label: '週 KD 黃金交叉',
-                            limit: '45',
-                            limit_desc: '以下',
-                        },
-                    ],
-                    sell: [
-                        {
-                            method: 'kd_turn_down',
-                            label: '週 KD 往下轉折',
-                            limit: '85',
-                            limit_desc: '以上',
-                        },
-                        {
-                            method: 'kd_dead',
-                            label: '週 KD 死亡交叉',
-                            limit: '77',
-                            limit_desc: '以上',
-                        },
-                    ],
-                },
-            },
-        },
-        {
-            name: '富達全球科技基金',
-            id: 'F0GBR04D20',
-            star: 2,
-            type: 'fund',
-        },
+        // {
+        //     name: '元大高股息',
+        //     id: '0056',
+        //     star: 3,
+        //     cost: {
+        //         settings: [{ cost: '33.9', number: 1000 }],
+        //         total: 1000,
+        //         avg: 33.9,
+        //         sum: 33900,
+        //         return: 0,
+        //         rate_of_return: 0,
+        //     },
+        //     policy: {
+        //         settings: {
+        //             buy: [
+        //                 {
+        //                     method: 'kd_gold',
+        //                     label: '週 KD 黃金交叉',
+        //                     limit: '45',
+        //                     limit_desc: '以下',
+        //                 },
+        //             ],
+        //             sell: [
+        //                 {
+        //                     method: 'kd_turn_down',
+        //                     label: '週 KD 往下轉折',
+        //                     limit: '85',
+        //                     limit_desc: '以上',
+        //                 },
+        //                 {
+        //                     method: 'kd_dead',
+        //                     label: '週 KD 死亡交叉',
+        //                     limit: '77',
+        //                     limit_desc: '以上',
+        //                 },
+        //             ],
+        //         },
+        //     },
+        // },
+        // {
+        //     name: '富達全球科技基金',
+        //     id: 'F0GBR04D20',
+        //     star: 2,
+        //     type: 'fund',
+        // },
         // {
         //     name: '台積電',
         //     id: '2330',
@@ -485,6 +485,7 @@ const stock = {
 
                     // 股票
                     if (!isFund) {
+                        console.log('GET_STOCK_PRICE 31');
                         axios
                             .get('https://api.finmindtrade.com/api/v4/data', {
                                 params: {
@@ -501,37 +502,45 @@ const stock = {
                             })
                             // 失敗
                             .catch((err) => {
-                                console.log('GET_STOCK_PRICE error');
+                                console.log('GET_STOCK_PRICE error. ' + stcokObj.id);
                                 context.commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                                 console.log(err);
                             });
                     } else {
+                        console.log('GET_STOCK_PRICE 32');
                         // 基金
-                        axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-                        axios
-                            .get(
-                                'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=' +
-                                    stcokObj.id +
-                                    ':FO;timeslot=' +
-                                    stockStartDate +
-                                    'T00:00:00Z-' +
-                                    today +
-                                    'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true'
-                            )
-                            // 成功
-                            .then((res) => {
-                                console.log('GET_STOCK_PRICE 4');
-                                context.commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: res.data });
-                            })
-                            // 失敗
-                            .catch((err) => {
-                                console.log('GET_STOCK_PRICE error');
-                                context.commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
-                                console.log(err);
-                            });
+                        context.commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
+                        // axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+                        // axios
+                        //     .get(
+                        //         'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=' +
+                        //             stcokObj.id +
+                        //             ':FO;timeslot=' +
+                        //             stockStartDate +
+                        //             'T00:00:00Z-' +
+                        //             today +
+                        //             'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true'
+                        //     )
+                        //     // 成功
+                        //     .then((res) => {
+                        //         console.log('GET_STOCK_PRICE 4');
+                        //         context.commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: res.data });
+                        //     })
+                        //     // 失敗
+                        //     .catch((err) => {
+                        //         console.log('GET_STOCK_PRICE error');
+                        //         context.commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
+                        //         console.log(err);
+                        //     });
                     }
                 } else {
-                    context.commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
+                    // 股票
+                    if (!isFund) {
+                        context.commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
+                    } else {
+                        // 基金
+                        context.commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
+                    }
                 }
             });
         },
@@ -688,11 +697,13 @@ const stock = {
         },
         SAVE_STOCK_PRICE(state, { stockId, data }) {
             console.log('SAVE_STOCK_PRICE');
+            console.log(stockId);
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            let currStockLastDate = null;
             if (data.data.length > 0) {
                 // 在此其實不用"避免重覆"的資料，因我的我 start_date 已是控制好我的DB沒有的日期，若強制抓回只是 data.data=[] 沒有資料而已
                 // 預設值
                 // const index = _.findIndex(state.stockList, ['id', stockId]);
-                const foundStock = state.stockList.find((v) => v.id === stockId);
                 // console.log(data.data);
                 // console.log(foundStock.data.daily);
                 // console.log(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
@@ -739,7 +750,7 @@ const stock = {
                 }
                 // console.log(foundStock.data.daily);
                 // 怕一次重啟2個API呼叫(如2個分頁都在執行)，values 的 array 要去掉現有<=最後日期
-                let currStockLastDate = null;
+
                 if (foundStock.data.daily.length > 0) {
                     //一開始可能都無資料
                     currStockLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
@@ -752,7 +763,18 @@ const stock = {
                 // console.log(values);
 
                 // theArray[index].data.daily.push(...res.data.data); // 塞入股價資料
-
+            }
+            console.log(foundStock.data);
+            if (
+                foundStock.data &&
+                foundStock.data.daily.length > 0 &&
+                (!_.has(foundStock, 'data.weekly') || // 基金, 第一次
+                    foundStock.data.weekly.length === 0 || // 第一次股票抓資料後，但沒更新 weekly時
+                    (foundStock.data.weekly.length > 0 && // 基金，第二次以後
+                        foundStock.data.daily[foundStock.data.daily.length - 1][0] !==
+                            foundStock.data.weekly[foundStock.data.weekly.length - 1][0]))
+            ) {
+                console.log('weekly');
                 // 塞入漲跌幅、最後股價
                 const v1 = foundStock.data.daily[foundStock.data.daily.length - 1][4];
                 const v2 = foundStock.data.daily[foundStock.data.daily.length - 2][4];
@@ -927,6 +949,7 @@ const stock = {
             const policyResult = [];
 
             if (
+                _.has(foundStock, 'data.weekly_kd') &&
                 (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell')) &&
                 (foundStock.calc_policy_date !== foundStock.last_price_date || !_.has(foundStock, 'policy.result')) // 日期判斷是有可能上回有淨值(此回沒有)，上回卻沒有計算完policy
                 //曾經發現有policy.settings，但都沒有算 policy.result

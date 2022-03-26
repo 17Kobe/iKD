@@ -8,16 +8,26 @@
         </el-upload>
         <br />
         &nbsp;&nbsp;<el-button type="danger" @click="onClear"><i class="el-icon-download"></i> 清除設定檔</el-button><br /><br />
-        &nbsp;&nbsp;<el-button type="success" @click="onForceRefresh"
-            ><i class="el-icon-refresh-right"></i> 立即更新股價</el-button
-        >
+        &nbsp;
+        <el-tooltip class="box-item" effect="dark" content="使用在星期六也要補班的時候" placement="top">
+            <el-button type="success" @click="onForceRefresh"><i class="el-icon-refresh-right"></i> 立即更新股價</el-button>
+        </el-tooltip>
+        <br /><br />
+        &nbsp;
+        <el-tooltip class="box-item" effect="dark" content="當網站的預設基金有增加時，可以執行更新後增加自選股" placement="top">
+            <el-button type="success" @click="onUpdateDefaultStockList"
+                ><i class="el-icon-refresh-right"></i> 更新預設自選股</el-button
+            >
+        </el-tooltip>
         <!-- <el-button type="primary" @click="onImport"><i class="el-icon-upload2"></i> 匯入設定檔</el-button> -->
     </el-drawer>
 </template>
 
 <script>
 // import _ from 'lodash';
+import _ from 'lodash';
 import { ElMessageBox, ElMessage } from 'element-plus';
+import DefaultStockList from '../store/data/default-stock-list.json';
 
 export default {
     name: 'component-form-search',
@@ -27,7 +37,11 @@ export default {
             title: '匯出/入 設定檔',
         };
     },
-    computed: {},
+    computed: {
+        stockList() {
+            return this.$store.state.price.stockList;
+        },
+    },
     mounted() {},
     methods: {
         onInit() {
@@ -91,6 +105,19 @@ export default {
             ElMessage({
                 type: 'success',
                 message: '完成立即更新股價!',
+            });
+        },
+
+        onUpdateDefaultStockList() {
+            console.log(DefaultStockList);
+            const storeStockList = this.stockList;
+
+            const newStockList = _.filter(DefaultStockList, function (obj) {
+                return !_.find(storeStockList, { id: obj.id });
+            });
+            console.log(newStockList);
+            newStockList.forEach((obj) => {
+                this.$store.commit('SAVE_A_STOCK', obj);
             });
         },
         // 讀檔參考 https://blog.csdn.net/qq_40729514/article/details/109677411
