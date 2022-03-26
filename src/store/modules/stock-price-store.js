@@ -3,6 +3,7 @@ import moment from 'moment';
 import _ from 'lodash';
 
 const defaultState = {
+    currUsdExchange: 28.54,
     // progressMultiple: 0.5, //* 4 則最大值為25%。 * 2 則最大值為50%。 * 1 則最大值為100%。 0.6%最大值為166% 0.5最大值為200%  0.2 最大值為500% 0.1 最大值為1000%
     stockList: [
         // {
@@ -654,12 +655,14 @@ const stock = {
                 console.log(close);
                 console.log(foundStock.cost.sum);
 
+                // 若有 buy_exchange，則要取到最新匯率
+                const exchange = foundStock.buy_exchange ? state.currUsdExchange : 1;
                 foundStock.cost.return = 0;
                 foundStock.cost.rate_of_return = 0;
                 if (foundStock.cost.sum !== 0) {
-                    foundStock.cost.return = Number((close * foundStock.cost.total - foundStock.cost.sum).toFixed(2));
+                    foundStock.cost.return = Number((close * foundStock.cost.total * exchange - foundStock.cost.sum).toFixed(2));
                     foundStock.cost.rate_of_return =
-                        ((close * foundStock.cost.total - foundStock.cost.sum) * 100) / foundStock.cost.sum;
+                        ((close * foundStock.cost.total * exchange - foundStock.cost.sum) * 100) / foundStock.cost.sum;
                 }
 
                 // save to localstorage

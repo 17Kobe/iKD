@@ -1,23 +1,27 @@
 <template>
     <div>
-        <el-row class="row-bg" justify="space-between" style="align-items: center;">
-            <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight:bold;">價差</el-col>
+        <el-row class="row-bg" justify="space-between" style="align-items: center">
+            <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight: bold">最新價差</el-col>
             <el-col :span="9" style="margin-right: 17px">
-                <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right" :type="totalSpread >= 0 ? 'danger' : 'success'"
+                <el-tag
+                    class="ml-2"
+                    size="large"
+                    style="margin: 5px 5px; float: right"
+                    :type="totalSpread >= 0 ? 'danger' : 'success'"
                     >總計
                     <span style="font-size: 24px"> $ </span>
                     <span style="font-size: 28px; font-weight: bold">
                         <!-- <number :from="0" :to="totalSpread" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
                         <number
-                        :from="0"
-                        :to="totalSpread"
-                        :format="currencyFormat"
-                        :duration="1"
-                        :delay="0"
-                        easing="Power1.easeOut"
-                        ref="totalSpread"
-                    /> 
-                    </span>&nbsp;元
+                            :from="0"
+                            :to="totalSpread"
+                            :format="currencyFormat"
+                            :duration="1"
+                            :delay="0"
+                            easing="Power1.easeOut"
+                            ref="totalSpread"
+                        /> </span
+                    >&nbsp;元
                 </el-tag>
             </el-col>
         </el-row>
@@ -28,7 +32,7 @@
             <el-table-column label="現價" prop="last_price" width="45" align="right" header-align="right"> </el-table-column>
             <el-table-column label="本金&nbsp;&nbsp;&nbsp;" width="75" align="right" header-align="right">
                 <template #default="scope">
-                    <span> $ {{ scope.row.cost.sum.toLocaleString('en-US') }} </span>
+                    <span> $ {{ Math.round(scope.row.cost.sum).toLocaleString('en-US') }} </span>
                 </template>
             </el-table-column>
             <el-table-column label="報酬率" width="53" align="right" header-align="right">
@@ -44,31 +48,31 @@
                         style="margin: 1px 0px"
                         :type="scope.row.cost.return >= 0 ? 'danger' : 'success'"
                         ><span style="font-size: 14px; font-weight: bold">
-                            $ {{ scope.row.cost.return.toLocaleString('en-US') }}
+                            $ {{ Math.round(scope.row.cost.return).toLocaleString('en-US') }}
                         </span></el-tag
                     >
                 </template>
             </el-table-column>
         </el-table>
         <br /><br />
-        <el-row class="row-bg" justify="space-between" style="align-items: center;">
-            <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight:bold;">股利</el-col>
-            <el-col :span="9" style="margin-right: 17px;">
+        <el-row class="row-bg" justify="space-between" style="align-items: center">
+            <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight: bold">預估股利</el-col>
+            <el-col :span="9" style="margin-right: 17px">
                 <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right"
                     >總計
                     <span style="font-size: 24px"> $ </span>
                     <span style="font-size: 28px; font-weight: bold">
                         <!-- <number :from="0" :to="totalSpread" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
                         <number
-                        :from="0"
-                        :to="totalDividend"
-                        :format="currencyFormat"
-                        :duration="1"
-                        :delay="0"
-                        easing="Power1.easeOut"
-                        ref="totalDividend"
-                    /> 
-                    </span>&nbsp;元
+                            :from="0"
+                            :to="totalDividend"
+                            :format="currencyFormat"
+                            :duration="1"
+                            :delay="0"
+                            easing="Power1.easeOut"
+                            ref="totalDividend"
+                        /> </span
+                    >&nbsp;元
                 </el-tag>
             </el-col>
         </el-row>
@@ -145,15 +149,14 @@ export default {
         },
     },
     watch: {
-        "$store.state.app.routerName": {
-            handler: function(newValue, oldValue) {
-                if (newValue != oldValue && newValue==='dividend')
-                    console.log(newValue);
-                    this.$refs.totalSpread.restart();
-                    this.$refs.totalDividend.restart();
+        '$store.state.app.routerName': {
+            handler: function (newValue, oldValue) {
+                if (newValue != oldValue && newValue === 'dividend') console.log(newValue);
+                this.$refs.totalSpread.restart();
+                this.$refs.totalDividend.restart();
             },
             //   immediate: true // provides initial (not changed yet) state
-        }
+        },
     },
     created() {
         console.log('created dividend');

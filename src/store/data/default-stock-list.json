@@ -6,7 +6,7 @@
         "cost": {
             "settings": [
                 {
-                    "cost": "33.9",
+                    "cost": 33.9,
                     "number": 1000
                 }
             ],
@@ -422,6 +422,8 @@
         "id": "F0GBR04D20",
         "star": 2,
         "type": "fund",
+        "currecy": "USD",
+        "buy_exchange": 28.54,
         "data": {
             "daily": [
                 [
@@ -12486,6 +12488,8 @@
         "id": "F0GBR04K8F",
         "star": 2,
         "type": "fund",
+        "currecy": "USD",
+        "buy_exchange": 28.54,
         "data": {
             "daily": [
                 [
@@ -29891,6 +29895,8 @@
         "id": "F0GBR04AR8",
         "star": 2,
         "type": "fund",
+        "currecy": "USD",
+        "buy_exchange": 28.54,
         "data": {
             "daily": [
                 [

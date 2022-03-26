@@ -64,6 +64,7 @@ export default {
             stockData: {},
             costList: [],
             defaultCost: 0, // 預設的股價，用代入的
+            defaultExchange: 1,
             // totalNumber: 0,
             form: [
                 // {
@@ -88,12 +89,14 @@ export default {
         sumCost() {
             console.log('averageCost');
             // 有可能cost 為 null，所以要變更為0
-            return this.form.reduce((acc, { cost, number }) => acc + (Number(cost) || 0) * parseInt(number, 10), 0);
+            return (
+                this.form.reduce((acc, { cost, number }) => acc + (cost || 0) * parseFloat(number, 10), 0) * this.defaultExchange
+            );
         },
         averageCost() {
             // parseFloat 是為了去除小數點後面的0
             // div 0 結果會 NaN, 所以把它變 /1
-            return Number((this.sumCost / (this.totalOfShares === 0 ? 1 : this.totalOfShares)).toFixed(2));
+            return Number((this.sumCost / (this.totalOfShares === 0 ? 1 : this.totalOfShares) / this.defaultExchange).toFixed(2));
         },
     },
     mounted() {},
@@ -134,7 +137,7 @@ export default {
             // eslint-disable-next-line prefer-destructuring
             this.defaultCost = this.stockData.last_price;
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定成本`;
-
+            if (this.stockData.buy_exchange) this.defaultExchange = this.stockData.buy_exchange;
             if (_.has(this.stockData, 'cost.settings')) this.form = _.cloneDeep(this.stockData.cost.settings);
             else this.form = [];
 
