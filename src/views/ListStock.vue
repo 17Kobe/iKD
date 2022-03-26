@@ -439,6 +439,7 @@ import FormPolicy from '@/components/FormPolicy.vue';
 import FormSearch from '@/components/FormSearch.vue';
 import FormExport from '@/components/FormExport.vue';
 import DefaultStockList from '../store/data/default-stock-list.json';
+import GlobalSettings from '../store/data/global-settings.json';
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 
@@ -477,6 +478,7 @@ export default {
     },
     created() {
         console.log('created');
+        this.$store.commit('SAVE_GLOBAL_SETTINGS', GlobalSettings);
         // 8秒後再畫全部
         // setInterval(() => {
         //     this.renderStockCount += 1;

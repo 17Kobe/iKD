@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 # 當發生錯誤時終止腳本運行
 set -e
+# 更新美金匯率及基金每日淨值至JSON檔案內
+node updateJsonFile.js
 # 打包
 npm run build
 # 移動至到打包後的dist目錄 

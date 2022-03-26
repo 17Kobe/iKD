@@ -21,10 +21,17 @@ GET https://api.finmindtrade.com/api/v4/data
 
 ###
 GET https://api.finmindtrade.com/api/v4/data
-    ?dataset=TaiwanStockFinancialStatements
-    &data_id=2330
-    &start_date=2020-01-13
+    ?dataset=TaiwanExchangeRate
+    &data_id=USD
+    &start_date=2022-02-26
     &token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE
+
+###
+GET https://api.finmindtrade.com/api/v4/data
+    ?dataset=TaiwanStockDividend
+    &data_id=2330
+    &start_date=2021-01-13
+ 
 
 ###
 GET https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F00000VTAH:FO;timeslot=2012-03-28T00:00:00Z-2022-03-25T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true
