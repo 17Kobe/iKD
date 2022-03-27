@@ -7,7 +7,7 @@
                 </el-card>
             </el-col>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
-                <el-card shadow="hover" style="height: 201px">
+                <el-card shadow="hover" style="height: 201px; text-align: right">
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px">存款總計</div>
                     <el-tag class="ml-2" size="large" style="margin: 5px 0 11px 0"
                         >存款
@@ -27,28 +27,28 @@
                         >股票損益 <span style="font-size: 20px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
                     </el-tag> -->
                     <br />
-                    <span v-if="demandDeposit > 0">
+                    <span v-if="demandDeposit > 0" style="margin-right: 2px">
                         &nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                             >活存
                             <span style="font-size: 15px; font-weight: bold">$ {{ demandDeposit.toLocaleString('en-US') }}</span
                             ><span style="font-size: 10px"> 元</span>
                         </el-tag>
                     </span>
-                    <span v-if="fixedDeposit > 0">
+                    <span v-if="fixedDeposit > 0" style="margin-right: 2px">
                         <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                             >定存
                             <span style="font-size: 15px; font-weight: bold">$ {{ fixedDeposit.toLocaleString('en-US') }}</span
                             ><span style="font-size: 10px"> 元</span>
                         </el-tag>
                     </span>
-                    <span v-if="fundDeposit > 0">
+                    <!-- <span v-if="fundDeposit > 0">
                         <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                             >基金
                             <span style="font-size: 15px; font-weight: bold">$ {{ fundDeposit.toLocaleString('en-US') }}</span
                             ><span style="font-size: 10px"> 元</span>
                         </el-tag>
-                    </span>
-                    <span v-if="stockDeposit > 0">
+                    </span> -->
+                    <span v-if="stockDeposit > 0" style="margin-right: 2px">
                         <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                             >股票
                             <span style="font-size: 15px; font-weight: bold">$ {{ stockDeposit.toLocaleString('en-US') }}</span
@@ -433,16 +433,18 @@ export default {
                         backgroundColor: [
                             // 背景色
                             'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 205, 86, 0.2)',
+                            'rgba(255, 244, 117, 0.2)',
+                            'rgba(203, 240, 248, 0.2)',
+                            'rgba(204, 255, 144, 0.2)',
                             'rgba(201, 203, 207, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
                             'rgba(255, 159, 64, 0.2)',
                         ],
                         borderColor: [
                             'rgb(153, 102, 255)',
-                            'rgb(255, 205, 86)',
+                            'rgb(210, 154, 32)',
+                            'rgb(0, 174, 204)',
+                            'rgba(103, 194, 58)',
                             'rgb(201, 203, 207)',
-                            'rgb(54, 162, 235)',
                             'rgba(255, 159, 64, 1)',
                         ],
                         borderWidth: 2, // 外框寬度
