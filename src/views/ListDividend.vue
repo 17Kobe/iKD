@@ -7,7 +7,7 @@
                     class="ml-2"
                     size="large"
                     style="margin: 5px 5px; float: right"
-                    :type="totalSpread >= 0 ? 'danger' : 'success'"
+                    :type="totalSpread >= 0 ? 'primary' : 'danger'"
                     >總計
                     <span style="font-size: 24px"> $ </span>
                     <span style="font-size: 28px; font-weight: bold">
@@ -48,7 +48,7 @@
                         class="ml-2"
                         size="small"
                         style="margin: 1px 0px"
-                        :type="scope.row.cost.return >= 0 ? 'danger' : 'success'"
+                        :type="scope.row.cost.return >= 0 ? 'primary' : 'danger'"
                         ><span style="font-size: 14px; font-weight: bold">
                             $ {{ scope.row.cost.return.toLocaleString('en-US') }}
                         </span></el-tag

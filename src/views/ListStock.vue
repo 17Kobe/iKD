@@ -68,7 +68,7 @@
                             :text-inside="true"
                             :stroke-width="20"
                             :percentage="Math.abs(scope.row.cost.rate_of_return) * progressMultiple"
-                            :color="scope.row.cost.rate_of_return <= 0 ? '#ccff90' : '#ffc2bd'"
+                            :color="scope.row.cost.rate_of_return <= 0 ? '#ffc2bd' : '#c0dfff'"
                             style="padding: 0 2px 0 18px"
                         >
                             <!-- style="width: 158px; z-index: 999; top: 3px" -->
@@ -113,7 +113,7 @@
                         <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 13px">
                             <div>
                                 持股成本&nbsp;&nbsp;<el-tag
-                                    :type="scope.row.cost.avg <= scope.row.last_price ? 'danger' : 'success'"
+                                    :type="scope.row.cost.avg <= scope.row.last_price ? 'primary' : 'danger'"
                                     class="ml-2"
                                     size="small"
                                     effect="plain"
@@ -138,7 +138,12 @@
                                 >
                             </div>
                             <div>
-                                本　　金&nbsp;&nbsp;<el-tag class="ml-2" size="small" effect="plain" style="margin: 1px 0px"
+                                本　　金&nbsp;&nbsp;<el-tag
+                                    class="ml-2"
+                                    type="warning"
+                                    size="small"
+                                    effect="plain"
+                                    style="margin: 1px 0px"
                                     ><span style="font-size: 14px; font-weight: bold">{{
                                         scope.row.cost.sum.toLocaleString('en-US')
                                     }}</span>
