@@ -1078,9 +1078,13 @@ const stock = {
         },
         getSpreadList: (state) => () => {
             console.log('getSpreadList');
-            return _.filter(state.stockList, function (obj) {
-                return obj.cost;
-            });
+            return _.orderBy(
+                _.filter(state.stockList, function (obj) {
+                    return obj.cost;
+                }),
+                ['cost.sum'],
+                ['desc']
+            );
         },
     },
 };
