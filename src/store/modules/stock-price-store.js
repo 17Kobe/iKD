@@ -266,6 +266,8 @@ const stock = {
             ) {
                 if (_.has(foundStock, 'policy')) delete foundStock.policy;
                 delete foundStock.calc_policy_date;
+                delete foundStock.data.ma_buy;
+                delete foundStock.data.ma_sell;
             } else {
                 foundStock.policy = { settings: { buy: [], sell: [] } };
                 foundStock.policy.settings = policyList; // 複製數據複本
@@ -355,7 +357,8 @@ const stock = {
             if (
                 foundStock.data &&
                 foundStock.data.daily.length > 0 &&
-                (!_.has(foundStock, 'data.weekly') || // 基金, 第一次
+                (data.data.length > 0 || // 股票正常進來
+                    !_.has(foundStock, 'data.weekly') || // 基金, 第一次
                     foundStock.data.weekly.length === 0 || // 第一次股票抓資料後，但沒更新 weekly時
                     (foundStock.data.weekly.length > 0 && // 基金，第二次以後
                         foundStock.data.daily[foundStock.data.daily.length - 1][0] !==
@@ -472,12 +475,12 @@ const stock = {
 
             // const index = _.findIndex(state.stockList, ['id', stockId]);
             const foundStock = state.stockList.find((v) => v.id === stockId);
-            foundStock.data.ma_buy = [];
-            foundStock.data.ma_sell = [];
+            // let isModify = false;
             let resData = [];
             let preMaLimit = 0; // 先前的MA參數值，不可能為0，所以設為0
             // ===================塞入股價週線MA1資料===================
             if (_.has(foundStock, 'policy.settings.buy')) {
+                foundStock.data.ma_buy = [];
                 const foundMaBuy = _.find(foundStock.policy.settings.buy, ['method', 'ma_buy']);
                 if (foundMaBuy) {
                     resData = [];
@@ -499,6 +502,7 @@ const stock = {
             }
             // ===================塞入股價週線MA BUY資料(有可能最後是塞MA1，若MA1沒資料的話)===================
             if (_.has(foundStock, 'policy.settings.sell')) {
+                foundStock.data.ma_sell = [];
                 const foundMaSell = _.find(foundStock.policy.settings.sell, ['method', 'ma_sell']);
                 if (foundMaSell && preMaLimit !== foundMaSell.limit) {
                     resData = [];
@@ -523,7 +527,8 @@ const stock = {
             }
 
             // ===================塞入localstorage===================
-            localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+            if (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell'))
+                localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
             console.log('SAVE_STOCK_MA OK');
         },
         SAVE_STOCK_POLICY_RESULT(state, stockId) {

@@ -60,12 +60,12 @@
         </el-row>
         <el-row style="margin-bottom: 4px">
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 2px 0 4px">
-                <el-card shadow="hover">
+                <el-card shadow="hover" class="horizontal-bar">
                     <PieChart :chartData="pieData" :options="pieOptions" />
                 </el-card>
             </el-col>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
-                <el-card shadow="hover">
+                <el-card shadow="hover" class="horizontal-bar">
                     <BarChart :chartData="horizontalBarData" :options="horizontalBarOptions" />
                 </el-card>
             </el-col>
@@ -112,7 +112,7 @@
             </el-row>
         </template>
         <el-row>
-            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px">
+            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 2px 4px 5px 4px">
                 <el-button type="primary" size="small" @click="onAddDeposit" round plain
                     ><i class="el-icon-plus"></i> 新增存款</el-button
                 >
@@ -163,7 +163,7 @@
             </el-row>
         </template>
         <el-row>
-            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px">
+            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 2px 4px 5px 4px">
                 <el-button type="primary" size="small" @click="onAddDebt" round plain
                     ><i class="el-icon-plus"></i> 新增負債</el-button
                 >
@@ -382,7 +382,9 @@ export default {
         stockCostExistOfName() {
             // 存在 cost 設定的股票名稱
             return this.stockCostExistAndTop5List.reduce((acc, { name }) => {
-                acc.push(name);
+                let tempName = name;
+                tempName = tempName.replace('基金', '').replace('A2', '');
+                acc.push(tempName);
                 return acc;
             }, []);
         },
@@ -457,11 +459,12 @@ export default {
             const { stockList } = this;
             return {
                 indexAxis: 'y',
+
                 scales: {
                     x: {
                         ticks: {
                             callback(value, index, ticks) {
-                                if (value >= 10000 || value <= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                if (value >= 10000 || value <= -10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
                                 else return `$ ${value}`;
                             },
                         },
@@ -667,5 +670,7 @@ export default {
 .el-input-group__prepend
     padding: 0 10px!important
 .el-card__body
-    padding: 8px
+    padding: 3px
+.horizontal-bar .el-card__body
+    padding: 3px 2px
 </style>

@@ -516,6 +516,10 @@ export default {
                     }
                     console.log(tempStockObj);
                     this.queueStockDataList.push(tempStockObj);
+                } else if (obj.type === 'fund') {
+                    // 無資料，且是基金時，但無資料還是蠻怪，localstorage不可能無資料
+                    const foundStock = DefaultStockList.find((v) => v.id === obj.id);
+                    this.queueStockDataList.push(_.pick(foundStock, ['id', 'data']));
                 }
 
                 return acc;
