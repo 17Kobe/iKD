@@ -1055,9 +1055,7 @@ const stock = {
             const maxEarnOrLoseRate = _.max(
                 _.map(state.stockList, (obj) => {
                     if (obj.cost) {
-                        return Math.abs(
-                            Number((((obj.last_price * obj.cost.total - obj.cost.sum) * 100) / obj.cost.sum).toFixed(2))
-                        );
+                        return Math.abs(obj.cost.rate_of_return);
                     }
 
                     return 0;
