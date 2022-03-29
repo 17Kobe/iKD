@@ -41,17 +41,17 @@
                             ><span style="font-size: 10px"> 元</span>
                         </el-tag>
                     </span>
-                    <!-- <span v-if="fundDeposit > 0">
-                        <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
-                            >基金
-                            <span style="font-size: 15px; font-weight: bold">$ {{ fundDeposit.toLocaleString('en-US') }}</span
-                            ><span style="font-size: 10px"> 元</span>
-                        </el-tag>
-                    </span> -->
                     <span v-if="stockDeposit > 0" style="margin-right: 2px">
                         <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                             >股票
                             <span style="font-size: 15px; font-weight: bold">$ {{ stockDeposit.toLocaleString('en-US') }}</span
+                            ><span style="font-size: 10px"> 元</span>
+                        </el-tag>
+                    </span>
+                    <span v-if="otherDeposit > 0" style="margin-right: 2px">
+                        <br />&nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                            >其它
+                            <span style="font-size: 15px; font-weight: bold">$ {{ otherDeposit.toLocaleString('en-US') }}</span
                             ><span style="font-size: 10px"> 元</span>
                         </el-tag>
                     </span>
@@ -355,17 +355,17 @@ export default {
                 return acc;
             }, 0);
         },
-        fundDeposit() {
-            // 定存 sum
-            return this.assetList.reduce((acc, { account, amount }) => {
-                if (account.includes('基金')) return acc + Math.abs(amount);
-                return acc;
-            }, 0);
-        },
+        // fundDeposit() {
+        //     // 定存 sum
+        //     return this.assetList.reduce((acc, { account, amount }) => {
+        //         if (account.includes('基金')) return acc + Math.abs(amount);
+        //         return acc;
+        //     }, 0);
+        // },
         otherDeposit() {
             // 其它 sum
             return this.assetList.reduce((acc, { account, amount, isPositive }) => {
-                if (!account.includes('定存') && !account.includes('活存') && !account.includes('基金') && isPositive)
+                if (!account.includes('定存') && !account.includes('活存') && isPositive)
                     return acc + Math.abs(amount);
                 return acc;
             }, 0);
@@ -531,7 +531,7 @@ export default {
                 labels: ['活存', '定存', '股票', '其它'],
                 datasets: [
                     {
-                        data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.fundDeposit, this.otherDeposit],
+                        data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.otherDeposit],
                         backgroundColor: [
                             // 背景色
                             'rgba(255, 205, 86, 0.5)',
