@@ -68,7 +68,7 @@
                             :text-inside="true"
                             :stroke-width="20"
                             :percentage="Math.abs(scope.row.cost.rate_of_return) * progressMultiple"
-                            :color="scope.row.cost.rate_of_return <= 0 ? '#ffc2bd' : '#c0dfff'"
+                            :color="scope.row.cost.rate_of_return <= 0 ? '#ffc2bd' : '#c5f4ff'"
                             style="padding: 0 2px 0 18px"
                         >
                             <!-- style="width: 158px; z-index: 999; top: 3px" -->

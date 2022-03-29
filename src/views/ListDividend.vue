@@ -1,7 +1,13 @@
 <template>
     <div>
         <el-row class="row-bg" justify="space-between" style="align-items: center">
-            <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight: bold">最新價差</el-col>
+            <el-col :span="11" style="margin-left: 17px; font-size: 18px; font-weight: bold"
+                >價差
+                <el-radio-group v-model="modeSpread" size="small" fill="#e9e9e9" text-color="#373737">
+                    <el-radio-button label="最新" />
+                    <el-radio-button label="歷史" />
+                </el-radio-group>
+            </el-col>
             <el-col :span="9" style="margin-right: 17px">
                 <el-tag
                     class="ml-2"
@@ -58,7 +64,13 @@
         </el-table>
 
         <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center">
-            <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight: bold">預估股利</el-col>
+            <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight: bold"
+                >股利
+                <el-radio-group v-model="modeDividend" size="small" fill="#e9e9e9" text-color="#373737">
+                    <el-radio-button label="預估" />
+                    <el-radio-button label="歷史" />
+                </el-radio-group>
+            </el-col>
             <el-col :span="9" style="margin-right: 17px">
                 <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right"
                     >總計
@@ -132,7 +144,10 @@
 export default {
     name: 'component-dividend',
     data() {
-        return {};
+        return {
+            modeSpread: '最新',
+            modeDividend: '預估',
+        };
     },
     computed: {
         dividendList() {
@@ -182,4 +197,6 @@ export default {
 <style lang="sass">
 .el-table .cell
     padding: 0
+.el-radio-button__inner
+    padding: 7px 10px!important
 </style>

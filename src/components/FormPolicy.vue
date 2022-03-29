@@ -42,8 +42,8 @@
 
             <el-form-item>
                 <el-button type="primary" size="small" @click="onAddBuy" style="margin-left: 5px"
-                    ><i class="el-icon-plus"></i
-                ></el-button>
+                    ><i class="el-icon-plus"></i>&nbsp;新增買進策略</el-button
+                >
             </el-form-item>
         </el-form>
 
@@ -86,8 +86,8 @@
 
             <el-form-item>
                 <el-button type="primary" size="small" @click="onAddSell" style="margin-left: 5px"
-                    ><i class="el-icon-plus"></i
-                ></el-button>
+                    ><i class="el-icon-plus"></i>&nbsp;新增賣出策略</el-button
+                >
             </el-form-item>
         </el-form>
     </el-drawer>
