@@ -33,7 +33,18 @@
         </el-row>
 
         <el-table :data="spreadList" style="width: 100%" empty-text="無資料">
-            <el-table-column label="名稱" prop="name" width="90" align="center"> </el-table-column>
+            <el-table-column label="名稱" width="90" align="center">
+                <template #default="scope">
+                    <el-badge
+                        :value="scope.row.badge"
+                        class="item"
+                        :class="[scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '', ['item', 'signal']]"
+                        :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
+                    >
+                        {{ scope.row.name }}
+                    </el-badge>
+                </template>
+            </el-table-column>
             <el-table-column label="成本價" prop="cost.avg" width="45" align="center"> </el-table-column>
             <el-table-column label="現價" prop="last_price" width="45" align="right" header-align="right"> </el-table-column>
             <el-table-column label="本金&nbsp;&nbsp;&nbsp;" width="75" align="right" header-align="right">
@@ -199,4 +210,7 @@ export default {
     padding: 0
 .el-radio-button__inner
     padding: 7px 10px!important
+.signal .el-badge__content
+    position: absolute
+    top: 7px
 </style>
