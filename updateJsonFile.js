@@ -4,6 +4,24 @@ const fs = require('fs');
 const _ = require('lodash');
 const axios = require('axios');
 const moment = require('moment');
+var os = require('os');
+
+var interfaces = os.networkInterfaces();
+var addresses = [];
+for (var k in interfaces) {
+    for (var k2 in interfaces[k]) {
+        var address = interfaces[k][k2];
+        if (address.family === 'IPv4' && !address.internal) {
+            addresses.push(address.address);
+        }
+    }
+}
+
+// console.log(addresses);
+
+const proxy = addresses.includes('10.144.169.121') ? 'http://10.160.3.88:8080' : null;
+
+console.log('proxy=' + proxy);
 
 const today = moment().format('YYYY-MM-DD');
 
@@ -30,6 +48,7 @@ function getPromise(url) {
             {
                 url: url,
                 json: true,
+                proxy: proxy,
             },
             (error, response, body) => {
                 console.log(response.statusCode);

@@ -55,6 +55,7 @@
                         <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 3px">
                             <el-form-item label="成交價">
                                 <el-input
+                                    v-model="sellPrice"
                                     placeholder="ex: 33.43"
                                     size="small"
                                     type="number"
@@ -69,6 +70,7 @@
                         <el-col :xs="11" :sm="10" :md="7" :lg="5" :xl="4" style="padding-left: 6px">
                             <el-form-item label="股數">
                                 <el-input-number
+                                    v-model="sellNumber"
                                     type="number"
                                     inputmode="decimal"
                                     :step="1000"
@@ -76,6 +78,20 @@
                                     style="margin-left: 2px"
                                     @focus="$event.target.select()"
                                 />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 3px">
+                            <el-form-item label="來源">
+                                <el-select v-model="sellSelectValue" placeholder="請選擇賣出來源" size="small" multiple>
+                                    <el-option
+                                        v-for="item in sellSourceOptions"
+                                        :key="item.index"
+                                        :label="item.label"
+                                        :value="item.index"
+                                    />
+                                </el-select>
                             </el-form-item>
                         </el-col>
                     </el-row>
@@ -113,6 +129,9 @@ export default {
                 // },
             ],
             formSell: [],
+            sellPrice: 0,
+            sellNumber: 1000,
+            sellSelectValue: [],
         };
     },
     computed: {
@@ -138,6 +157,12 @@ export default {
             // parseFloat 是為了去除小數點後面的0
             // div 0 結果會 NaN, 所以把它變 /1
             return Number((this.sumCost / (this.totalOfShares === 0 ? 1 : this.totalOfShares) / this.defaultExchange).toFixed(2));
+        },
+        sellSourceOptions() {
+            return this.form.reduce((acc, { cost, number }, index) => {
+                acc.push({ index, cost, number, label: cost + ' 元 ( ' + number + ' 股 )' });
+                return acc;
+            }, []);
         },
     },
     mounted() {},
@@ -179,6 +204,7 @@ export default {
             this.stockData = this.$store.getters.getStock(stockId); // 因為 computed 是在網頁開啟時就跑了，那時還沒有id就會變成沒過濾全都取了。為了在點擊設定才去取，所以要這樣
             // eslint-disable-next-line prefer-destructuring
             this.defaultCost = this.stockData.last_price;
+            this.sellPrice = this.defaultCost;
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定成本`;
             // 一定要用 else，不然可能用到上個開的股票了
             if (this.stockData.buy_exchange) this.defaultExchange = this.stockData.buy_exchange;
