@@ -33,7 +33,7 @@
         </el-row>
 
         <el-table :data="spreadList" style="width: 100%" empty-text="無資料">
-            <el-table-column label="名稱" width="90" align="center">
+            <el-table-column label="名稱" width="90" align="center" fixed>
                 <template #default="scope">
                     <el-badge
                         :value="scope.row.badge"
@@ -70,6 +70,40 @@
                             $ {{ scope.row.cost.return.toLocaleString('en-US') }}
                         </span></el-tag
                     >
+                </template>
+            </el-table-column>
+            <el-table-column label="漲跌幅" width="80" align="right" header-align="right">
+                <template #default="scope">
+                    <span
+                        :style="[
+                            scope.row.last_price_spread < 0
+                                ? { color: '#01aa00' }
+                                : scope.row.last_price_spread > 0
+                                ? { color: '#ee3333' }
+                                : { color: '#495057' },
+                            { 'font-size': '14px', 'font-weight': 'bold' },
+                        ]"
+                    >
+                        <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
+                        <i
+                            :class="[
+                                scope.row.last_price_spread < 0
+                                    ? 'el-icon-caret-bottom'
+                                    : scope.row.last_price_spread > 0
+                                    ? 'el-icon-caret-top'
+                                    : '',
+                            ]"
+                            :style="[
+                                scope.row.last_price_spread > 0
+                                    ? { position: 'relative', top: '2px' }
+                                    : { position: 'relative', top: '1px' },
+                            ]"
+                        ></i>
+                        <!-- 漲跌幅 如，2.53% -->
+                        <span style="font-size: 13px">
+                            {{ scope.row.last_price_spread !== null ? scope.row.last_price_spread + '%' : '' }}
+                        </span>
+                    </span>
                 </template>
             </el-table-column>
         </el-table>
