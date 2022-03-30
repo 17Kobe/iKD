@@ -48,16 +48,43 @@
         總金額 {{ sumCost.toLocaleString('en-US') }} 元<br />
         平均成交價： {{ averageCost }} 元<br />
         總股數：{{ totalOfShares }} 股 / {{ totalOf1000Shares }} 張 <br /><br />
-        <el-collapse>
+        <el-collapse v-if="form.length > 0">
             <el-collapse-item title="賣出股票" style="font-size: 15px">
-                <div>
-                    Consistent with real life: in line with the process and logic of real life, and comply with languages and
-                    habits that the users are used to;
-                </div>
-                <div>
-                    Consistent within interface: all elements should be consistent, such as: design style, icons and texts,
-                    position of elements, etc.
-                </div>
+                <el-form ref="formCostSellRef" :model="formSell">
+                    <el-row>
+                        <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 3px">
+                            <el-form-item label="成交價">
+                                <el-input
+                                    placeholder="ex: 33.43"
+                                    size="small"
+                                    type="number"
+                                    inputmode="decimal"
+                                    style="margin-left: 2px"
+                                    @focus="$event.target.select()"
+                                >
+                                    <template #suffix>元</template>
+                                </el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :xs="11" :sm="10" :md="7" :lg="5" :xl="4" style="padding-left: 6px">
+                            <el-form-item label="股數">
+                                <el-input-number
+                                    type="number"
+                                    inputmode="decimal"
+                                    :step="1000"
+                                    size="small"
+                                    style="margin-left: 2px"
+                                    @focus="$event.target.select()"
+                                />
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-form-item>
+                        <el-button type="primary" size="small" @click="onAdd" style="margin-left: 5px"
+                            ><i class="el-icon-plus"></i>&nbsp;送出</el-button
+                        >
+                    </el-form-item>
+                </el-form>
             </el-collapse-item>
         </el-collapse>
     </el-drawer>
@@ -85,6 +112,7 @@ export default {
                 //     number: 1000,
                 // },
             ],
+            formSell: [],
         };
     },
     computed: {
