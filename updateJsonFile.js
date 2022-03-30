@@ -1,4 +1,5 @@
-const https = require('https');
+// const https = require('https');
+const request = require('request');
 const fs = require('fs');
 const _ = require('lodash');
 const axios = require('axios');
@@ -23,30 +24,25 @@ const urls = [
 
 const fundName = ['富達全球科技基金', '貝萊德世界能源基金A2', '貝萊德世界黃金基金A2', '安聯台灣智慧基金'];
 
-const prices = {};
-
-function getPromise(backend) {
+function getPromise(url) {
     return new Promise(function (resolve) {
-        https.get(backend, function (res) {
-            console.log(`Got response: ${res.statusCode}`);
-            var body = '';
-            res.on('data', function (chunk) {
-                body += chunk;
-            });
-
-            res.on('end', function () {
-                var data = JSON.parse(body);
-                // console.log('Got a response: ', data);
+        request(
+            {
+                url: url,
+                json: true,
+            },
+            (error, response, body) => {
+                console.log(response.statusCode);
                 const values = [];
-                if (data.data.dates.length > 0) {
-                    data.data.dates.forEach((date, index) => {
-                        const closePrice = parseFloat(data.data.closePrices[index]);
+                if (body.data.dates.length > 0) {
+                    body.data.dates.forEach((date, index) => {
+                        const closePrice = parseFloat(body.data.closePrices[index]);
                         values.push([date, closePrice, closePrice, closePrice, closePrice]);
                     });
                 }
-                resolve(res.statusCode === 200 ? values : []);
-            });
-        });
+                resolve(response.statusCode === 200 ? values : []);
+            }
+        );
     });
 }
 
