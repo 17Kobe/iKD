@@ -104,7 +104,7 @@
 
         <el-table :data="dividendList" style="width: 100%" empty-text="無資料">
             <el-table-column label="名稱" prop="name" width="90" align="center"> </el-table-column>
-            <el-table-column label="除息日" width="42" align="center">
+            <el-table-column label="除息日" width="42" align="center" v-if="modeDividend === '預估'">
                 <template #default="scope">
                     {{ scope.row.trading_date.substr(5, 5).replace('-', '/') }}
                 </template>
@@ -122,9 +122,9 @@
                     <span style="font-weight: bold">{{ scope.row.earnings_distribution }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="發放日" width="42" align="center">
+            <el-table-column label="發放日" :width="modeDividend === '預估' ? 42 : 82" align="center">
                 <template #default="scope">
-                    {{ scope.row.payment_date.substr(5, 5).replace('-', '/') }}
+                    {{ modeDividend === '預估' ? scope.row.payment_date.substr(5, 5).replace('-', '/') : scope.row.payment_date }}
                 </template>
             </el-table-column>
             <el-table-column label="累積股數" width="70" align="right" header-align="right">
@@ -162,7 +162,7 @@ export default {
     },
     computed: {
         dividendList() {
-            return this.$store.getters.getDividendList();
+            return this.$store.getters.getDividendList(this.modeDividend);
         },
         spreadList() {
             return this.$store.getters.getSpreadList();
@@ -189,10 +189,13 @@ export default {
     },
     created() {
         console.log('created dividend');
-        const localdividendList = JSON.parse(localStorage.getItem('dividendList')) || [];
+        const localDividendList = JSON.parse(localStorage.getItem('dividendList')) || [];
+        const localHistoryDividendList = JSON.parse(localStorage.getItem('historyDividendList')) || [];
         // console.log(localdividendList);
         // localStockList 有可能是本地資料，或是預設資料。然後再呼叫載入 this.stockList
-        this.$store.commit('SAVE_DIVIDEND_LIST', localdividendList);
+        this.$store.commit('SAVE_DIVIDEND_LIST', localDividendList);
+        this.$store.commit('SAVE_HISTORY_DIVIDEND_LIST', localHistoryDividendList);
+
         console.log('created dividend over');
     },
     mounted() {

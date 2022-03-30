@@ -119,6 +119,7 @@ export default {
             const index = this.form.push({
                 cost: this.defaultCost,
                 number: 1000,
+                // buy_date: '2021-01-01',
                 buy_date: moment().format('YYYY-MM-DD'),
             });
             // nextTick()會在DOM已掛載、渲染完成後，執行nextTick()內的程式碼

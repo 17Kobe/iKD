@@ -4,6 +4,7 @@ import moment from 'moment';
 
 const defaultState = {
     dividendList: [],
+    historyDividendList: [],
 };
 
 const dividend = {
@@ -46,6 +47,7 @@ const dividend = {
                                 stockId: stcokObj.id,
                                 stockName: stcokObj.name,
                                 stockCostSettings: stcokObj.cost.settings,
+                                stockCrawlerDividendLastDate: localcrawlerDividendLastDate,
                                 data: res.data,
                             });
 
@@ -62,6 +64,7 @@ const dividend = {
                         stockId: stcokObj.id,
                         stockName: stcokObj.name,
                         stockCostSettings: [],
+                        stockCrawlerDividendLastDate: '',
                         data: [],
                     });
                 }
@@ -75,7 +78,11 @@ const dividend = {
             state.dividendList = data;
             // console.log(state.currStockDayData);
         },
-        SAVE_DIVIDEND(state, { stockId, stockName, stockCostSettings, data }) {
+        SAVE_HISTORY_DIVIDEND_LIST(state, data) {
+            console.log('SAVE_HISTORY_DIVIDEND_LIST');
+            state.historyDividendList = data;
+        },
+        SAVE_DIVIDEND(state, { stockId, stockName, stockCostSettings, stockCrawlerDividendLastDate, data }) {
             console.log('SAVE_DIVIDEND');
             // 會清掉再全部重加
             let isSaveToLocalStorage = false;
@@ -84,11 +91,46 @@ const dividend = {
                 _.remove(state.dividendList, (obj) => obj.id === stockId);
                 isSaveToLocalStorage = true;
             }
+            let isSaveHistoryToLocalStorage = false;
 
             const today = moment().startOf('day');
 
             if (_.has(data, 'data') && data.data.length > 0) {
-                // 計算今年，現在日期以後確定會發的股利
+                // 2022/01/01
+                // ===== 計算歷史股利 ====
+                const filterSureDividendHistory = _.filter(
+                    data.data,
+                    (o) =>
+                        moment(o.CashDividendPaymentDate).isSameOrBefore(today) &&
+                        moment(o.CashDividendPaymentDate).isAfter(moment(stockCrawlerDividendLastDate))
+                ); // 發放日在今天以前，並且是未曾計算日以後，這是確定的喔
+                filterSureDividendHistory.forEach((dividendObj) => {
+                    // 尋找小於等於除息日前的股票數目
+                    const accNumber = stockCostSettings.reduce((acc, { number, buy_date }) => {
+                        let addNumber = 0;
+                        if (!buy_date || moment(buy_date).isSameOrBefore(dividendObj.CashExDividendTradingDate)) {
+                            addNumber = number;
+                        }
+                        return acc + addNumber;
+                    }, 0);
+
+                    console.log(accNumber);
+
+                    if (accNumber > 0) {
+                        state.historyDividendList.push({
+                            id: stockId,
+                            name: stockName,
+                            payment_date: dividendObj.CashDividendPaymentDate,
+                            trading_date: dividendObj.CashExDividendTradingDate,
+                            earnings_distribution: dividendObj.CashEarningsDistribution,
+                            number_of_shares: accNumber,
+                            isSure: true,
+                        });
+                        isSaveHistoryToLocalStorage = true;
+                    }
+                });
+
+                // ===== 計算今年，現在日期以後確定會發的股利 ====
                 let thisYearLastCashDividendPaymentDate = null; // 用於算未確定的，要從這個日期以後
                 const filterSureDividend = _.filter(data.data, (o) => moment(o.CashDividendPaymentDate).isSameOrAfter(today)); // 發放日在今天以後，這是確定的喔
 
@@ -117,7 +159,7 @@ const dividend = {
                         });
                     }
                 });
-                // 計算去年，>現在日期以後，可能會發的股利
+                // ===== 計算去年，>現在日期以後，可能會發的股利 =====
                 const lastYearStartDate = thisYearLastCashDividendPaymentDate || today;
                 const thisDayLastYearAddOneMonth = lastYearStartDate.clone().subtract(1, 'years').add(30, 'days'); // 在此若沒加clone 會改變today值
                 const theLastDayOfLastYear = moment().subtract(1, 'years').endOf('year').startOf('day'); // 去年的最後一天
@@ -161,18 +203,24 @@ const dividend = {
                 localStorage.setItem('dividendList', JSON.stringify(state.dividendList));
                 console.log('SAVE_DIVIDEND OK');
             }
+            if (isSaveHistoryToLocalStorage) {
+                localStorage.setItem('historyDividendList', JSON.stringify(state.historyDividendList));
+            }
         },
     },
     getters: {
         // 該股票的股數，是另外再去撈的，如此才能當股數改變時又能即時反應
-        getDividendList: (state, getters, rootState) => () => {
+        getDividendList: (state, getters, rootState) => (mode) => {
             console.log('getDividendList');
-            const { dividendList } = state;
-            dividendList.forEach((obj, index) => {
+            // const { dividendList } = state;
+            let tempDividendList = undefined;
+            if (mode === '預估') tempDividendList = state.dividendList;
+            else tempDividendList = state.historyDividendList;
+            tempDividendList.forEach((obj, index) => {
                 const foundStock = _.find(rootState.price.stockList, ['id', obj.id]);
-                if (!dividendList[index].number_of_shares) dividendList[index].number_of_shares = foundStock.cost.total;
+                if (!tempDividendList[index].number_of_shares) tempDividendList[index].number_of_shares = foundStock.cost.total;
             });
-            return _.orderBy(dividendList, ['trading_date'], ['asc']);
+            return _.orderBy(tempDividendList, ['trading_date'], ['asc']);
         },
     },
 };
