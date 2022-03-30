@@ -656,6 +656,7 @@ input::-webkit-inner-spin-button
 .el-badge__content.is-fixed
     top: -2px
     right: calc(2px + var(--el-badge-size) / 2)
+    opacity: 0.88
 // group button padding 左右小一點
 .el-input-group__prepend
     padding: 0 10px
@@ -669,6 +670,7 @@ input::-webkit-inner-spin-button
     animation-play-state: running
     right: -20px
     top: -9px
+    opacity: 0.88
 
 // 全部 drawer title 變下面沒那麼多
 .el-drawer__header

@@ -217,4 +217,8 @@ export default {
     position: absolute
     top: 7px
     opacity: 0.88
+.signal.shake-base .el-badge__content
+    position: absolute
+    top: -2px
+    opacity: 0.88
 </style>
