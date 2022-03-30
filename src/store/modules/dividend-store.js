@@ -45,6 +45,7 @@ const dividend = {
                             context.commit('SAVE_DIVIDEND', {
                                 stockId: stcokObj.id,
                                 stockName: stcokObj.name,
+                                stockCostSettings: stcokObj.cost.settings,
                                 data: res.data,
                             });
 
@@ -60,6 +61,7 @@ const dividend = {
                     context.commit('SAVE_DIVIDEND', {
                         stockId: stcokObj.id,
                         stockName: stcokObj.name,
+                        stockCostSettings: [],
                         data: [],
                     });
                 }
@@ -73,7 +75,7 @@ const dividend = {
             state.dividendList = data;
             // console.log(state.currStockDayData);
         },
-        SAVE_DIVIDEND(state, { stockId, stockName, data }) {
+        SAVE_DIVIDEND(state, { stockId, stockName, stockCostSettings, data }) {
             console.log('SAVE_DIVIDEND');
             // 會清掉再全部重加
             let isSaveToLocalStorage = false;
@@ -88,17 +90,32 @@ const dividend = {
             if (_.has(data, 'data') && data.data.length > 0) {
                 // 計算今年，現在日期以後確定會發的股利
                 let thisYearLastCashDividendPaymentDate = null; // 用於算未確定的，要從這個日期以後
-                const filterSureDividend = _.filter(data.data, (o) => moment(o.CashDividendPaymentDate).isSameOrAfter(today));
+                const filterSureDividend = _.filter(data.data, (o) => moment(o.CashDividendPaymentDate).isSameOrAfter(today)); // 發放日在今天以後，這是確定的喔
+
                 filterSureDividend.forEach((dividendObj) => {
+                    // 尋找小於等於除息日前的股票數目
+                    const accNumber = stockCostSettings.reduce((acc, { number, buy_date }) => {
+                        let addNumber = 0;
+                        if (!buy_date || moment(buy_date).isSameOrBefore(dividendObj.CashExDividendTradingDate)) {
+                            addNumber = number;
+                        }
+                        return acc + addNumber;
+                    }, 0);
+
+                    console.log(accNumber);
+
                     thisYearLastCashDividendPaymentDate = moment(dividendObj.CashDividendPaymentDate);
-                    state.dividendList.push({
-                        id: stockId,
-                        name: stockName,
-                        payment_date: dividendObj.CashDividendPaymentDate,
-                        trading_date: dividendObj.CashExDividendTradingDate,
-                        earnings_distribution: dividendObj.CashEarningsDistribution,
-                        isSure: true,
-                    });
+                    if (accNumber > 0) {
+                        state.dividendList.push({
+                            id: stockId,
+                            name: stockName,
+                            payment_date: dividendObj.CashDividendPaymentDate,
+                            trading_date: dividendObj.CashExDividendTradingDate,
+                            earnings_distribution: dividendObj.CashEarningsDistribution,
+                            number_of_shares: accNumber,
+                            isSure: true,
+                        });
+                    }
                 });
                 // 計算去年，>現在日期以後，可能會發的股利
                 const lastYearStartDate = thisYearLastCashDividendPaymentDate || today;
@@ -106,14 +123,13 @@ const dividend = {
                 const theLastDayOfLastYear = moment().subtract(1, 'years').endOf('year').startOf('day'); // 去年的最後一天
 
                 // 曾經出現預估報酬率，去年的2021出現2筆tradingDate相同，PaymentDate也相同，但 date是未來2027日期的(現在是2022)
-                const filterNotSureDividend = _.filter(
-                    data.data,
-                    (o) => {
-                        return moment(o.CashDividendPaymentDate).isSameOrAfter(thisDayLastYearAddOneMonth) &&
+                const filterNotSureDividend = _.filter(data.data, (o) => {
+                    return (
+                        moment(o.CashDividendPaymentDate).isSameOrAfter(thisDayLastYearAddOneMonth) &&
                         moment(o.CashExDividendTradingDate).isSameOrBefore(theLastDayOfLastYear) && // 像台積電會少算12月配息日，因為拿到錢是1月份
-                        moment(o.date).isBefore(today); // date 不能是未來日期
-                    }
-                );
+                        moment(o.date).isBefore(today)
+                    ); // date 不能是未來日期
+                });
                 filterNotSureDividend.forEach((dividendObj) => {
                     state.dividendList.push({
                         id: stockId,
@@ -154,7 +170,7 @@ const dividend = {
             const { dividendList } = state;
             dividendList.forEach((obj, index) => {
                 const foundStock = _.find(rootState.price.stockList, ['id', obj.id]);
-                dividendList[index].number_of_shares = foundStock.cost.total;
+                if (!dividendList[index].number_of_shares) dividendList[index].number_of_shares = foundStock.cost.total;
             });
             return _.orderBy(dividendList, ['trading_date'], ['asc']);
         },

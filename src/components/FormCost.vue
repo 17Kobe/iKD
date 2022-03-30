@@ -41,18 +41,31 @@
 
             <el-form-item>
                 <el-button type="primary" size="small" @click="onAdd" style="margin-left: 5px"
-                    ><i class="el-icon-plus"></i>&nbsp;新增買進股價</el-button
+                    ><i class="el-icon-plus"></i>&nbsp;新增買進股票</el-button
                 >
             </el-form-item>
         </el-form>
         總金額 {{ sumCost.toLocaleString('en-US') }} 元<br />
         平均成交價： {{ averageCost }} 元<br />
-        總股數：{{ totalOfShares }} 股 / {{ totalOf1000Shares }} 張
+        總股數：{{ totalOfShares }} 股 / {{ totalOf1000Shares }} 張 <br /><br />
+        <el-collapse>
+            <el-collapse-item title="賣出股票" style="font-size: 15px">
+                <div>
+                    Consistent with real life: in line with the process and logic of real life, and comply with languages and
+                    habits that the users are used to;
+                </div>
+                <div>
+                    Consistent within interface: all elements should be consistent, such as: design style, icons and texts,
+                    position of elements, etc.
+                </div>
+            </el-collapse-item>
+        </el-collapse>
     </el-drawer>
 </template>
 
 <script>
 import _ from 'lodash';
+import moment from 'moment';
 
 export default {
     name: 'component-form-cost',
@@ -106,6 +119,7 @@ export default {
             const index = this.form.push({
                 cost: this.defaultCost,
                 number: 1000,
+                buy_date: moment().format('YYYY-MM-DD'),
             });
             // nextTick()會在DOM已掛載、渲染完成後，執行nextTick()內的程式碼
             // https://stackoverflow.com/questions/59749325/vue-set-focus-to-dynamic-input-box
