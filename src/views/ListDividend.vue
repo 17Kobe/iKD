@@ -213,5 +213,5 @@ export default {
 .signal .el-badge__content
     position: absolute
     top: 7px
-    opacity: 0.8
+    opacity: 0.88
 </style>
