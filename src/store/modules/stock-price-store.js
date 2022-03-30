@@ -949,12 +949,15 @@ const stock = {
                     foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
                     foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
                     if (foundKdGold) {
-                        const lastestK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1][1];
-                        if (lastestK <= foundKdGold.limit) foundStock.badge = '準買';
+                        const lastestArray = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1];
+                        const lastestK = lastestArray[1];
+                        const lastestD = lastestArray[2];
+                        if (lastestK <= foundKdGold.limit && lastestK < lastestD) foundStock.badge = '準買'; // K要小於D，才是訊號前的準備
                     }
                     if (foundKdTurnUp) {
                         const lastestK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1][1];
-                        if (lastestK <= foundKdTurnUp.limit) foundStock.badge = '準買';
+                        const lastSecondK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 2][1];
+                        if (lastestK <= foundKdTurnUp.limit && lastestK < lastSecondK) foundStock.badge = '準買';
                     }
                 }
 
@@ -969,13 +972,16 @@ const stock = {
                         foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
                         foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
                         if (foundKdDead) {
-                            const lastestK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1][1];
+                            const lastestArray = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1];
+                            const lastestK = lastestArray[1];
+                            const lastestD = lastestArray[2];
 
-                            if (lastestK >= foundKdDead.limit) foundStock.badge = '準賣';
+                            if (lastestK >= foundKdDead.limit && lastestK > lastestD) foundStock.badge = '準賣'; // K要大於D，才是訊號前的準備
                         }
                         if (foundKdTurnDown) {
                             const lastestK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1][1];
-                            if (lastestK >= foundKdTurnDown.limit) foundStock.badge = '準賣';
+                            const lastSecondK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 2][1];
+                            if (lastestK >= foundKdTurnDown.limit && lastestK > lastSecondK) foundStock.badge = '準賣';
                         }
                     }
                 }
