@@ -149,7 +149,7 @@
                         value="估"
                         class="item"
                         type="warning"
-                        style="position: relative; top: 6px"
+                        style="position: relative; top: 6px; opacity: 0.83"
                         v-if="!scope.row.isSure"
                     >
                     </el-badge>

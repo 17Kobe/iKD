@@ -140,9 +140,9 @@
                             <div>
                                 本　　金&nbsp;&nbsp;<el-tag
                                     class="ml-2"
-                                    type="warning"
+                                    type='info'
                                     size="small"
-                                    effect="plain"
+                                    effect="dark"
                                     style="margin: 1px 0px"
                                     ><span style="font-size: 14px; font-weight: bold">{{
                                         scope.row.cost.sum.toLocaleString('en-US')

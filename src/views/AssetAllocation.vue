@@ -223,7 +223,7 @@ export default {
                     },
                     title: {
                         display: true,
-                        text: '存款負債表',
+                        text: '存款負債',
                         // align: 'start',
                         padding: {
                             top: 5,
@@ -265,7 +265,7 @@ export default {
                 plugins: {
                     title: {
                         display: true,
-                        text: '存款配置表',
+                        text: '存款配置',
                         // align: 'start',
                         padding: {
                             top: 5,
@@ -502,7 +502,7 @@ export default {
                     },
                     title: {
                         display: true,
-                        text: '股票損益表',
+                        text: '股票 Top 5 本金的損益',
                         // align: 'start',
                         padding: {
                             top: 5,
