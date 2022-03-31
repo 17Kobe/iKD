@@ -1,5 +1,5 @@
 @echo off
-cd /d "%~dp0"
+cd D:\Code\iKD\
 node updateJsonFile.js
 npm run build
 cd dist

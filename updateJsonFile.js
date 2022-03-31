@@ -4,7 +4,10 @@ const fs = require('fs');
 const _ = require('lodash');
 const axios = require('axios');
 const moment = require('moment');
-var os = require('os');
+const os = require('os');
+const HttpsProxyAgent = require('https-proxy-agent')
+
+
 
 var interfaces = os.networkInterfaces();
 var addresses = [];
@@ -20,6 +23,7 @@ for (var k in interfaces) {
 // console.log(addresses);
 
 const proxy = addresses.includes('10.144.169.121') ? 'http://10.160.3.88:8080' : null;
+const agent = addresses.includes('10.144.169.121') ? new HttpsProxyAgent('http://10.160.3.88:8080') : null;
 
 console.log('proxy=' + proxy);
 
@@ -88,6 +92,7 @@ Promise.all(urls.map(getPromise)).then(function (stats) {
     const oneMonthAgo = moment().subtract(30, 'days').format('YYYY-MM-DD'); // 30天前避免農曆年或近期取不到值，但最終只是要抓最新的
     axios
         .get('https://api.finmindtrade.com/api/v4/data', {
+            httpsAgent: agent,
             params: {
                 dataset: 'TaiwanExchangeRate',
                 data_id: 'USD',
