@@ -304,4 +304,6 @@ export default {
     font-size: 16px
 .i-form .el-form-item__content
     line-height: 28px
+.el-drawer.rtl
+    overflow: scroll
 </style>
