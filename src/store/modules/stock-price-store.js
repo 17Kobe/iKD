@@ -1110,6 +1110,16 @@ const stock = {
                 ['desc']
             );
         },
+        getNoBuyList: (state) => () => {
+            console.log('getNoBuyList');
+            return _.orderBy(
+                _.filter(state.stockList, function (obj) {
+                    return !obj.cost;
+                }),
+                ['order'],
+                ['asc']
+            );
+        },
     },
 };
 

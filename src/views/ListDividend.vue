@@ -108,6 +108,7 @@
             </el-table-column>
         </el-table>
 
+<!-- ================================ 股利 -->
         <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center">
             <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight: bold"
                 >股利
@@ -175,6 +176,64 @@
                 </template>
             </el-table-column>
         </el-table>
+
+<!-- ================================ 其他尚未買進股票 -->
+        <el-row class="row-bg" justify="space-between" style="margin-top: 17px; align-items: center">
+            <el-col :span="11" style="margin-left: 17px; font-size: 18px; font-weight: bold"
+                >其他尚未買進股票
+            </el-col>
+        </el-row>
+
+        <el-table :data="noBuyList" style="width: 100%" empty-text="無資料">
+            <el-table-column label="名稱" width="220" align="center" fixed>
+                <template #default="scope">
+                    <el-badge
+                        :value="scope.row.badge"
+                        class="item"
+                        :class="[scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '', ['item', 'signal', 'signal-pos']]"
+                        :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
+                    >
+                        {{ scope.row.name }}
+                    </el-badge>
+                </template>
+            </el-table-column>
+            <el-table-column label="現價" prop="last_price" width="45" align="right" header-align="right"> </el-table-column>
+            <el-table-column label="漲跌幅" width="80" align="right" header-align="right">
+                <template #default="scope">
+                    <span
+                        :style="[
+                            scope.row.last_price_spread < 0
+                                ? { color: '#01aa00' }
+                                : scope.row.last_price_spread > 0
+                                ? { color: '#ee3333' }
+                                : { color: '#495057' },
+                            { 'font-size': '14px', 'font-weight': 'bold' },
+                        ]"
+                    >
+                        <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
+                        <i
+                            :class="[
+                                scope.row.last_price_spread < 0
+                                    ? 'el-icon-caret-bottom'
+                                    : scope.row.last_price_spread > 0
+                                    ? 'el-icon-caret-top'
+                                    : '',
+                            ]"
+                            :style="[
+                                scope.row.last_price_spread > 0
+                                    ? { position: 'relative', top: '2px' }
+                                    : { position: 'relative', top: '1px' },
+                            ]"
+                        ></i>
+                        <!-- 漲跌幅 如，2.53% -->
+                        <span style="font-size: 13px">
+                            {{ scope.row.last_price_spread !== null ? scope.row.last_price_spread + '%' : '' }}
+                        </span>
+                    </span>
+                </template>
+            </el-table-column>
+        </el-table>
+
         <br /><br />
         <br /><br />
     </div>
@@ -200,6 +259,9 @@ export default {
         },
         spreadList() {
             return this.$store.getters.getSpreadList();
+        },
+        noBuyList() {
+            return this.$store.getters.getNoBuyList();
         },
         totalDividend() {
             return this.dividendList.reduce(
@@ -257,4 +319,12 @@ export default {
     top: -2px
     right: -20px
     opacity: 0.83
+
+.signal.signal-pos .el-badge__content
+    right: 2px
+    top: 9px
+
+.signal.signal-pos.shake-base .el-badge__content
+    right: -27px
+    top: 0px
 </style>

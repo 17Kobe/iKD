@@ -570,12 +570,12 @@ export default {
         //     this.$store.dispatch('GET_STOCK_PRICE');
         // }, 3000);
         // 欄位設成fixed然後table又設成header在最上方，會造成欄位自行多加 Is-hidden而使得看不到欄位名稱
-        this.$nextTick(() => {
-            const elems = document.querySelectorAll('.is-hidden');
-            [].forEach.call(elems, (el) => {
-                el.classList.remove('is-hidden');
-            });
-        });
+        // this.$nextTick(() => {
+        //     const elems = document.querySelectorAll('.is-hidden');
+        //     [].forEach.call(elems, (el) => {
+        //         el.classList.remove('is-hidden');
+        //     });
+        // });
     },
     methods: {
         fmtDate(timestamp) {
