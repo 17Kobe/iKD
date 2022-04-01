@@ -21,6 +21,7 @@
                 </el-menu-item>
             </el-menu>
         </footer>
+        <el-backtop :right="10" :bottom="68" :visibility-height="30" />
     </div>
 </template>
 

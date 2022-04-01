@@ -173,7 +173,6 @@
             </el-col> -->
         </el-row>
 
-        <br />
         <div style="font-size: 14px; color: #999; margin: 20px">
             <div>
                 【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、
