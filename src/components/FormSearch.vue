@@ -53,6 +53,7 @@
                 </template>
             </el-table-column>
         </el-table>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;總數量：{{customStockList.length}}
     </el-drawer>
 </template>
 

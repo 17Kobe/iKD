@@ -502,7 +502,7 @@ export default {
                     },
                     title: {
                         display: true,
-                        text: '股票 Top 5 本金的損益',
+                        text: '股票本金 Top 5 的損益',
                         // align: 'start',
                         padding: {
                             top: 5,
