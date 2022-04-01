@@ -81,7 +81,7 @@
                                 : scope.row.last_price_spread > 0
                                 ? { color: '#ee3333' }
                                 : { color: '#495057' },
-                            { 'font-size': '14px', 'font-weight': 'bold' },
+                            { 'font-size': '14px' },
                         ]"
                     >
                         <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
@@ -100,15 +100,18 @@
                             ]"
                         ></i>
                         <!-- 漲跌幅 如，2.53% -->
-                        <span style="font-size: 13px">
-                            {{ scope.row.last_price_spread !== null ? scope.row.last_price_spread + '%' : '' }}
+                        <span style="font-size: 14px">
+                            {{ scope.row.last_price_spread }}<span style="margin-left: 2px">%</span>
                         </span>
                     </span>
                 </template>
             </el-table-column>
+            <el-table-column label="累積股數&nbsp;&nbsp;" width="80" align="right" header-align="right">
+                <template #default="scope"> {{ scope.row.cost.total.toLocaleString('en-US') }} 股&nbsp;&nbsp; </template>
+            </el-table-column>
         </el-table>
 
-<!-- ================================ 股利 -->
+        <!-- ================================ 股利 -->
         <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center">
             <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight: bold"
                 >股利
@@ -177,20 +180,21 @@
             </el-table-column>
         </el-table>
 
-<!-- ================================ 其他尚未買進股票 -->
+        <!-- ================================ 未買進的股票 -->
         <el-row class="row-bg" justify="space-between" style="margin-top: 17px; align-items: center">
-            <el-col :span="11" style="margin-left: 17px; font-size: 18px; font-weight: bold"
-                >其他尚未買進股票
-            </el-col>
+            <el-col :span="11" style="margin-left: 17px; font-size: 18px; font-weight: bold">未買進的股票 </el-col>
         </el-row>
 
-        <el-table :data="noBuyList" style="width: 100%" empty-text="無資料">
-            <el-table-column label="名稱" width="220" align="center" fixed>
+        <el-table :data="noBuyList" style="width: 100%" empty-text="無資料" class="i-table">
+            <el-table-column label="名稱" width="220" align="center">
                 <template #default="scope">
                     <el-badge
                         :value="scope.row.badge"
                         class="item"
-                        :class="[scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '', ['item', 'signal', 'signal-pos']]"
+                        :class="[
+                            scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '',
+                            ['item', 'signal', 'signal-pos'],
+                        ]"
                         :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
                     >
                         {{ scope.row.name }}
@@ -207,7 +211,7 @@
                                 : scope.row.last_price_spread > 0
                                 ? { color: '#ee3333' }
                                 : { color: '#495057' },
-                            { 'font-size': '14px', 'font-weight': 'bold' },
+                            { 'font-size': '14px' },
                         ]"
                     >
                         <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
@@ -226,8 +230,8 @@
                             ]"
                         ></i>
                         <!-- 漲跌幅 如，2.53% -->
-                        <span style="font-size: 13px">
-                            {{ scope.row.last_price_spread !== null ? scope.row.last_price_spread + '%' : '' }}
+                        <span style="font-size: 14px">
+                            {{ scope.row.last_price_spread }}<span style="margin-left: 2px">%</span>
                         </span>
                     </span>
                 </template>
@@ -241,7 +245,7 @@
 
 <script>
 // import _ from 'lodash';
-
+//
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 
@@ -307,6 +311,9 @@ export default {
 <style lang="sass">
 .el-table .cell
     padding: 0
+// 其它未買進的股票高度也跟上面2個表格一樣高，一致性比較好
+.el-table.i-table .cell
+    min-height: 24px
 .el-radio-button__inner
     padding: 7px 10px!important
 .signal .el-badge__content

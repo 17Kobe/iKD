@@ -223,7 +223,7 @@ export default {
                     },
                     title: {
                         display: true,
-                        text: '存款負債',
+                        text: '存款和負債',
                         // align: 'start',
                         padding: {
                             top: 5,
@@ -365,8 +365,7 @@ export default {
         otherDeposit() {
             // 其它 sum
             return this.assetList.reduce((acc, { account, amount, isPositive }) => {
-                if (!account.includes('定存') && !account.includes('活存') && isPositive)
-                    return acc + Math.abs(amount);
+                if (!account.includes('定存') && !account.includes('活存') && isPositive) return acc + Math.abs(amount);
                 return acc;
             }, 0);
         },
