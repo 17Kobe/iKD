@@ -45,12 +45,12 @@
                 >
             </el-form-item>
         </el-form>
-        總金額 {{ sumCost.toLocaleString('en-US') }} 元<br />
-        平均成交價： {{ averageCost }} 元<br />
-        總股數：{{ totalOfShares }} 股 / {{ totalOf1000Shares }} 張 <br /><br />
+        平均買進成交價： {{ averageCost }} 元<br />
+        共買進股數：{{ totalOfShares }} 股 / {{ totalOf1000Shares }} 張 <br />
+        共買進金額 {{ sumCost.toLocaleString('en-US') }} 元<br /><br />
         <el-collapse v-if="form.length > 0">
-            <el-collapse-item title="賣出股票" style="font-size: 15px">
-                <el-form ref="formCostSellRef" :model="formSell">
+            <el-collapse-item title="&nbsp;&nbsp;&nbsp;&nbsp;賣出股票">
+                <el-form ref="formCostSellRef" :model="formSell" class="i-form">
                     <el-row>
                         <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 3px">
                             <el-form-item label="成交價">
@@ -74,6 +74,7 @@
                                     type="number"
                                     inputmode="decimal"
                                     :step="1000"
+                                    :max="totalOfShares"
                                     size="small"
                                     style="margin-left: 2px"
                                     @focus="$event.target.select()"
@@ -84,23 +85,33 @@
                     <el-row>
                         <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 3px">
                             <el-form-item label="來源">
-                                <el-select v-model="sellSelectValue" placeholder="請選擇賣出來源" size="small" multiple>
+                                <el-checkbox-group v-model="checkedSellSrc" style="margin-left: 10px">
+                                    <template v-for="sellSrc in sellSrcOptions" :key="sellSrc.index">
+                                        <el-checkbox :label="sellSrc.label">{{ sellSrc.label }}</el-checkbox>
+                                    </template>
+                                </el-checkbox-group>
+                                <!-- <el-select v-model="sellSelectValue" placeholder="請選擇賣出來源" size="small" multiple>
                                     <el-option
                                         v-for="item in sellSourceOptions"
                                         :key="item.index"
                                         :label="item.label"
                                         :value="item.index"
                                     />
-                                </el-select>
+                                </el-select> -->
                             </el-form-item>
                         </el-col>
                     </el-row>
                     <el-form-item>
                         <el-button type="primary" size="small" @click="onAdd" style="margin-left: 5px"
-                            ><i class="el-icon-plus"></i>&nbsp;送出</el-button
+                            ><i class="el-icon-plus"></i>&nbsp;送出歷史賣出股票</el-button
                         >
                     </el-form-item>
                 </el-form>
+                <span style="font-size: 16px">
+                    賣出成交價： {{ sellPrice }} 元<br />
+                    賣出股數：{{ sellNumber }} 股 / {{ sellTotalOf1000Shares }} 張 <br />
+                    賣出金額 {{ sellSumPrice.toLocaleString('en-US') }} 元<br /><br />
+                </span>
             </el-collapse-item>
         </el-collapse>
     </el-drawer>
@@ -130,8 +141,11 @@ export default {
             ],
             formSell: [],
             sellPrice: 0,
-            sellNumber: 1000,
+            sellNumber: 0, //預設賣0股，給沒有買股票做為初始值，其它數字是動態給的
             sellSelectValue: [],
+
+            // sellSrcOptions: ['上海', '北京', '广州', '深圳'],
+            checkedSellSrc: [],
         };
     },
     computed: {
@@ -146,6 +160,12 @@ export default {
             // https://stackoverflow.com/questions/50670204/sum-up-array-with-objects
             return Number((this.totalOfShares / 1000).toFixed(2));
         },
+        sellTotalOf1000Shares() {
+            console.log('sellTotalOf1000Shares');
+
+            // https://stackoverflow.com/questions/50670204/sum-up-array-with-objects
+            return Number((this.sellNumber / 1000).toFixed(2));
+        },
         sumCost() {
             console.log('averageCost');
             // 有可能cost 為 null，所以要變更為0
@@ -158,11 +178,47 @@ export default {
             // div 0 結果會 NaN, 所以把它變 /1
             return Number((this.sumCost / (this.totalOfShares === 0 ? 1 : this.totalOfShares) / this.defaultExchange).toFixed(2));
         },
-        sellSourceOptions() {
-            return this.form.reduce((acc, { cost, number }, index) => {
-                acc.push({ index, cost, number, label: cost + ' 元 ( ' + number + ' 股 )' });
+        sellSrcOptions() {
+            let sellNumber = this.sellNumber; // 總共賣出的股數
+            this.checkedSellSrc = [];
+            // buy_date 是因為價格若一樣，則先買的日期要先賣
+            return _.orderBy(this.form, ['cost', 'buy_date'], ['desc', 'asc']).reduce((acc, { cost, number }, index) => {
+                // 該價格總共有的股數
+                // 計算可以賣的股數
+                // console.log('sellNumber =' + sellNumber);
+                let availableSellNumber = 0;
+                // 賣出總張出 >= 此價格的張數
+                if (sellNumber >= number) availableSellNumber = number;
+                else availableSellNumber = sellNumber; // 賣出總張出 < 此價格的張數
+                // console.log('availableSellNumber =' + availableSellNumber);
+                sellNumber = sellNumber - availableSellNumber; // 在此有可能減一減就變0
+                // console.log('sellNumber =' + sellNumber);
+                const label = cost + ' 元 ( 持有 ' + number + ' 股, 賣出 ' + availableSellNumber + ' 股)';
+                acc.push({
+                    index,
+                    cost,
+                    number,
+                    label: label,
+                });
+
+                if (availableSellNumber > 0) this.checkedSellSrc.push(label);
                 return acc;
             }, []);
+        },
+        sellSumPrice() {
+            console.log('sellSumPrice');
+            // 有可能cost 為 null，所以要變更為0
+            return Math.round(
+                this.checkedSellSrc.reduce((acc, label) => {
+                    var match = /(.*) 元 .*賣出 (.*) 股/.exec(label);
+                    const sellPrice = match[1];
+                    const sellNumber = match[2];
+
+                    // console.log(match[1]);
+                    // console.log(match[2]);
+                    return acc + (sellPrice || 0) * parseFloat(sellNumber, 10);
+                }, 0) * this.defaultExchange
+            );
         },
     },
     mounted() {},
@@ -216,6 +272,11 @@ export default {
             // this.$nextTick(() => {
             // this.$refs.cost0[0].focus();
             // });
+            if (_.has(this.stockData, 'cost.settings')) {
+                if (this.stockData.star === 3) this.sellNumber = Math.trunc(this.stockData.cost.total / 3);
+                // 只賣3分之1，無條件捨去
+                else this.sellNumber = this.stockData.cost.total;
+            } else this.sellNumber = 0;
         },
         onClosed() {
             this.$store.commit('SAVE_STOCK_COST', {
@@ -238,4 +299,9 @@ export default {
     padding: 0
 .el-input--small .el-input__inner
     padding: 0 17px 0 8px
+// 設定折疊的title字型大小
+.el-collapse-item__header
+    font-size: 16px
+.i-form .el-form-item__content
+    line-height: 28px
 </style>
