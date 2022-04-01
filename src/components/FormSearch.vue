@@ -102,7 +102,8 @@ export default {
             return this.$store.state.taiwan.taiwanStockList;
         },
         customStockList() {
-            return this.$store.state.price.stockList;
+            // return this.$store.state.price.stockList;
+            return this.$store.getters.getStockSortedList();
         },
     },
     mounted() {},

@@ -465,7 +465,8 @@ export default {
             // console.log(this.firstRender);
             // // 先畫6筆，符合iphone XR一次可以看到的數量，之後再畫全部
             // if (this.firstRender) return this.$store.state.price.stockList.slice(0, 6);
-            return this.$store.state.price.stockList;
+            return this.$store.getters.getStockSortedList();
+            // return this.$store.state.price.stockList;
 
             // return this.$store.state.price.stockList.reduce((acc, obj) => {
             //     if (obj.data) {
@@ -510,7 +511,10 @@ export default {
             // 將 localstorage 重塞回到 vuex 的 stockList
         } else {
             // 若已有資料時則先去除 data, policy(因為policy也會畫KD圖訊號)資料，用 setInterval來載入資料比較好
-            localStockList = localStockList.reduce((acc, obj) => {
+            localStockList = _.orderBy(localStockList,
+                ['order'],
+                ['asc']
+            ).reduce((acc, obj) => {
                 acc.push(_.omit(obj, ['data']));
                 if (obj.data) {
                     let tempStockObj = _.pick(obj, ['id', 'data']);

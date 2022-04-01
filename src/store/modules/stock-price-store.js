@@ -173,17 +173,34 @@ const stock = {
         MOVE_A_STOCK(state, { stockId, direction }) {
             // data 是 object {name: XXX, id: XXX}
             console.log('MOVE_A_STOCK');
-            const index = _.findIndex(state.stockList, ['id', stockId]);
-            console.log(index);
+            // const index = _.findIndex(state.stockList, ['id', stockId]);
+            // console.log(index);
 
-            const tmpStock = state.stockList.splice(index, 1)[0]; // 找出來是[{}]，所以要加[0]
+            // 先設定好原本的order，有可能原本都沒有
+            const stockSortedList = _.orderBy(state.stockList, ['order'], ['asc']);
+            stockSortedList.forEach((obj, index) => {
+                const foundStock = state.stockList.find((v) => v.id === obj.id);
+                foundStock.order = index + 1; // 順序從1開始
+            });
+            const foundStockMoveSrc = state.stockList.find((v) => v.id === stockId);
+            
+            const srcStockOrder = foundStockMoveSrc.order;
+            let dstStockOrder = null;
+            if (direction === 'bottom')
+                dstStockOrder = srcStockOrder + 1;
+            if (direction === 'top')
+                dstStockOrder = srcStockOrder - 1;
+            
+            const foundStockMoveDst = state.stockList.find((v) => v.order === dstStockOrder);
             if (direction === 'bottom') {
-                state.stockList.splice(index + 1, 0, tmpStock);
+                foundStockMoveSrc.order = foundStockMoveSrc.order + 1;
+                foundStockMoveDst.order = foundStockMoveDst.order - 1;
             }
-            if (direction === 'top') {
-                state.stockList.splice(index - 1, 0, tmpStock);
+            else if (direction === 'top') {
+                foundStockMoveSrc.order = foundStockMoveSrc.order - 1;
+                foundStockMoveDst.order = foundStockMoveDst.order + 1;
             }
-            // console.log(state.currStockDayData);
+
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
         DEL_A_STOCK(state, data) {
@@ -991,6 +1008,10 @@ const stock = {
         },
     },
     getters: {
+        getStockSortedList: (state) => () => {
+            console.log('getStockSortedList');
+            return _.orderBy(state.stockList, ['order'], ['asc']);
+        },
         // object of array to filter
         getStock: (state) => (id) => {
             console.log('getStock');
