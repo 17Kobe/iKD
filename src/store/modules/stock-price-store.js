@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 const defaultState = {
     usdExchange: 30,
-    stockList: [],
+    stockList: [], // 目前知道 ios 在 19支股票，>=19會不能儲存localstorage
 };
 
 const stock = {

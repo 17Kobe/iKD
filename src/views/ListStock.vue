@@ -521,7 +521,7 @@ export default {
                     // 若是基金時，在這裡是塞JSON的data.daily資料，因為是可能最新的。但不修改data.weekly資料喔，這部份還是由vuex去算
                     if (obj.type === 'fund') {
                         const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
-                        tempStockObj.data.daily = foundStock.data.daily;
+                        tempStockObj.data.daily = _.cloneDeep(foundStock.data.daily);
                     }
                     console.log(tempStockObj);
                     this.queueStockDataList.push(tempStockObj);
@@ -570,12 +570,12 @@ export default {
         //     this.$store.dispatch('GET_STOCK_PRICE');
         // }, 3000);
         // 欄位設成fixed然後table又設成header在最上方，會造成欄位自行多加 Is-hidden而使得看不到欄位名稱
-        // this.$nextTick(() => {
-        //     const elems = document.querySelectorAll('.is-hidden');
-        //     [].forEach.call(elems, (el) => {
-        //         el.classList.remove('is-hidden');
-        //     });
-        // });
+        this.$nextTick(() => {
+            const elems = document.querySelectorAll('.is-hidden');
+            [].forEach.call(elems, (el) => {
+                el.classList.remove('is-hidden');
+            });
+        });
     },
     methods: {
         fmtDate(timestamp) {
