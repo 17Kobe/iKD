@@ -170,6 +170,13 @@ const stock = {
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.dispatch('GET_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
+        ADD_A_STOCK_KEY(state, { stockId, isDvidend }) {
+            console.log('ADD_A_STOCK_KEY');
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            foundStock.is_dividend = isDvidend;
+            // state.stockList.push(data);
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+        },
         MOVE_A_STOCK(state, { stockId, direction }) {
             // data 是 object {name: XXX, id: XXX}
             console.log('MOVE_A_STOCK');
@@ -183,20 +190,17 @@ const stock = {
                 foundStock.order = index + 1; // 順序從1開始
             });
             const foundStockMoveSrc = state.stockList.find((v) => v.id === stockId);
-            
+
             const srcStockOrder = foundStockMoveSrc.order;
             let dstStockOrder = null;
-            if (direction === 'bottom')
-                dstStockOrder = srcStockOrder + 1;
-            if (direction === 'top')
-                dstStockOrder = srcStockOrder - 1;
-            
+            if (direction === 'bottom') dstStockOrder = srcStockOrder + 1;
+            if (direction === 'top') dstStockOrder = srcStockOrder - 1;
+
             const foundStockMoveDst = state.stockList.find((v) => v.order === dstStockOrder);
             if (direction === 'bottom') {
                 foundStockMoveSrc.order = foundStockMoveSrc.order + 1;
                 foundStockMoveDst.order = foundStockMoveDst.order - 1;
-            }
-            else if (direction === 'top') {
+            } else if (direction === 'top') {
                 foundStockMoveSrc.order = foundStockMoveSrc.order - 1;
                 foundStockMoveDst.order = foundStockMoveDst.order + 1;
             }

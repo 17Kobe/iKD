@@ -3,6 +3,7 @@
         "name": "元大高股息",
         "id": "0056",
         "star": 3,
+        "is_dividend": true,
         "cost": {
             "settings": [
                 {
@@ -47,6 +48,7 @@
         "name": "台積電",
         "id": "2330",
         "star": 3,
+        "is_dividend": true,
         "policy": {
             "settings": {
                 "buy": [
@@ -134,6 +136,7 @@
         "name": "聯發科",
         "id": "2454",
         "star": 2,
+        "is_dividend": true,
         "policy": {
             "settings": {
                 "buy": [
@@ -171,6 +174,7 @@
         "name": "大立光",
         "id": "3008",
         "star": 2,
+        "is_dividend": true,
         "policy": {
             "settings": {
                 "buy": [
@@ -202,6 +206,7 @@
         "name": "台達電",
         "id": "2308",
         "star": 2,
+        "is_dividend": true,
         "policy": {
             "settings": {
                 "buy": [
@@ -233,6 +238,7 @@
         "name": "富邦金",
         "id": "2881",
         "star": 2,
+        "is_dividend": true,
         "policy": {
             "settings": {
                 "buy": [
@@ -258,6 +264,7 @@
         "name": "元大金",
         "id": "2885",
         "star": 1,
+        "is_dividend": true,
         "policy": {
             "settings": {
                 "buy": [
@@ -289,6 +296,7 @@
         "name": "玉山金",
         "id": "2884",
         "star": 1,
+        "is_dividend": true,
         "policy": {
             "settings": {
                 "buy": [
@@ -314,6 +322,7 @@
         "name": "卜蜂",
         "id": "1215",
         "star": 1,
+        "is_dividend": true,
         "policy": {
             "settings": {
                 "buy": [

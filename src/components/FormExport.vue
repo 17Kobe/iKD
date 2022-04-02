@@ -112,6 +112,17 @@ export default {
             console.log(DefaultStockList);
             const storeStockList = this.stockList;
 
+            // 找出儲存有缺少的key
+            storeStockList.forEach((obj) => {
+                const foundStock = DefaultStockList.find((v) => v.id === obj.id);
+                if (foundStock.is_dividend && !obj.is_dividend)
+                    this.$store.commit('ADD_A_STOCK_KEY', {
+                        stockId: obj.id,
+                        isDvidend: foundStock.is_dividend,
+                    });
+            });
+
+            // 找出預設清單有但儲存是沒有id的新增加的清單
             const newStockList = _.filter(DefaultStockList, function (obj) {
                 return !_.find(storeStockList, { id: obj.id });
             });

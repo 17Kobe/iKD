@@ -28,7 +28,12 @@ const dividend = {
                 const localcrawlerDividendLastDate =
                     stcokObj.crawler_dividend_last_date || moment().subtract(1, 'days').format('YYYY-MM-DD');
                 // 必須是有買的才要去抓未來配息
-                if (_.has(stcokObj, 'cost.settings') && today !== localcrawlerDividendLastDate) {
+                if (
+                    _.has(stcokObj, 'cost.settings') &&
+                    stcokObj.type !== 'fund' &&
+                    stcokObj.is_dividend &&
+                    today !== localcrawlerDividendLastDate
+                ) {
                     // 為了只下一次API，但還要抓二年的資料回來算平均
                     axios
                         .get('https://api.finmindtrade.com/api/v4/data', {

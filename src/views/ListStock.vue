@@ -140,7 +140,7 @@
                             <div>
                                 本　　金&nbsp;&nbsp;<el-tag
                                     class="ml-2"
-                                    type='info'
+                                    type="info"
                                     size="small"
                                     effect="dark"
                                     style="margin: 1px 0px"
@@ -511,10 +511,7 @@ export default {
             // 將 localstorage 重塞回到 vuex 的 stockList
         } else {
             // 若已有資料時則先去除 data, policy(因為policy也會畫KD圖訊號)資料，用 setInterval來載入資料比較好
-            localStockList = _.orderBy(localStockList,
-                ['order'],
-                ['asc']
-            ).reduce((acc, obj) => {
+            localStockList = _.orderBy(localStockList, ['order'], ['asc']).reduce((acc, obj) => {
                 acc.push(_.omit(obj, ['data']));
                 if (obj.data) {
                     let tempStockObj = _.pick(obj, ['id', 'data']);
@@ -525,11 +522,12 @@ export default {
                     }
                     console.log(tempStockObj);
                     this.queueStockDataList.push(tempStockObj);
-                } else if (obj.type === 'fund') {
-                    // 無資料，且是基金時，但無資料還是蠻怪，localstorage不可能無資料
-                    const foundStock = DefaultStockList.find((v) => v.id === obj.id);
-                    this.queueStockDataList.push(_.pick(foundStock, ['id', 'data']));
                 }
+                // else if (obj.type === 'fund') {
+                //     // 無資料，且是基金時，但無資料還是蠻怪，localstorage不可能無資料
+                //     const foundStock = DefaultStockList.find((v) => v.id === obj.id);
+                //     this.queueStockDataList.push(_.pick(foundStock, ['id', 'data']));
+                // }
 
                 return acc;
             }, []);
