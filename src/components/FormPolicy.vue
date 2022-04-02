@@ -1,7 +1,7 @@
 <template>
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="85%">
         <el-form ref="formPolicyBuyRef" :model="form.buy">
-            <div style="font-size: 24px; margin: 0px 10px 10px">買進</div>
+            <div style="font-size: 24px; margin: 0px 10px 10px">買進策略</div>
 
             <el-row v-for="(item, index) in form.buy" :key="index">
                 <el-col :xs="12" :sm="6" :md="4" :lg="5" :xl="3" style="padding-left: 3px">
@@ -48,7 +48,7 @@
         </el-form>
 
         <el-form ref="formPolicySellRef" :model="form.sell">
-            <div style="font-size: 24px; margin: 0px 10px 10px">賣出</div>
+            <div style="font-size: 24px; margin: 0px 10px 10px">賣出策略</div>
 
             <el-row v-for="(item, index) in form.sell" :key="index">
                 <el-col :xs="12" :sm="6" :md="4" :lg="5" :xl="3" style="padding-left: 3px">
@@ -95,6 +95,7 @@
 
 <script>
 import _ from 'lodash';
+import { ElMessageBox, ElMessage } from 'element-plus';
 
 export default {
     name: 'component-form-policy',
@@ -250,10 +251,44 @@ export default {
             // });
         },
         onDelBuy(index) {
-            this.form.buy.splice(index, 1);
+            ElMessageBox.confirm(`將要刪除 [${this.form.buy[index].label}] 此買進策略?`, '確定', {
+                confirmButtonText: '確定',
+                cancelButtonText: '取消',
+                type: 'warning',
+            })
+                .then(() => {
+                    this.form.buy.splice(index, 1);
+                    ElMessage({
+                        type: 'success',
+                        message: '完成刪除!',
+                    });
+                })
+                .catch(() => {
+                    ElMessage({
+                        type: 'info',
+                        message: '取消刪除!',
+                    });
+                });
         },
         onDelSell(index) {
-            this.form.sell.splice(index, 1);
+            ElMessageBox.confirm(`將要刪除 [${this.form.sell[index].label}] 此賣出策略?`, '確定', {
+                confirmButtonText: '確定',
+                cancelButtonText: '取消',
+                type: 'warning',
+            })
+                .then(() => {
+                    this.form.sell.splice(index, 1);
+                    ElMessage({
+                        type: 'success',
+                        message: '完成刪除!',
+                    });
+                })
+                .catch(() => {
+                    ElMessage({
+                        type: 'info',
+                        message: '取消刪除!',
+                    });
+                });
         },
         onChangeBuyMethod(selValue, index) {
             // console.log(selValue);

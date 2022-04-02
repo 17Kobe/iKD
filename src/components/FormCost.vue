@@ -293,7 +293,24 @@ export default {
             // this.$refs[`number${index}`][0].focus();
         },
         onDel(index) {
-            this.form.splice(index, 1);
+            ElMessageBox.confirm(`將要刪除 成交價[${this.form[index].cost}] 股數[${this.form[index].number}] 的股票?`, '確定', {
+                confirmButtonText: '確定',
+                cancelButtonText: '取消',
+                type: 'warning',
+            })
+                .then(() => {
+                    this.form.splice(index, 1);
+                    ElMessage({
+                        type: 'success',
+                        message: '完成刪除!',
+                    });
+                })
+                .catch(() => {
+                    ElMessage({
+                        type: 'info',
+                        message: '取消刪除!',
+                    });
+                });
         },
         onInit(stockId) {
             console.log('onInit');
