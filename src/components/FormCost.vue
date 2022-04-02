@@ -1,5 +1,6 @@
 <template>
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="85%">
+        <span style="font-size: 24px">&nbsp;&nbsp;&nbsp;&nbsp;買進股票</span>
         <el-form ref="formCostRef" :model="form">
             <el-row v-for="(item, index) in form" :key="index">
                 <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 3px">
@@ -45,9 +46,9 @@
                 >
             </el-form-item>
         </el-form>
-        買進平均成本價： {{ averageCost }} 元<br />
-        買進股數：{{ totalOfShares }} 股 / {{ totalOf1000Shares }} 張 <br />
-        買進金額： {{ sumCost.toLocaleString('en-US') }} 元<br /><br />
+        &nbsp;買進平均成本價： {{ averageCost }} 元<br />
+        &nbsp;買進股數：{{ totalOfShares }} 股 / {{ totalOf1000Shares }} 張 <br />
+        &nbsp;買進金額： {{ sumCost.toLocaleString('en-US') }} 元<br /><br />
         <el-collapse v-if="form.length > 0">
             <el-collapse-item title="&nbsp;&nbsp;&nbsp;&nbsp;賣出股票">
                 <el-form ref="formCostSellRef" :model="formSell" class="i-form">
@@ -108,16 +109,16 @@
                     </el-form-item>
                 </el-form>
                 <span style="font-size: 16px">
-                    賣出平均成本價： {{ sellAverageCost }} 元<br />
-                    賣出成交價： {{ sellPrice }} 元<br />
-                    賣出股數：{{ sellNumber }} 股 / {{ sellTotalOf1000Shares }} 張 <br />
-                    賣出本金： {{ sellOriginSpend.toLocaleString('en-US') }} 元<br />
-                    賣出金額： {{ sellSumPrice.toLocaleString('en-US') }} 元<br />
-                    賣出報酬率：
+                    &nbsp;賣出平均成本價： {{ sellAverageCost }} 元<br />
+                    &nbsp;賣出成交價： {{ sellPrice }} 元<br />
+                    &nbsp;賣出股數：{{ sellNumber }} 股 / {{ sellTotalOf1000Shares }} 張 <br />
+                    &nbsp;賣出本金： {{ sellOriginSpend.toLocaleString('en-US') }} 元<br />
+                    &nbsp;賣出金額： {{ sellSumPrice.toLocaleString('en-US') }} 元<br />
+                    &nbsp;賣出報酬率：
                     <span :style="[sellRateOfReturn >= 0 ? { color: '#419eff' } : { color: '#f56c6c' }, {}]"
                         >{{ sellRateOfReturn.toFixed(1) }} %</span
                     ><br />
-                    賣出價差：
+                    &nbsp;賣出價差：
                     <span :style="[sellSpread >= 0 ? { color: '#419eff' } : { color: '#f56c6c' }, {}]"
                         >{{ sellSpread.toLocaleString('en-US') }} 元</span
                     ><br />
@@ -504,7 +505,7 @@ export default {
     padding: 0 17px 0 8px
 // 設定折疊的title字型大小
 .el-collapse-item__header
-    font-size: 16px
+    font-size: 24px
 .i-form .el-form-item__content
     line-height: 28px
 .el-drawer.rtl

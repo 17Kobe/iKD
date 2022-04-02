@@ -124,7 +124,7 @@
                     >
                         <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 13px">
                             <div>
-                                成 <span style="margin-left: 5px">本</span>
+                                成 <span style="margin-left: 4px">本</span>
                                 <span style="margin-left: 5px">價</span>&nbsp;&nbsp;<el-tag
                                     :type="scope.row.cost.avg <= scope.row.last_price ? 'primary' : 'danger'"
                                     class="ml-2"
