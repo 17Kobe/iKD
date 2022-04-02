@@ -2,7 +2,7 @@
     <div>
         <el-row class="row-bg" justify="space-between" style="align-items: center">
             <el-col :span="11" style="margin-left: 17px; font-size: 18px; font-weight: bold"
-                >價&nbsp;&nbsp;差&nbsp;&nbsp;
+                >價差&nbsp;&nbsp;
                 <el-radio-group v-model="modeSpread" size="small" fill="#dedede" text-color="#373737">
                     <el-radio-button label="最新" />
                     <el-radio-button label="歷史" />
@@ -56,16 +56,7 @@
                     </span>
                 </template>
             </el-table-column>
-            <el-table-column
-                label="現價"
-                prop="last_price"
-                width="45"
-                align="right"
-                header-align="right"
-                v-if="modeSpread === '最新'"
-            >
-            </el-table-column>
-            <el-table-column label="賣價" prop="sell_price" width="45" align="center" v-if="modeSpread === '歷史'">
+            <el-table-column :label="modeSpread === '最新' ? '現價' : '賣價'" prop="last_price" width="45" align="center">
             </el-table-column>
             <el-table-column label="本金&nbsp;&nbsp;&nbsp;" width="75" align="right" header-align="right">
                 <template #default="scope">
@@ -147,7 +138,7 @@
         <!-- ================================ 股利 -->
         <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center">
             <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight: bold"
-                >股&nbsp;&nbsp;利&nbsp;&nbsp;
+                >股利&nbsp;&nbsp;
                 <el-radio-group v-model="modeDividend" size="small" fill="#dedede" text-color="#373737">
                     <el-radio-button label="預估" />
                     <el-radio-button label="歷史" />

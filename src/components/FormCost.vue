@@ -381,7 +381,7 @@ export default {
                         name: this.stockData.name,
                         id: this.stockId,
                         buy_average_cost: this.sellAverageCost, // 成本價
-                        sell_price: this.sellPrice, // 賣價
+                        last_price: this.sellPrice, // 賣價, 原本用 sell_price，為了欄位一致改用 last_price，可解決欄位切換後會有粗體，可能隱藏欄位導致
                         buy_spend: this.sellOriginSpend, // 本金
                         sell_rate_of_return: this.sellRateOfReturn, // 報酬率
                         sell_return: this.sellSpread, // 價差
