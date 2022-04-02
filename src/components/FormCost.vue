@@ -23,13 +23,13 @@
                     <el-form-item label="股數">
                         <el-input-number
                             type="number"
-                            inputmode="decimal"
                             v-model="item.number"
                             :step="1000"
                             size="small"
+                            :ref="`number${index}`"
                             @keyup="onChangeNumber($event, index)"
                             style="margin-left: 2px"
-                            @focus="$event.target.select()"
+                            @focus="onFocusNumber($event, index)"
                         />
                     </el-form-item>
                 </el-col>
@@ -265,14 +265,31 @@ export default {
         onChangeCost(e, index) {
             console.log('onChangeCost');
             // 加 parseFloat就要是要把字串變float，存在 the.form裡面
-            // 一定要搭配type="number"，否則小數點.會輸入不出來
-            this.form[index].cost = parseInt(e.target.value);
+            // 一定要搭配type="number"，否則小數點.手機會輸入不出來
+
+            // 最終不能用 parseFloat 跟 parseInt 都會造成不能輸入小數點的問題，只好這裡是字串
+            this.form[index].cost = e.target.value;
         },
         onChangeNumber(e, index) {
             console.log('onChangeNumber');
             // 用 change 事件一樣會偵測不到，要用 keyup 事件才能在有按鍵輸入時即時反應值，
             //  e.target.value 是字串，要變整數。並且要給10才不會 eslint
+            // 而且用 parseInt 也可以輸入 float
             this.form[index].number = parseInt(e.target.value, 10);
+        },
+        onFocusNumber(e, index) {
+            console.log('onFocusNumber');
+            // console.log(e);
+            // console.log(index);
+            // console.log(this.$refs[`number${index}`]);
+            // console.log(this.$refs[`number${index}`][0]);
+            const input = this.$refs[`number${index}`][0].$el.querySelector('.el-input__inner');
+            input.setAttribute('inputmode', 'decimal');
+            e.target.select();
+            // inputmode="decimal"
+            // console.log(input);
+            // console.log(index);
+            // this.$refs[`number${index}`][0].focus();
         },
         onDel(index) {
             this.form.splice(index, 1);
@@ -372,7 +389,7 @@ export default {
                     let form = _.orderBy(
                         this.form.reduce((acc, obj, index) => {
                             acc.push({
-                                cost: parseFloat(obj.cost, 10),
+                                cost: parseFloat(obj.cost),
                                 number: obj.number,
                                 buy_date: obj.buy_date,
                                 index: index,
@@ -421,6 +438,11 @@ export default {
                         this.form.splice(v, 1);
                     });
 
+                    // 因為無法解決手機無法輸入.小數點時轉float會連.都沒有，所以最後才轉
+                    this.form.forEach((obj, index) => {
+                        this.form[index].cost = parseFloat(obj.cost);
+                    });
+
                     // console.log(removeIndex);
                     // console.log(this.form);
                     // console.log(this.averageCost);
@@ -455,6 +477,11 @@ export default {
                 });
         },
         onClosed() {
+            // 因為無法解決手機無法輸入.小數點時轉float會連.都沒有，所以最後才轉
+            this.form.forEach((obj, index) => {
+                this.form[index].cost = parseFloat(obj.cost);
+            });
+
             this.$store.commit('SAVE_STOCK_COST', {
                 stockId: this.stockId,
                 costList: this.form,
