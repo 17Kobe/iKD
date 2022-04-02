@@ -76,10 +76,12 @@
                 <template #default="scope">
                     <span style="font-weight: bold"
                         >{{
-                            scope.row.cost.rate_of_return >= 1000
+                            scope.row.cost.rate_of_return === null
+                                ? 'N/A'
+                                : scope.row.cost.rate_of_return >= 1000
                                 ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
                                 : scope.row.cost.rate_of_return.toFixed(1)
-                        }}<span style="margin-left: 2px">%</span></span
+                        }}<span style="margin-left: 2px" v-if="scope.row.cost.rate_of_return !== null">%</span></span
                     >
                 </template>
             </el-table-column>

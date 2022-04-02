@@ -68,11 +68,15 @@
                             :text-inside="true"
                             :stroke-width="20"
                             :percentage="
-                                Math.abs(scope.row.cost.rate_of_return) > 1000
+                                scope.row.cost.rate_of_return === null || Math.abs(scope.row.cost.rate_of_return) > 1000
                                     ? 100
                                     : Math.abs(scope.row.cost.rate_of_return) * progressMultiple
                             "
-                            :color="scope.row.cost.rate_of_return <= 0 ? '#ffc2bd' : '#c5f4ff'"
+                            :color="
+                                scope.row.cost.rate_of_return !== null && scope.row.cost.rate_of_return <= 0
+                                    ? '#ffc2bd'
+                                    : '#c5f4ff'
+                            "
                             style="padding: 0 2px 0 18px"
                         >
                             <!-- style="width: 158px; z-index: 999; top: 3px" -->
@@ -81,12 +85,14 @@
                                 損益&nbsp;&nbsp;<span style="font-size: 13px; font-weight: bold"
                                     >$ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
                                 >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
-                                    Math.abs(scope.row.cost.rate_of_return) >= 1000
+                                    scope.row.cost.rate_of_return === null
+                                        ? 'N/A'
+                                        : Math.abs(scope.row.cost.rate_of_return) >= 1000
                                         ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
                                         : Number(scope.row.cost.rate_of_return.toFixed(1))
-                                }}</span
-                                ><span style="color: #999999">%</span></span
-                            >
+                                }}</span>
+                                <span style="color: #999999" v-if="scope.row.cost.rate_of_return !== null">%</span>
+                            </span>
                         </el-progress>
                     </div>
                 </template>

@@ -266,8 +266,9 @@ const stock = {
                 foundStock.cost.rate_of_return = 0;
                 foundStock.cost.return = Math.round(close * foundStock.cost.total * exchange - foundStock.cost.sum);
                 foundStock.cost.rate_of_return =
-                    ((close * foundStock.cost.total * exchange - foundStock.cost.sum) * 100) /
-                    (foundStock.cost.sum === 0 ? 1 : foundStock.cost.sum); // 只發股數，有可能股價輸入0
+                    foundStock.cost.sum === 0
+                        ? null
+                        : ((close * foundStock.cost.total * exchange - foundStock.cost.sum) * 100) / foundStock.cost.sum; // 只發股數，有可能股價輸入0，這時設為 null，顯示則為 N/A 無法計算，因為成本為0，報酬率為無限吧
 
                 // save to localstorage
                 localStorage.setItem('stockList', JSON.stringify(state.stockList));
@@ -1084,7 +1085,7 @@ const stock = {
             const maxEarnOrLoseRate = _.max(
                 _.map(state.stockList, (obj) => {
                     if (obj.cost) {
-                        if (Math.abs(obj.cost.rate_of_return) <= 1000)
+                        if (obj.cost.rate_of_return !== null && Math.abs(obj.cost.rate_of_return) <= 1000)
                             // <=1000 才會列入計算
                             return Math.abs(obj.cost.rate_of_return);
                     }
