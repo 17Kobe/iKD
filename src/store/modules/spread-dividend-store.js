@@ -232,9 +232,13 @@ const dividend = {
             // const { SpreadList } = state;
             let tempSpreadList = undefined;
             if (mode === '最新')
-                tempSpreadList = _.filter(rootState.price.stockList, function (obj) {
-                    return obj.cost;
-                });
+                tempSpreadList = _.orderBy(
+                    _.filter(rootState.price.stockList, function (obj) {
+                        return obj.cost;
+                    }),
+                    ['cost.sum'],
+                    ['desc']
+                );
             else {
                 // 歷史
                 tempSpreadList = state.historySpreadList;
@@ -246,9 +250,10 @@ const dividend = {
                     tempSpreadList[index].cost.return = obj.sell_return; // 價差
                     tempSpreadList[index].cost.total = obj.sell_number; // 累積股數
                 });
+                tempSpreadList = _.orderBy(tempSpreadList, ['sell_date'], ['desc']);
             }
             console.log(tempSpreadList);
-            return _.orderBy(tempSpreadList, ['cost.sum'], ['desc']);
+            return tempSpreadList;
         },
         // 該股票的股數，是另外再去撈的，如此才能當股數改變時又能即時反應
         getDividendList: (state, getters, rootState) => (mode) => {

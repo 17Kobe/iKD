@@ -266,7 +266,7 @@ export default {
             console.log('onChangeCost');
             // 加 parseFloat就要是要把字串變float，存在 the.form裡面
             // 一定要搭配type="number"，否則小數點.會輸入不出來
-            this.form[index].cost = e.target.value;
+            this.form[index].cost = parseInt(e.target.value);
         },
         onChangeNumber(e, index) {
             console.log('onChangeNumber');
@@ -291,8 +291,16 @@ export default {
             if (this.stockData.buy_exchange) this.defaultExchange = this.stockData.buy_exchange;
             else this.defaultExchange = 1;
 
-            if (_.has(this.stockData, 'cost.settings')) this.form = _.cloneDeep(this.stockData.cost.settings);
-            else this.form = [];
+            if (_.has(this.stockData, 'cost.settings')) {
+                let tempForm = _.cloneDeep(this.stockData.cost.settings);
+                // 為了賣出股票是按照日期排序升序，但有些又沒有買的日期，就偷塞假值
+                tempForm.forEach((obj, index) => {
+                    if (!obj.buy_date) {
+                        tempForm[index].buy_date = '2022-01-01';
+                    }
+                });
+                this.form = tempForm;
+            } else this.form = [];
 
             // this.$nextTick(() => {
             // this.$refs.cost0[0].focus();
@@ -347,14 +355,93 @@ export default {
                     });
 
                     // 計算剩餘股數去更新
+                    // 取得賣出的來源股價及股數，是由高而
 
-                    // this.$store.commit('SAVE_STOCK_COST', {
-                    //     stockId: this.stockId,
-                    //     costList: this.form,
-                    //     totalOfShares: this.totalOfShares,
-                    //     averageCost: this.averageCost,
-                    //     sumCost: this.sumCost,
-                    // });
+                    // _.orderBy(this.form, ['cost', 'buy_date'], ['desc', 'asc']).
+                    const sellSrc = this.checkedSellSrc.reduce((acc, label) => {
+                        var match = /(.*) 元 .*賣出 (.*) 股/.exec(label);
+                        const sellPrice = match[1];
+                        const sellNumber = match[2];
+                        acc.push({ sellPrice: parseFloat(sellPrice, 10), sellNumber: parseFloat(sellNumber, 10) });
+                        return acc;
+                    }, []);
+
+                    console.log(sellSrc);
+
+                    // 先塞入索引，然後再對 form 排序
+                    let form = _.orderBy(
+                        this.form.reduce((acc, obj, index) => {
+                            acc.push({
+                                cost: parseFloat(obj.cost, 10),
+                                number: obj.number,
+                                buy_date: obj.buy_date,
+                                index: index,
+                            });
+                            return acc;
+                        }, []),
+                        ['cost', 'buy_date'],
+                        ['desc', 'asc']
+                    );
+
+                    console.log(form);
+
+                    let removeIndex = [];
+                    sellSrc.forEach((obj) => {
+                        // 找到第1筆應該就是對的，因為有排序
+                        const found = _.find(form, function (o) {
+                            return o.cost === obj.sellPrice;
+                        });
+                        console.log('=======');
+                        console.log(found);
+                        console.log(obj.sellNumber);
+                        if (found.number === obj.sellNumber) {
+                            // 數量一致，代表全賣
+                            // this.form.splice(found.index, 1);
+                            removeIndex.push(found.index);
+                            // 這裡也要察際刪掉 index，則下個find才會對。_.remove 是實際移除喔
+                            _.remove(form, (obj) => {
+                                obj.index === found.index;
+                            });
+                        }
+                        // 部份刪
+                        else {
+                            console.log(found.index);
+                            console.log(this.form[found.index].number);
+                            console.log(obj.sellNumber);
+                            this.form[found.index].number = this.form[found.index].number - obj.sellNumber;
+                            console.log(this.form[found.index].number);
+                        }
+                    });
+                    console.log(removeIndex);
+                    // 由大到小，準備要刪的index
+                    removeIndex = _.reverse(_.sortBy(removeIndex));
+                    console.log(this.form);
+                    // 真正從 the.form 去刪除
+                    removeIndex.forEach((v) => {
+                        this.form.splice(v, 1);
+                    });
+
+                    // console.log(removeIndex);
+                    // console.log(this.form);
+                    // console.log(this.averageCost);
+                    // console.log(this.totalOfShares);
+                    // console.log(this.sumCost);
+
+                    this.$store.commit('SAVE_STOCK_COST', {
+                        stockId: this.stockId,
+                        costList: this.form,
+                        totalOfShares: this.totalOfShares,
+                        averageCost: this.averageCost,
+                        sumCost: this.sumCost,
+                    });
+
+                    //j 重新調整可賣股數
+                    if (!_.isEmpty(this.form)) {
+                        if (this.stockData.star === 3) this.sellNumber = Math.trunc(this.totalOfShares / 3);
+                        // 只賣3分之1，無條件捨去
+                        else this.sellNumber = this.totalOfShares;
+                    } else this.sellNumber = 0;
+
                     ElMessage({
                         type: 'success',
                         message: '完成送出!',

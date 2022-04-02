@@ -124,6 +124,8 @@
             >
                 <template #default="scope"> {{ scope.row.cost.total.toLocaleString('en-US') }} 股&nbsp;&nbsp; </template>
             </el-table-column>
+            <el-table-column label="賣出日期" prop="sell_date" width="90" align="center" v-if="modeSpread === '歷史'">
+            </el-table-column>
         </el-table>
 
         <!-- ================================ 股利 -->
