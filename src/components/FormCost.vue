@@ -45,9 +45,9 @@
                 >
             </el-form-item>
         </el-form>
-        平均買進成交價： {{ averageCost }} 元<br />
-        共買進股數：{{ totalOfShares }} 股 / {{ totalOf1000Shares }} 張 <br />
-        共買進金額 {{ sumCost.toLocaleString('en-US') }} 元<br /><br />
+        買進平均成本價： {{ averageCost }} 元<br />
+        買進股數：{{ totalOfShares }} 股 / {{ totalOf1000Shares }} 張 <br />
+        買進金額： {{ sumCost.toLocaleString('en-US') }} 元<br /><br />
         <el-collapse v-if="form.length > 0">
             <el-collapse-item title="&nbsp;&nbsp;&nbsp;&nbsp;賣出股票">
                 <el-form ref="formCostSellRef" :model="formSell" class="i-form">
@@ -102,15 +102,25 @@
                         </el-col>
                     </el-row>
                     <el-form-item>
-                        <el-button type="primary" size="small" @click="onAdd" style="margin-left: 5px"
+                        <el-button type="primary" size="small" @click="onAddSellHistory" style="margin-left: 5px"
                             ><i class="el-icon-plus"></i>&nbsp;送出歷史賣出股票</el-button
                         >
                     </el-form-item>
                 </el-form>
                 <span style="font-size: 16px">
+                    賣出平均成本價： {{ Number(sellAverageCost.toFixed(2)) }} 元<br />
                     賣出成交價： {{ sellPrice }} 元<br />
                     賣出股數：{{ sellNumber }} 股 / {{ sellTotalOf1000Shares }} 張 <br />
-                    賣出金額 {{ sellSumPrice.toLocaleString('en-US') }} 元<br /><br />
+                    賣出本金： {{ sellOriginSpend.toLocaleString('en-US') }} 元<br />
+                    賣出金額： {{ sellSumPrice.toLocaleString('en-US') }} 元<br />
+                    賣出報酬率：
+                    <span :style="[sellRateOfReturn >= 0 ? { color: '#419eff' } : { color: '#f56c6c' }, {}]"
+                        >{{ sellRateOfReturn.toFixed(1) }} %</span
+                    ><br />
+                    賣出價差：
+                    <span :style="[sellSpread >= 0 ? { color: '#419eff' } : { color: '#f56c6c' }, {}]"
+                        >{{ sellSpread.toLocaleString('en-US') }} 元</span
+                    ><br />
                 </span>
             </el-collapse-item>
         </el-collapse>
@@ -120,6 +130,7 @@
 <script>
 import _ from 'lodash';
 import moment from 'moment';
+import { ElMessageBox, ElMessage } from 'element-plus';
 
 export default {
     name: 'component-form-cost',
@@ -206,7 +217,10 @@ export default {
             }, []);
         },
         sellSumPrice() {
-            console.log('sellSumPrice');
+            return Math.round(this.sellPrice * this.sellNumber);
+        },
+        sellOriginSpend() {
+            console.log('sellOriginSpend');
             // 有可能cost 為 null，所以要變更為0
             return Math.round(
                 this.checkedSellSrc.reduce((acc, label) => {
@@ -219,6 +233,15 @@ export default {
                     return acc + (sellPrice || 0) * parseFloat(sellNumber, 10);
                 }, 0) * this.defaultExchange
             );
+        },
+        sellSpread() {
+            return this.sellSumPrice - this.sellOriginSpend;
+        },
+        sellRateOfReturn() {
+            return ((this.sellSumPrice - this.sellOriginSpend) * 100) / this.sellOriginSpend;
+        },
+        sellAverageCost() {
+            return this.sellOriginSpend / this.sellNumber;
         },
     },
     mounted() {},
@@ -277,6 +300,66 @@ export default {
                 // 只賣3分之1，無條件捨去
                 else this.sellNumber = this.stockData.cost.total;
             } else this.sellNumber = 0;
+        },
+        onAddSellHistory() {
+            ElMessageBox.confirm(`將要送出 [${this.stockData.name}] 歷史賣出股票?`, '送出', {
+                confirmButtonText: '送出',
+                cancelButtonText: '取消',
+                type: 'warning',
+            })
+                .then(() => {
+                    // 賣出送出
+                    // 本金、平均成本價、價差、報酬率
+                    // 股票名稱、id、成本價、賣價、本金、報酬率、價差、賣出股數、賣出日期
+                    //     成本價：賣出平均成本價
+                    //     賣價：賣出成交價
+                    //     本金：賣出本金
+                    //     報酬率：賣出報酬率
+                    //     賣出股數：賣出股數
+                    //     賣出日期：今天日期
+                    // { stockId, stockName, buyAverageCost, sellPrice, buySpend, sellRateOfReturn, sellSpread, sellNumber, sellDate }
+                    // 賣出平均成本價： {{ Number(sellAverageCost.toFixed(2)) }} 元<br />
+                    // 賣出成交價： {{ sellPrice }} 元<br />
+                    // 賣出股數：{{ sellNumber }} 股 / {{ sellTotalOf1000Shares }} 張 <br />
+                    // 賣出本金： {{ sellOriginSpend.toLocaleString('en-US') }} 元<br />
+                    // 賣出金額： {{ sellSumPrice.toLocaleString('en-US') }} 元<br />
+                    // 賣出報酬率：
+                    // <span :style="[sellRateOfReturn >= 0 ? { color: '#419eff' } : { color: '#f56c6c' }, {}]"
+                    //     >{{ sellRateOfReturn.toFixed(1) }} %</span
+                    // ><br />
+                    // 賣出價差：
+                    // <span :style="[sellSpread >= 0 ? { color: '#419eff' } : { color: '#f56c6c' }, {}]"
+                    //     >{{ sellSpread.toLocaleString('en-US') }} 元</span
+                    // >
+
+                    this.$store.commit('PUSH_HISTORY_DIVIDEND_LIST', {
+                        name: this.stockData.name,
+                        id: this.stockId,
+                        buy_average_cost: this.sellAverageCost, // 成本價
+                        sell_price: this.sellPrice, // 賣價
+                        buy_spend: this.sellOriginSpend, // 本金
+                        sell_rate_of_return: this.sellRateOfReturn, // 報酬率
+                        sell_number: this.sellNumber, // 賣出股數
+                        sell_date: moment().format('YYYY-MM-DD'), // 賣出日期
+                    });
+                    // this.$store.commit('SAVE_STOCK_COST', {
+                    //     stockId: this.stockId,
+                    //     costList: this.form,
+                    //     totalOfShares: this.totalOfShares,
+                    //     averageCost: this.averageCost,
+                    //     sumCost: this.sumCost,
+                    // });
+                    ElMessage({
+                        type: 'success',
+                        message: '完成送出!',
+                    });
+                })
+                .catch(() => {
+                    ElMessage({
+                        type: 'info',
+                        message: '取消送出!',
+                    });
+                });
         },
         onClosed() {
             this.$store.commit('SAVE_STOCK_COST', {

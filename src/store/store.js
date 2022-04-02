@@ -3,7 +3,7 @@ import app from './modules/app-store';
 import price from './modules/stock-price-store';
 import taiwan from './modules/taiwan-stock-list-store';
 import asset from './modules/asset-store';
-import dividend from './modules/dividend-store';
+import dividend from './modules/spread-dividend-store';
 
 const defaultState = {};
 

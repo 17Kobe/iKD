@@ -1,7 +1,7 @@
 import { createRouter, createWebHashHistory } from 'vue-router';
 import ListStock from '@/views/ListStock.vue';
 import AssetAllocation from '@/views/AssetAllocation.vue';
-import ListDividend from '@/views/ListDividend.vue';
+import ListSpreadDividend from '@/views/ListSpreadDividend.vue';
 
 const router = createRouter({
     history: createWebHashHistory(),
@@ -12,7 +12,7 @@ const router = createRouter({
             components: {
                 default: ListStock, // 預設第一頁是顯示 自訂股票
                 asset: AssetAllocation, // 點到 tab 時，會顯示 router-view 的 name
-                dividend: ListDividend, // 點到 tab 時，會顯示 router-view 的 name
+                dividend: ListSpreadDividend, // 點到 tab 時，會顯示 router-view 的 name
             },
         },
     ],

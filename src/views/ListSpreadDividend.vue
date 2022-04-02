@@ -290,10 +290,12 @@ export default {
     created() {
         console.log('created dividend');
         const localDividendList = JSON.parse(localStorage.getItem('dividendList')) || [];
+        const localHistorySpreadList = JSON.parse(localStorage.getItem('historySpreadList')) || [];
         const localHistoryDividendList = JSON.parse(localStorage.getItem('historyDividendList')) || [];
         // console.log(localdividendList);
         // localStockList 有可能是本地資料，或是預設資料。然後再呼叫載入 this.stockList
         this.$store.commit('SAVE_DIVIDEND_LIST', localDividendList);
+        this.$store.commit('SAVE_HISTORY_SPREAD_LIST', localHistorySpreadList);
         this.$store.commit('SAVE_HISTORY_DIVIDEND_LIST', localHistoryDividendList);
 
         console.log('created dividend over');

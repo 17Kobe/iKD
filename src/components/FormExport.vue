@@ -154,11 +154,11 @@ export default {
                         const localDividendList = obj.dividendList || [];
                         store.commit('SAVE_DIVIDEND_LIST', localDividendList);
                     }
-                    if (obj.historyDividendList) {
-                        localStorage.setItem('historyDividendList', JSON.stringify(obj.historyDividendList));
-                        const localHistoryDividendList = obj.historyDividendList || [];
-                        store.commit('SAVE_HISTORY_DIVIDEND_LIST', localHistoryDividendList);
-                    }
+                    // if (obj.historyDividendList) {
+                    //     localStorage.setItem('historyDividendList', JSON.stringify(obj.historyDividendList));
+                    //     const localHistoryDividendList = obj.historyDividendList || [];
+                    //     store.commit('SAVE_HISTORY_DIVIDEND_LIST', localHistoryDividendList);
+                    // }
                     ElMessage({
                         type: 'success',
                         message: '完成匯入設定檔!',
