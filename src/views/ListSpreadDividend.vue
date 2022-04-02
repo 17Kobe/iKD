@@ -45,7 +45,17 @@
                     </el-badge>
                 </template>
             </el-table-column>
-            <el-table-column label="成本價" prop="cost.avg" width="45" align="center"> </el-table-column>
+            <el-table-column label="成本價" width="45" align="center">
+                <template #default="scope">
+                    <span>
+                        {{
+                            scope.row.cost.avg >= 100
+                                ? Number(scope.row.cost.avg.toFixed(1))
+                                : Number(scope.row.cost.avg.toFixed(2))
+                        }}
+                    </span>
+                </template>
+            </el-table-column>
             <el-table-column
                 label="現價"
                 prop="last_price"
@@ -65,7 +75,8 @@
             <el-table-column label="報酬率" width="53" align="right" header-align="right">
                 <template #default="scope">
                     <span style="font-weight: bold"
-                        >{{ scope.row.cost.rate_of_return.toFixed(1) }}<span style="margin-left: 2px">%</span></span
+                        >{{ scope.row.cost.rate_of_return > 1000 ? '>1k' : scope.row.cost.rate_of_return.toFixed(1)
+                        }}<span style="margin-left: 2px">%</span></span
                     >
                 </template>
             </el-table-column>

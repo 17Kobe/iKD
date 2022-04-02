@@ -264,11 +264,10 @@ const stock = {
                 const exchange = foundStock.buy_exchange ? state.usdExchange : 1;
                 foundStock.cost.return = 0;
                 foundStock.cost.rate_of_return = 0;
-                if (foundStock.cost.sum !== 0) {
-                    foundStock.cost.return = Math.round(close * foundStock.cost.total * exchange - foundStock.cost.sum);
-                    foundStock.cost.rate_of_return =
-                        ((close * foundStock.cost.total * exchange - foundStock.cost.sum) * 100) / foundStock.cost.sum;
-                }
+                foundStock.cost.return = Math.round(close * foundStock.cost.total * exchange - foundStock.cost.sum);
+                foundStock.cost.rate_of_return =
+                    ((close * foundStock.cost.total * exchange - foundStock.cost.sum) * 100) /
+                    (foundStock.cost.sum === 0 ? 1 : foundStock.cost.sum); // 只發股數，有可能股價輸入0
 
                 // save to localstorage
                 localStorage.setItem('stockList', JSON.stringify(state.stockList));
@@ -1085,7 +1084,9 @@ const stock = {
             const maxEarnOrLoseRate = _.max(
                 _.map(state.stockList, (obj) => {
                     if (obj.cost) {
-                        return Math.abs(obj.cost.rate_of_return);
+                        if (Math.abs(obj.cost.rate_of_return) <= 1000)
+                            // <=1000 才會列入計算
+                            return Math.abs(obj.cost.rate_of_return);
                     }
 
                     return 0;
@@ -1099,8 +1100,8 @@ const stock = {
             else if (maxEarnOrLoseRate <= 166) progressMultiple = 0.6;
             else if (maxEarnOrLoseRate <= 500) progressMultiple = 0.2;
             else if (maxEarnOrLoseRate <= 1000) progressMultiple = 0.1;
-            else if (maxEarnOrLoseRate <= 2000) progressMultiple = 0.05;
-            else if (maxEarnOrLoseRate <= 10000) progressMultiple = 0.01;
+            // else if (maxEarnOrLoseRate <= 2000) progressMultiple = 0.05;
+            // else if (maxEarnOrLoseRate <= 10000) progressMultiple = 0.01;
             // state.progressMultiple = progressMultiple;
             return progressMultiple;
         },
