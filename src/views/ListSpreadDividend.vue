@@ -140,7 +140,7 @@
             <el-col :span="9" style="margin-left: 17px; font-size: 18px; font-weight: bold"
                 >股利&nbsp;&nbsp;
                 <el-radio-group v-model="modeDividend" size="small" fill="#dedede" text-color="#373737">
-                    <el-radio-button label="預估" />
+                    <el-radio-button label="未來" />
                     <el-radio-button label="歷史" />
                 </el-radio-group>
             </el-col>
@@ -166,7 +166,7 @@
 
         <el-table :data="dividendList" style="width: 100%" empty-text="無資料">
             <el-table-column label="名稱" prop="name" width="90" align="center"> </el-table-column>
-            <el-table-column label="除息日" width="42" align="center" v-if="modeDividend === '預估'">
+            <el-table-column label="除息日" width="42" align="center" v-if="modeDividend === '未來'">
                 <template #default="scope">
                     {{ scope.row.trading_date.substr(5, 5).replace('-', '/') }}
                 </template>
@@ -184,9 +184,9 @@
                     <span style="font-weight: bold; color: #7b7b7b">{{ scope.row.earnings_distribution }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="發放日" :width="modeDividend === '預估' ? 42 : 82" align="center">
+            <el-table-column label="發放日" :width="modeDividend === '未來' ? 42 : 82" align="center">
                 <template #default="scope">
-                    {{ modeDividend === '預估' ? scope.row.payment_date.substr(5, 5).replace('-', '/') : scope.row.payment_date }}
+                    {{ modeDividend === '未來' ? scope.row.payment_date.substr(5, 5).replace('-', '/') : scope.row.payment_date }}
                 </template>
             </el-table-column>
             <el-table-column label="累積股數" width="70" align="right" header-align="right">
@@ -278,7 +278,7 @@ export default {
     data() {
         return {
             modeSpread: '最新',
-            modeDividend: '預估',
+            modeDividend: '未來',
         };
     },
     computed: {

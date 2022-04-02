@@ -260,7 +260,7 @@ const dividend = {
             console.log('getDividendList');
             // const { dividendList } = state;
             let tempDividendList = undefined;
-            if (mode === '預估') tempDividendList = state.dividendList;
+            if (mode === '未來') tempDividendList = state.dividendList;
             else tempDividendList = state.historyDividendList; // 歷史
 
             // 若沒有股數，則加上股數
