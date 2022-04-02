@@ -686,6 +686,10 @@ input::-webkit-inner-spin-button
 .el-drawer__header
     margin-bottom: 10px
 
+// 進度列中的文字靠左對齊
+.el-progress-bar__inner
+    text-align: left
+
 @keyframes shake-base
     0%, 100%
         transform: translate3d(-2px, 0, 0)
