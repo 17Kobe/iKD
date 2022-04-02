@@ -46,7 +46,17 @@
                 </template>
             </el-table-column>
             <el-table-column label="成本價" prop="cost.avg" width="45" align="center"> </el-table-column>
-            <el-table-column label="現價" prop="last_price" width="45" align="right" header-align="right"> </el-table-column>
+            <el-table-column
+                label="現價"
+                prop="last_price"
+                width="45"
+                align="right"
+                header-align="right"
+                v-if="modeSpread === '最新'"
+            >
+            </el-table-column>
+            <el-table-column label="賣價" prop="sell_price" width="45" align="center" v-if="modeSpread === '歷史'">
+            </el-table-column>
             <el-table-column label="本金&nbsp;&nbsp;&nbsp;" width="75" align="right" header-align="right">
                 <template #default="scope">
                     <span> $ {{ scope.row.cost.sum.toLocaleString('en-US') }} </span>
@@ -72,7 +82,7 @@
                     >
                 </template>
             </el-table-column>
-            <el-table-column label="漲跌幅" width="80" align="right" header-align="right">
+            <el-table-column label="漲跌幅" width="80" align="right" header-align="right" v-if="modeSpread === '最新'">
                 <template #default="scope">
                     <span
                         :style="[
@@ -106,7 +116,12 @@
                     </span>
                 </template>
             </el-table-column>
-            <el-table-column label="累積股數&nbsp;&nbsp;" width="80" align="right" header-align="right">
+            <el-table-column
+                :label="modeSpread === '最新' ? '累積股數&nbsp;&nbsp;' : '賣出股數&nbsp;&nbsp;'"
+                width="80"
+                align="right"
+                header-align="right"
+            >
                 <template #default="scope"> {{ scope.row.cost.total.toLocaleString('en-US') }} 股&nbsp;&nbsp; </template>
             </el-table-column>
         </el-table>
@@ -258,23 +273,23 @@ export default {
         };
     },
     computed: {
+        spreadList() {
+            return this.$store.getters.getSpreadList(this.modeSpread);
+        },
         dividendList() {
             return this.$store.getters.getDividendList(this.modeDividend);
         },
-        spreadList() {
-            return this.$store.getters.getSpreadList();
-        },
         noBuyList() {
             return this.$store.getters.getNoBuyList();
+        },
+        totalSpread() {
+            return this.spreadList.reduce((acc, { cost }) => acc + cost.return, 0);
         },
         totalDividend() {
             return this.dividendList.reduce(
                 (acc, { number_of_shares, earnings_distribution }) => acc + Math.round(number_of_shares * earnings_distribution),
                 0
             );
-        },
-        totalSpread() {
-            return this.spreadList.reduce((acc, { cost }) => acc + cost.return, 0);
         },
     },
     watch: {

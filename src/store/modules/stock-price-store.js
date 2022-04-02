@@ -1104,16 +1104,6 @@ const stock = {
             // state.progressMultiple = progressMultiple;
             return progressMultiple;
         },
-        getSpreadList: (state) => () => {
-            console.log('getSpreadList');
-            return _.orderBy(
-                _.filter(state.stockList, function (obj) {
-                    return obj.cost;
-                }),
-                ['cost.sum'],
-                ['desc']
-            );
-        },
         getNoBuyList: (state) => () => {
             console.log('getNoBuyList');
             return _.orderBy(

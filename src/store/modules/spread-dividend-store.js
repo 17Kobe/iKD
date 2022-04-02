@@ -226,13 +226,39 @@ const dividend = {
         },
     },
     getters: {
+        getSpreadList: (state, getters, rootState) => (mode) => {
+            console.log('getSpreadList');
+            // console.log(mode);
+            // const { SpreadList } = state;
+            let tempSpreadList = undefined;
+            if (mode === '最新')
+                tempSpreadList = _.filter(rootState.price.stockList, function (obj) {
+                    return obj.cost;
+                });
+            else {
+                // 歷史
+                tempSpreadList = state.historySpreadList;
+                tempSpreadList.forEach(function (obj, index) {
+                    tempSpreadList[index].cost = {};
+                    tempSpreadList[index].cost.avg = obj.buy_average_cost; // 成本價
+                    tempSpreadList[index].cost.sum = obj.buy_spend; // 本金
+                    tempSpreadList[index].cost.rate_of_return = obj.sell_rate_of_return; // 報酬率
+                    tempSpreadList[index].cost.return = obj.sell_return; // 價差
+                    tempSpreadList[index].cost.total = obj.sell_number; // 累積股數
+                });
+            }
+            console.log(tempSpreadList);
+            return _.orderBy(tempSpreadList, ['cost.sum'], ['desc']);
+        },
         // 該股票的股數，是另外再去撈的，如此才能當股數改變時又能即時反應
         getDividendList: (state, getters, rootState) => (mode) => {
             console.log('getDividendList');
             // const { dividendList } = state;
             let tempDividendList = undefined;
             if (mode === '預估') tempDividendList = state.dividendList;
-            else tempDividendList = state.historyDividendList;
+            else tempDividendList = state.historyDividendList; // 歷史
+
+            // 若沒有股數，則加上股數
             tempDividendList.forEach((obj, index) => {
                 const foundStock = _.find(rootState.price.stockList, ['id', obj.id]);
                 if (!tempDividendList[index].number_of_shares) tempDividendList[index].number_of_shares = foundStock.cost.total;

@@ -108,7 +108,7 @@
                     </el-form-item>
                 </el-form>
                 <span style="font-size: 16px">
-                    賣出平均成本價： {{ Number(sellAverageCost.toFixed(2)) }} 元<br />
+                    賣出平均成本價： {{ sellAverageCost }} 元<br />
                     賣出成交價： {{ sellPrice }} 元<br />
                     賣出股數：{{ sellNumber }} 股 / {{ sellTotalOf1000Shares }} 張 <br />
                     賣出本金： {{ sellOriginSpend.toLocaleString('en-US') }} 元<br />
@@ -217,7 +217,7 @@ export default {
             }, []);
         },
         sellSumPrice() {
-            return Math.round(this.sellPrice * this.sellNumber);
+            return Math.round(this.sellPrice * this.sellNumber * this.defaultExchange);
         },
         sellOriginSpend() {
             console.log('sellOriginSpend');
@@ -241,7 +241,9 @@ export default {
             return ((this.sellSumPrice - this.sellOriginSpend) * 100) / this.sellOriginSpend;
         },
         sellAverageCost() {
-            return this.sellOriginSpend / this.sellNumber;
+            return Number(
+                (this.sellOriginSpend / (this.sellNumber === 0 ? 1 : this.sellNumber) / this.defaultExchange).toFixed(2)
+            );
         },
     },
     mounted() {},
@@ -339,9 +341,13 @@ export default {
                         sell_price: this.sellPrice, // 賣價
                         buy_spend: this.sellOriginSpend, // 本金
                         sell_rate_of_return: this.sellRateOfReturn, // 報酬率
+                        sell_return: this.sellSpread, // 價差
                         sell_number: this.sellNumber, // 賣出股數
                         sell_date: moment().format('YYYY-MM-DD'), // 賣出日期
                     });
+
+                    // 計算剩餘股數去更新
+
                     // this.$store.commit('SAVE_STOCK_COST', {
                     //     stockId: this.stockId,
                     //     costList: this.form,
