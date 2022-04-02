@@ -75,7 +75,10 @@
             <el-table-column label="報酬率" width="53" align="right" header-align="right">
                 <template #default="scope">
                     <span style="font-weight: bold"
-                        >{{ scope.row.cost.rate_of_return > 1000 ? '>1k' : scope.row.cost.rate_of_return.toFixed(1)
+                        >{{
+                            scope.row.cost.rate_of_return >= 1000
+                                ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
+                                : scope.row.cost.rate_of_return.toFixed(1)
                         }}<span style="margin-left: 2px">%</span></span
                     >
                 </template>

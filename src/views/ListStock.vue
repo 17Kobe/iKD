@@ -81,8 +81,8 @@
                                 損益&nbsp;&nbsp;<span style="font-size: 13px; font-weight: bold"
                                     >$ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
                                 >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
-                                    Math.abs(scope.row.cost.rate_of_return) > 1000
-                                        ? '>1k'
+                                    Math.abs(scope.row.cost.rate_of_return) >= 1000
+                                        ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
                                         : Number(scope.row.cost.rate_of_return.toFixed(1))
                                 }}</span
                                 ><span style="color: #999999">%</span></span
