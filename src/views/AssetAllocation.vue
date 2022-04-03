@@ -325,13 +325,6 @@ export default {
                 plugins: {
                     title: {
                         display: false,
-                        // text: '存款配置',
-                        // // align: 'start',
-                        // padding: {
-                        //     top: 5,
-                        //     bottom: 10,
-                        // },
-                        // color: 'blue',
                     },
                     datalabels: {
                         display: false,
@@ -350,21 +343,22 @@ export default {
                         // },
                         // color: '#fff',
                     },
-                    // tooltip: {
-                    //     callbacks: {
-                    //         label(context) {
-                    //             console.log(context);
-                    //             let label = context.label || '';
-                    //             if (label) {
-                    //                 label += ': ';
-                    //             }
-                    //             if (context.parsed !== null) {
-                    //                 label += `$ ${context.parsed.toLocaleString('en-US')}`;
-                    //             }
-                    //             return label;
-                    //         },
-                    //     },
-                    // },
+                    tooltip: {
+                        callbacks: {
+                            title(context) {
+                                const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+                                return (
+                                    moment(context[0].parsed.x).format('YYYY-MM-DD') +
+                                    '(' +
+                                    dayOfWeek[moment(context[0].parsed.x).day()] +
+                                    ')'
+                                );
+                            },
+                            label(context) {
+                                return ' $ ' + context.parsed.y.toLocaleString('en-US');
+                            },
+                        },
+                    },
                     legend: {
                         display: false,
                     },
