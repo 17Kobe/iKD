@@ -189,6 +189,7 @@
 
 <script>
 import _ from 'lodash';
+import moment from 'moment';
 import { Chart, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { BarChart, PieChart } from 'vue-chart-3';
@@ -314,6 +315,9 @@ export default {
         };
     },
     computed: {
+        historyAssetList() {
+            return this.$store.state.asset.historyAssetList;
+        },
         stockList() {
             return this.$store.state.price.stockList;
         },
@@ -321,13 +325,22 @@ export default {
             return this.$store.state.asset.assetList;
         },
         assets() {
-            return (
+            const tempAssets =
                 this.stockDeposit +
                 this.assetList.reduce((acc, { amount, isPositive }) => {
                     if (isPositive) return acc + amount;
                     return acc;
-                }, 0)
-            );
+                }, 0);
+
+            console.log('=======assets');
+
+            // 存到歷史存款去
+            this.$store.commit('ADD_OR_UPDATE_HISTORY_ASSET_LIST', [
+                moment().format('YYYY-MM-DD'), // 日期
+                tempAssets, // 總存款
+            ]);
+
+            return tempAssets;
         },
         liabilities() {
             return this.assetList.reduce((acc, { amount, isPositive }) => {
@@ -558,11 +571,17 @@ export default {
         }
 
         this.$store.commit('SAVE_ASSET', localAssetList);
+
+        // localstorage 儲存是有負值，在這要轉成無負債
         this.assetList = localAssetList.reduce((acc, { account, amount }) => {
             acc.push({ account: account, amount: Math.abs(amount), isPositive: amount >= 0 });
             return acc;
         }, []);
         console.log('created asset over!');
+
+        // 歷史存款
+        const localHistoryAssettList = JSON.parse(localStorage.getItem('historyAssetList')) || [];
+        this.$store.commit('SAVE_HISTORY_ASSET_LIST', localHistoryAssettList);
     },
     methods: {
         onAddDeposit() {

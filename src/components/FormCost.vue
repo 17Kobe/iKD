@@ -377,7 +377,7 @@ export default {
                     //     >{{ sellSpread.toLocaleString('en-US') }} 元</span
                     // >
 
-                    this.$store.commit('PUSH_HISTORY_DIVIDEND_LIST', {
+                    this.$store.commit('PUSH_HISTORY_SPREAD_LIST', {
                         name: this.stockData.name,
                         id: this.stockId,
                         buy_average_cost: this.sellAverageCost, // 成本價

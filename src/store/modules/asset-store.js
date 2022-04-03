@@ -21,6 +21,7 @@ const defaultState = {
             amount: -2000000,
         },
     ],
+    historyAssetList: [],
 };
 
 const asset = {
@@ -36,6 +37,23 @@ const asset = {
             state.assetList = assetList;
             localStorage.setItem('assetList', JSON.stringify(state.assetList));
             console.log('SAVE_ASSET OVER');
+        },
+        // 一開始載入localstorage用的，不用再儲存至localstorage
+        SAVE_HISTORY_ASSET_LIST(state, data) {
+            console.log('SAVE_HISTORY_ASSET_LIST');
+            state.historyAssetList = data;
+        },
+        ADD_OR_UPDATE_HISTORY_ASSET_LIST(state, data) {
+            // { stockId, stockName, buyAverageCost, sellPrice, buySpend, sellRateOfReturn, sellSpread, sellNumber, sellDate }
+            // id、股票名稱、成本價、賣價、本金、報酬率、價差、賣出股數、賣出日期
+            console.log('ADD_OR_UPDATE_HISTORY_ASSET_LIST');
+
+            const foundHistoryAsset = state.historyAssetList.find((array) => array[0] === data[0]); // 沒找到會undefined
+
+            // 有找到日期就用更新，沒找到日期就push
+            if (foundHistoryAsset) foundHistoryAsset[1] = data[1];
+            else state.historyAssetList.push(data);
+            localStorage.setItem('historyAssetList', JSON.stringify(state.historyAssetList));
         },
     },
     getters: {},

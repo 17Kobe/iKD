@@ -84,14 +84,15 @@ const dividend = {
             state.dividendList = data;
             // console.log(state.currStockDayData);
         },
+        // 一開始載入用，不用再存 localstorage
         SAVE_HISTORY_SPREAD_LIST(state, data) {
             console.log('SAVE_HISTORY_SPREAD_LIST');
             state.historySpreadList = data;
         },
-        PUSH_HISTORY_DIVIDEND_LIST(state, data) {
+        PUSH_HISTORY_SPREAD_LIST(state, data) {
             // { stockId, stockName, buyAverageCost, sellPrice, buySpend, sellRateOfReturn, sellSpread, sellNumber, sellDate }
             // id、股票名稱、成本價、賣價、本金、報酬率、價差、賣出股數、賣出日期
-            console.log('PUSH_HISTORY_DIVIDEND_LIST');
+            console.log('PUSH_HISTORY_SPREAD_LIST');
             state.historySpreadList.push(data);
             localStorage.setItem('historySpreadList', JSON.stringify(state.historySpreadList));
         },
