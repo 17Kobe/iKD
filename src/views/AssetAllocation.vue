@@ -270,7 +270,9 @@ export default {
                 // 隱藏點
                 elements: {
                     point: {
-                        radius: 1,
+                        radius: 0,
+                        hitRadius: 3,
+                        hoverRadius: 5,
                     },
                 },
                 scales: {
@@ -680,6 +682,7 @@ export default {
                 // labels: ['2022-04-01', '2022-04-02', '2022-04-03'],
                 datasets: [
                     {
+                        // pointRadius: 0,
                         // data: [
                         //     // {
                         //     //     x: moment('2021-09-06'),
