@@ -11,7 +11,7 @@
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
                         存款摘要
                     </div>
-                    <el-tag class="ml-2 my-2" size="large"
+                    <el-tag class="ml-2 my-1" size="large"
                         >總計
                         <span style="font-size: 20px"> $ </span>
                         <span style="font-size: 24px; font-weight: bold">
@@ -308,7 +308,16 @@ export default {
                             // beginAtZero: true,
                             // stepSize: 100000,
                             callback(value, index, ticks) {
-                                return `$ ${value.toLocaleString('en-US')}`;
+                                console.log(ticks[index]);
+                                //有小數點就不顯示，可以是 step以0.5前進
+                                if (value.toString().includes('.')) return '';
+                                // 超過5個就顯示3個，所以最多有可能顯示4個
+                                else if (ticks.length >= 5 && index % 2 === 1) return '';
+                                // 怕顯示萬結果都一樣
+                                else if (ticks.length >= 2 && ticks[1].value - ticks[0].value < 1000)
+                                    return `$ ${value.toLocaleString('en-US')}`;
+                                else if (value >= 10000) return `$ ${(value / 10000).toFixed(1)} 萬`;
+                                else return `$ ${value.toLocaleString('en-US')}`;
                             },
                         },
                     },
@@ -852,5 +861,5 @@ export default {
 .horizontal-bar .el-card__body
     padding: 3px 2px
 #line-chart
-    height: 125px
+    height: 133px
 </style>
