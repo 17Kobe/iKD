@@ -267,21 +267,48 @@ export default {
             },
 
             lineOptions: {
+                // 隱藏點
+                elements: {
+                    point: {
+                        radius: 1,
+                    },
+                },
                 scales: {
                     x: {
                         type: 'time',
                         time: {
                             unit: 'month',
-                            // displayFormats: {
-                            //     quarter: '[Q]Q - YYYY',
-                            // },
+                            displayFormats: {
+                                quarter: '[Q]Q - YYYY',
+                            },
+                        },
+                        ticks: {
+                            callback: function (value, index, ticks) {
+                                let showMonth = '';
+                                if (value.includes('Jan')) showMonth = value.replace('Jan ', '') + '-1月';
+                                else if (value.includes('Feb')) showMonth = '2月';
+                                else if (value.includes('Mar')) showMonth = '3月';
+                                else if (value.includes('Apr')) showMonth = '4月';
+                                else if (value.includes('May')) showMonth = '5月';
+                                else if (value.includes('Jun')) showMonth = '6月';
+                                else if (value.includes('Jul')) showMonth = '7月';
+                                else if (value.includes('Aug')) showMonth = '8月';
+                                else if (value.includes('Sep')) showMonth = '9月';
+                                else if (value.includes('Oct')) showMonth = '10月';
+                                else if (value.includes('Nov')) showMonth = '11月';
+                                else if (value.includes('Dec')) showMonth = '12月';
+                                return showMonth;
+                            },
                         },
                     },
                     y: {
                         ticks: {
+                            suggestedMin: 0,
+                            // min: 0, // it is for ignoring negative step.
+                            // beginAtZero: true,
+                            // stepSize: 100000,
                             callback(value, index, ticks) {
-                                if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
-                                else return `$ ${value}`;
+                                return `$ ${value.toLocaleString('en-US')}`;
                             },
                         },
                     },
@@ -651,30 +678,40 @@ export default {
                 datasets: [
                     {
                         // data: [
-                        //     {
-                        //         x: moment('2021-09-06'),
-                        //         y: 560,
-                        //     },
-                        //     {
-                        //         x: moment('2021-10-06'),
-                        //         y: 550,
-                        //     },
+                        //     // {
+                        //     //     x: moment('2021-09-06'),
+                        //     //     y: 564450,
+                        //     // },
+                        //     // {
+                        //     //     x: moment('2021-10-06'),
+                        //     //     y: 564450,
+                        //     // },
                         //     {
                         //         x: moment('2021-11-06'),
-                        //         y: 50,
+                        //         y: 564411,
                         //     },
                         //     {
                         //         x: moment('2021-11-07'),
-                        //         y: 60,
+                        //         y: 566450,
                         //     },
                         //     {
                         //         x: moment('2021-11-08'),
-                        //         y: 20,
+                        //         y: 561350,
+                        //     },
+                        //     {
+                        //         x: moment('2021-11-09'),
+                        //         y: 561350,
+                        //     },
+                        //     {
+                        //         x: moment('2021-12-02'),
+                        //         y: 566350,
                         //     },
                         // ],
                         data: this.historyAssetList,
                         borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(215, 240, 250, 0.5)',
                         borderWidth: 2, // 外框寬度
+                        fill: true /* this option hide background-color */,
                     },
                 ],
             };

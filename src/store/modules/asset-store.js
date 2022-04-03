@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 const defaultState = {
     assetList: [
         {
@@ -59,12 +61,13 @@ const asset = {
     getters: {
         getHistoryAssetList: (state) => () => {
             console.log('getHistoryAssetList');
-
+            const sixMonthAgo = moment().subtract(6, 'months');
             return state.historyAssetList.reduce((acc, array) => {
-                acc.push({
-                    x: array[0],
-                    y: array[1],
-                });
+                if (moment(array[0]).isSameOrAfter(sixMonthAgo))
+                    acc.push({
+                        x: moment(array[0]),
+                        y: array[1],
+                    });
                 return acc;
             }, []);
         },
