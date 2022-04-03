@@ -56,7 +56,19 @@ const asset = {
             localStorage.setItem('historyAssetList', JSON.stringify(state.historyAssetList));
         },
     },
-    getters: {},
+    getters: {
+        getHistoryAssetList: (state) => () => {
+            console.log('getHistoryAssetList');
+
+            return state.historyAssetList.reduce((acc, array) => {
+                acc.push({
+                    x: array[0],
+                    y: array[1],
+                });
+                return acc;
+            }, []);
+        },
+    },
 };
 
 export default asset;

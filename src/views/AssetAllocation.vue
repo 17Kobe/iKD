@@ -11,7 +11,7 @@
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
                         存款摘要
                     </div>
-                    <el-tag class="ml-2" size="large" style="margin: 5px 0 11px 0"
+                    <el-tag class="ml-2 my-2" size="large"
                         >總計
                         <span style="font-size: 20px"> $ </span>
                         <span style="font-size: 24px; font-weight: bold">
@@ -29,7 +29,7 @@
                         >股票損益 <span style="font-size: 20px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
                     </el-tag> -->
                     <br />
-                    <span v-if="demandDeposit > 0" style="margin-right: 2px">
+                    <!-- <span v-if="demandDeposit > 0" style="margin-right: 2px">
                         &nbsp;&nbsp;&nbsp;<el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                             >活存
                             <span style="font-size: 15px; font-weight: bold">$ {{ demandDeposit.toLocaleString('en-US') }}</span
@@ -56,7 +56,8 @@
                             <span style="font-size: 15px; font-weight: bold">$ {{ otherDeposit.toLocaleString('en-US') }}</span
                             ><span style="font-size: 10px"> 元</span>
                         </el-tag>
-                    </span>
+                    </span> -->
+                    <LineChart :chartData="lineData" :options="lineOptions" />
                 </el-card>
             </el-col>
         </el-row>
@@ -191,8 +192,9 @@
 import _ from 'lodash';
 import moment from 'moment';
 import { Chart, registerables } from 'chart.js';
+import 'chartjs-adapter-moment';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { BarChart, PieChart } from 'vue-chart-3';
+import { BarChart, PieChart, LineChart } from 'vue-chart-3';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import ElCurrencyInput from '@/components/ElCurrencyInput.vue';
 
@@ -203,7 +205,7 @@ Chart.register(ChartDataLabels);
 export default {
     name: 'component-asset',
     // components: { highcharts: Chart },
-    components: { ElCurrencyInput, BarChart, PieChart },
+    components: { ElCurrencyInput, BarChart, PieChart, LineChart },
 
     data() {
         return {
@@ -263,50 +265,70 @@ export default {
                     },
                 },
             },
-            pieOptions: {
-                plugins: {
-                    title: {
-                        display: true,
-                        text: '存款配置',
-                        // align: 'start',
-                        padding: {
-                            top: 5,
-                            bottom: 10,
-                        },
-                        // color: 'blue',
-                    },
-                    datalabels: {
-                        formatter: (value, ctx) => {
-                            console.log(ctx);
 
-                            let sum = 0;
-                            const dataArr = ctx.chart.data.datasets[0].data;
-                            dataArr.map((data) => {
-                                sum += data;
-                            });
-                            const itemName = ['活存', '定存', '股票', '其它'];
-                            console.log(value);
-                            if (value === 0) return '';
-                            const percentage = `  ${itemName[ctx.dataIndex]}\n${((value * 100) / sum).toFixed(2)} %`;
-                            return percentage;
+            lineOptions: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'month',
+                            // displayFormats: {
+                            //     quarter: '[Q]Q - YYYY',
+                            // },
                         },
-                        // color: '#fff',
                     },
-                    tooltip: {
-                        callbacks: {
-                            label(context) {
-                                console.log(context);
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed !== null) {
-                                    label += `$ ${context.parsed.toLocaleString('en-US')}`;
-                                }
-                                return label;
+                    y: {
+                        ticks: {
+                            callback(value, index, ticks) {
+                                if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                else return `$ ${value}`;
                             },
                         },
                     },
+                },
+                plugins: {
+                    title: {
+                        display: false,
+                        // text: '存款配置',
+                        // // align: 'start',
+                        // padding: {
+                        //     top: 5,
+                        //     bottom: 10,
+                        // },
+                        // color: 'blue',
+                    },
+                    datalabels: {
+                        display: false,
+                        // formatter: (value, ctx) => {
+                        //     console.log(ctx);
+                        //     let sum = 0;
+                        //     const dataArr = ctx.chart.data.datasets[0].data;
+                        //     dataArr.map((data) => {
+                        //         sum += data;
+                        //     });
+                        //     const itemName = ['活存', '定存', '股票', '其它'];
+                        //     console.log(value);
+                        //     if (value === 0) return '';
+                        //     const percentage = `  ${itemName[ctx.dataIndex]}\n${((value * 100) / sum).toFixed(2)} %`;
+                        //     return percentage;
+                        // },
+                        // color: '#fff',
+                    },
+                    // tooltip: {
+                    //     callbacks: {
+                    //         label(context) {
+                    //             console.log(context);
+                    //             let label = context.label || '';
+                    //             if (label) {
+                    //                 label += ': ';
+                    //             }
+                    //             if (context.parsed !== null) {
+                    //                 label += `$ ${context.parsed.toLocaleString('en-US')}`;
+                    //             }
+                    //             return label;
+                    //         },
+                    //     },
+                    // },
                     legend: {
                         display: false,
                     },
@@ -316,7 +338,7 @@ export default {
     },
     computed: {
         historyAssetList() {
-            return this.$store.state.asset.historyAssetList;
+            return this.$store.getters.getHistoryAssetList();
         },
         stockList() {
             return this.$store.state.price.stockList;
@@ -437,6 +459,70 @@ export default {
                 ],
             };
         },
+        pieOptions() {
+            return {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '存款配置',
+                        // align: 'start',
+                        padding: {
+                            top: 5,
+                            bottom: 3,
+                        },
+                        // color: 'blue',
+                    },
+                    subtitle: {
+                        display: true,
+                        align: 'end',
+                        position: 'bottom',
+                        text: [
+                            '活存：$ ' + this.demandDeposit.toLocaleString('en-US') + ' 元          ',
+                            '定存：$ ' + this.fixedDeposit.toLocaleString('en-US') + ' 元          ',
+                            '股票：$ ' + this.stockDeposit.toLocaleString('en-US') + ' 元          ',
+                        ],
+                        font: {
+                            size: 13,
+                        },
+                    },
+                    datalabels: {
+                        formatter: (value, ctx) => {
+                            console.log(ctx);
+
+                            let sum = 0;
+                            const dataArr = ctx.chart.data.datasets[0].data;
+                            dataArr.map((data) => {
+                                sum += data;
+                            });
+                            const itemName = ['活存', '定存', '股票', '其它'];
+                            console.log(value);
+                            if (value === 0) return '';
+                            const percentage = `  ${itemName[ctx.dataIndex]}\n${((value * 100) / sum).toFixed(2)} %`;
+                            return percentage;
+                        },
+                        // color: '#fff',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                console.log(context);
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += `$ ${context.parsed.toLocaleString('en-US')}`;
+                                }
+                                return label;
+                            },
+                        },
+                    },
+                    legend: {
+                        display: false,
+                    },
+                },
+            };
+        },
         horizontalBarData() {
             return {
                 labels: this.stockCostExistOfName,
@@ -554,6 +640,40 @@ export default {
                             'rgba(204, 255, 144, 0.5)',
                         ],
                         // borderColor: ['rgb(66, 66, 66)'],
+                        borderWidth: 2, // 外框寬度
+                    },
+                ],
+            };
+        },
+        lineData() {
+            return {
+                // labels: ['2022-04-01', '2022-04-02', '2022-04-03'],
+                datasets: [
+                    {
+                        // data: [
+                        //     {
+                        //         x: moment('2021-09-06'),
+                        //         y: 560,
+                        //     },
+                        //     {
+                        //         x: moment('2021-10-06'),
+                        //         y: 550,
+                        //     },
+                        //     {
+                        //         x: moment('2021-11-06'),
+                        //         y: 50,
+                        //     },
+                        //     {
+                        //         x: moment('2021-11-07'),
+                        //         y: 60,
+                        //     },
+                        //     {
+                        //         x: moment('2021-11-08'),
+                        //         y: 20,
+                        //     },
+                        // ],
+                        data: this.historyAssetList,
+                        borderColor: 'rgb(54, 162, 235)',
                         borderWidth: 2, // 外框寬度
                     },
                 ],
@@ -694,4 +814,6 @@ export default {
     padding: 3px
 .horizontal-bar .el-card__body
     padding: 3px 2px
+#line-chart
+    height: 125px
 </style>
