@@ -9,7 +9,7 @@
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
                 <el-card shadow="hover" style="height: 201px; text-align: right">
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
-                        存款摘要
+                        資產摘要
                     </div>
                     <el-tag class="ml-2 my-1" size="large"
                         >總計
@@ -117,7 +117,7 @@
         <el-row>
             <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 2px 4px 5px 4px">
                 <el-button type="primary" size="small" @click="onAddDeposit" round plain
-                    ><i class="el-icon-plus"></i> 新增存款</el-button
+                    ><i class="el-icon-plus"></i> 新增資產</el-button
                 >
             </el-col>
             <!-- <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
@@ -179,7 +179,7 @@
         <div style="font-size: 14px; color: #999; margin: 20px">
             <div>
                 【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、
-                定存)時，將會統計至「存款配置表」。另外，股票則是從自選股中有設定成本會自動同步過來。
+                定存)時，將會統計至「資產配置」。另外，股票則是從自選股中有設定成本會自動同步過來。
             </div>
             <div>【$】請輸入帳戶目前金額。</div>
         </div>
@@ -227,7 +227,7 @@ export default {
                     },
                     title: {
                         display: true,
-                        text: '存款和負債',
+                        text: '資產和負債',
                         // align: 'start',
                         padding: {
                             top: 5,
@@ -471,7 +471,7 @@ export default {
         },
         barData() {
             return {
-                labels: ['存款', '負債'],
+                labels: ['資產', '負債'],
                 datasets: [
                     {
                         data: [this.assets, this.liabilities],
@@ -496,7 +496,7 @@ export default {
                 plugins: {
                     title: {
                         display: true,
-                        text: '存款配置',
+                        text: '資產配置',
                         // align: 'start',
                         padding: {
                             top: 5,
