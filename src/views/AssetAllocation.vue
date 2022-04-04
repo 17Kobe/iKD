@@ -310,15 +310,27 @@ export default {
                             // beginAtZero: true,
                             // stepSize: 100000,
                             callback(value, index, ticks) {
-                                console.log(ticks[index]);
+                                // console.log(ticks);
                                 //有小數點就不顯示，可以是 step以0.5前進
                                 if (value.toString().includes('.')) return '';
                                 // 超過5個就顯示3個，所以最多有可能顯示4個
-                                else if (ticks.length >= 5 && index % 2 === 1) return '';
+                                else if (ticks.length >= 6 && index % 3 >= 1) return '';
+                                else if (ticks.length === 5 && index % 2 === 1) return '';
                                 // 怕顯示萬結果都一樣
-                                else if (ticks.length >= 2 && ticks[1].value - ticks[0].value < 1000)
-                                    return `$ ${value.toLocaleString('en-US')}`;
-                                else if (value >= 10000) return `$ ${(value / 10000).toFixed(1)} 萬`;
+                                else if (ticks.length >= 6 && ticks[4].value - ticks[0].value >= 1000 && value >= 10000)
+                                    return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                else if (ticks.length === 5 && ticks[2].value - ticks[0].value >= 1000 && value >= 10000)
+                                    return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                else if (
+                                    ticks.length < 5 &&
+                                    ticks.length >= 2 &&
+                                    ticks[1].value - ticks[0].value >= 1000 &&
+                                    value >= 10000
+                                )
+                                    return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                // else if (ticks.length >= 2 && ticks[1].value - ticks[0].value < 1000)
+                                //     return `$ ${value.toLocaleString('en-US')}`;
+                                // else if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
                                 else return `$ ${value.toLocaleString('en-US')}`;
                             },
                         },
@@ -684,33 +696,33 @@ export default {
                     {
                         // pointRadius: 0,
                         // data: [
-                        //     // {
-                        //     //     x: moment('2021-09-06'),
-                        //     //     y: 564450,
-                        //     // },
-                        //     // {
-                        //     //     x: moment('2021-10-06'),
-                        //     //     y: 564450,
-                        //     // },
+                        // {
+                        //     x: moment('2021-09-06'),
+                        //     y: 564450,
+                        // },
+                        // {
+                        //     x: moment('2021-10-06'),
+                        //     y: 564450,
+                        // },
+                        // {
+                        //     x: moment('2021-11-06'),
+                        //     y: 564411,
+                        // },
+                        // {
+                        //     x: moment('2021-11-07'),
+                        //     y: 566450,
+                        // },
+                        // {
+                        //     x: moment('2021-11-08'),
+                        //     y: 561350,
+                        // },
                         //     {
-                        //         x: moment('2021-11-06'),
-                        //         y: 564411,
+                        //         x: moment('2022-04-03'),
+                        //         y: 879789,
                         //     },
                         //     {
-                        //         x: moment('2021-11-07'),
-                        //         y: 566450,
-                        //     },
-                        //     {
-                        //         x: moment('2021-11-08'),
-                        //         y: 561350,
-                        //     },
-                        //     {
-                        //         x: moment('2021-11-09'),
-                        //         y: 561350,
-                        //     },
-                        //     {
-                        //         x: moment('2021-12-02'),
-                        //         y: 566350,
+                        //         x: moment('2022-04-04'),
+                        //         y: 881335,
                         //     },
                         // ],
                         data: this.historyAssetList,
