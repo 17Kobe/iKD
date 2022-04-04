@@ -232,7 +232,7 @@ const dividend = {
             // console.log(mode);
             // const { SpreadList } = state;
             let tempSpreadList = undefined;
-            if (mode === '最新')
+            if (mode === '目前')
                 tempSpreadList = _.orderBy(
                     _.filter(rootState.price.stockList, function (obj) {
                         return obj.cost;

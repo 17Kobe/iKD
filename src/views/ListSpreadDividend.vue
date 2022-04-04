@@ -4,7 +4,7 @@
             <el-col :span="11" style="margin-left: 17px; font-size: 18px; font-weight: bold"
                 >價差&nbsp;&nbsp;
                 <el-radio-group v-model="modeSpread" size="small" fill="#dedede" text-color="#373737">
-                    <el-radio-button label="最新" />
+                    <el-radio-button label="目前" />
                     <el-radio-button label="歷史" />
                 </el-radio-group>
             </el-col>
@@ -56,7 +56,7 @@
                     </span>
                 </template>
             </el-table-column>
-            <el-table-column :label="modeSpread === '最新' ? '現價' : '賣價'" prop="last_price" width="45" align="center">
+            <el-table-column :label="modeSpread === '目前' ? '現價' : '賣價'" prop="last_price" width="45" align="center">
             </el-table-column>
             <el-table-column label="本金&nbsp;&nbsp;&nbsp;" width="75" align="right" header-align="right">
                 <template #default="scope">
@@ -89,7 +89,7 @@
                     >
                 </template>
             </el-table-column>
-            <el-table-column label="漲跌幅" width="80" align="right" header-align="right" v-if="modeSpread === '最新'">
+            <el-table-column label="漲跌幅" width="80" align="right" header-align="right" v-if="modeSpread === '目前'">
                 <template #default="scope">
                     <span
                         :style="[
@@ -124,7 +124,7 @@
                 </template>
             </el-table-column>
             <el-table-column
-                :label="modeSpread === '最新' ? '累積股數&nbsp;&nbsp;' : '賣出股數&nbsp;&nbsp;'"
+                :label="modeSpread === '目前' ? '累積股數&nbsp;&nbsp;' : '賣出股數&nbsp;&nbsp;'"
                 width="80"
                 align="right"
                 header-align="right"
@@ -277,7 +277,7 @@ export default {
     name: 'component-dividend',
     data() {
         return {
-            modeSpread: '最新',
+            modeSpread: '目前',
             modeDividend: '未來',
         };
     },
@@ -304,9 +304,10 @@ export default {
     watch: {
         '$store.state.app.routerName': {
             handler: function (newValue, oldValue) {
-                if (newValue != oldValue && newValue === 'dividend') console.log(newValue);
-                this.$refs.totalSpread.restart();
-                this.$refs.totalDividend.restart();
+                if (newValue != oldValue && newValue === 'dividend') {
+                    this.$refs.totalSpread.restart();
+                    this.$refs.totalDividend.restart();
+                }
             },
             //   immediate: true // provides initial (not changed yet) state
         },
