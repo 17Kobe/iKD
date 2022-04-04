@@ -727,7 +727,7 @@ export default {
                         // ],
                         data: this.historyAssetList,
                         borderColor: 'rgb(54, 162, 235)',
-                        backgroundColor: 'rgba(215, 240, 250, 0.5)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
                         borderWidth: 2, // 外框寬度
                         fill: true /* this option hide background-color */,
                     },
