@@ -112,6 +112,7 @@ const dividend = {
             let isSaveHistoryToLocalStorage = false;
 
             const today = moment().startOf('day');
+            console.log(data);
 
             if (_.has(data, 'data') && data.data.length > 0) {
                 // 2022/01/01
@@ -150,7 +151,10 @@ const dividend = {
 
                 // ===== 計算今年，現在日期以後確定會發的股利 ====
                 let thisYearLastCashDividendPaymentDate = null; // 用於算未確定的，要從這個日期以後
-                const filterSureDividend = _.filter(data.data, (o) => moment(o.CashDividendPaymentDate).isSameOrAfter(today)); // 發放日在今天以後，這是確定的喔
+                const filterSureDividend = _.filter(
+                    data.data,
+                    (o) => moment(o.CashDividendPaymentDate).isSameOrAfter(today) && moment(o.date).isBefore(today) // 日期一樣不能是未來日期
+                ); // 發放日在今天以後，這是確定的喔
 
                 filterSureDividend.forEach((dividendObj) => {
                     // 尋找小於等於除息日前的股票數目
@@ -182,8 +186,16 @@ const dividend = {
                 const thisDayLastYearAddOneMonth = lastYearStartDate.clone().subtract(1, 'years').add(30, 'days'); // 在此若沒加clone 會改變today值
                 const theLastDayOfLastYear = moment().subtract(1, 'years').endOf('year').startOf('day'); // 去年的最後一天
 
+                // console.log(thisYearLastCashDividendPaymentDate.format('YYYY-MM-DD'));
+                // console.log(lastYearStartDate.format('YYYY-MM-DD'));
+                // console.log(thisDayLastYearAddOneMonth.format('YYYY-MM-DD'));
+                // console.log(theLastDayOfLastYear.format('YYYY-MM-DD'));
+                // console.log(today.format('YYYY-MM-DD'));
                 // 曾經出現預估報酬率，去年的2021出現2筆tradingDate相同，PaymentDate也相同，但 date是未來2027日期的(現在是2022)
                 const filterNotSureDividend = _.filter(data.data, (o) => {
+                    console.log(moment(o.CashDividendPaymentDate).format('YYYY-MM-DD'));
+                    console.log(moment(o.CashExDividendTradingDate).format('YYYY-MM-DD'));
+                    console.log(moment(o.date).format('YYYY-MM-DD'));
                     return (
                         moment(o.CashDividendPaymentDate).isSameOrAfter(thisDayLastYearAddOneMonth) &&
                         moment(o.CashExDividendTradingDate).isSameOrBefore(theLastDayOfLastYear) && // 像台積電會少算12月配息日，因為拿到錢是1月份
