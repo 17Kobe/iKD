@@ -65,7 +65,7 @@
             </el-table-column>
             <el-table-column label="報酬率" width="53" align="right" header-align="right">
                 <template #default="scope">
-                    <span style="font-weight: bold; color: #7b7b7b"
+                    <span style="font-weight: bold; color: #a8a8a8"
                         >{{
                             scope.row.cost.rate_of_return === null
                                 ? 'N/A'
@@ -181,7 +181,7 @@
                         v-if="!scope.row.isSure"
                     >
                     </el-badge>
-                    <span style="font-weight: bold; color: #7b7b7b">{{ scope.row.earnings_distribution }}</span>
+                    <span style="font-weight: bold; color: #a8a8a8">{{ scope.row.earnings_distribution }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="發放日" :width="modeDividend === '未來' ? 42 : 82" align="center">
