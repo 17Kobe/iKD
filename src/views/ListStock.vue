@@ -82,7 +82,11 @@
                             <!-- style="width: 158px; z-index: 999; top: 3px" -->
                             <!-- '#fef0f0' #f690a9 -->
                             <span style="color: #222326; font-size: 9px">
-                                損益&nbsp;&nbsp;<span style="font-size: 13px; font-weight: bold"
+                                損益&nbsp;&nbsp;<span
+                                    :style="[
+                                        scope.row.cost.return >= 0 ? { color: '#18b0e1' } : { color: '#f56c70' },
+                                        { 'font-size': '13px', 'font-weight': 'bold' },
+                                    ]"
                                     >$ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
                                 >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
                                     scope.row.cost.rate_of_return === null
