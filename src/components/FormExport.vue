@@ -115,7 +115,8 @@ export default {
             // 找出儲存有缺少的key
             storeStockList.forEach((obj) => {
                 const foundStock = DefaultStockList.find((v) => v.id === obj.id);
-                if (foundStock.is_dividend && !obj.is_dividend)
+                if (foundStock && foundStock.is_dividend && !obj.is_dividend)
+                    // 加 foundStock 是因為有可能是後來自己加的股票
                     this.$store.commit('ADD_A_STOCK_KEY', {
                         stockId: obj.id,
                         isDvidend: foundStock.is_dividend,
