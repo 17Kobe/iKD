@@ -12,6 +12,7 @@
         "chartjs-adapter-moment": "^1.0.0",
         "chartjs-plugin-datalabels": "^2.0.0",
         "element-plus": "^1.0.2-beta.71",
+        "esbuild-windows-64": "^0.14.31",
         "highcharts": "^9.3.3",
         "highcharts-vue": "^1.4.0",
         "lodash": "^4.17.21",
