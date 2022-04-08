@@ -84,7 +84,7 @@
                             <span style="color: #222326; font-size: 9px">
                                 損益&nbsp;&nbsp;<span
                                     :style="[
-                                        scope.row.cost.return >= 0 ? { color: '#18b0e1' } : { color: '#f56c70' },
+                                        scope.row.cost.return >= 0 ? { color: '#2cc8fb' } : { color: '#f56c70' },
                                         { 'font-size': '13px', 'font-weight': 'bold' },
                                     ]"
                                     >$ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
