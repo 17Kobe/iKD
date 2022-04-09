@@ -210,7 +210,7 @@
         </el-row>
 
         <el-table :data="noBuyList" style="width: 100%" empty-text="無資料" class="i-table">
-            <el-table-column label="名稱" width="220" align="center">
+            <el-table-column label="名稱" width="130" align="center">
                 <template #default="scope">
                     <el-badge
                         :value="scope.row.badge"
@@ -221,7 +221,7 @@
                         ]"
                         :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
                     >
-                        {{ scope.row.name }}
+                        {{ scope.row.name.replace('A2', '') }}
                     </el-badge>
                 </template>
             </el-table-column>
