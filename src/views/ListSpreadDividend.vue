@@ -340,7 +340,9 @@ export default {
     padding: 0
 // 其它未買進的股票高度也跟上面2個表格一樣高，一致性比較好
 .el-table.i-table .cell
-    min-height: 24px
+    min-height: 26px
+    position: relative
+    top: 2px
 .el-radio-button__inner
     padding: 7px 10px!important
 .signal .el-badge__content
@@ -356,7 +358,7 @@ export default {
 
 .signal.signal-pos .el-badge__content
     right: 2px
-    top: 9px
+    top: 6px
 
 .signal.signal-pos.shake-base .el-badge__content
     right: -27px
