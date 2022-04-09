@@ -123,7 +123,7 @@
                         @click="doShowCost(scope.row.id)"
                         :style="[
                             scope.row.cost && scope.row.cost.settings.length >= 1 ? { width: '190px' } : {},
-                            { 'text-align': 'left', 'line-height': '18px' },
+                            { 'text-align': 'left', 'line-height': '18px', padding: '3px 9px' },
                         ]"
                     >
                         <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 13px">
@@ -194,7 +194,7 @@
                             (scope.row.policy.settings.buy.length >= 1 || scope.row.policy.settings.sell.length >= 1)
                                 ? { width: '235px' }
                                 : {},
-                            { 'text-align': 'left', 'line-height': '18px' },
+                            { 'text-align': 'left', 'line-height': '18px', padding: '6px 9px' },
                         ]"
                     >
                         <div
