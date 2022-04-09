@@ -41,7 +41,7 @@
                         :class="[scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '', ['item', 'signal']]"
                         :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
                     >
-                        {{ scope.row.name }}
+                        {{ scope.row.name.replace('A2', '') }}
                     </el-badge>
                 </template>
             </el-table-column>

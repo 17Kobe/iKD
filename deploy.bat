@@ -1,6 +1,7 @@
 @echo off
 cd D:\Code\iKD\
 node updateJsonFile.js
+git pull https://github.com/17kobe/iKD.git master
 npm run build
 cd dist
 git init

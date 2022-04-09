@@ -3,6 +3,8 @@
 set -e
 # 更新美金匯率及基金每日淨值至JSON檔案內
 node updateJsonFile.js
+# 先拉碼，也可以用在店裡
+git pull https://github.com/17kobe/iKD.git master
 # 打包
 npm run build
 # 移動至到打包後的dist目錄 
