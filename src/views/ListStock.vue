@@ -114,7 +114,7 @@
                     <!-- <ChartWeekK :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
                 </template>
             </el-table-column>
-            <el-table-column label="成本" width="200" align="center">
+            <el-table-column label="成本" width="190" header-align="center" align="center">
                 <template #default="scope">
                     <el-button
                         size="small"
@@ -122,7 +122,7 @@
                         plain
                         @click="doShowCost(scope.row.id)"
                         :style="[
-                            scope.row.cost && scope.row.cost.settings.length >= 1 ? { width: '190px' } : {},
+                            scope.row.cost && scope.row.cost.settings.length >= 1 ? { width: 'auto' } : {},
                             { 'text-align': 'left', 'line-height': '18px', padding: '3px 9px' },
                         ]"
                     >
@@ -179,7 +179,7 @@
                     </el-button>
                 </template>
             </el-table-column>
-            <el-table-column label="買賣策略" width="240" align="center">
+            <el-table-column label="買賣策略" width="210" align="center">
                 <template #default="scope">
                     <el-button
                         size="small"
@@ -192,7 +192,7 @@
                             scope.row.policy.settings.buy &&
                             scope.row.policy.settings.sell &&
                             (scope.row.policy.settings.buy.length >= 1 || scope.row.policy.settings.sell.length >= 1)
-                                ? { width: '235px' }
+                                ? { width: 'auto' }
                                 : {},
                             { 'text-align': 'left', 'line-height': '18px', padding: '6px 9px' },
                         ]"
