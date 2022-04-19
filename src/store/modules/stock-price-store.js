@@ -13,116 +13,150 @@ const stock = {
         return defaultState;
     },
     actions: {
-        GET_STOCK_PRICE(context, force = false) {
+        async GET_STOCK_PRICE({ state, commit }, force = false) {
+            // GET_STOCK_PRICE(context, force = false) {
             console.log('GET_STOCK_PRICE 0');
 
-            context.state.stockList.forEach((stcokObj) => {
-                // 為了修改，所以多加 index 及 theArray 參數
-                // console.log(stcokObj);
+            await Promise.all(
+                _.map(state.stockList, async (stcokObj) => {
+                    // 為了修改，所以多加 index 及 theArray 參數
+                    // console.log(stcokObj);
 
-                // console.log(currStock[index]);
-                const isFund = stcokObj.type === 'fund'; // 判斷是否為基金
-                console.log('GET_STOCK_PRICE 1');
-                const stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
-                // console.log(stockDataDaily);
-                // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
-                const stockStartDate = moment(
-                    stockDataDaily.length === 0
-                        ? '2010-01-01'
-                        : moment(stockDataDaily[stockDataDaily.length - 1][0]).add(1, 'days')
-                ).format('YYYY-MM-DD');
+                    // console.log(currStock[index]);
+                    const isFund = stcokObj.type === 'fund'; // 判斷是否為基金
+                    console.log('GET_STOCK_PRICE 1');
+                    const stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
+                    // console.log(stockDataDaily);
+                    // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
+                    const stockStartDate = moment(
+                        stockDataDaily.length === 0
+                            ? '2010-01-01'
+                            : moment(stockDataDaily[stockDataDaily.length - 1][0]).add(1, 'days')
+                    ).format('YYYY-MM-DD');
 
-                console.log('GET_STOCK_PRICE 2');
-                // 按照網站存在的日期才發出API需求
-                // https://stackoverflow.com/questions/36197031/how-to-use-moment-js-to-check-whether-the-current-time-is-between-2-times
-                const currentTime = moment(); // 目前時間
-                const today = currentTime.format('YYYY-MM-DD');
-                const stockMarketCloseTime = moment('13:30:00', 'hh:mm:ss');
-                let siteExistsLatestDate = moment().format('YYYY-MM-DD');
-                console.log(currentTime.day());
-                if (currentTime.day() === 6)
-                    // 星期六，不算了，就減一天
-                    siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
-                else if (currentTime.day() === 0)
-                    // 星期日，不算了，就減二天
-                    siteExistsLatestDate = moment().subtract(2, 'days').format('YYYY-MM-DD');
-                else if (currentTime.day() === 1 && currentTime.isBefore(stockMarketCloseTime))
-                    // 星期一且還沒交易結束時間，不算了，就減三天
-                    siteExistsLatestDate = moment().subtract(3, 'days').format('YYYY-MM-DD');
-                else if (currentTime.isBefore(stockMarketCloseTime))
-                    // 如果目前時間少於交易結束時間，則要減一天
-                    siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
-                // console.log(currentTime.format('YYYY-MM-DD hh:mm:ss'));
-                // console.log(stockMarketCloseTime.format('YYYY-MM-DD hh:mm:ss'));
-                // console.log(siteExistsLatestDate);
-                // console.log(stockData);
-                // console.log(stockData.at(-1)[0]);
-                // console.log(stockStartDate);
+                    console.log('GET_STOCK_PRICE 2');
+                    // 按照網站存在的日期才發出API需求
+                    // https://stackoverflow.com/questions/36197031/how-to-use-moment-js-to-check-whether-the-current-time-is-between-2-times
+                    const currentTime = moment(); // 目前時間
+                    const today = currentTime.format('YYYY-MM-DD');
+                    const stockMarketCloseTime = moment('13:30:00', 'hh:mm:ss');
+                    let siteExistsLatestDate = moment().format('YYYY-MM-DD');
+                    console.log(currentTime.day());
+                    if (currentTime.day() === 6)
+                        // 星期六，不算了，就減一天
+                        siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
+                    else if (currentTime.day() === 0)
+                        // 星期日，不算了，就減二天
+                        siteExistsLatestDate = moment().subtract(2, 'days').format('YYYY-MM-DD');
+                    else if (currentTime.day() === 1 && currentTime.isBefore(stockMarketCloseTime))
+                        // 星期一且還沒交易結束時間，不算了，就減三天
+                        siteExistsLatestDate = moment().subtract(3, 'days').format('YYYY-MM-DD');
+                    else if (currentTime.isBefore(stockMarketCloseTime))
+                        // 如果目前時間少於交易結束時間，則要減一天
+                        siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
+                    // console.log(currentTime.format('YYYY-MM-DD hh:mm:ss'));
+                    // console.log(stockMarketCloseTime.format('YYYY-MM-DD hh:mm:ss'));
+                    // console.log(siteExistsLatestDate);
+                    // console.log(stockData);
+                    // console.log(stockData.at(-1)[0]);
+                    // console.log(stockStartDate);
 
-                // 因為我有將 stockStartDate + 1天，所以有 Same
-                if (moment(siteExistsLatestDate).isSameOrAfter(stockStartDate) || force) {
-                    console.log('GET_STOCK_PRICE 3');
+                    // 因為我有將 stockStartDate + 1天，所以有 Same
+                    if (moment(siteExistsLatestDate).isSameOrAfter(stockStartDate) || force) {
+                        console.log('GET_STOCK_PRICE 3');
 
-                    // 股票
-                    if (!isFund) {
-                        console.log('GET_STOCK_PRICE 31');
-                        axios
-                            .get('https://api.finmindtrade.com/api/v4/data', {
-                                params: {
-                                    dataset: 'TaiwanStockPrice',
-                                    data_id: stcokObj.id,
-                                    start_date: stockStartDate,
-                                    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
-                                },
-                            })
-                            // 成功
-                            .then((res) => {
-                                console.log('GET_STOCK_PRICE 4');
-                                context.commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: res.data });
-                            })
-                            // 失敗
-                            .catch((err) => {
-                                console.log('GET_STOCK_PRICE error. ' + stcokObj.id);
-                                context.commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
-                                console.log(err);
-                            });
+                        // 股票
+                        if (!isFund) {
+                            console.log('GET_STOCK_PRICE 31');
+                            // 因為 axios 是非同步，但我要確實等它執行完才 resolve
+                            await axios
+                                .get('https://api.finmindtrade.com/api/v4/data', {
+                                    params: {
+                                        dataset: 'TaiwanStockPrice',
+                                        data_id: stcokObj.id,
+                                        start_date: stockStartDate,
+                                        token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
+                                    },
+                                })
+                                // 成功
+                                .then((res) => {
+                                    console.log('GET_STOCK_PRICE 4');
+                                    commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: res.data });
+                                })
+                                // 失敗
+                                .catch((err) => {
+                                    console.log('GET_STOCK_PRICE error. ' + stcokObj.id);
+                                    commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
+                                    console.log(err);
+                                });
+                        } else {
+                            console.log('GET_STOCK_PRICE 32');
+                            // 基金
+                            commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
+                            // axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+                            // axios
+                            //     .get(
+                            //         'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=' +
+                            //             stcokObj.id +
+                            //             ':FO;timeslot=' +
+                            //             stockStartDate +
+                            //             'T00:00:00Z-' +
+                            //             today +
+                            //             'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true'
+                            //     )
+                            //     // 成功
+                            //     .then((res) => {
+                            //         console.log('GET_STOCK_PRICE 4');
+                            //         context.commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: res.data });
+                            //     })
+                            //     // 失敗
+                            //     .catch((err) => {
+                            //         console.log('GET_STOCK_PRICE error');
+                            //         context.commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
+                            //         console.log(err);
+                            //     });
+                        }
                     } else {
-                        console.log('GET_STOCK_PRICE 32');
-                        // 基金
-                        context.commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
-                        // axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
-                        // axios
-                        //     .get(
-                        //         'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=' +
-                        //             stcokObj.id +
-                        //             ':FO;timeslot=' +
-                        //             stockStartDate +
-                        //             'T00:00:00Z-' +
-                        //             today +
-                        //             'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true'
-                        //     )
-                        //     // 成功
-                        //     .then((res) => {
-                        //         console.log('GET_STOCK_PRICE 4');
-                        //         context.commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: res.data });
-                        //     })
-                        //     // 失敗
-                        //     .catch((err) => {
-                        //         console.log('GET_STOCK_PRICE error');
-                        //         context.commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
-                        //         console.log(err);
-                        //     });
+                        // 股票
+                        if (!isFund) {
+                            commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
+                        } else {
+                            // 基金
+                            commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
+                        }
                     }
-                } else {
-                    // 股票
-                    if (!isFund) {
-                        context.commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
-                    } else {
-                        // 基金
-                        context.commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
-                    }
-                }
-            });
+                    return 'ok';
+                })
+            );
+            console.log('all ok');
+            // 為了股票值全部更新完去更新資產值
+            // 並且該值要讀 localstorage 才是最新的，vuex若沒開啟資產配置是不會是最新值，只是預設值
+            const localAssetList = JSON.parse(localStorage.getItem('assetList')) || [];
+            // 必須曾經有改過才存到歷史存款去
+            if (!_.isEmpty(localAssetList)) {
+                const stockDeposit = state.stockList.reduce((acc, { cost }) => {
+                    if (cost && cost.sum) return acc + cost.sum + cost.return;
+                    return acc;
+                }, 0);
+
+                const tempAssets =
+                    stockDeposit +
+                    localAssetList.reduce((acc, { amount }) => {
+                        if (amount >= 0) return acc + amount;
+                        return acc;
+                    }, 0);
+
+                console.log('=======assets');
+
+                // 存到歷史存款去
+                // 歷史存款要先從 localstorage 讀到並且存到 vuex，因為這原本是 AssetAllocation才去做的。而ADD_OR_UPDATE_HISTORY_ASSET_LIST是判斷vuex內容去更新的
+                const localHistoryAssettList = JSON.parse(localStorage.getItem('historyAssetList')) || [];
+                commit('SAVE_HISTORY_ASSET_LIST', localHistoryAssettList);
+                commit('ADD_OR_UPDATE_HISTORY_ASSET_LIST', [
+                    moment().format('YYYY-MM-DD'), // 日期
+                    tempAssets, // 總存款
+                ]);
+            }
         },
     },
     mutations: {
