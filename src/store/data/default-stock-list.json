@@ -145,12 +145,6 @@
                         "label": "週 KD 黃金交叉",
                         "limit": "50",
                         "limit_desc": "以下"
-                    },
-                    {
-                        "method": "kd_turn_up",
-                        "label": "週 KD 往上轉折",
-                        "limit": "27",
-                        "limit_desc": "以下"
                     }
                 ],
                 "sell": [
