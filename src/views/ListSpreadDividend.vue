@@ -38,7 +38,17 @@
                     <el-badge
                         :value="scope.row.badge"
                         class="item"
-                        :class="[scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '', ['item', 'signal']]"
+                        :class="[
+                            scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '',
+                            scope.row.name.length >= 6
+                                ? 'l6'
+                                : scope.row.name.length >= 5
+                                ? 'l5'
+                                : scope.row.name.length >= 4
+                                ? 'l4'
+                                : '',
+                            ['item', 'signal'],
+                        ]"
                         :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
                     >
                         {{ scope.row.name.replace('A2', '') }}
@@ -313,7 +323,7 @@ export default {
         },
     },
     created() {
-        console.log('created dividend');
+        console.log('created dividend!!!');
         const localDividendList = JSON.parse(localStorage.getItem('dividendList')) || [];
         const localHistorySpreadList = JSON.parse(localStorage.getItem('historySpreadList')) || [];
         const localHistoryDividendList = JSON.parse(localStorage.getItem('historyDividendList')) || [];
@@ -338,7 +348,7 @@ export default {
 <style lang="sass">
 .el-table .cell
     padding: 0
-// 其它未買進的股票高度也跟上面2個表格一樣高，一致性比較好
+// 其它未買進股票高度也跟上面2個表格一樣高，一致性比較好
 .el-table.i-table .cell
     min-height: 26px
     position: relative
@@ -355,6 +365,20 @@ export default {
     top: -2px
     right: -20px
     opacity: 0.83
+
+.signal.l4 .el-badge__content
+    right: 21px
+.signal.l5 .el-badge__content
+    right: 28px
+.signal.l6 .el-badge__content
+    right: 38px
+
+.signal.shake-base.l4 .el-badge__content
+    right: -13px
+.signal.shake-base.l5 .el-badge__content
+    right: -6px
+.signal.shake-base.l6 .el-badge__content
+    right: 4px
 
 .signal.signal-pos .el-badge__content
     right: 2px
