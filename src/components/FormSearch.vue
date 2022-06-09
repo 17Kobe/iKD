@@ -28,10 +28,21 @@
                 ></el-button>
             </el-form-item>
         </el-form>
-        <el-table :data="customStockList" :show-header="false" :stripe="true" style="width: 100%; margin-top: 5px">
+        <el-table
+            :data="customStockList"
+            :show-header="false"
+            :stripe="true"
+            :row-class-name="tableRowClassName"
+            style="width: 100%; margin-top: 5px"
+        >
             <el-table-column fixed label="名稱" width="200">
                 <template #default="scope">
-                    <span style="font-size: 16px; font-weight: bold; margin-left: 8px"> {{ scope.row.name }} </span>&nbsp;
+                    <span
+                        style="font-size: 16px; font-weight: bold; margin-left: 8px"
+                        @click="onChangeBackgroundColor(scope.row.id)"
+                    >
+                        {{ scope.row.name }} </span
+                    >&nbsp;
                     <span style="color: #cccccc" v-if="scope.row.type !== 'fund'">{{ scope.row.id }}</span>
                 </template>
             </el-table-column>
@@ -53,7 +64,7 @@
                 </template>
             </el-table-column>
         </el-table>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;總數量：{{customStockList.length}}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;總數量：{{ customStockList.length }}
     </el-drawer>
 </template>
 
@@ -137,6 +148,12 @@ export default {
                 this.stockOptions = [];
             }
         },
+        tableRowClassName(row) {
+            if (row.row.background) {
+                return 'color-row';
+            }
+            return '';
+        },
 
         onAdd() {
             console.log('onAdd');
@@ -178,6 +195,9 @@ export default {
         },
         onMove(stockId, direction) {
             this.$store.commit('MOVE_A_STOCK', { stockId, direction });
+        },
+        onChangeBackgroundColor(stockId) {
+            this.$store.commit('SAVE_STOCK_BACKGROUND_COLOR', stockId);
         },
         onInit() {
             console.log('onInit');

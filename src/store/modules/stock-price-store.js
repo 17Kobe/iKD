@@ -257,6 +257,18 @@ const stock = {
             // save to localstorage
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
+        SAVE_STOCK_BACKGROUND_COLOR(state, stockId) {
+            // object of array 去 find 並 update
+            const found = state.stockList.find((v) => v.id === stockId);
+            if (found.background) {
+                if (found.background === true) found.background = false;
+                else found.background = true;
+            } else {
+                found.background = true;
+            }
+            // save to localstorage
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+        },
         SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
             console.log('SAVE_STOCK_COST');
             // object of array 去 find 並 update

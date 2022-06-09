@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-table :data="stockList" style="width: 100%" empty-text="無資料">
+        <el-table :data="stockList" :row-class-name="tableRowClassName" style="width: 100%" empty-text="無資料">
             <el-table-column
                 fixed
                 label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名稱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;股價"
@@ -603,6 +603,12 @@ export default {
         getDifference(array1, array2) {
             return array1.filter((object1) => !array2.some((object2) => object1.id === object2.id));
         },
+        tableRowClassName(row) {
+            if (row.row.background) {
+                return 'color-row';
+            }
+            return '';
+        },
         doShowCost(id) {
             // console.log(this.$refs);
             // 父改子去顯示 drawer 變數 不好，子要被改值
@@ -713,4 +719,11 @@ input::-webkit-inner-spin-button
         transform: translate3d(-4px, 0, 0)
     50%
         transform: translate3d(+4px, 0, 0)
+
+// 自訂想專注的顏色
+.el-table .color-row
+    background: #fffbec
+
+.el-table--striped .el-table__body tr.el-table__row--striped.color-row td
+    background: #fffbec
 </style>
