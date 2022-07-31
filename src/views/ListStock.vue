@@ -88,7 +88,7 @@
                                         { 'font-size': '13px', 'font-weight': 'bold' },
                                     ]"
                                     >$ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
-                                >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #999999">{{
+                                >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #545454">{{
                                     scope.row.cost.rate_of_return === null
                                         ? 'N/A'
                                         : Math.abs(scope.row.cost.rate_of_return) >= 1000

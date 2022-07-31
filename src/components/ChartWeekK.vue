@@ -232,7 +232,7 @@ export default {
                                 let increment = (this.dataMax - this.dataMin) / 2;
                                 // const max = this.dataMax;
                                 const min = this.dataMin;
-                                if (increment > 1) {
+                                if (this.dataMin > 20 && increment > 1) {
                                     increment = Math.ceil(increment);
                                     tick = Math.floor(this.dataMin);
                                     for (tick; tick <= this.dataMax + increment / 2; tick += increment) {

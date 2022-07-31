@@ -593,9 +593,25 @@ const stock = {
                 }
             }
 
+            [5, 10, 20].forEach((limit) => {
+                resData = [];
+                for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
+                    const startIndex = k - limit - 1 < 0 ? 0 : k - limit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
+                    const endIndex = k;
+                    const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
+                    const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
+                    const average = _.mean(rangeCloseArray);
+
+                    const date = foundStock.data.weekly[endIndex][0];
+
+                    resData.push([date, average]);
+                }
+                foundStock.data['ma' + limit] = resData;
+            });
+
             // ===================塞入localstorage===================
-            if (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell'))
-                localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+            // if (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell'))
+            localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
             console.log('SAVE_STOCK_MA OK');
         },
         SAVE_STOCK_POLICY_RESULT(state, stockId) {
