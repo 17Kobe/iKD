@@ -10,16 +10,27 @@
         <div style="position: absolute; top: 80px; right: 14px; font-size: 12px" v-if="ohlc && ohlc.length > 0">
             <!-- <span style="color: #834beb">P</span>: {{ Number(ohlc.at(-1)[3].toFixed(2)) }} -->
             <span v-if="last_price"
-                ><span style="color: #000000">&nbsp;&nbsp;{{ last_price }}</span></span
+                ><span style="color: #000000" title="股價">&nbsp;&nbsp;{{ last_price }}</span></span
+            >
+            <span v-if="cost && cost.length > 0"
+                ><span style="color: #4286f5" title="平均成本線"
+                    >&nbsp;&nbsp;{{ Number(cost[cost.length - 1][1].toFixed(2)) }}</span
+                ></span
             >
             <span v-if="ma5 && ma5.length > 0"
-                ><span style="color: #834beb">&nbsp;&nbsp;{{ Number(ma5[ma5.length - 1][1].toFixed(2)) }}</span></span
+                ><span style="color: #834beb" title="MA(5)"
+                    >&nbsp;&nbsp;{{ Number(ma5[ma5.length - 1][1].toFixed(2)) }}</span
+                ></span
             >
             <span v-if="ma10 && ma10.length > 0"
-                ><span style="color: #febd09">&nbsp;&nbsp;{{ Number(ma10[ma10.length - 1][1].toFixed(2)) }}</span></span
+                ><span style="color: #febd09" title="MA(10)"
+                    >&nbsp;&nbsp;{{ Number(ma10[ma10.length - 1][1].toFixed(2)) }}</span
+                ></span
             >
             <span v-if="ma20 && ma20.length > 0"
-                ><span style="color: #e65596">&nbsp;&nbsp;{{ Number(ma20[ma20.length - 1][1].toFixed(2)) }}</span></span
+                ><span style="color: #fc7742" title="MA(20)"
+                    >&nbsp;&nbsp;{{ Number(ma20[ma20.length - 1][1].toFixed(2)) }}</span
+                ></span
             >
         </div>
         <!-- :updateArgs="[true, true, true]" -->
@@ -56,6 +67,10 @@ export default {
         ma20() {
             console.log('ma20');
             return this.$store.getters.getStockDataWeeklyMa20(this.parentData);
+        },
+        cost() {
+            console.log('cost');
+            return this.$store.getters.getStockDataWeeklyCost(this.parentData);
         },
         // ma_buy() {
         //     console.log('ma_buy');
@@ -316,8 +331,20 @@ export default {
                     {
                         type: 'line',
                         name: 'MA20線',
-                        color: '#e65596',
+                        color: '#fc7742',
                         data: this.ma20,
+                        dataGrouping: {
+                            // anchor: 'end',
+                            // firstAnchor: 'end',
+                            lastAnchor: 'lastPoint',
+                            units: [['day', [1]]],
+                        },
+                    },
+                    {
+                        type: 'line',
+                        name: '成本線',
+                        color: '#4286f5',
+                        data: this.cost,
                         dataGrouping: {
                             // anchor: 'end',
                             // firstAnchor: 'end',

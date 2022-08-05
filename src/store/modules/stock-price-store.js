@@ -348,7 +348,10 @@ const stock = {
                 alert(err);
             }
 
+            // TODO: SAVE_STOCK_MA 及 SAVE_STOCK_COST_LINE 未來都要移除
             this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線, 看console.log會依序執行commit，一個一個執行完才執行下個，看起來沒問題
+            this.commit('SAVE_STOCK_COST_LINE', stockId); // 計算 成本線
+
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
         },
         SAVE_STOCK_PRICE(state, { stockId, data }) {
@@ -532,10 +535,58 @@ const stock = {
                 localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
                 if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId); // 有新值就要更新成本的報酬率
                 this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線
+                this.commit('SAVE_STOCK_COST_LINE', stockId); // 計算 成本線
                 console.log('SAVE_STOCK_PRICE OK');
             }
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
             // 有可能有policy設定，有/無淨值，上回沒算完就關了，需要於 SAVE_STOCK_POLICY_RESULT 內部去確認有無算完
+        },
+        SAVE_STOCK_COST_LINE(state, stockId) {
+            console.log('SAVE_STOCK_COST_LINE');
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+
+            let resData = [];
+            if (
+                _.has(foundStock, 'cost') &&
+                _.has(foundStock, 'data.daily') &&
+                foundStock.data.daily.length > 0 &&
+                _.has(foundStock, 'cost.settings')
+            ) {
+                let i = 0;
+                let averageCost = 0;
+                let sumCost = 0;
+                let sumNumber = 0;
+                for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
+                    const startIndex = k - 1 < 0 ? 0 : k - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
+                    const endIndex = k;
+                    const startDate = moment(foundStock.data.weekly[startIndex][0]).add(1, 'days');
+                    const endDate = moment(foundStock.data.weekly[endIndex][0]);
+
+                    // 目前加總總金額 除 目前總股數 就是 目前成本
+                    while (i <= foundStock.cost.settings.length - 1) {
+                        const costDate = moment(foundStock.cost.settings[i].buy_date);
+                        // console.log('=============');
+                        // console.log(i);
+                        // console.log(costDate.format('YYYY-MM-DD'));
+                        // console.log(moment(startDate).format('YYYY-MM-DD'));
+                        // console.log(moment(endDate).format('YYYY-MM-DD'));
+                        if (costDate.isAfter(endDate)) break;
+                        else if (costDate.isSameOrAfter(startDate) && costDate.isSameOrBefore(endDate)) {
+                            // found
+                            sumNumber += foundStock.cost.settings[i].number;
+                            sumCost += foundStock.cost.settings[i].number * foundStock.cost.settings[i].cost;
+                            i += 1;
+                        } else i += 1;
+                    }
+
+                    averageCost = sumNumber > 0 ? Math.round((sumCost * 100) / sumNumber) / 100 : 0;
+                    if (averageCost > 0) resData.push([endDate.format('YYYY-MM-DD'), averageCost]);
+                }
+            }
+            foundStock.data['cost'] = resData;
+            // ===================塞入localstorage===================
+            localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+            console.log('SAVE_STOCK_COST_LINE OK');
         },
         SAVE_STOCK_MA(state, stockId) {
             console.log('SAVE_STOCK_MA');
@@ -592,7 +643,7 @@ const stock = {
             //         // }
             //     }
             // }
-
+            let resData = [];
             [5, 10, 20].forEach((limit) => {
                 resData = [];
                 for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
@@ -1153,6 +1204,14 @@ const stock = {
             const found = getters.getStock(id);
             return found.data && found.data.ma_sell
                 ? _.slice(found.data.ma_sell, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
+                : [];
+        },
+        getStockDataWeeklyCost: (state, getters) => (id) => {
+            console.log('getStockDataWeeklyCost');
+            // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
+            const found = getters.getStock(id);
+            return found.data && found.data.cost
+                ? _.slice(found.data.cost, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
                 : [];
         },
         getStockPolicyMa: (state, getters) => (id) => {
