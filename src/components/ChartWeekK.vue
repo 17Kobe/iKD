@@ -9,13 +9,17 @@
         </highcharts>
         <div style="position: absolute; top: 80px; right: 14px; font-size: 12px" v-if="ohlc && ohlc.length > 0">
             <!-- <span style="color: #834beb">P</span>: {{ Number(ohlc.at(-1)[3].toFixed(2)) }} -->
-            <span v-if="ma_buy && ma_buy.length > 0"
-                ><span style="color: #834beb">&nbsp;MA({{ ma_policy.ma_buy_limit }})</span>:
-                {{ Number(ma_buy[ma_buy.length - 1][1].toFixed(2)) }}</span
+            <span v-if="last_price"
+                ><span style="color: #000000">&nbsp;&nbsp;{{ last_price }}</span></span
             >
-            <span v-if="ma_sell && ma_sell.length > 0"
-                ><span style="color: #e6a23c">&nbsp;MA({{ ma_policy.ma_sell_limit }})</span>:
-                {{ Number(ma_sell[ma_sell.length - 1][1].toFixed(2)) }}</span
+            <span v-if="ma5 && ma5.length > 0"
+                ><span style="color: #834beb">&nbsp;&nbsp;{{ Number(ma5[ma5.length - 1][1].toFixed(2)) }}</span></span
+            >
+            <span v-if="ma10 && ma10.length > 0"
+                ><span style="color: #febd09">&nbsp;&nbsp;{{ Number(ma10[ma10.length - 1][1].toFixed(2)) }}</span></span
+            >
+            <span v-if="ma20 && ma20.length > 0"
+                ><span style="color: #e65596">&nbsp;&nbsp;{{ Number(ma20[ma20.length - 1][1].toFixed(2)) }}</span></span
             >
         </div>
         <!-- :updateArgs="[true, true, true]" -->
@@ -37,18 +41,34 @@ export default {
             console.log('ohlc');
             return this.$store.getters.getStockDataWeekly(this.parentData);
         },
-        ma_buy() {
-            console.log('ma_buy');
-            return this.$store.getters.getStockDataWeeklyMaBuy(this.parentData);
+        last_price() {
+            console.log('last_price');
+            return this.$store.getters.getStockLastPrice(this.parentData);
         },
-        ma_sell() {
-            console.log('ma_sell');
-            return this.$store.getters.getStockDataWeeklyMaSell(this.parentData);
+        ma5() {
+            console.log('ma5');
+            return this.$store.getters.getStockDataWeeklyMa5(this.parentData);
         },
-        ma_policy() {
-            console.log('ma_policy');
-            return this.$store.getters.getStockPolicyMa(this.parentData);
+        ma10() {
+            console.log('ma10');
+            return this.$store.getters.getStockDataWeeklyMa10(this.parentData);
         },
+        ma20() {
+            console.log('ma20');
+            return this.$store.getters.getStockDataWeeklyMa20(this.parentData);
+        },
+        // ma_buy() {
+        //     console.log('ma_buy');
+        //     return this.$store.getters.getStockDataWeeklyMaBuy(this.parentData);
+        // },
+        // ma_sell() {
+        //     console.log('ma_sell');
+        //     return this.$store.getters.getStockDataWeeklyMaSell(this.parentData);
+        // },
+        // ma_policy() {
+        //     console.log('ma_policy');
+        //     return this.$store.getters.getStockPolicyMa(this.parentData);
+        // },
         chartOptions() {
             const component = this;
             return {
@@ -175,10 +195,10 @@ export default {
                             } else {
                                 console.log(component);
 
-                                const color = index === 1 ? '#834beb' : '#e6a23c';
-                                const limit = index === 1 ? component.ma_policy.ma_buy_limit : component.ma_policy.ma_sell_limit;
-                                str += `<span><span style="color: ${color}">MA(${limit})</span>: ${point.y.toFixed(2)}
-                                </span>`;
+                                // const color = index === 1 ? '#834beb' : '#e6a23c';
+                                // const limit = index === 1 ? component.ma_policy.ma_buy_limit : component.ma_policy.ma_sell_limit;
+                                // str += `<span><span style="color: ${color}">MA(${limit})</span>: ${point.y.toFixed(2)}
+                                // </span>`;
                             }
                         });
 
@@ -271,9 +291,9 @@ export default {
                     },
                     {
                         type: 'line',
-                        name: 'MA Buy線',
+                        name: 'MA5線',
                         color: '#834beb',
-                        data: this.ma_buy,
+                        data: this.ma5,
                         dataGrouping: {
                             // anchor: 'end',
                             // firstAnchor: 'end',
@@ -283,9 +303,9 @@ export default {
                     },
                     {
                         type: 'line',
-                        name: 'MA Sell線',
-                        color: '#e6a23c',
-                        data: this.ma_sell,
+                        name: 'MA10線',
+                        color: '#febd09',
+                        data: this.ma10,
                         dataGrouping: {
                             // anchor: 'end',
                             // firstAnchor: 'end',
@@ -293,6 +313,42 @@ export default {
                             units: [['day', [1]]],
                         },
                     },
+                    {
+                        type: 'line',
+                        name: 'MA20線',
+                        color: '#e65596',
+                        data: this.ma20,
+                        dataGrouping: {
+                            // anchor: 'end',
+                            // firstAnchor: 'end',
+                            lastAnchor: 'lastPoint',
+                            units: [['day', [1]]],
+                        },
+                    },
+                    // {
+                    //     type: 'line',
+                    //     name: 'MA Buy線',
+                    //     color: '#834beb',
+                    //     data: this.ma_buy,
+                    //     dataGrouping: {
+                    //         // anchor: 'end',
+                    //         // firstAnchor: 'end',
+                    //         lastAnchor: 'lastPoint',
+                    //         units: [['day', [1]]],
+                    //     },
+                    // },
+                    // {
+                    //     type: 'line',
+                    //     name: 'MA Sell線',
+                    //     color: '#e6a23c',
+                    //     data: this.ma_sell,
+                    //     dataGrouping: {
+                    //         // anchor: 'end',
+                    //         // firstAnchor: 'end',
+                    //         lastAnchor: 'lastPoint',
+                    //         units: [['day', [1]]],
+                    //     },
+                    // },
                 ],
             };
         },

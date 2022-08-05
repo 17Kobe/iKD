@@ -543,55 +543,55 @@ const stock = {
             // const index = _.findIndex(state.stockList, ['id', stockId]);
             const foundStock = state.stockList.find((v) => v.id === stockId);
             // let isModify = false;
-            let resData = [];
-            let preMaLimit = 0; // 先前的MA參數值，不可能為0，所以設為0
-            // ===================塞入股價週線MA1資料===================
-            if (_.has(foundStock, 'policy.settings.buy')) {
-                foundStock.data.ma_buy = [];
-                const foundMaBuy = _.find(foundStock.policy.settings.buy, ['method', 'ma_buy']);
-                if (foundMaBuy) {
-                    resData = [];
-                    const maBuyLimit = foundMaBuy.limit;
-                    preMaLimit = maBuyLimit;
-                    for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
-                        const startIndex = k - maBuyLimit - 1 < 0 ? 0 : k - maBuyLimit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
-                        const endIndex = k;
-                        const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
-                        const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
-                        const average = _.mean(rangeCloseArray);
+            // let resData = [];
+            // let preMaLimit = 0; // 先前的MA參數值，不可能為0，所以設為0
+            // // ===================塞入股價週線MA1資料===================
+            // if (_.has(foundStock, 'policy.settings.buy')) {
+            //     foundStock.data.ma_buy = [];
+            //     const foundMaBuy = _.find(foundStock.policy.settings.buy, ['method', 'ma_buy']);
+            //     if (foundMaBuy) {
+            //         resData = [];
+            //         const maBuyLimit = foundMaBuy.limit;
+            //         preMaLimit = maBuyLimit;
+            //         for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
+            //             const startIndex = k - maBuyLimit - 1 < 0 ? 0 : k - maBuyLimit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
+            //             const endIndex = k;
+            //             const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
+            //             const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
+            //             const average = _.mean(rangeCloseArray);
 
-                        const date = foundStock.data.weekly[endIndex][0];
+            //             const date = foundStock.data.weekly[endIndex][0];
 
-                        resData.push([date, average]);
-                    }
-                    foundStock.data.ma_buy = resData;
-                }
-            }
-            // ===================塞入股價週線MA BUY資料(有可能最後是塞MA1，若MA1沒資料的話)===================
-            if (_.has(foundStock, 'policy.settings.sell')) {
-                foundStock.data.ma_sell = [];
-                const foundMaSell = _.find(foundStock.policy.settings.sell, ['method', 'ma_sell']);
-                if (foundMaSell && preMaLimit !== foundMaSell.limit) {
-                    resData = [];
-                    const maSellLimit = foundMaSell.limit;
-                    for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
-                        const startIndex = k - maSellLimit - 1 < 0 ? 0 : k - maSellLimit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
-                        const endIndex = k;
-                        const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
-                        const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
-                        const average = _.mean(rangeCloseArray);
+            //             resData.push([date, average]);
+            //         }
+            //         foundStock.data.ma_buy = resData;
+            //     }
+            // }
+            // // ===================塞入股價週線MA BUY資料(有可能最後是塞MA1，若MA1沒資料的話)===================
+            // if (_.has(foundStock, 'policy.settings.sell')) {
+            //     foundStock.data.ma_sell = [];
+            //     const foundMaSell = _.find(foundStock.policy.settings.sell, ['method', 'ma_sell']);
+            //     if (foundMaSell && preMaLimit !== foundMaSell.limit) {
+            //         resData = [];
+            //         const maSellLimit = foundMaSell.limit;
+            //         for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
+            //             const startIndex = k - maSellLimit - 1 < 0 ? 0 : k - maSellLimit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
+            //             const endIndex = k;
+            //             const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
+            //             const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
+            //             const average = _.mean(rangeCloseArray);
 
-                        const date = foundStock.data.weekly[endIndex][0];
+            //             const date = foundStock.data.weekly[endIndex][0];
 
-                        resData.push([date, average]);
-                    }
-                    // if (_.has(foundStock, 'data.ma1') && _.isEmpty(foundStock.data.ma1)) {
-                    //     foundStock.data.ma1 = resData;
-                    // } else {
-                    foundStock.data.ma_sell = resData;
-                    // }
-                }
-            }
+            //             resData.push([date, average]);
+            //         }
+            //         // if (_.has(foundStock, 'data.ma1') && _.isEmpty(foundStock.data.ma1)) {
+            //         //     foundStock.data.ma1 = resData;
+            //         // } else {
+            //         foundStock.data.ma_sell = resData;
+            //         // }
+            //     }
+            // }
 
             [5, 10, 20].forEach((limit) => {
                 resData = [];
@@ -1083,6 +1083,11 @@ const stock = {
             console.log('getStock');
             return _.find(state.stockList, ['id', id]);
         },
+        getStockLastPrice: (state, getters) => (id) => {
+            console.log('getStockLastPrice');
+            const found = getters.getStock(id);
+            return found.last_price;
+        },
         getStockDataWeekly: (state, getters) => (id) => {
             console.log('getStockDataWeekly');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
@@ -1108,6 +1113,30 @@ const stock = {
             const found = getters.getStock(id);
             return found.data && found.data.weekly_kd
                 ? _.slice(found.data.weekly_kd, -26).map((value) => [moment(value[0]).valueOf(), value[1], value[2]])
+                : [];
+        },
+        getStockDataWeeklyMa5: (state, getters) => (id) => {
+            console.log('getStockDataWeeklyMa5');
+            // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
+            const found = getters.getStock(id);
+            return found.data && found.data.ma5
+                ? _.slice(found.data.ma5, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
+                : [];
+        },
+        getStockDataWeeklyMa10: (state, getters) => (id) => {
+            console.log('getStockDataWeeklyMa10');
+            // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
+            const found = getters.getStock(id);
+            return found.data && found.data.ma10
+                ? _.slice(found.data.ma10, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
+                : [];
+        },
+        getStockDataWeeklyMa20: (state, getters) => (id) => {
+            console.log('getStockDataWeeklyMa20');
+            // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
+            const found = getters.getStock(id);
+            return found.data && found.data.ma20
+                ? _.slice(found.data.ma20, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
                 : [];
         },
         getStockDataWeeklyMaBuy: (state, getters) => (id) => {
