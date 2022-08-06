@@ -308,6 +308,7 @@ export default {
                         type: 'line',
                         name: 'MA5線',
                         color: '#834beb',
+                        lineWidth: 1,
                         data: this.ma5,
                         dataGrouping: {
                             // anchor: 'end',
@@ -320,6 +321,7 @@ export default {
                         type: 'line',
                         name: 'MA10線',
                         color: '#febd09',
+                        lineWidth: 1,
                         data: this.ma10,
                         dataGrouping: {
                             // anchor: 'end',
@@ -332,6 +334,7 @@ export default {
                         type: 'line',
                         name: 'MA20線',
                         color: '#fc7742',
+                        lineWidth: 1,
                         data: this.ma20,
                         dataGrouping: {
                             // anchor: 'end',
