@@ -345,6 +345,7 @@ export default {
                         name: '成本線',
                         color: '#4286f5',
                         data: this.cost,
+                        step: 'left',
                         dataGrouping: {
                             // anchor: 'end',
                             // firstAnchor: 'end',

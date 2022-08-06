@@ -347,11 +347,6 @@ const stock = {
             } catch (err) {
                 alert(err);
             }
-
-            // TODO: SAVE_STOCK_MA 及 SAVE_STOCK_COST_LINE 未來都要移除
-            this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線, 看console.log會依序執行commit，一個一個執行完才執行下個，看起來沒問題
-            this.commit('SAVE_STOCK_COST_LINE', stockId); // 計算 成本線
-
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
         },
         SAVE_STOCK_PRICE(state, { stockId, data }) {
