@@ -68,7 +68,7 @@
             </el-table-column>
             <el-table-column :label="modeSpread === '目前' ? '現價' : '賣價'" prop="last_price" width="45" align="center">
             </el-table-column>
-            <el-table-column label="本金&nbsp;&nbsp;&nbsp;" width="75" align="right" header-align="right">
+            <el-table-column label="本金&nbsp;" width="75" align="right" header-align="right">
                 <template #default="scope">
                     <span> $ {{ scope.row.cost.sum.toLocaleString('en-US') }} </span>
                 </template>
@@ -142,7 +142,7 @@
                 <template #default="scope"> {{ scope.row.cost.total.toLocaleString('en-US') }} 股&nbsp;&nbsp; </template>
             </el-table-column>
             <el-table-column
-                :label="'市值'"
+                label="市值&nbsp;"
                 width="75"
                 align="right"
                 header-align="right"
