@@ -141,6 +141,14 @@
             >
                 <template #default="scope"> {{ scope.row.cost.total.toLocaleString('en-US') }} 股&nbsp;&nbsp; </template>
             </el-table-column>
+            <el-table-column
+                :label="'市值'"
+                width="75"
+                align="right"
+                header-align="right"
+            >
+                <template #default="scope"> $ {{ (scope.row.cost.sum + scope.row.cost.return).toLocaleString('en-US') }} </template>
+            </el-table-column>
             <el-table-column label="賣出日期" prop="sell_date" width="90" align="center" v-if="modeSpread === '歷史'">
             </el-table-column>
         </el-table>
