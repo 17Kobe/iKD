@@ -79,6 +79,15 @@
                 <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
                     <el-input
                         size="small"
+                        :input-style="
+                            item.account.includes('活存')
+                                ? { color: 'rgb(255, 159, 64)' }
+                                : item.account.includes('定存')
+                                ? { color: 'rgb(242, 202, 100)' }
+                                : item.account.includes('股票')
+                                ? { color: 'rgb(75, 192, 192)' }
+                                : { color: 'rgb(153, 102, 255)' }
+                        "
                         placeholder=""
                         v-model="item.account"
                         :ref="`deposit${index}`"
@@ -130,6 +139,7 @@
                 <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
                     <el-input
                         size="small"
+                        :input-style="{ color: '#ff6384' }"
                         placeholder=""
                         v-model="item.account"
                         :ref="`deposit${index}`"
@@ -677,8 +687,8 @@ export default {
                         data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.otherDeposit],
                         backgroundColor: [
                             // 背景色
-                            'rgba(255, 205, 86, 0.5)',
                             'rgba(255, 159, 64, 0.5)',
+                            'rgba(255, 205, 86, 0.5)',
                             'rgba(75, 192, 192, 0.4)',
                             'rgba(153, 102, 255, 0.5)',
                             'rgba(204, 255, 144, 0.5)',
