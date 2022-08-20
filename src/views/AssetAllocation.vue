@@ -79,21 +79,21 @@
                 <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
                     <el-input
                         size="small"
-                        :input-style="
-                            item.account.includes('活存')
-                                ? { color: 'rgb(255, 159, 64)' }
-                                : item.account.includes('定存')
-                                ? { color: 'rgb(242, 202, 100)' }
-                                : item.account.includes('股票')
-                                ? { color: 'rgb(75, 192, 192)' }
-                                : { color: 'rgb(153, 102, 255)' }
-                        "
                         placeholder=""
                         v-model="item.account"
                         :ref="`deposit${index}`"
+                        :class="[
+                            item.account.includes('活存')
+                                ? 'demand-deposit-bg'
+                                : item.account.includes('定存')
+                                ? 'fixed-deposit-bg'
+                                : item.account.includes('股票')
+                                ? 'stock-deposit-bg'
+                                : 'other-deposit-bg',
+                        ]"
                         @change="onChangeAccount($event, index)"
                     >
-                        <template #prepend>帳戶</template>
+                        <template #prepend><span>帳戶</span></template>
                     </el-input>
                 </el-col>
                 <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
@@ -102,6 +102,15 @@
                         placeholder=""
                         v-model="item.amount"
                         @keyup="onChangeAmount($event, index)"
+                        :class="[
+                            item.account.includes('活存')
+                                ? 'demand-deposit-bg'
+                                : item.account.includes('定存')
+                                ? 'fixed-deposit-bg'
+                                : item.account.includes('股票')
+                                ? 'stock-deposit-bg'
+                                : 'other-deposit-bg',
+                        ]"
                         :options="{
                             locale: 'en-US',
                             currency: 'USD',
@@ -139,10 +148,10 @@
                 <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
                     <el-input
                         size="small"
-                        :input-style="{ color: '#ff6384' }"
                         placeholder=""
                         v-model="item.account"
                         :ref="`deposit${index}`"
+                        class="liabilities-deposit-bg"
                         @change="onChangeAccount($event, index)"
                     >
                         <template #prepend>帳戶</template>
@@ -153,6 +162,7 @@
                         size="small"
                         placeholder=""
                         v-model="item.amount"
+                        class="liabilities-deposit-bg"
                         @keyup="onChangeAmount($event, index)"
                         :options="{
                             locale: 'en-US',
@@ -687,8 +697,8 @@ export default {
                         data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.otherDeposit],
                         backgroundColor: [
                             // 背景色
-                            'rgba(255, 159, 64, 0.5)',
                             'rgba(255, 205, 86, 0.5)',
+                            'rgba(255, 159, 64, 0.5)',
                             'rgba(75, 192, 192, 0.4)',
                             'rgba(153, 102, 255, 0.5)',
                             'rgba(204, 255, 144, 0.5)',
@@ -881,4 +891,15 @@ export default {
     padding: 3px 2px
 #line-chart
     height: 133px
+
+.demand-deposit-bg > .el-input-group__prepend
+    background: rgba(255, 205, 86, 0.5)
+.fixed-deposit-bg > .el-input-group__prepend
+    background: rgba(255, 159, 64, 0.5)
+.stock-deposit-bg > .el-input-group__prepend
+    background: rgba(75, 192, 192, 0.4)
+.other-deposit-bg > .el-input-group__prepend
+    background: rgba(153, 102, 255, 0.5)
+.liabilities-deposit-bg > .el-input-group__prepend
+    background: rgba(255, 99, 132, 0.2)
 </style>
