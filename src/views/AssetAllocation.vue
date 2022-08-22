@@ -74,6 +74,42 @@
             </el-col>
         </el-row>
         <!-- <chart v-if="loaded" :chartdata="chartdata" :options="options"> </chart> -->
+        <template v-for="(item, index) in spreadList" :key="index">
+            <el-row>
+                <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                    <el-input
+                        size="small"
+                        placeholder=""
+                        v-model="item.name"
+                        class="stock-deposit-bg"
+                    >
+                        <template #prepend><span>股票</span></template>
+                    </el-input>
+                </el-col>
+                <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                    <ElCurrencyInput
+                        size="small"
+                        placeholder=""
+                        v-model="item.cost.market_value"
+                        class="stock-deposit-bg"
+                        :options="{
+                            locale: 'en-US',
+                            currency: 'USD',
+                            currencyDisplay: 'hidden',
+                            hideCurrencySymbolOnFocus: true,
+                            hideGroupingSeparatorOnFocus: true,
+                            hideNegligibleDecimalDigitsOnFocus: true,
+                            autoDecimalDigits: false,
+                            autoSign: true,
+                            useGrouping: true,
+                            accountingSign: false,
+                        }"
+                    />
+                </el-col>
+                <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                </el-col>
+            </el-row>
+        </template>
         <template v-for="(item, index) in assetList" :key="index">
             <el-row v-if="item.isPositive">
                 <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
@@ -198,8 +234,8 @@
 
         <div style="font-size: 14px; color: #999; margin: 20px">
             <div>
-                【帳戶】請輸入帳戶名稱，若輸入包括關鍵字(活存、
-                定存)時，將會自動分類統計。另外，股票會從自選股中有設定成本同步過來。
+                【帳戶】請輸入帳戶名稱，輸入若包括關鍵字(活存、
+                定存)時會自動分類統計。股票則會自動同步。
             </div>
             <div>【$】請輸入帳戶目前金額。</div>
         </div>
@@ -403,6 +439,9 @@ export default {
     computed: {
         historyAssetList() {
             return this.$store.getters.getHistoryAssetList();
+        },
+        spreadList() {
+            return this.$store.getters.getSpreadList('目前');
         },
         stockList() {
             return this.$store.state.price.stockList;
@@ -898,6 +937,8 @@ export default {
     background: rgba(255, 159, 64, 0.5)
 .stock-deposit-bg > .el-input-group__prepend
     background: rgba(75, 192, 192, 0.4)
+.stock-deposit-bg > input
+    background: #f7f7f7
 .other-deposit-bg > .el-input-group__prepend
     background: rgba(153, 102, 255, 0.5)
 .liabilities-deposit-bg > .el-input-group__prepend

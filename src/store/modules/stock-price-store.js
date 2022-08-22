@@ -311,6 +311,7 @@ const stock = {
                 foundStock.cost.return = 0;
                 foundStock.cost.rate_of_return = 0;
                 foundStock.cost.return = Math.round(close * foundStock.cost.total * exchange - foundStock.cost.sum);
+                foundStock.cost.market_value = foundStock.cost.sum + foundStock.cost.return;
                 foundStock.cost.rate_of_return =
                     foundStock.cost.sum === 0
                         ? null
