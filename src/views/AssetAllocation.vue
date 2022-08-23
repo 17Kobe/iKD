@@ -75,7 +75,7 @@
         </el-row>
         <!-- <chart v-if="loaded" :chartdata="chartdata" :options="options"> </chart> -->
         <template v-for="(item, index) in spreadList" :key="index">
-            <el-row>
+            <el-row style="margin-bottom: 1px;">
                 <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
                     <el-input
                         size="small"
