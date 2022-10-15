@@ -29,6 +29,37 @@
                         /> </span
                     >&nbsp;元
                 </el-tag>
+                <el-tag
+                    class="ml-2"
+                    size="large"
+                    style="margin: 5px 5px; float: right"
+                    :type="totalRateOfReturn >= 0 ? 'danger' : 'success '"
+                    >漲跌幅
+                    <span style="font-size: 24px"
+                        ><i
+                            :class="[
+                                totalRateOfReturn < 0 ? 'el-icon-caret-bottom' : totalRateOfReturn > 0 ? 'el-icon-caret-top' : '',
+                            ]"
+                            :style="[
+                                totalRateOfReturn > 0
+                                    ? { position: 'relative', top: '2px' }
+                                    : { position: 'relative', top: '1px' },
+                            ]"
+                        ></i
+                    ></span>
+                    <span style="font-size: 28px; font-weight: bold">
+                        <!-- <number :from="0" :to="totalSpread" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
+                        <number
+                            :from="0"
+                            :to="Math.abs(totalRateOfReturn)"
+                            :format="currencyPointFormat"
+                            :duration="1"
+                            :delay="0"
+                            easing="Power1.easeOut"
+                            ref="totalRateOfReturn"
+                        /> </span
+                    >&nbsp;%
+                </el-tag>
             </el-col>
         </el-row>
 
@@ -141,13 +172,10 @@
             >
                 <template #default="scope"> {{ scope.row.cost.total.toLocaleString('en-US') }} 股&nbsp;&nbsp; </template>
             </el-table-column>
-            <el-table-column
-                label="市值&nbsp;"
-                width="75"
-                align="right"
-                header-align="right"
-            >
-                <template #default="scope"> $ {{ (scope.row.cost.sum + scope.row.cost.return).toLocaleString('en-US') }} </template>
+            <el-table-column label="市值&nbsp;" width="75" align="right" header-align="right">
+                <template #default="scope">
+                    $ {{ (scope.row.cost.sum + scope.row.cost.return).toLocaleString('en-US') }}
+                </template>
             </el-table-column>
             <el-table-column label="賣出日期" prop="sell_date" width="90" align="center" v-if="modeSpread === '歷史'">
             </el-table-column>
@@ -312,6 +340,11 @@ export default {
         totalSpread() {
             return this.spreadList.reduce((acc, { cost }) => acc + cost.return, 0);
         },
+        totalRateOfReturn() {
+            return this.totalSpread == 0
+                ? 0
+                : (this.totalSpread * 100) / this.spreadList.reduce((acc, { cost }) => acc + cost.sum, 0);
+        },
         totalDividend() {
             return this.dividendList.reduce(
                 (acc, { number_of_shares, earnings_distribution }) => acc + Math.round(number_of_shares * earnings_distribution),
@@ -349,6 +382,9 @@ export default {
     methods: {
         currencyFormat(number) {
             return Number(number.toFixed(0)).toLocaleString('en-US');
+        },
+        currencyPointFormat(number) {
+            return Number(number.toFixed(1)).toLocaleString('en-US');
         },
     },
 };
