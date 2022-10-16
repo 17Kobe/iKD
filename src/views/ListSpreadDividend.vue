@@ -1,18 +1,18 @@
 <template>
     <div>
         <el-row class="row-bg" justify="space-between" style="align-items: center">
-            <el-col :span="11" style="margin-left: 17px; font-size: 18px"
+            <el-col :span="8" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">價差&nbsp;&nbsp;</span>
                 <el-radio-group v-model="modeSpread" size="small" fill="#dedede" text-color="#373737">
                     <el-radio-button label="目前" />
                     <el-radio-button label="歷史" />
                 </el-radio-group>
             </el-col>
-            <el-col :span="9" style="margin-right: 17px">
+            <el-col :span="15" style="margin-right: 4px">
                 <el-tag
                     class="ml-2"
                     size="large"
-                    style="margin: 5px 5px; float: right"
+                    style="margin: 5px 2px; padding: 0 4px; float: right"
                     :type="totalSpread >= 0 ? 'primary' : 'danger'"
                     >總計
                     <span style="font-size: 24px"> $ </span>
@@ -30,12 +30,11 @@
                     >&nbsp;元
                 </el-tag>
                 <el-tag
-                    class="ml-2"
-                    size="large"
-                    style="margin: 5px 5px; float: right"
+                    size="small"
+                    style="float: right; position: relative; left: 7px; top: 2px; padding: 0 2px; border-radius: 10px"
                     :type="totalRateOfReturn >= 0 ? 'danger' : 'success '"
-                    >漲跌幅
-                    <span style="font-size: 24px"
+                >
+                    <span style="font-size: 14px"
                         ><i
                             :class="[
                                 totalRateOfReturn < 0 ? 'el-icon-caret-bottom' : totalRateOfReturn > 0 ? 'el-icon-caret-top' : '',
@@ -47,7 +46,7 @@
                             ]"
                         ></i
                     ></span>
-                    <span style="font-size: 28px; font-weight: bold">
+                    <span style="font-size: 14px; font-weight: bold">
                         <!-- <number :from="0" :to="totalSpread" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
                         <number
                             :from="0"
@@ -183,15 +182,15 @@
 
         <!-- ================================ 股利 -->
         <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center">
-            <el-col :span="9" style="margin-left: 17px; font-size: 18px"
+            <el-col :span="8" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">股利&nbsp;&nbsp;</span>
                 <el-radio-group v-model="modeDividend" size="small" fill="#dedede" text-color="#373737">
                     <el-radio-button label="未來" />
                     <el-radio-button label="歷史" />
                 </el-radio-group>
             </el-col>
-            <el-col :span="9" style="margin-right: 17px">
-                <el-tag class="ml-2" size="large" style="margin: 5px 5px; float: right"
+            <el-col :span="15" style="margin-right: 4px">
+                <el-tag class="ml-2" size="large" style="margin: 5px 2px; padding: 0 4px; float: right"
                     >總計
                     <span style="font-size: 24px"> $ </span>
                     <span style="font-size: 28px; font-weight: bold">
@@ -252,7 +251,7 @@
 
         <!-- ================================ 未買進的股票 -->
         <el-row class="row-bg" justify="space-between" style="margin-top: 17px; align-items: center">
-            <el-col :span="11" style="margin-left: 17px; font-size: 18px; font-weight: bold">追蹤中</el-col>
+            <el-col :span="11" style="margin-left: 6px; font-size: 18px; font-weight: bold">追蹤中</el-col>
         </el-row>
 
         <el-table :data="noBuyList" style="width: 100%" empty-text="無資料" class="i-table">
