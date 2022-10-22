@@ -204,6 +204,14 @@ const stock = {
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.dispatch('GET_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
+        SAVE_STOCK_DIVIDEND_LAST_DATE(state) {
+            console.log('SAVE_STOCK_DIVIDEND_LAST_DATE');
+            state.stockList.forEach((o) => {
+                o.crawler_dividend_last_date = '2022-10-01';
+            });
+
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+        },
         ADD_A_STOCK_KEY(state, { stockId, isDvidend }) {
             console.log('ADD_A_STOCK_KEY');
             const foundStock = state.stockList.find((v) => v.id === stockId);

@@ -8,6 +8,9 @@
         </el-upload>
         <br />
         &nbsp;&nbsp;<el-button type="danger" @click="onClear"><i class="el-icon-download"></i> 清除設定檔</el-button><br /><br />
+        &nbsp;&nbsp;<el-button type="success" @click="onForceDividendRefresh"
+            ><i class="el-icon-refresh-right"></i> 立即更新配息</el-button
+        ><br /><br />
         &nbsp;
         <el-tooltip class="box-item" effect="dark" content="使用在星期六也要補班的時候" placement="top">
             <el-button type="success" @click="onForceRefresh"><i class="el-icon-refresh-right"></i> 立即更新股價</el-button>
@@ -97,6 +100,15 @@ export default {
                         message: '取消刪除設定檔!',
                     });
                 });
+        },
+
+        onForceDividendRefresh() {
+            this.$store.commit('SAVE_STOCK_DIVIDEND_LAST_DATE');
+
+            ElMessage({
+                type: 'success',
+                message: '完成立即更新股價!',
+            });
         },
 
         onForceRefresh() {

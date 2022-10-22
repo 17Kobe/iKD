@@ -153,7 +153,7 @@ const dividend = {
                 let thisYearLastCashDividendPaymentDate = null; // 用於算未確定的，要從這個日期以後
                 const filterSureDividend = _.filter(
                     data.data,
-                    (o) => moment(o.CashDividendPaymentDate).isSameOrAfter(today) && moment(o.date).isBefore(today) // 日期一樣不能是未來日期
+                    (o) => moment(o.CashDividendPaymentDate).isSameOrAfter(today) //&& moment(o.date).isBefore(today) // 日期一樣不能是未來日期
                 ); // 發放日在今天以後，這是確定的喔
 
                 filterSureDividend.forEach((dividendObj) => {
