@@ -115,7 +115,14 @@ const dividend = {
             console.log(data);
 
             if (_.has(data, 'data') && data.data.length > 0) {
-                // 2022/01/01
+                // ===== 修正 FindMid 股利的 CashDividendPaymentDate 日期有誤 ====
+                const found_index_0056 = _.findIndex(data.data, function (o) {
+                    return o.stock_id === '0056' && o.date === '2022-10-25';
+                });
+                if (found_index_0056 > -1) {
+                    data.data[found_index_0056].CashDividendPaymentDate = '2022-11-22';
+                }
+
                 // ===== 計算歷史股利 ====
                 const filterSureDividendHistory = _.filter(
                     data.data,
