@@ -75,14 +75,9 @@
         </el-row>
         <!-- <chart v-if="loaded" :chartdata="chartdata" :options="options"> </chart> -->
         <template v-for="(item, index) in spreadList" :key="index">
-            <el-row style="margin-bottom: 1px;">
+            <el-row style="margin-bottom: 1px">
                 <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                    <el-input
-                        size="small"
-                        placeholder=""
-                        v-model="item.name"
-                        class="stock-deposit-bg"
-                    >
+                    <el-input size="small" placeholder="" v-model="item.name" class="stock-deposit-bg">
                         <template #prepend><span>股票</span></template>
                     </el-input>
                 </el-col>
@@ -106,8 +101,7 @@
                         }"
                     />
                 </el-col>
-                <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                </el-col>
+                <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px"> </el-col>
             </el-row>
         </template>
         <template v-for="(item, index) in assetList" :key="index">
@@ -233,10 +227,7 @@
         </el-row>
 
         <div style="font-size: 14px; color: #999; margin: 20px">
-            <div>
-                【帳戶】請輸入帳戶名稱，輸入若包括關鍵字(活存、
-                定存)時會自動分類統計。股票則會自動同步。
-            </div>
+            <div>【帳戶】請輸入帳戶名稱，輸入若包括關鍵字(活存、 定存)時會自動分類統計。股票則會自動同步。</div>
             <div>【$】請輸入帳戶目前金額。</div>
         </div>
         <br /><br />
@@ -580,7 +571,7 @@ export default {
                         align: 'end',
                         position: 'bottom',
                         text: [
-                            '活存：$ ' + this.demandDeposit.toLocaleString('en-US') + ' 元          ',
+                            '現金：$ ' + this.demandDeposit.toLocaleString('en-US') + ' 元          ',
                             '定存：$ ' + this.fixedDeposit.toLocaleString('en-US') + ' 元          ',
                             '股票：$ ' + this.stockDeposit.toLocaleString('en-US') + ' 元          ',
                         ],
@@ -597,7 +588,7 @@ export default {
                             dataArr.map((data) => {
                                 sum += data;
                             });
-                            const itemName = ['活存', '定存', '股票', '其它'];
+                            const itemName = ['現金', '定存', '股票', '其它'];
                             console.log(value);
                             if (value === 0) return '';
                             const percentage = `  ${itemName[ctx.dataIndex]}\n${((value * 100) / sum).toFixed(2)} %`;
