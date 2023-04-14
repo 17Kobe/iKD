@@ -545,7 +545,8 @@ const stock = {
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
             // 有可能有policy設定，有/無淨值，上回沒算完就關了，需要於 SAVE_STOCK_POLICY_RESULT 內部去確認有無算完
         },
-        SAVE_STOCK_COST_LINE(state, stockId) { // 平均成本線
+        SAVE_STOCK_COST_LINE(state, stockId) {
+            // 平均成本線
             console.log('SAVE_STOCK_COST_LINE');
             const foundStock = state.stockList.find((v) => v.id === stockId);
 
@@ -1266,8 +1267,24 @@ const stock = {
                 _.filter(state.stockList, function (obj) {
                     return !obj.cost;
                 }),
-                [(obj) => obj.badge !== null, 'order'],
-                ['desc', 'asc']
+                [
+                    (obj) => {
+                        if (obj.badge === '買') {
+                            return 0;
+                        } else if (obj.badge === '準買') {
+                            return 2;
+                        } else if (obj.badge === '賣') {
+                            return 3;
+                        } else if (obj.badge === '準賣') {
+                            return 4;
+                        } else {
+                            return 5;
+                        }
+                    },
+                    ,
+                    'order',
+                ],
+                ['asc', 'asc']
             );
         },
     },
