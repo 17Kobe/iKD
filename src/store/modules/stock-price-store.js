@@ -1266,8 +1266,8 @@ const stock = {
                 _.filter(state.stockList, function (obj) {
                     return !obj.cost;
                 }),
-                ['order'],
-                ['asc']
+                [(obj) => obj.badge !== null, 'order'],
+                ['desc', 'asc']
             );
         },
     },
