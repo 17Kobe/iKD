@@ -545,7 +545,7 @@ const stock = {
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
             // 有可能有policy設定，有/無淨值，上回沒算完就關了，需要於 SAVE_STOCK_POLICY_RESULT 內部去確認有無算完
         },
-        SAVE_STOCK_COST_LINE(state, stockId) {
+        SAVE_STOCK_COST_LINE(state, stockId) { // 平均成本線
             console.log('SAVE_STOCK_COST_LINE');
             const foundStock = state.stockList.find((v) => v.id === stockId);
 

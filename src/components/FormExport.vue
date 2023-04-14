@@ -104,7 +104,7 @@ export default {
 
         onForceDividendRefresh() {
             this.$store.commit('SAVE_STOCK_DIVIDEND_LAST_DATE');
-
+            this.$store.commit('DELETE_DUPLICATE_HISTORY_DIVIDEND_DATA');
             ElMessage({
                 type: 'success',
                 message: '完成立即更新股價!',

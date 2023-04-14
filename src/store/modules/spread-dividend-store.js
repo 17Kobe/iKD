@@ -100,6 +100,16 @@ const dividend = {
             console.log('SAVE_HISTORY_DIVIDEND_LIST');
             state.historyDividendList = data;
         },
+        DELETE_DUPLICATE_HISTORY_DIVIDEND_DATA(state, data) {
+            console.log('DELETE_DUPLICATE_HISTORY_DIVIDEND_DATA');
+            const isEqual = (obj1, obj2) => {
+                return obj1.id === obj2.id && obj1.payment_date === obj2.payment_date;
+            };
+
+            const uniqueHistoryDividendList = _.uniqWith(state.historyDividendList, isEqual);
+            state.historyDividendList = uniqueHistoryDividendList;
+            localStorage.setItem('historyDividendList', JSON.stringify(state.historyDividendList));
+        },
         SAVE_DIVIDEND(state, { stockId, stockName, stockCostSettings, stockCrawlerDividendLastDate, data }) {
             console.log('SAVE_DIVIDEND');
             // 會清掉再全部重加
