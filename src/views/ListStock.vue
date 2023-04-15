@@ -108,12 +108,20 @@
                     <!-- <ChartWeekKd :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
                 </template>
             </el-table-column>
+
+            <el-table-column label="週RSI" width="230" align="center">
+                <template #default="scope">
+                    <ChartWeekRsi :parentData="scope.row.id" />
+                </template>
+            </el-table-column>
+
             <el-table-column label="週K線" width="250" align="center">
                 <template #default="scope">
                     <ChartWeekK :parentData="scope.row.id" />
                     <!-- <ChartWeekK :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
                 </template>
             </el-table-column>
+
             <el-table-column label="成本" width="190" header-align="center" align="center">
                 <template #default="scope">
                     <el-button
@@ -457,6 +465,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import ChartWeekKd from '@/components/ChartWeekKd.vue';
+import ChartWeekRsi from '@/components/ChartWeekRsi.vue';
 import ChartWeekK from '@/components/ChartWeekK.vue';
 import FormCost from '@/components/FormCost.vue';
 import FormPolicy from '@/components/FormPolicy.vue';
@@ -469,7 +478,7 @@ import GlobalSettings from '../store/data/global-settings.json';
 
 export default {
     name: 'component-list',
-    components: { ChartWeekKd, ChartWeekK, FormCost, FormPolicy, FormSearch, FormExport },
+    components: { ChartWeekKd, ChartWeekRsi, ChartWeekK, FormCost, FormPolicy, FormSearch, FormExport },
     data() {
         return {
             // rateOfReturn: 0,

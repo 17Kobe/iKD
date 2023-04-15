@@ -122,6 +122,18 @@ export default {
                     default_limit_desc: '以下',
                 },
                 {
+                    value: 'rsi_over_sold',
+                    label: '週 RSI 超賣',
+                    default_limit: 5,
+                    default_limit_desc: '以下',
+                },
+                {
+                    value: 'rsi_turn_up',
+                    label: '週 RSI 往上轉折',
+                    default_limit: 10,
+                    default_limit_desc: '以下',
+                },
+                {
                     value: 'ma_buy',
                     label: '搭配 MA 均線',
                     default_limit: 14,
@@ -151,6 +163,18 @@ export default {
                     value: 'kd_turn_down',
                     label: '週 KD 往下轉折',
                     default_limit: 80,
+                    default_limit_desc: '以上',
+                },
+                {
+                    value: 'rsi_over_bought',
+                    label: '週 RSI 超買',
+                    default_limit: 95,
+                    default_limit_desc: '以上',
+                },
+                {
+                    value: 'rsi_turn_down',
+                    label: '週 RSI 往下轉折',
+                    default_limit: 90,
                     default_limit_desc: '以上',
                 },
                 {

@@ -7,9 +7,8 @@
             style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 80px; left: 97px; font-size: 12px" v-if="k && k.length > 0">
-            <span style="color: #4286f5">K</span>: {{ k[k.length - 1][1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
-            {{ d[d.length - 1][1].toFixed(2) }}
+        <div style="position: absolute; top: 80px; left: 128px; font-size: 12px" v-if="rsi5 && rsi5.length > 0">
+            <span style="color: #4286f5">RSI5</span>: {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
         </div>
 
         <!-- :updateArgs="[true, true, true]" -->
@@ -32,11 +31,8 @@ export default {
     },
     computed: {
         // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
-        k() {
-            return this.stockDataOfKdPrice.map((value) => [value[0], value[1]]);
-        },
-        d() {
-            return this.stockDataOfKdPrice.map((value) => [value[0], value[2]]);
+        rsi5() {
+            return this.stockDataOfRsiPrice.map((value) => [value[0], value[1]]);
         },
         stockData() {
             console.log('stockData');
@@ -44,8 +40,8 @@ export default {
             return this.$store.getters.getStock(this.parentData);
         },
 
-        stockDataOfKdPrice() {
-            console.log('stockDataOfKdPrice');
+        stockDataOfRsiPrice() {
+            console.log('stockDataOfRsiPrice');
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 只取出最後52筆的週KD資料出來，約1年，因為1年52週
@@ -59,7 +55,7 @@ export default {
             //         ])) ||
             //     []
             // );
-            return this.$store.getters.getStockDataWeeklyKd(this.parentData);
+            return this.$store.getters.getStockDataWeeklyRsi(this.parentData);
         },
 
         stockDataOfPolicyResultBuy() {
@@ -76,9 +72,9 @@ export default {
                         this.stockData.policy.result,
                         (o) =>
                             moment().diff(moment(o.date), 'days') <= 365 &&
-                            _.some(o.reason, (el) => _.includes(el, 'kd')) && // 必需有 kd 的訊號設定
+                            _.some(o.reason, (el) => _.includes(el, 'rsi')) && // 必需有 rsi 的訊號設定
                             o.is_sure_buy
-                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
+                    ).map((obj) => [moment(obj.date).valueOf(), obj.rsi])) ||
                 []
             );
         },
@@ -95,9 +91,9 @@ export default {
                         this.stockData.policy.result,
                         (o) =>
                             moment().diff(moment(o.date), 'days') <= 365 &&
-                            _.some(o.reason, (el) => _.includes(el, 'kd')) && // 必需有 kd 的訊號設定
+                            _.some(o.reason, (el) => _.includes(el, 'rsi')) && // 必需有 rsi 的訊號設定
                             o.is_sure_sell
-                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
+                    ).map((obj) => [moment(obj.date).valueOf(), obj.rsi])) ||
                 []
             );
         },
@@ -114,50 +110,50 @@ export default {
                         this.stockData.policy.result,
                         (o) =>
                             moment().diff(moment(o.date), 'days') <= 365 &&
-                            _.some(o.reason, (el) => _.includes(el, 'kd')) && // 必需有 kd 的訊號設定
+                            _.some(o.reason, (el) => _.includes(el, 'rsi')) && // 必需有 rsi 的訊號設定
                             (o.is_buy_cancel || o.is_sell_cancel)
-                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
+                    ).map((obj) => [moment(obj.date).valueOf(), obj.rsi])) ||
                 []
             );
         },
 
-        kdGoldLimit() {
-            // 黃金交叉，值要畫橫線
+        rsiOverSoldLimit() {
+            // 超賣，值要畫橫線
             console.log('kdGoldLimit');
             let ret = -999; // 讓他畫線畫在看到到的地方
             if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.buy) {
-                const found = _.find(this.stockData.policy.settings.buy, ['method', 'kd_gold']);
+                const found = _.find(this.stockData.policy.settings.buy, ['method', 'rsi_over_sold']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
             // console.log(ret);
             return ret;
         },
-        kdTurnUpLmit() {
-            // 黃金轉折，值要畫橫線
+        rsiTurnUpLmit() {
+            // 往下轉折，值要畫橫線
             console.log('kdGoldTurn');
             let ret = -999; // 讓他畫線畫在看到到的地方
             if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.buy) {
-                const found = _.find(this.stockData.policy.settings.buy, ['method', 'kd_turn_up']);
+                const found = _.find(this.stockData.policy.settings.buy, ['method', 'rsi_turn_up']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
             return ret;
         },
-        kdDeadLimit() {
-            // 死亡交叉，值要畫橫線
-            console.log('kdDeadLimit');
+        rsiOverBoughtLimit() {
+            // 超買，值要畫橫線
+            console.log('rsiOverBoughtLimit');
             let ret = -999; // 讓他畫線畫在看到到的地方
             if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.sell) {
-                const found = _.find(this.stockData.policy.settings.sell, ['method', 'kd_dead']);
+                const found = _.find(this.stockData.policy.settings.sell, ['method', 'rsi_over_bought']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
             return ret;
         },
-        kdTurnDownLmit() {
-            // 死亡交叉，值要畫橫線
+        rsiTurnDownLmit() {
+            // 往下轉折，值要畫橫線
             console.log('kdTurnUpLmit');
             let ret = -999; // 讓他畫線畫在看到到的地方
             if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.sell) {
-                const found = _.find(this.stockData.policy.settings.sell, ['method', 'kd_turn_down']);
+                const found = _.find(this.stockData.policy.settings.sell, ['method', 'rsi_turn_down']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
             return ret;
@@ -266,19 +262,16 @@ export default {
                                 )}(<span style="color: #3333ee; font-weight:bold;">${
                                     dayOfWeek[moment(point.x).day()]
                                 }</span>)</div>`;
-                                str += `<div><span style="color: #4286f5; font-weight:bold;">K</span>: ${Number(
+                                str += `<div><span style="color: #4286f5; font-weight:bold;">RSI</span>: ${Number(
                                     point.y.toFixed(2)
                                 )} `;
-                            } else if (index === 1) {
+
+                                // 取得該股價並且顯示
                                 const found = _.find(
                                     component.stockData.data.weekly,
                                     (array) => array[0] === moment(point.x).format('YYYY-MM-DD')
                                 );
-
-                                // 取得該股價並且顯示
-                                str += `<span style="color: #e75c9a; font-weight:bold;">D</span>: ${Number(
-                                    point.y.toFixed(2)
-                                )}<br><span style="color: #834beb; font-weight:bold;">股價</span>: ${found[4]}
+                                str += `<br><span style="color: #834beb; font-weight:bold;">股價</span>: ${found[4]}
                                 </div>`;
                             }
                         });
@@ -322,27 +315,27 @@ export default {
                         max: 100,
                         plotLines: [
                             {
-                                color: '#ff9494', // 黃金交叉
-                                dashStyle: 'LongDash',
-                                value: this.kdGoldLimit,
+                                color: '#ff9494', // 超賣
+                                dashStyle: 'Solid',
+                                value: this.rsiOverSoldLimit,
                                 width: 1,
                             },
                             {
                                 color: '#ff9494', // 往上轉折
-                                dashStyle: 'Solid',
-                                value: this.kdTurnUpLmit,
+                                dashStyle: 'LongDash',
+                                value: this.rsiTurnUpLmit,
                                 width: 1,
                             },
                             {
-                                color: '#76dc43', // 死亡交叉
-                                dashStyle: 'LongDash',
-                                value: this.kdDeadLimit,
+                                color: '#76dc43', // 超買
+                                dashStyle: 'Solid',
+                                value: this.rsiOverBoughtLimit,
                                 width: 1,
                             },
                             {
                                 color: '#76dc43', // 往下轉折
-                                dashStyle: 'Solid',
-                                value: this.kdTurnDownLmit,
+                                dashStyle: 'LongDash',
+                                value: this.rsiTurnDownLmit,
                                 width: 1,
                             },
                         ],
@@ -383,14 +376,9 @@ export default {
                 ],
                 series: [
                     {
-                        name: 'K線',
+                        name: 'RSI5',
                         color: '#4286f5',
-                        data: this.k,
-                    },
-                    {
-                        name: 'D線',
-                        color: '#e75c9a',
-                        data: this.d,
+                        data: this.rsi5,
                     },
                     {
                         type: 'scatter',

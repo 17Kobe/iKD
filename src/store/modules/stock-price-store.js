@@ -190,6 +190,44 @@ const stock = {
             return weeklyKdData;
             // commit('SAVE_STOCK_WEEKLY_KD', { stockId: stockId, data: weeklyKdData });
         },
+        async CALC_STOCK_WEEKLY_RSI({ state }, stockId) {
+            const period = 5;
+            console.log('CALC_STOCK_WEEKLY_RSI');
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            let weeklyRsiData = [];
+            let gains = [];
+            let losses = [];
+            let avgGain = 0;
+            let avgLoss = 0;
+
+            for (let i = 0; i < foundStock.data.weekly.length; i++) {
+                let closePrice = foundStock.data.weekly[i][4];
+                if (i === 0) {
+                    gains.push(0);
+                    losses.push(0);
+                } else {
+                    let diff = closePrice - foundStock.data.weekly[i - 1][4];
+                    gains.push(Math.max(diff, 0));
+                    losses.push(Math.max(-diff, 0));
+                }
+
+                if (i >= period) {
+                    avgGain = (avgGain * (period - 1) + gains[i]) / period;
+                    avgLoss = (avgLoss * (period - 1) + losses[i]) / period;
+                } else {
+                    avgGain = (avgGain * (i + 1) + gains[i]) / (i + 2);
+                    avgLoss = (avgLoss * (i + 1) + losses[i]) / (i + 2);
+                }
+
+                if (i >= period - 1) {
+                    let rs = avgGain / avgLoss;
+                    weeklyRsiData.push([foundStock.data.weekly[i][0], 100 - 100 / (1 + rs)]);
+                }
+            }
+
+            return weeklyRsiData;
+        },
+
         async CALC_STOCK_WEEKLY_MA({ state }, stockId) {
             console.log('CALC_STOCK_WEEKLY_MA');
 
@@ -610,12 +648,14 @@ const stock = {
 
                 // ===================塞入股價週線KD資料===================
 
-                const [weekly_kd_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
+                const [weekly_kd_data, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
                     this.dispatch('CALC_STOCK_WEEKLY_KD', stockId),
+                    this.dispatch('CALC_STOCK_WEEKLY_RSI', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_MA', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_COST_LINE', stockId),
                 ]);
                 foundStock.data.weekly_kd = weekly_kd_data;
+                foundStock.data.weekly_rsi = weekly_rsi_data;
                 _.merge(foundStock.data, weekly_ma_data); // 將 var a={ma5:[], ma10:[], ma20:[]}; 塞到 var b={data:{ma5:[], ma10:[], ma20:[]}} ，用lodash
                 foundStock.data.cost = weekly_cost_line_data;
 
@@ -635,32 +675,41 @@ const stock = {
             const foundStock = state.stockList.find((v) => v.id === stockId);
 
             // 黃金交叉、死亡交叉
-            const policyResult = [];
+            let policyResult = [];
 
             if (
-                _.has(foundStock, 'data.weekly_kd') &&
                 (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell')) &&
                 (foundStock.calc_policy_date !== foundStock.last_price_date || !_.has(foundStock, 'policy.result')) // 日期判斷是有可能上回有淨值(此回沒有)，上回卻沒有計算完policy
                 //曾經發現有policy.settings，但都沒有算 policy.result
             ) {
+                // 訊號開關
                 console.log('SAVE_STOCK_POLICY_RESULT foundStock');
                 let foundKdGold = false;
                 let foundKdTurnUp = false;
                 let foundKdDead = false;
                 let foundKdTurnDown = false;
+                let foundRsiOverSold = false;
+                let foundRsiTurnUp = false;
+                let foundRsiOverBought = false;
+                let foundRsiTurnDown = false;
                 let foundMaBuy = false;
                 let foundMaSell = false;
                 if (_.has(foundStock, 'policy.settings.buy')) {
                     foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
                     foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
+                    foundRsiOverSold = _.find(foundStock.policy.settings.buy, ['method', 'rsi_over_sold']);
+                    foundRsiTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'rsi_turn_up']);
                     foundMaBuy = _.find(foundStock.policy.settings.buy, ['method', 'ma_buy']);
                 }
                 if (_.has(foundStock, 'policy.settings.sell')) {
                     foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
                     foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
+                    foundRsiOverBought = _.find(foundStock.policy.settings.sell, ['method', 'rsi_over_bought']);
+                    foundRsiTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'rsi_turn_down']);
                     foundMaSell = _.find(foundStock.policy.settings.sell, ['method', 'ma_sell']);
                 }
 
+                // KD 相關訊號
                 let kdGoldReady = false;
                 let kdDeadReady = false;
                 let preK = 0;
@@ -772,6 +821,113 @@ const stock = {
                     }
                     preK = k;
                 });
+
+                // RSI 相關訊號
+                // let rsiOverSoldReady = false;
+                // let rsiOverBoughtReady = false;
+                let preRsi = 0;
+                let rsiTurnUpReady = false;
+                let rsiTurnDownReady = false;
+                foundStock.data.weekly_rsi.forEach((item, dataIndex) => {
+                    const rsi = item[1];
+                    // 週 RSI 超賣 買進訊號
+                    if (foundRsiOverSold) {
+                        if (rsi <= foundRsiOverSold.limit) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            if (index === -1)
+                                policyResult.push({
+                                    date: item[0],
+                                    is_buy: rsi_over_sold,
+                                    rsi,
+                                    price: dataWeeklyPrice,
+                                    reason: ['rsi_over_sold'],
+                                });
+                            else {
+                                policyResult[index].is_buy = true;
+                                policyResult[index].rsi = rsi;
+                                policyResult[index].reason.push('rsi_over_sold');
+                            }
+                        }
+                    }
+                    // 週 RSI 往上轉折 買進訊號
+                    if (foundRsiTurnUp) {
+                        if (rsi < preRsi) {
+                            rsiTurnUpReady = true;
+                        }
+                        if (preRsi <= foundRsiTurnUp.limit && rsi >= preRsi && rsiTurnUpReady) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            if (index === -1)
+                                policyResult.push({
+                                    date: item[0],
+                                    is_buy: true,
+                                    rsi,
+                                    price: dataWeeklyPrice,
+                                    reason: ['rsi_turn_up'],
+                                });
+                            else {
+                                policyResult[index].is_buy = true;
+                                policyResult[index].rsi = rsi;
+                                policyResult[index].reason.push('rsi_turn_up');
+                            }
+                            rsiTurnUpReady = false;
+                        }
+                    }
+
+                    // 週 RSI 超買 賣出訊號
+                    if (foundRsiOverBought) {
+                        if (rsi >= foundRsiOverBought.limit) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            if (index === -1)
+                                policyResult.push({
+                                    date: item[0],
+                                    is_sell: true,
+                                    rsi,
+                                    price: dataWeeklyPrice,
+                                    reason: ['rsi_over_bought'],
+                                });
+                            else {
+                                policyResult[index].is_sell = true;
+                                policyResult[index].rsi = rsi;
+                                policyResult[index].reason.push('rsi_over_bought');
+                            }
+                        }
+                    }
+                    // 週 RSI 往下轉折 賣出訊號
+                    if (foundRsiTurnDown) {
+                        if (rsi > preRsi) {
+                            rsiTurnDownReady = true;
+                        }
+                        if (preRsi >= foundRsiTurnDown.limit && rsi <= preRsi && rsiTurnDownReady) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            if (index === -1)
+                                policyResult.push({
+                                    date: item[0],
+                                    is_sell: true,
+                                    rsi,
+                                    price: dataWeeklyPrice,
+                                    reason: ['rsi_turn_down'],
+                                });
+                            else {
+                                policyResult[index].is_sell = true;
+                                policyResult[index].rsi = rsi;
+                                policyResult[index].reason.push('rsi_turn_down');
+                            }
+                            rsiTurnDownReady = false;
+                        }
+                    }
+                    preRsi = rsi;
+                });
+
+                // 因為 KD完才RSI，日期會沒有按升序排，所以在這重排
+                policyResult = _.sortBy(policyResult, 'date');
 
                 // 搭配 MA 均線 日均線之上
                 policyResult.forEach((item) => {
@@ -1127,6 +1283,14 @@ const stock = {
             const found = getters.getStock(id);
             return found.data && found.data.weekly_kd
                 ? _.slice(found.data.weekly_kd, -26).map((value) => [moment(value[0]).valueOf(), value[1], value[2]])
+                : [];
+        },
+        getStockDataWeeklyRsi: (state, getters) => (id) => {
+            console.log('getStockDataWeeklyKd');
+            // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
+            const found = getters.getStock(id);
+            return found.data && found.data.weekly_rsi
+                ? _.slice(found.data.weekly_rsi, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
                 : [];
         },
         getStockDataWeeklyMa5: (state, getters) => (id) => {
