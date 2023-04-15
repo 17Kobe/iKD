@@ -158,6 +158,108 @@ const stock = {
                 ]);
             }
         },
+        async CALC_STOCK_WEEKLY_KD({ state }, stockId) {
+            console.log('CALC_STOCK_WEEKLY_KD');
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            let weeklyKdData = [];
+            let rsv = 0;
+            let preK = 0;
+            let preD = 0;
+            let todayK = 0;
+            let todayD = 0;
+
+            // 從最早日期開始算，因為公式有用昨天
+            for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
+                const startIndex = k - 8 < 0 ? 0 : k - 8; // 如果減完小於0，就=0。正常寫法是-9+1，但我寫-8就好了
+                const endIndex = k;
+                const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
+                const rangeHighArray = _.map(range2dArray, (v) => v[2]);
+                const rangeLowArray = _.map(range2dArray, (v) => v[3]);
+                const low = _.min(rangeLowArray);
+                const high = _.max(rangeHighArray);
+
+                rsv = ((foundStock.data.weekly[k][4] - low) / (high - low)) * 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
+                todayK = (2 / 3) * preK + (1 / 3) * rsv; // k=2/3 * 昨日的k值 + 1/3*今日的RSV
+                todayD = (2 / 3) * preD + (1 / 3) * todayK; // d=2/3 * 昨日的d值 + 1/3*今日的k值
+                preK = todayK;
+                preD = todayD;
+                const date = foundStock.data.weekly[endIndex][0];
+
+                weeklyKdData.push([date, todayK, todayD]);
+            }
+            return weeklyKdData;
+            // commit('SAVE_STOCK_WEEKLY_KD', { stockId: stockId, data: weeklyKdData });
+        },
+        async CALC_STOCK_WEEKLY_MA({ state }, stockId) {
+            console.log('CALC_STOCK_WEEKLY_MA');
+
+            // const index = _.findIndex(state.stockList, ['id', stockId]);
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+
+            let weeklyMaData = { ma5: [], ma10: [], ma20: [] };
+            [5, 10, 20].forEach((limit) => {
+                let maDataX = [];
+                for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
+                    const startIndex = k - limit - 1 < 0 ? 0 : k - limit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
+                    const endIndex = k;
+                    const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
+                    const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
+                    const average = _.mean(rangeCloseArray);
+
+                    const date = foundStock.data.weekly[endIndex][0];
+
+                    maDataX.push([date, average]);
+                }
+                weeklyMaData['ma' + limit] = maDataX;
+            });
+            return weeklyMaData;
+        },
+        async CALC_STOCK_WEEKLY_COST_LINE({ state }, stockId) {
+            // 平均成本線
+            console.log('CALC_STOCK_WEEKLY_COST_LINE');
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+
+            let weeklyCostLineData = [];
+            if (
+                _.has(foundStock, 'cost') &&
+                _.has(foundStock, 'data.daily') &&
+                foundStock.data.daily.length > 0 &&
+                _.has(foundStock, 'cost.settings')
+            ) {
+                let i = 0;
+                let averageCost = 0;
+                let sumCost = 0;
+                let sumNumber = 0;
+                for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
+                    const startIndex = k - 1 < 0 ? 0 : k - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
+                    const endIndex = k;
+                    const startDate = moment(foundStock.data.weekly[startIndex][0]).add(1, 'days');
+                    const endDate = moment(foundStock.data.weekly[endIndex][0]);
+
+                    // 目前加總總金額 除 目前總股數 就是 目前成本
+                    while (i <= foundStock.cost.settings.length - 1) {
+                        const costDate = moment(foundStock.cost.settings[i].buy_date);
+                        // console.log('=============');
+                        // console.log(i);
+                        // console.log(costDate.format('YYYY-MM-DD'));
+                        // console.log(moment(startDate).format('YYYY-MM-DD'));
+                        // console.log(moment(endDate).format('YYYY-MM-DD'));
+                        if (costDate.isAfter(endDate)) break;
+                        else if (costDate.isSameOrAfter(startDate) && costDate.isSameOrBefore(endDate)) {
+                            // found
+                            sumNumber += foundStock.cost.settings[i].number;
+                            sumCost += foundStock.cost.settings[i].number * foundStock.cost.settings[i].cost;
+                            i += 1;
+                        } else i += 1;
+                    }
+
+                    averageCost = sumNumber > 0 ? Math.round((sumCost * 100) / sumNumber) / 100 : 0;
+                    if (averageCost > 0) weeklyCostLineData.push([endDate.format('YYYY-MM-DD'), averageCost]);
+                }
+            }
+
+            return weeklyCostLineData;
+        },
     },
     mutations: {
         SAVE_GLOBAL_SETTINGS(state, data) {
@@ -358,7 +460,7 @@ const stock = {
             }
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
         },
-        SAVE_STOCK_PRICE(state, { stockId, data }) {
+        async SAVE_STOCK_PRICE(state, { stockId, data }) {
             console.log('SAVE_STOCK_PRICE');
             console.log(stockId);
             const foundStock = state.stockList.find((v) => v.id === stockId);
@@ -507,168 +609,24 @@ const stock = {
                 // this.$set(foundStock.data, 'weekly', _.reverse(resData));
 
                 // ===================塞入股價週線KD資料===================
-                resData = [];
-                let rsv = 0;
-                let preK = 0;
-                let preD = 0;
-                let todayK = 0;
-                let todayD = 0;
 
-                // 從最早日期開始算，因為公式有用昨天
-                for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
-                    const startIndex = k - 8 < 0 ? 0 : k - 8; // 如果減完小於0，就=0。正常寫法是-9+1，但我寫-8就好了
-                    const endIndex = k;
-                    const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
-                    const rangeHighArray = _.map(range2dArray, (v) => v[2]);
-                    const rangeLowArray = _.map(range2dArray, (v) => v[3]);
-                    const low = _.min(rangeLowArray);
-                    const high = _.max(rangeHighArray);
-
-                    rsv = ((foundStock.data.weekly[k][4] - low) / (high - low)) * 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
-                    todayK = (2 / 3) * preK + (1 / 3) * rsv; // k=2/3 * 昨日的k值 + 1/3*今日的RSV
-                    todayD = (2 / 3) * preD + (1 / 3) * todayK; // d=2/3 * 昨日的d值 + 1/3*今日的k值
-                    preK = todayK;
-                    preD = todayD;
-                    const date = foundStock.data.weekly[endIndex][0];
-
-                    resData.push([date, todayK, todayD]);
-                }
-                foundStock.data.weekly_kd = resData;
+                const [weekly_kd_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
+                    this.dispatch('CALC_STOCK_WEEKLY_KD', stockId),
+                    this.dispatch('CALC_STOCK_WEEKLY_MA', stockId),
+                    this.dispatch('CALC_STOCK_WEEKLY_COST_LINE', stockId),
+                ]);
+                foundStock.data.weekly_kd = weekly_kd_data;
+                _.merge(foundStock.data, weekly_ma_data); // 將 var a={ma5:[], ma10:[], ma20:[]}; 塞到 var b={data:{ma5:[], ma10:[], ma20:[]}} ，用lodash
+                foundStock.data.cost = weekly_cost_line_data;
 
                 // ===================塞入localstorage===================
                 localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+
                 if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId); // 有新值就要更新成本的報酬率
-                this.commit('SAVE_STOCK_MA', stockId); // 計算 MA線
-                this.commit('SAVE_STOCK_COST_LINE', stockId); // 計算 成本線
                 console.log('SAVE_STOCK_PRICE OK');
             }
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
             // 有可能有policy設定，有/無淨值，上回沒算完就關了，需要於 SAVE_STOCK_POLICY_RESULT 內部去確認有無算完
-        },
-        SAVE_STOCK_COST_LINE(state, stockId) {
-            // 平均成本線
-            console.log('SAVE_STOCK_COST_LINE');
-            const foundStock = state.stockList.find((v) => v.id === stockId);
-
-            let resData = [];
-            if (
-                _.has(foundStock, 'cost') &&
-                _.has(foundStock, 'data.daily') &&
-                foundStock.data.daily.length > 0 &&
-                _.has(foundStock, 'cost.settings')
-            ) {
-                let i = 0;
-                let averageCost = 0;
-                let sumCost = 0;
-                let sumNumber = 0;
-                for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
-                    const startIndex = k - 1 < 0 ? 0 : k - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
-                    const endIndex = k;
-                    const startDate = moment(foundStock.data.weekly[startIndex][0]).add(1, 'days');
-                    const endDate = moment(foundStock.data.weekly[endIndex][0]);
-
-                    // 目前加總總金額 除 目前總股數 就是 目前成本
-                    while (i <= foundStock.cost.settings.length - 1) {
-                        const costDate = moment(foundStock.cost.settings[i].buy_date);
-                        // console.log('=============');
-                        // console.log(i);
-                        // console.log(costDate.format('YYYY-MM-DD'));
-                        // console.log(moment(startDate).format('YYYY-MM-DD'));
-                        // console.log(moment(endDate).format('YYYY-MM-DD'));
-                        if (costDate.isAfter(endDate)) break;
-                        else if (costDate.isSameOrAfter(startDate) && costDate.isSameOrBefore(endDate)) {
-                            // found
-                            sumNumber += foundStock.cost.settings[i].number;
-                            sumCost += foundStock.cost.settings[i].number * foundStock.cost.settings[i].cost;
-                            i += 1;
-                        } else i += 1;
-                    }
-
-                    averageCost = sumNumber > 0 ? Math.round((sumCost * 100) / sumNumber) / 100 : 0;
-                    if (averageCost > 0) resData.push([endDate.format('YYYY-MM-DD'), averageCost]);
-                }
-            }
-            foundStock.data['cost'] = resData;
-            // ===================塞入localstorage===================
-            localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
-            console.log('SAVE_STOCK_COST_LINE OK');
-        },
-        SAVE_STOCK_MA(state, stockId) {
-            console.log('SAVE_STOCK_MA');
-
-            // const index = _.findIndex(state.stockList, ['id', stockId]);
-            const foundStock = state.stockList.find((v) => v.id === stockId);
-            // let isModify = false;
-            // let resData = [];
-            // let preMaLimit = 0; // 先前的MA參數值，不可能為0，所以設為0
-            // // ===================塞入股價週線MA1資料===================
-            // if (_.has(foundStock, 'policy.settings.buy')) {
-            //     foundStock.data.ma_buy = [];
-            //     const foundMaBuy = _.find(foundStock.policy.settings.buy, ['method', 'ma_buy']);
-            //     if (foundMaBuy) {
-            //         resData = [];
-            //         const maBuyLimit = foundMaBuy.limit;
-            //         preMaLimit = maBuyLimit;
-            //         for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
-            //             const startIndex = k - maBuyLimit - 1 < 0 ? 0 : k - maBuyLimit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
-            //             const endIndex = k;
-            //             const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
-            //             const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
-            //             const average = _.mean(rangeCloseArray);
-
-            //             const date = foundStock.data.weekly[endIndex][0];
-
-            //             resData.push([date, average]);
-            //         }
-            //         foundStock.data.ma_buy = resData;
-            //     }
-            // }
-            // // ===================塞入股價週線MA BUY資料(有可能最後是塞MA1，若MA1沒資料的話)===================
-            // if (_.has(foundStock, 'policy.settings.sell')) {
-            //     foundStock.data.ma_sell = [];
-            //     const foundMaSell = _.find(foundStock.policy.settings.sell, ['method', 'ma_sell']);
-            //     if (foundMaSell && preMaLimit !== foundMaSell.limit) {
-            //         resData = [];
-            //         const maSellLimit = foundMaSell.limit;
-            //         for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
-            //             const startIndex = k - maSellLimit - 1 < 0 ? 0 : k - maSellLimit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
-            //             const endIndex = k;
-            //             const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
-            //             const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
-            //             const average = _.mean(rangeCloseArray);
-
-            //             const date = foundStock.data.weekly[endIndex][0];
-
-            //             resData.push([date, average]);
-            //         }
-            //         // if (_.has(foundStock, 'data.ma1') && _.isEmpty(foundStock.data.ma1)) {
-            //         //     foundStock.data.ma1 = resData;
-            //         // } else {
-            //         foundStock.data.ma_sell = resData;
-            //         // }
-            //     }
-            // }
-            let resData = [];
-            [5, 10, 20].forEach((limit) => {
-                resData = [];
-                for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
-                    const startIndex = k - limit - 1 < 0 ? 0 : k - limit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
-                    const endIndex = k;
-                    const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
-                    const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
-                    const average = _.mean(rangeCloseArray);
-
-                    const date = foundStock.data.weekly[endIndex][0];
-
-                    resData.push([date, average]);
-                }
-                foundStock.data['ma' + limit] = resData;
-            });
-
-            // ===================塞入localstorage===================
-            // if (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell'))
-            localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
-            console.log('SAVE_STOCK_MA OK');
         },
         SAVE_STOCK_POLICY_RESULT(state, stockId) {
             console.log('SAVE_STOCK_POLICY_RESULT');
