@@ -1013,7 +1013,7 @@ const stock = {
                     if (foundCostDown && numberOfBuy > 1) {
                         // 會在買超過1次才會進來判斷，因為這樣才有之前報酬率
                         const rateOfReturn = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
-                        if (rateOfReturn * 100 > -foundCostDown) {
+                        if (rateOfReturn * 100 > -foundCostDown.limit) {
                             // 比負10還大，就是沒超過，就不買了。foundCostDown都是正值，但實際人認知是負值
                             isCancelToBuy = true;
                             obj.is_buy_cancel = true;
@@ -1098,6 +1098,7 @@ const stock = {
                                   buy_or_sell: buyOrSell,
                                   price: obj.price,
                                   rate_of_return: obj.rate_of_return ? `${Number((obj.rate_of_return * 100).toFixed(1))}%` : '',
+                                  reason: obj.reason,
                               };
                           }
                       )

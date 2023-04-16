@@ -187,7 +187,7 @@
                     </el-button>
                 </template>
             </el-table-column>
-            <el-table-column label="買賣策略" width="210" align="center">
+            <el-table-column label="買賣策略" width="225" align="center">
                 <template #default="scope">
                     <el-button
                         size="small"
@@ -330,6 +330,35 @@
                                     ]"
                                     >{{ item.rate_of_return }}</span
                                 >
+                                &nbsp;&nbsp;<span
+                                    :style="[
+                                        item.buy_or_sell === '買'
+                                            ? { 'background-color': '#f28b82' }
+                                            : { 'background-color': '#82d125' },
+                                        {
+                                            'font-size': '14px',
+                                            display: 'inline-block',
+                                            width: '100px',
+                                            'text-align': 'center',
+                                            color: 'white',
+                                            'border-radius': '15px / 120px',
+                                            padding: '5px',
+                                            margin: '1px',
+                                        },
+                                    ]"
+                                >
+                                    <span v-if="item.reason.includes('kd_gold')">KD 黃金交叉</span>
+                                    <span v-if="item.reason.includes('kd_turn_up')">KD往 上轉折</span>
+                                    <span v-if="item.reason.includes('rsi_over_sold')">RSI 超賣</span>
+                                    <span v-if="item.reason.includes('rsi_turn_up')">RSI 往上轉折</span>
+
+                                    <span v-if="item.reason.includes('kd_dead')">KD 死亡交叉</span>
+                                    <span v-if="item.reason.includes('kd_turn_down')">KD 往下轉折</span>
+                                    <span v-if="item.reason.includes('rsi_over_bought')">RSI 超買</span>
+                                    <span v-if="item.reason.includes('rsi_turn_down')">RSI 往下轉折</span>
+
+                                    <span v-if="item.reason.includes('latest')">現在</span>
+                                </span>
                             </div>
                         </div>
                         <template #reference>
