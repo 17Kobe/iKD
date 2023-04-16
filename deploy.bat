@@ -1,6 +1,6 @@
 @echo off
 cd /d "%~dp0"
-git reset --hard origin/master
+git pull origin master --force
 node updateJsonFile.js
 call npm run build
 cd /d "D:\Code\iKD\dist\"

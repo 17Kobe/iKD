@@ -2,7 +2,7 @@
 # 當發生錯誤時終止腳本運行
 set -e
 # 先拉碼，也可以用在店裡
-git reset --hard origin/master
+git pull origin master --force
 # 更新美金匯率及基金每日淨值至JSON檔案內
 node updateJsonFile.js
 # 打包

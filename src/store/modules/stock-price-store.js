@@ -5,6 +5,7 @@ import _ from 'lodash';
 const defaultState = {
     usdExchange: 30,
     stockList: [], // 目前知道 ios 在 19支股票，>=19會不能儲存localstorage
+    tempStockList: [], // 暫存股票data變一年以內
 };
 
 const stock = {
@@ -654,10 +655,24 @@ const stock = {
                     this.dispatch('CALC_STOCK_WEEKLY_MA', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_COST_LINE', stockId),
                 ]);
-                foundStock.data.weekly_kd = weekly_kd_data;
-                foundStock.data.weekly_rsi = weekly_rsi_data;
-                _.merge(foundStock.data, weekly_ma_data); // 將 var a={ma5:[], ma10:[], ma20:[]}; 塞到 var b={data:{ma5:[], ma10:[], ma20:[]}} ，用lodash
-                foundStock.data.cost = weekly_cost_line_data;
+
+                let tempStockListStockData = {};
+                tempStockListStockData.weekly_kd = weekly_kd_data;
+                tempStockListStockData.weekly_rsi = weekly_rsi_data;
+                tempStockListStockData.ma5 = weekly_ma_data.ma5;
+                tempStockListStockData.ma10 = weekly_ma_data.ma10;
+                tempStockListStockData.ma20 = weekly_ma_data.ma20;
+                tempStockListStockData.cost = weekly_cost_line_data;
+                state.tempStockList.push({ id: stockId, data: tempStockListStockData });
+
+                foundStock.data.weekly_kd = _.slice(weekly_kd_data, -26);
+                foundStock.data.weekly_rsi = _.slice(weekly_rsi_data, -26);
+                foundStock.data.ma5 = _.takeRight(weekly_ma_data.ma5, 26);
+                foundStock.data.ma10 = _.takeRight(weekly_ma_data.ma10, 26);
+                foundStock.data.ma20 = _.takeRight(weekly_ma_data.ma20, 26);
+                foundStock.data.cost = _.slice(weekly_cost_line_data, -26);
+
+                // console.log(foundStock);
 
                 // ===================塞入localstorage===================
                 localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
@@ -668,11 +683,30 @@ const stock = {
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
             // 有可能有policy設定，有/無淨值，上回沒算完就關了，需要於 SAVE_STOCK_POLICY_RESULT 內部去確認有無算完
         },
-        SAVE_STOCK_POLICY_RESULT(state, stockId) {
+        async SAVE_STOCK_POLICY_RESULT(state, stockId) {
             console.log('SAVE_STOCK_POLICY_RESULT');
 
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
+
+            // 像是從 UI改policy會沒有 tempStockList，需要重新計算
+            let foundTempStock = state.tempStockList.find((v) => v.id === stockId);
+            if (typeof foundTempStock === 'undefined') {
+                const [weekly_kd_data, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
+                    this.dispatch('CALC_STOCK_WEEKLY_KD', stockId),
+                    this.dispatch('CALC_STOCK_WEEKLY_RSI', stockId),
+                    this.dispatch('CALC_STOCK_WEEKLY_MA', stockId),
+                    this.dispatch('CALC_STOCK_WEEKLY_COST_LINE', stockId),
+                ]);
+                let tempStockListStockData = {};
+                tempStockListStockData.weekly_kd = weekly_kd_data;
+                tempStockListStockData.weekly_rsi = weekly_rsi_data;
+                _.merge(tempStockListStockData, weekly_ma_data);
+                tempStockListStockData.cost = weekly_cost_line_data;
+                state.tempStockList.push({ id: stockId, data: tempStockListStockData });
+
+                foundTempStock = state.tempStockList.find((v) => v.id === stockId);
+            }
 
             // 黃金交叉、死亡交叉
             let policyResult = [];
@@ -715,7 +749,7 @@ const stock = {
                 let preK = 0;
                 let kdTurnUpReady = false;
                 let kdTurnDownReady = false;
-                foundStock.data.weekly_kd.forEach((item, dataIndex) => {
+                foundTempStock.data.weekly_kd.forEach((item, dataIndex) => {
                     const k = item[1];
                     const d = item[2];
                     // 週 KD 黃金交叉 買進訊號
@@ -828,7 +862,7 @@ const stock = {
                 let preRsi = 0;
                 let rsiTurnUpReady = false;
                 let rsiTurnDownReady = false;
-                foundStock.data.weekly_rsi.forEach((item, dataIndex) => {
+                foundTempStock.data.weekly_rsi.forEach((item, dataIndex) => {
                     const rsi = item[1];
                     // 週 RSI 超賣 買進訊號
                     if (foundRsiOverSold) {
@@ -966,6 +1000,9 @@ const stock = {
 
                 this.commit('SAVE_STOCK_POLICY_RETURN_RESULT', stockId); // 計算policy且有關報酬率的結果
             }
+            // 算完就清除，如此不占用記憶體
+            state.tempStockList = [];
+
             console.log('SAVE_STOCK_POLICY_RESULT OK');
         },
         SAVE_STOCK_POLICY_RETURN_RESULT(state, stockId) {
@@ -1192,6 +1229,7 @@ const stock = {
             console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE');
 
             const foundStock = state.stockList.find((v) => v.id === stockId);
+            const foundTempStock = state.tempStockList.find((v) => v.id === stockId);
             // 如果是最後一個日期，且也不是賣，並且之前有買，這時要算一下最新狀態，有可能是要買入或賣出或都沒有，
             if (!foundStock.badge && _.has(foundStock, 'policy.result') && foundStock.policy.result.length >= 1) {
                 // 代表沒有確定買跟確定賣，需要確定之前有買才有預測賣，若是預測買就不用看了
@@ -1203,14 +1241,14 @@ const stock = {
                     foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
                     foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
                     if (foundKdGold) {
-                        const lastArray = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1];
+                        const lastArray = foundTempStock.data.weekly_kd[foundTempStock.data.weekly_kd.length - 1];
                         const lastK = lastArray[1];
                         const lastD = lastArray[2];
                         if (lastK <= foundKdGold.limit && lastK < lastD) foundStock.badge = '準買'; // K要小於D，才是訊號前的準備
                     }
                     if (foundKdTurnUp) {
-                        const lastK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1][1];
-                        const lastSecondK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 2][1];
+                        const lastK = foundTempStock.data.weekly_kd[foundTempStock.data.weekly_kd.length - 1][1];
+                        const lastSecondK = foundTempStock.data.weekly_kd[foundTempStock.data.weekly_kd.length - 2][1];
                         if (lastK <= foundKdTurnUp.limit && lastK < lastSecondK) foundStock.badge = '準買';
                     }
                 }
@@ -1226,14 +1264,14 @@ const stock = {
                         foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
                         foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
                         if (foundKdDead) {
-                            const lastArray = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1];
+                            const lastArray = foundTempStock.data.weekly_kd[foundTempStock.data.weekly_kd.length - 1];
                             const lastK = lastArray[1];
                             const lastD = lastArray[2];
                             if (lastK >= foundKdDead.limit && lastK > lastD) foundStock.badge = '準賣'; // K要大於D，才是訊號前的準備
                         }
                         if (foundKdTurnDown) {
-                            const lastestK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 1][1];
-                            const lastSecondK = foundStock.data.weekly_kd[foundStock.data.weekly_kd.length - 2][1];
+                            const lastestK = foundTempStock.data.weekly_kd[foundTempStock.data.weekly_kd.length - 1][1];
+                            const lastSecondK = foundTempStock.data.weekly_kd[foundTempStock.data.weekly_kd.length - 2][1];
                             if (lastestK >= foundKdTurnDown.limit && lastestK > lastSecondK) foundStock.badge = '準賣';
                         }
                     }
