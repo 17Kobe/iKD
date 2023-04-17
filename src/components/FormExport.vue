@@ -64,7 +64,7 @@ export default {
         onExport() {
             console.log('onExport');
             const data = JSON.stringify(localStorage);
-            const blob = new Blob([data], { type: 'application/json' });
+            const blob = new Blob([data], { type: 'application/octet-stream' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.download = 'iKD.json';
