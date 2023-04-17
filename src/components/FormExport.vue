@@ -63,21 +63,14 @@ export default {
         },
         onExport() {
             console.log('onExport');
-            const a = document.createElement('a');
-            const exportData = {};
-            const localStockList = localStorage.getItem('stockList');
-            const localAssetList = localStorage.getItem('assetList');
-            const localDividendList = localStorage.getItem('dividendList');
-
-            //! = null
-            if (localStockList) exportData.stockList = JSON.parse(localStockList);
-            if (localAssetList) exportData.assetList = JSON.parse(localAssetList);
-            if (localDividendList) exportData.dividendList = JSON.parse(localDividendList);
-
-            const file = new Blob([JSON.stringify(exportData)], { type: 'text/plain' });
-            a.href = URL.createObjectURL(file);
-            a.download = 'iKD.txt';
-            a.click();
+            const data = JSON.stringify(localStorage);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.download = 'iKD.json';
+            link.href = url;
+            link.click();
+            URL.revokeObjectURL(url);
         },
         onClear() {
             ElMessageBox.confirm(`將要刪除所有自行設定內容，包括成本及買賣策略?`, '刪除', {
