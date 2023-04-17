@@ -109,11 +109,11 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="週RSI" width="230" align="center">
+            <!-- <el-table-column label="週RSI" width="230" align="center">
                 <template #default="scope">
                     <ChartWeekRsi :parentData="scope.row.id" />
                 </template>
-            </el-table-column>
+            </el-table-column> -->
 
             <el-table-column label="週K線" width="250" align="center">
                 <template #default="scope">

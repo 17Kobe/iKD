@@ -1,5 +1,11 @@
 <template>
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="45%">
+        &nbsp;&nbsp;<el-button type="primary" @click="onUploadSync"><i class="el-icon-upload2"></i> 上傳同步資料</el-button>
+        <br />
+        <br />
+        &nbsp;&nbsp;<el-button type="primary" @click="onDownloadSync"><i class="el-icon-download"></i> 下載同步資料</el-button>
+        <br />
+        <br />
         &nbsp;&nbsp;<el-button type="primary" @click="onExport"><i class="el-icon-download"></i> 匯出設定檔</el-button>
         <br />
         <br />
@@ -45,8 +51,32 @@ export default {
             return this.$store.state.price.stockList;
         },
     },
-    mounted() {},
+    mounted() {
+        console.log(this.$gapi);
+    },
     methods: {
+        async uploadToDrive() {
+            // try {
+            //     const { currentUser, gapi, hasGrantedScopes } = await this.$gapi.login();
+            //     // console.log({ currentUser, gapi, hasGrantedScopes });
+            //     console.log(this.$gapi);
+            //     const data = JSON.stringify(localStorage); // 打包 localstorage 為 JSON 字串
+            //     const file = new Blob([data], { type: 'application/json' }); // 建立 Blob 物件
+            //     const metadata = { name: 'iKD.json' }; // 檔案名稱
+            //     const res = await this.$gapi.client.drive.files.create({
+            //         resource: metadata,
+            //         media: {
+            //             mimeType: 'application/json',
+            //             body: file,
+            //         },
+            //         fields: 'id',
+            //     });
+            //     console.log(res);
+            // } catch (error) {
+            //     console.error(error);
+            // }
+        },
+
         onInit() {
             console.log('onInit');
             this.isShow = true;
@@ -60,6 +90,13 @@ export default {
             //     averageCost: this.averageCost,
             //     sumCost: this.sumCost,
             // });
+        },
+        onUploadSync() {
+            console.log('onUploadSync');
+            this.uploadToDrive();
+        },
+        onDownloadSync() {
+            console.log('onDownloadSync');
         },
         onExport() {
             console.log('onExport');
