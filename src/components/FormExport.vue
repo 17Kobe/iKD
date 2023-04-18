@@ -1,5 +1,6 @@
 <template>
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="45%">
+        <GoogleLogin :callback="callback" popup-type="TOKEN" prompt />
         &nbsp;&nbsp;<el-button type="primary" @click="onUploadSync"><i class="el-icon-upload2"></i> 上傳同步資料</el-button>
         <br />
         <br />
@@ -55,6 +56,9 @@ export default {
         console.log(this.$gapi);
     },
     methods: {
+        callback(response) {
+            console.log('Handle the response', response);
+        },
         async uploadToDrive() {
             // try {
             //     const { currentUser, gapi, hasGrantedScopes } = await this.$gapi.login();

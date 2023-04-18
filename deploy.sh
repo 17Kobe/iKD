@@ -18,3 +18,4 @@ git push -f https://github.com/17kobe/iKD.git master:gh-pages
 # 將dist資料夾中的內容推送至遠端 iKD 的 gh-pages 分支中，並強制無條件將舊有的內容取代成目前的內容（指令 git push -f)
 # 分支名稱會叫gh-pages是因為Github在部署時只允許三種來源(master, gh-pages, master/docs)
 cd -
+git restore .

@@ -14,7 +14,7 @@ import loadStock from 'highcharts/modules/stock';
 // 參考 https://github.com/weizhenye/vue-highcharts/issues/39
 import loadIndicatorsAll from 'highcharts/indicators/indicators-all';
 // 在這裡一定要用大括號，不然會錯，因為highcharts-vue.js中有命名為 Chart 的export
-// import VueGapi from 'vue-gapi';
+import vue3GoogleLogin from 'vue3-google-login';
 
 import VueNumber from 'vue-number-animation';
 import store from '@/store/store';
@@ -45,6 +45,11 @@ app.use(store);
 app.use(router);
 app.use(ElementPlus);
 app.use(VueNumber);
+app.use(vue3GoogleLogin, {
+    clientId: '1083375588595-fdcmvn5j59q1tbbkiag54qi17r9374eu.apps.googleusercontent.com',
+    // scope: 'https://www.googleapis.com/auth/drive.file',
+    // prompt: 'select_account',
+});
 // app.use(VueGapi, {
 //     // apiKey: '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',
 //     clientId: '1083375588595-fdcmvn5j59q1tbbkiag54qi17r9374eu.apps.googleusercontent.com',
