@@ -1003,8 +1003,6 @@ const stock = {
             // 算完就清除，如此不占用記憶體
             state.tempStockList = [];
 
-            _.remove(state.stockList, (o) => o.id === "2308");
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
             console.log('SAVE_STOCK_POLICY_RESULT OK');
         },
         SAVE_STOCK_POLICY_RETURN_RESULT(state, stockId) {
