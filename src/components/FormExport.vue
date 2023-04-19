@@ -59,7 +59,7 @@ export default {
         async uploadData() {
             try {
                 // 取得 localstorage 中的資料
-                const GITHUB_ACCESS_TOKEN = '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';
+                const GITHUB_ACCESS_TOKEN = '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';
                 const data = JSON.stringify(window.localStorage);
 
                 // 將資料轉換成 Blob 物件
@@ -89,7 +89,6 @@ export default {
                         'https://api.github.com/repos/17Kobe/iKD/contents/assets/my_localstorage.json',
                         {
                             message: 'Upload iKD localstorage data',
-                            // content: btoa(data), // 直接傳遞檔案
                             content: contentBase64,
                             sha: 'sha',
                             branch: 'gh-pages',
