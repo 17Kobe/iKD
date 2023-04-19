@@ -36,6 +36,7 @@
 // import _ from 'lodash';
 import _ from 'lodash';
 import axios from 'axios';
+import CryptoJS from 'crypto-js';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import DefaultStockList from '../store/data/default-stock-list.json';
 
@@ -56,10 +57,25 @@ export default {
         console.log(this.$gapi);
     },
     methods: {
+        createCathy() {
+            let elva = '';
+
+            return {
+                getKobe: function () {
+                    elva = '5KZ493uKLWlakctmu9NAzQ012VUgpZ1iwE4u';
+                    return elva;
+                },
+            };
+        },
         async uploadData() {
             try {
+                const cathy = this.createCathy();
                 // 取得 localstorage 中的資料
-                const GITHUB_ACCESS_TOKEN = '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';
+                const GITHUB_ACCESS_TOKEN = CryptoJS.AES.decrypt(
+                    'U2FsdGVkX1/f4v8wb4AfQPIrmo7wQJBv7EnT8VZ8qX1cbglnDPNZL9n87xZvyuPPifZLkkDBAIKf8wAnWaMXHQ==',
+                    cathy.getKobe()
+                ).toString(CryptoJS.enc.Utf8);
+
                 const data = JSON.stringify(window.localStorage);
 
                 // 將資料轉換成 Blob 物件
@@ -90,7 +106,7 @@ export default {
                         {
                             message: 'Upload iKD localstorage data',
                             content: contentBase64,
-                            sha: 'sha',
+                            sha: sha,
                             branch: 'gh-pages',
                         },
                         {
