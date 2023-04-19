@@ -109,11 +109,11 @@
                 </template>
             </el-table-column>
 
-            <!-- <el-table-column label="週RSI" width="230" align="center">
+            <el-table-column label="週RSI" width="230" align="center" :visible="!isMobile" v-if="!isMobile">
                 <template #default="scope">
                     <ChartWeekRsi :parentData="scope.row.id" />
                 </template>
-            </el-table-column> -->
+            </el-table-column>
 
             <el-table-column label="週K線" width="250" align="center">
                 <template #default="scope">
@@ -514,6 +514,7 @@ export default {
             // historyData: [],
             // renderStockCount: 0,
             queueStockDataList: [],
+            isMobile: true, // 預設要先隱藏再顯示，否則手機看有的股票的KD會拉長
         };
     },
     computed: {
@@ -596,6 +597,7 @@ export default {
     },
     mounted() {
         // 在 mounted() 事件時就可以發送，因為此時不須 data 及 computed 資料都準備好(因為沒有要data 參數，在create())
+        this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
         // 看起來此timer會 commit裡面一個一個都跑完，才進行下一個，所以不用擔心 dispatch是還沒commit
         var timerIdOfSetStockData = setInterval(() => {

@@ -1,6 +1,6 @@
 <template>
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="45%">
-        &nbsp;&nbsp;<el-button type="primary" @click="uploadData"><i class="el-icon-upload2"></i> 上傳同步資料</el-button>
+        &nbsp;&nbsp;<el-button type="primary" @click="onUploadSync"><i class="el-icon-upload2"></i> 上傳同步資料</el-button>
         <br />
         <br />
         &nbsp;&nbsp;<el-button type="primary" @click="onDownloadSync"><i class="el-icon-download"></i> 下載同步資料</el-button>
@@ -67,7 +67,22 @@ export default {
                 },
             };
         },
-        async uploadData() {
+        onInit() {
+            console.log('onInit');
+            this.isShow = true;
+        },
+        onClosed() {
+            // console.log(this.form);
+            // this.$store.commit('SAVE_STOCK_COST', {
+            //     stockId: this.stockId,
+            //     costList: this.form,
+            //     totalOfShares: this.totalOfShares,
+            //     averageCost: this.averageCost,
+            //     sumCost: this.sumCost,
+            // });
+        },
+        async onUploadSync() {
+            console.log('onUploadSync');
             try {
                 const cathy = this.createCathy();
                 // 取得 localstorage 中的資料
@@ -116,32 +131,48 @@ export default {
                         }
                     );
                     console.log(uploadResponse);
+                    ElMessage({
+                        type: 'success',
+                        message: '完成上傳同步資料至線上!',
+                    });
                 };
             } catch (error) {
                 console.error(error);
             }
         },
-
-        onInit() {
-            console.log('onInit');
-            this.isShow = true;
-        },
-        onClosed() {
-            // console.log(this.form);
-            // this.$store.commit('SAVE_STOCK_COST', {
-            //     stockId: this.stockId,
-            //     costList: this.form,
-            //     totalOfShares: this.totalOfShares,
-            //     averageCost: this.averageCost,
-            //     sumCost: this.sumCost,
-            // });
-        },
-        onUploadSync() {
-            console.log('onUploadSync');
-            this.uploadToDrive();
-        },
         onDownloadSync() {
             console.log('onDownloadSync');
+            ElMessageBox.confirm(`確認將要同步線上的所有資料，本地資料會消失?`, '同步', {
+                confirmButtonText: '同步',
+                cancelButtonText: '取消',
+                type: 'warning',
+            })
+                .then(() => {
+                    // 清除 localStorage 資料
+                    localStorage.clear();
+
+                    // 載入 JSON 資料
+                    fetch('https://17kobe.github.io/iKD/assets/my_localstorage.json')
+                        .then((response) => response.json())
+                        .then((data) => {
+                            // 將 JSON 資料存儲到 localStorage
+                            Object.keys(data).forEach((key) => {
+                                localStorage.setItem(key, data[key]);
+                            });
+                            console.log('localStorage 已更新', localStorage);
+                        })
+                        .catch((error) => console.error(error));
+                    ElMessage({
+                        type: 'success',
+                        message: '完成同步線上的所有資料!',
+                    });
+                })
+                .catch(() => {
+                    ElMessage({
+                        type: 'info',
+                        message: '取消同步線上的所有資料!',
+                    });
+                });
         },
         onExport() {
             console.log('onExport');
