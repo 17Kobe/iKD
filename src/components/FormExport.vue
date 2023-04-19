@@ -1,7 +1,6 @@
 <template>
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="45%">
-        <GoogleLogin :callback="callback" popup-type="TOKEN" prompt />
-        &nbsp;&nbsp;<el-button type="primary" @click="onUploadSync"><i class="el-icon-upload2"></i> 上傳同步資料</el-button>
+        &nbsp;&nbsp;<el-button type="primary" @click="uploadData"><i class="el-icon-upload2"></i> 上傳同步資料</el-button>
         <br />
         <br />
         &nbsp;&nbsp;<el-button type="primary" @click="onDownloadSync"><i class="el-icon-download"></i> 下載同步資料</el-button>
@@ -36,6 +35,7 @@
 <script>
 // import _ from 'lodash';
 import _ from 'lodash';
+import axios from 'axios';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import DefaultStockList from '../store/data/default-stock-list.json';
 
@@ -56,29 +56,55 @@ export default {
         console.log(this.$gapi);
     },
     methods: {
-        callback(response) {
-            console.log('Handle the response', response);
-        },
-        async uploadToDrive() {
-            // try {
-            //     const { currentUser, gapi, hasGrantedScopes } = await this.$gapi.login();
-            //     // console.log({ currentUser, gapi, hasGrantedScopes });
-            //     console.log(this.$gapi);
-            //     const data = JSON.stringify(localStorage); // 打包 localstorage 為 JSON 字串
-            //     const file = new Blob([data], { type: 'application/json' }); // 建立 Blob 物件
-            //     const metadata = { name: 'iKD.json' }; // 檔案名稱
-            //     const res = await this.$gapi.client.drive.files.create({
-            //         resource: metadata,
-            //         media: {
-            //             mimeType: 'application/json',
-            //             body: file,
-            //         },
-            //         fields: 'id',
-            //     });
-            //     console.log(res);
-            // } catch (error) {
-            //     console.error(error);
-            // }
+        async uploadData() {
+            try {
+                // 取得 localstorage 中的資料
+                const GITHUB_ACCESS_TOKEN = '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';
+                const data = JSON.stringify(window.localStorage);
+
+                // 將資料轉換成 Blob 物件
+                const blob = new Blob([data], { type: 'application/json' });
+
+                // 讀取 Blob 內容，並使用 FileReader 轉換成 Base64 編碼
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = async () => {
+                    const contentBase64 = reader.result.split(',')[1];
+
+                    // 取得現有檔案的 SHA 值
+                    const url = 'https://api.github.com/repos/17Kobe/iKD/contents/assets/my_localstorage.json';
+                    const response = await axios.get(url, {
+                        headers: {
+                            Authorization: `Bearer ${GITHUB_ACCESS_TOKEN}`,
+                        },
+                        params: {
+                            ref: 'gh-pages', // 指定分支為 gh-pages
+                        },
+                    });
+                    console.log(response);
+                    const sha = response.data.sha;
+
+                    // 在這裡上傳到 Github
+                    const uploadResponse = await axios.put(
+                        'https://api.github.com/repos/17Kobe/iKD/contents/assets/my_localstorage.json',
+                        {
+                            message: 'Upload iKD localstorage data',
+                            // content: btoa(data), // 直接傳遞檔案
+                            content: contentBase64,
+                            sha: 'sha',
+                            branch: 'gh-pages',
+                        },
+                        {
+                            headers: {
+                                Authorization: `Bearer ${GITHUB_ACCESS_TOKEN}`,
+                            },
+                        }
+                    );
+                    console.log(uploadResponse);
+                };
+            } catch (error) {
+                console.error(error);
+            }
         },
 
         onInit() {

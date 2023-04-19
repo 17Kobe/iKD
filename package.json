@@ -25,7 +25,6 @@
         "vue-currency-input": "^2.4.0",
         "vue-number-animation": "^1.1.1",
         "vue-router": "^4.0.12",
-        "vue3-google-login": "^2.0.15",
         "vuex": "^4.0.2"
     },
     "devDependencies": {
