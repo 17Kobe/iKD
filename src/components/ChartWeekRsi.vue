@@ -345,33 +345,40 @@ export default {
                         resize: {
                             enabled: true,
                         },
-                        // 調整 y 軸 tick的間距，運用到高度最大化，不浪費
                         tickPositioner() {
-                            const positions = [];
-                            // 一開始時 dataMax 及 dataMin會是null，然後再用 toFixed就會有錯，所以加 if 來避免
+                            const positions = [0, 50, 100];
                             if (this.dataMin && this.dataMax) {
-                                let tick = 0;
-                                let increment = (this.dataMax - this.dataMin) / 2;
-                                // const max = this.dataMax;
-                                const min = this.dataMin;
-                                if (increment > 1) {
-                                    increment = Math.ceil(increment);
-                                    tick = Math.floor(this.dataMin);
-                                    for (tick; tick - increment <= this.dataMax; tick += increment) {
-                                        if (tick > 100) tick = 100;
-                                        else if (tick < 0) tick = 0;
-                                        positions.push(tick);
-                                    }
-                                } else {
-                                    tick = Number(min.toFixed(1));
-                                    increment = Number(increment.toFixed(3));
-                                    for (tick; tick - increment <= this.dataMax; tick += increment) {
-                                        positions.push(Number(tick.toFixed(2)));
-                                    }
-                                }
+                                // ... 你原本的 tickPositioner 設定
                             }
                             return positions;
                         },
+                        // 調整 y 軸 tick的間距，運用到高度最大化，不浪費
+                        // tickPositioner() {
+                        //     const positions = [];
+                        //     // 一開始時 dataMax 及 dataMin會是null，然後再用 toFixed就會有錯，所以加 if 來避免
+                        //     if (this.dataMin && this.dataMax) {
+                        //         let tick = 0;
+                        //         let increment = (this.dataMax - this.dataMin) / 2;
+                        //         // const max = this.dataMax;
+                        //         const min = this.dataMin;
+                        //         if (increment > 1) {
+                        //             increment = Math.ceil(increment);
+                        //             tick = Math.floor(this.dataMin);
+                        //             for (tick; tick - increment <= this.dataMax; tick += increment) {
+                        //                 if (tick > 100) tick = 100;
+                        //                 else if (tick < 0) tick = 0;
+                        //                 positions.push(tick);
+                        //             }
+                        //         } else {
+                        //             tick = Number(min.toFixed(1));
+                        //             increment = Number(increment.toFixed(3));
+                        //             for (tick; tick - increment <= this.dataMax; tick += increment) {
+                        //                 positions.push(Number(tick.toFixed(2)));
+                        //             }
+                        //         }
+                        //     }
+                        //     return positions;
+                        // },
                     },
                 ],
                 series: [
