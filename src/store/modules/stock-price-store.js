@@ -1047,7 +1047,8 @@ const stock = {
                     // !isReadyToSell && 不需要這個判斷，因為隨時都可買
                     // 如果有 搭配 成本價跌超過，則在此決定那個買是否真的要買
                     let isCancelToBuy = false;
-                    if (foundCostDown && numberOfBuy > 1) {
+                    if (foundCostDown && numberOfBuy >= 1) {
+                        // 因為當前的雖然要=2，但是還沒有寫入，所以1時，也代表第2次了
                         // 會在買超過1次才會進來判斷，因為這樣才有之前報酬率
                         const rateOfReturn = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
                         if (rateOfReturn * 100 > -foundCostDown.limit) {
