@@ -77,7 +77,14 @@
         <template v-for="(item, index) in spreadList" :key="index">
             <el-row style="margin-bottom: 1px">
                 <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
-                    <el-input size="small" placeholder="" v-model="item.name" class="stock-deposit-bg">
+                    <el-input
+                        size="small"
+                        placeholder=""
+                        v-model="item.name"
+                        class="stock-deposit-bg"
+                        readonly
+                        :style="{ 'pointer-events': 'none' }"
+                    >
                         <template #prepend><span>股票</span></template>
                     </el-input>
                 </el-col>
@@ -87,6 +94,7 @@
                         placeholder=""
                         v-model="item.cost.market_value"
                         class="stock-deposit-bg"
+                        :is-stock="true"
                         :options="{
                             locale: 'en-US',
                             currency: 'USD',

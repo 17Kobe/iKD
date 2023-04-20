@@ -1,5 +1,11 @@
 <template>
-    <el-input ref="inputRef" class="i-currency" :modelValue="formattedValue" @focus="selectAll()">
+    <el-input
+        ref="inputRef"
+        :class="{ 'i-currency': true, disabled: isStock }"
+        :modelValue="formattedValue"
+        @focus="!isStock && selectAll()"
+        :style="isStock ? { 'pointer-events': 'none' } : {}"
+    >
         <template #prepend>$</template>
         <template #suffix><span style="position: relative; top: 8px; font-size: 10px">元</span> </template>
     </el-input>
@@ -11,6 +17,10 @@ import { useCurrencyInput } from 'vue-currency-input';
 export default {
     name: 'ElCurrencyInput',
     props: {
+        isStock: {
+            type: Boolean,
+            default: false,
+        },
         modelValue: Number,
         options: Object,
     },
