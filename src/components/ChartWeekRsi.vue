@@ -313,6 +313,18 @@ export default {
                     {
                         min: 0,
                         max: 100,
+                        plotBands: [
+                            {
+                                from: 90,
+                                to: 100,
+                                color: 'rgba(75, 192, 192, 0.5)', // 設定填充顏色為紅色
+                            },
+                            {
+                                from: 0,
+                                to: 10,
+                                color: 'rgba(255, 99, 132, 0.5)', // 設定填充顏色為紅色
+                            },
+                        ],
                         plotLines: [
                             {
                                 color: '#ff9494', // 超賣

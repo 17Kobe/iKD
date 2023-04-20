@@ -166,6 +166,37 @@ export default {
         chartOptions() {
             // component 參考 https://stackoverflow.com/questions/68381856/how-to-access-highcharts-stock-tooltip-data-in-vue
             const component = this;
+            let plotBands = [];
+            if (this.kdTurnDownLmit !== -999) {
+                plotBands.push({
+                    from: this.kdTurnDownLmit,
+                    to: 100,
+                    color: 'rgba(75, 192, 192, 0.5)', // 設定填充顏色為紅色
+                });
+            }
+            if (this.kdDeadLimit !== -999) {
+                plotBands.push({
+                    from: this.kdDeadLimit,
+                    to: this.kdTurnDownLmit !== -999 ? this.kdTurnDownLmit : 100,
+                    color: 'rgba(75, 192, 192, 0.05)', // 設定填充顏色為紅色
+                });
+            }
+
+            if (this.kdTurnUpLmit !== -999) {
+                plotBands.push({
+                    from: 0,
+                    to: this.kdTurnUpLmit,
+                    color: 'rgba(255, 99, 132, 0.5)', // 設定填充顏色為紅色
+                });
+            }
+            if (this.kdGoldLimit !== -999) {
+                plotBands.push({
+                    from: this.kdTurnUpLmit !== -999 ? this.kdTurnUpLmit : 0,
+                    to: this.kdGoldLimit,
+                    color: 'rgba(255, 99, 132, 0.2)', // 設定填充顏色為紅色
+                });
+            }
+
             return {
                 chart: {
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
@@ -320,32 +351,7 @@ export default {
                     {
                         min: 0,
                         max: 100,
-                        plotLines: [
-                            {
-                                color: '#ff9494', // 黃金交叉
-                                dashStyle: 'LongDash',
-                                value: this.kdGoldLimit,
-                                width: 1,
-                            },
-                            {
-                                color: '#ff9494', // 往上轉折
-                                dashStyle: 'Solid',
-                                value: this.kdTurnUpLmit,
-                                width: 1,
-                            },
-                            {
-                                color: '#76dc43', // 死亡交叉
-                                dashStyle: 'LongDash',
-                                value: this.kdDeadLimit,
-                                width: 1,
-                            },
-                            {
-                                color: '#76dc43', // 往下轉折
-                                dashStyle: 'Solid',
-                                value: this.kdTurnDownLmit,
-                                width: 1,
-                            },
-                        ],
+                        plotBands: plotBands,
                         startOnTick: false,
                         showLastLabel: true,
                         // endOnTick: false,
