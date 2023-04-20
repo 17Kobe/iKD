@@ -154,8 +154,9 @@ export default {
                     // 清除 localStorage 資料
                     localStorage.clear();
 
-                    // 載入 JSON 資料
-                    fetch('https://17kobe.github.io/iKD/assets/my_localstorage.json')
+                    // 載入 JSON 資料，後面加日期是為了避免手機用快取下載，而非真正抓最新的資料
+                    const url = 'https://17kobe.github.io/iKD/assets/my_localstorage.json?' + new Date().getTime();
+                    fetch(url)
                         .then((response) => response.json())
                         .then((data) => {
                             // 將 JSON 資料存儲到 localStorage
