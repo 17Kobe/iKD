@@ -159,10 +159,14 @@ export default {
                         .then((response) => response.json())
                         .then((data) => {
                             // 將 JSON 資料存儲到 localStorage
-                            Object.keys(data).forEach((key) => {
-                                localStorage.setItem(key, data[key]);
-                            });
-                            console.log('localStorage 已更新', localStorage);
+                            try {
+                                Object.keys(data).forEach((key) => {
+                                    localStorage.setItem(key, data[key]);
+                                    console.log('localStorage 已更新', localStorage);
+                                });
+                            } catch (e) {
+                                console.log('localStorage 儲存失敗：', e);
+                            }
                         })
                         .catch((error) => console.error(error));
                     ElMessage({
