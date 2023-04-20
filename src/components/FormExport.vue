@@ -3,23 +3,20 @@
         &nbsp;&nbsp;<el-button type="warning" @click="onUploadSync"><i class="el-icon-upload2"></i> 上傳同步資料</el-button>
         <br />
         <br />
-        &nbsp;&nbsp;<el-button type="warning" @click="onDownloadSync"
-            ><i class="el-icon-download"></i> 下載同步資料(只限PC)</el-button
-        >
+        &nbsp;&nbsp;<el-button type="warning" @click="onDownloadSync"><i class="el-icon-download"></i> 下載同步資料</el-button>
         <br />
         <br />
-        &nbsp;&nbsp;<el-button type="primary" @click="onExport"><i class="el-icon-download"></i> 匯出設定檔</el-button>
+        <!-- &nbsp;&nbsp;<el-button type="primary" @click="onExport"><i class="el-icon-download"></i> 匯出設定檔</el-button>
         <br />
         <br />
         <el-upload class="upload-demo" action="" :auto-upload="false" :on-change="openFile" :limit="1">
             &nbsp;&nbsp;<el-button type="primary"><i class="el-icon-upload2"></i> 匯入設定檔</el-button>
         </el-upload>
-        <br />
-        &nbsp;&nbsp;<el-button type="danger" @click="onClear"><i class="el-icon-download"></i> 清除設定檔</el-button><br /><br />
+        <br /> -->
+        <!-- &nbsp;&nbsp;<el-button type="danger" @click="onClear"><i class="el-icon-download"></i> 清除設定檔</el-button><br /><br />
         &nbsp;&nbsp;<el-button type="danger" @click="onForceDividendRefresh"
-            ><i class="el-icon-refresh-right"></i> 刪除重覆的配息</el-button
-        ><br />
-        <br />
+            ><i class="el-icon-refresh-right"></i> 刪除重覆的配息</el-button><br /><br /> -->
+
         &nbsp;
         <el-tooltip class="box-item" effect="dark" content="使用在星期六也要補班的時候" placement="top">
             <el-button type="success" @click="onForceRefresh"><i class="el-icon-refresh-right"></i> 立即更新股價</el-button>
