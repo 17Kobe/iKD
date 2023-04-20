@@ -123,6 +123,7 @@ const dividend = {
 
             const today = moment().startOf('day');
             console.log(data);
+            console.log(stockCrawlerDividendLastDate);
 
             if (_.has(data, 'data') && data.data.length > 0) {
                 // ===== 修正 FindMid 股利的 CashDividendPaymentDate 日期有誤 ====
