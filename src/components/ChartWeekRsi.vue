@@ -150,7 +150,7 @@ export default {
         },
         rsiTurnDownLmit() {
             // 往下轉折，值要畫橫線
-            console.log('kdTurnUpLmit');
+            console.log('rsiTurnDownLmit');
             let ret = -999; // 讓他畫線畫在看到到的地方
             if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.sell) {
                 const found = _.find(this.stockData.policy.settings.sell, ['method', 'rsi_turn_down']);
@@ -162,6 +162,38 @@ export default {
         chartOptions() {
             // component 參考 https://stackoverflow.com/questions/68381856/how-to-access-highcharts-stock-tooltip-data-in-vue
             const component = this;
+
+            let plotBands = [];
+            if (this.rsiOverBoughtLimit !== -999) {
+                plotBands.push({
+                    from: this.rsiOverBoughtLimit,
+                    to: 100,
+                    color: 'rgba(75, 192, 192, 0.5)', // 設定填充顏色為紅色
+                });
+            }
+            if (this.rsiTurnDownLmit !== -999) {
+                plotBands.push({
+                    from: this.rsiTurnDownLmit,
+                    to: this.rsiOverBoughtLimit !== -999 ? this.rsiOverBoughtLimit : 100,
+                    color: 'rgba(75, 192, 192, 0.05)', // 設定填充顏色為紅色
+                });
+            }
+
+            if (this.rsiOverSoldLimit !== -999) {
+                plotBands.push({
+                    from: 0,
+                    to: this.rsiOverSoldLimit,
+                    color: 'rgba(255, 99, 132, 0.5)', // 設定填充顏色為紅色
+                });
+            }
+            if (this.rsiTurnUpLmit !== -999) {
+                plotBands.push({
+                    from: this.rsiOverSoldLimit !== -999 ? this.rsiOverSoldLimit : 0,
+                    to: this.rsiTurnUpLmit,
+                    color: 'rgba(255, 99, 132, 0.2)', // 設定填充顏色為紅色
+                });
+            }
+
             return {
                 chart: {
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
@@ -313,44 +345,7 @@ export default {
                     {
                         min: 0,
                         max: 100,
-                        plotBands: [
-                            {
-                                from: 90,
-                                to: 100,
-                                color: 'rgba(75, 192, 192, 0.5)', // 設定填充顏色為紅色
-                            },
-                            {
-                                from: 0,
-                                to: 10,
-                                color: 'rgba(255, 99, 132, 0.5)', // 設定填充顏色為紅色
-                            },
-                        ],
-                        plotLines: [
-                            {
-                                color: '#ff9494', // 超賣
-                                dashStyle: 'Solid',
-                                value: this.rsiOverSoldLimit,
-                                width: 1,
-                            },
-                            {
-                                color: '#ff9494', // 往上轉折
-                                dashStyle: 'LongDash',
-                                value: this.rsiTurnUpLmit,
-                                width: 1,
-                            },
-                            {
-                                color: '#76dc43', // 超買
-                                dashStyle: 'Solid',
-                                value: this.rsiOverBoughtLimit,
-                                width: 1,
-                            },
-                            {
-                                color: '#76dc43', // 往下轉折
-                                dashStyle: 'LongDash',
-                                value: this.rsiTurnDownLmit,
-                                width: 1,
-                            },
-                        ],
+                        plotBands: plotBands,
                         startOnTick: false,
                         showLastLabel: true,
                         // endOnTick: false,
