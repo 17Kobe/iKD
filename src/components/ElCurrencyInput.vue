@@ -3,7 +3,6 @@
         ref="inputRef"
         :class="{ 'i-currency': true, disabled: isStock }"
         :modelValue="formattedValue"
-        @focus="!isStock && selectAll()"
         :style="isStock ? { 'pointer-events': 'none' } : {}"
     >
         <template #prepend>$</template>
@@ -13,6 +12,7 @@
 
 <script>
 import { useCurrencyInput } from 'vue-currency-input';
+import { onMounted } from 'vue';
 
 export default {
     name: 'ElCurrencyInput',
@@ -26,14 +26,8 @@ export default {
     },
     setup(props) {
         const { inputRef, formattedValue } = useCurrencyInput(props.options);
+
         return { inputRef, formattedValue };
-    },
-    methods: {
-        selectAll() {
-            setTimeout(() => {
-                this.$refs.inputRef.select();
-            }, 200);
-        },
     },
 };
 </script>
