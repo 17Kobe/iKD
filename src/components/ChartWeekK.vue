@@ -344,12 +344,13 @@ export default {
                         },
                     },
                     {
-                        type: 'line',
+                        type: 'area',
                         name: '成本線',
-                        color: '#4286f5',
+                        fillColor: 'rgba(54, 162, 235, 0.2)', // 設定填滿顏色
                         data: this.cost,
                         // dashStyle: 'ShortDash',
                         step: 'left',
+                        threshold: null, // 設置為 null，使 Y 軸動態範圍與其他圖表類型相同。否則會從0開始
                         dataGrouping: {
                             // anchor: 'end',
                             // firstAnchor: 'end',
