@@ -162,15 +162,16 @@ export default {
                                     localStorage.setItem(key, data[key]);
                                     console.log('localStorage 已更新', localStorage);
                                 });
+                                ElMessage({
+                                    type: 'success',
+                                    message: '完成同步線上的所有資料!',
+                                });
+                                location.reload();
                             } catch (e) {
                                 console.log('localStorage 儲存失敗：', e);
                             }
                         })
                         .catch((error) => console.error(error));
-                    ElMessage({
-                        type: 'success',
-                        message: '完成同步線上的所有資料!',
-                    });
                 })
                 .catch(() => {
                     ElMessage({
