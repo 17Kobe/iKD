@@ -873,7 +873,7 @@ const stock = {
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
-                                    is_buy: rsi_over_sold,
+                                    is_buy: true,
                                     rsi,
                                     price: dataWeeklyPrice,
                                     reason: ['rsi_over_sold'],

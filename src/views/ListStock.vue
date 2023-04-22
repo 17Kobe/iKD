@@ -1,6 +1,15 @@
 <template>
     <div>
-        <el-table :data="stockList" :row-class-name="tableRowClassName" style="width: 100%" empty-text="無資料">
+        <div v-if="showStockAnalysis">
+            <StockAnalysis :id="currentStockId" @back="showStockAnalysis = false" />
+        </div>
+        <el-table
+            v-if="!showStockAnalysis"
+            :data="stockList"
+            :row-class-name="tableRowClassName"
+            style="width: 100%"
+            empty-text="無資料"
+        >
             <el-table-column
                 fixed
                 label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名稱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;股價"
@@ -16,13 +25,21 @@
                             :class="[scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '', , 'item']"
                             :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
                         >
-                            <span style="font-size: 16px; font-weight: bold">
+                            <span
+                                style="font-size: 16px; font-weight: bold; cursor: pointer"
+                                @click="goToStockAnalysis(scope.row.id)"
+                            >
                                 {{ scope.row.name }}
                             </span>
                         </el-badge>
                         <br />
 
-                        <span style="color: #cccccc" v-if="scope.row.type !== 'fund'">{{ scope.row.id }}</span>
+                        <span
+                            style="color: #cccccc; cursor: pointer"
+                            v-if="scope.row.type !== 'fund'"
+                            @click="goToStockAnalysis(scope.row.id)"
+                            >{{ scope.row.id }}</span
+                        >
                         <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
                         </el-rate>
                     </div>
@@ -475,10 +492,10 @@
                 <el-table-column prop="city" label="本益比" width="120" />
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
-        <el-button style="margin-top: 10px" type="info" plain @click="doShowSearch()"
+        <el-button v-if="!showStockAnalysis" style="margin-top: 10px" type="info" plain @click="doShowSearch()"
             ><i class="el-icon-plus"></i>&nbsp;新增自選股</el-button
         >
-        <el-button style="margin-top: 10px" type="info" plain @click="doShowExport()"
+        <el-button v-if="!showStockAnalysis" style="margin-top: 10px" type="info" plain @click="doShowExport()"
             ><i class="el-icon-place"></i>&nbsp;進階設定</el-button
         >
         <br /><br />
@@ -500,6 +517,7 @@ import FormCost from '@/components/FormCost.vue';
 import FormPolicy from '@/components/FormPolicy.vue';
 import FormSearch from '@/components/FormSearch.vue';
 import FormExport from '@/components/FormExport.vue';
+import StockAnalysis from '@/components/StockAnalysis.vue';
 import DefaultStockList from '../store/data/default-stock-list.json';
 import GlobalSettings from '../store/data/global-settings.json';
 // This starter template is using Vue 3 experimental <script setup> SFCs
@@ -507,14 +525,16 @@ import GlobalSettings from '../store/data/global-settings.json';
 
 export default {
     name: 'component-list',
-    components: { ChartWeekKd, ChartWeekRsi, ChartWeekK, FormCost, FormPolicy, FormSearch, FormExport },
+    components: { ChartWeekKd, ChartWeekRsi, ChartWeekK, FormCost, FormPolicy, FormSearch, FormExport, StockAnalysis },
     data() {
         return {
             // rateOfReturn: 0,
             // historyData: [],
             // renderStockCount: 0,
+            showStockAnalysis: false,
             queueStockDataList: [],
             isMobile: true, // 預設要先隱藏再顯示，否則手機看有的股票的KD會拉長
+            currentStockId: null,
         };
     },
     computed: {
@@ -680,6 +700,11 @@ export default {
         // buyOrSellFormatter(row, column, cellValue) {
         //     return '<b>buy</b>';
         // },
+
+        goToStockAnalysis(id) {
+            this.showStockAnalysis = true;
+            this.currentStockId = id;
+        },
     },
 };
 </script>
