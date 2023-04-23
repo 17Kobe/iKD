@@ -5,6 +5,7 @@ const fs = require('fs');
 const filename = 'D:\\Code\\ikd\\ikd-buy-sell-signal.png';
 
 console.log('Deleting existing file...');
+// 這樣寫法是讓刪除一定要在 puppeteer 前執行
 fs.unlink(filename, (err) => {
     if (err) {
         console.log('No existing file to delete.');
@@ -42,5 +43,13 @@ fs.unlink(filename, (err) => {
             console.log('No screenshot taken.');
         }
         // await browser.close();
+
+        fs.unlink(filename, (err) => {
+            if (err) {
+                console.log('No existing file to delete.');
+            } else {
+                console.log('Existing file deleted.');
+            }
+        });
     })();
 });
