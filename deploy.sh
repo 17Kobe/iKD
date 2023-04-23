@@ -3,18 +3,22 @@
 
 # 當發生錯誤時終止腳本運行
 set -e
+# 先將 遠端部份檔案備份回來
+cd dist
+# 因為dist資料夾預設是被ignore的，因此在進入dist資料夾後初始化git
+git init
+git pull https://github.com/17kobe/iKD.git gh-pages --force
 # 先拉碼，也可以用在店裡
+cd -
 git pull origin master --force
 # 更新美金匯率及基金每日淨值至JSON檔案內
 node updateJsonFile.js
 # 打包
 npm run build
 # 下載回來 my_localstorage.json 這個檔案，一定要在 npm run build 後面才執行，不然 dist 資料夾會被刪除
-curl -o ./dist/assets/my_localstorage.json https://17kobe.github.io/iKD/assets/my_localstorage.json
+# curl -o ./dist/assets/my_localstorage.json https://17kobe.github.io/iKD/assets/data/my_localstorage.json
 # 移動至到打包後的dist目錄 
 cd dist
-# 因為dist資料夾預設是被ignore的，因此在進入dist資料夾後初始化git
-git init
 # 將所有檔案加到索引
 git add -A
 # 預計在遠端 ph-pages 分支新增 commit，實際仍是 master 裡面 dist 分支的commit
