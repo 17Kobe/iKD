@@ -1284,9 +1284,16 @@ const stock = {
         },
     },
     getters: {
-        getStockSortedList: (state) => () => {
-            console.log('getStockSortedList');
-            return _.orderBy(state.stockList, ['order'], ['asc']);
+        // http://localhost:3000/#/?export=true
+        // 增加 query 判斷，query有可能是 {} 或 {export:true}，若 export =true 時才要 filter，否則不要filter
+        getStockSortedList: (state) => (query) => {
+            let filteredList = state.stockList;
+            if (query && query.export) {
+                filteredList = _.filter(filteredList, (stock) => {
+                    return stock.badge === '買' || stock.badge === '賣' || stock.badge === '準買' || stock.badge === '準賣';
+                });
+            }
+            return _.orderBy(filteredList, ['order'], ['asc']);
         },
         // object of array to filter
         getStock: (state) => (id) => {
