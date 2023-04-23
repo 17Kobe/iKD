@@ -5,9 +5,7 @@ const _ = require('lodash');
 const axios = require('axios');
 const moment = require('moment');
 const os = require('os');
-const HttpsProxyAgent = require('https-proxy-agent')
-
-
+const HttpsProxyAgent = require('https-proxy-agent');
 
 var interfaces = os.networkInterfaces();
 var addresses = [];
@@ -70,56 +68,66 @@ function getPromise(url) {
 }
 
 Promise.all(urls.map(getPromise)).then(function (stats) {
-    let rawdata = fs.readFileSync('./src/store/data/default-stock-list.json');
-    let defaultStockList = JSON.parse(rawdata);
-    // console.log(defaultStockList);
+    // 載入 JSON 資料，後面加日期是為了避免手機用快取下載，而非真正抓最新的資料
+    const url = 'https://17kobe.github.io/iKD/assets/my_localstorage.json?' + new Date().getTime();
 
-    stats.forEach((price, index) => {
-        const foundStock = defaultStockList.find((obj) => obj.name === fundName[index]);
-        foundStock.data = foundStock.data || {};
-        foundStock.data.daily = foundStock.data.daily || [];
-        foundStock.data.daily = price;
-    });
-
-    let writeData = JSON.stringify(defaultStockList, null, 4); //t, null, 2
-
-    fs.writeFile('./src/store/data/default-stock-list.json', writeData, (err) => {
-        if (err) throw err;
-        console.log('Data written to file');
-    });
-
-    // console.log('ALL DONE!! stats is', stats);
-    const oneMonthAgo = moment().subtract(30, 'days').format('YYYY-MM-DD'); // 30天前避免農曆年或近期取不到值，但最終只是要抓最新的
     axios
-        .get('https://api.finmindtrade.com/api/v4/data', {
-            httpsAgent: agent,
-            params: {
-                dataset: 'TaiwanExchangeRate',
-                data_id: 'USD',
-                start_date: oneMonthAgo,
-                token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
-            },
-        })
-        // 成功
-        .then((res) => {
-            if (res.data.data.length > 0) {
-                let rawdata = fs.readFileSync('./src/store/data/global-settings.json');
-                let globalSettings = JSON.parse(rawdata);
+        .get(url)
+        .then((response) => {
+            // let rawdata = fs.readFileSync('./src/store/data/default-stock-list.json');
+            let defaultStockList = JSON.parse(response.data.stockList);
+            // console.log(defaultStockList);
 
-                globalSettings.usd_exchange = res.data.data[res.data.data.length - 1].spot_buy;
+            stats.forEach((price, index) => {
+                const foundStock = defaultStockList.find((obj) => obj.name === fundName[index]);
+                foundStock.data = foundStock.data || {};
+                foundStock.data.daily = foundStock.data.daily || [];
+                foundStock.data.daily = price;
+            });
 
-                let writeData = JSON.stringify(globalSettings, null, 4); //t, null, 2
+            let writeData = JSON.stringify(defaultStockList, null, 4); //t, null, 2
 
-                fs.writeFile('./src/store/data/global-settings.json', writeData, (err) => {
-                    if (err) throw err;
-                    console.log('Data written to file');
+            fs.writeFile('./src/store/data/default-stock-list.json', writeData, (err) => {
+                if (err) throw err;
+                console.log('Data written to file');
+            });
+
+            // console.log('ALL DONE!! stats is', stats);
+            const oneMonthAgo = moment().subtract(30, 'days').format('YYYY-MM-DD'); // 30天前避免農曆年或近期取不到值，但最終只是要抓最新的
+            axios
+                .get('https://api.finmindtrade.com/api/v4/data', {
+                    httpsAgent: agent,
+                    params: {
+                        dataset: 'TaiwanExchangeRate',
+                        data_id: 'USD',
+                        start_date: oneMonthAgo,
+                        token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
+                    },
+                })
+                // 成功
+                .then((res) => {
+                    if (res.data.data.length > 0) {
+                        let rawdata = fs.readFileSync('./src/store/data/global-settings.json');
+                        let globalSettings = JSON.parse(rawdata);
+
+                        globalSettings.usd_exchange = res.data.data[res.data.data.length - 1].spot_buy;
+
+                        let writeData = JSON.stringify(globalSettings, null, 4); //t, null, 2
+
+                        fs.writeFile('./src/store/data/global-settings.json', writeData, (err) => {
+                            if (err) throw err;
+                            console.log('Data written to file');
+                        });
+                    }
+                    console.log('success!');
+                })
+                // 失敗
+                .catch((err) => {
+                    console.log('error!');
+                    console.log(err);
                 });
-            }
-            console.log('success!');
         })
-        // 失敗
-        .catch((err) => {
-            console.log('error!');
-            console.log(err);
+        .catch((error) => {
+            console.error(error);
         });
 });
