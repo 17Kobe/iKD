@@ -6,8 +6,8 @@ set -e
 # 先將 遠端部份檔案備份回來
 cd dist
 # 因為dist資料夾預設是被ignore的，因此在進入dist資料夾後初始化git，先取回 dist 的 my_localstorage.json
-git init
-git pull https://github.com/17kobe/iKD.git gh-pages --force
+git fetch origin gh-pages
+git reset --hard origin/gh-pages
 # 先強制拉碼，公司也可以更新家裡已commit內容
 cd -
 git pull origin master --force

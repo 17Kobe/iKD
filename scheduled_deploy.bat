@@ -4,8 +4,8 @@ cd /d "%~dp0"
 :: 先將 遠端部份檔案備份回來
 cd /d "D:\Code\iKD\dist\"
 :: 因為dist資料夾預設是被ignore的，因此在進入dist資料夾後初始化git
-git init
-git pull https://github.com/17kobe/iKD.git gh-pages --force
+git fetch origin gh-pages
+git reset --hard origin/gh-pages
 cd ..
 git pull origin master --force
 node updateJsonFile.js
