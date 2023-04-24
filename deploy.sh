@@ -15,13 +15,15 @@ git pull origin master --force
 node updateJsonFile.js
 # 備份 dist data/my_localstorage.json及images目錄
 mkdir dist-temp
-cp -r dist/assets/data/* dist-temp/assets/data/
-cp -r dist/assets/images/* dist-temp/assets/images/
+mkdir -p dist-temp/assets/data
+mkdir -p dist-temp/assets/images
+cp -r dist/assets/data/* dist-temp/assets/data/ 2>/dev/null || :
+cp -r dist/assets/images/* dist-temp/assets/images/ 2>/dev/null || :
 # 打包
 npm run build
 # 還原 dist data及images目錄
-cp -r -f dist-temp/assets/data/* dist/assets/data/
-cp -r -f dist-temp/assets/images/* dist/assets/images/
+cp -rf dist-temp/assets/data/* dist/assets/data/
+cp -rf dist-temp/assets/images/* dist/assets/images/
 rm -rf dist-temp
 # 下載回來 my_localstorage.json 這個檔案，一定要在 npm run build 後面才執行，不然 dist 資料夾會被刪除
 # curl -o ./dist/assets/my_localstorage.json https://17kobe.github.io/iKD/assets/data/my_localstorage.json
