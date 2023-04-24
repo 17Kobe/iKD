@@ -4,7 +4,7 @@ const fs = require('fs');
 const moment = require('moment');
 
 const now = moment();
-const timestamp = now.format('YYYYMMDDHHmm');
+const timestamp = now.format('YYYYMMDDHH');
 const filename = `D:\\Code\\ikd\\dist\\assets\\images\\ikd-buy-sell-signal-${timestamp}.png`;
 
 console.log('Deleting existing file...');
@@ -42,7 +42,7 @@ console.log('Launching Puppeteer...');
         await page.waitForTimeout(1000); // 等待 1 秒以讓所有元素出現在屏幕上
         await page.screenshot({ path: filename, fullPage: true });
         console.log(`Screenshot saved to ${filename}.`);
-        console.log(`${filename}`);
+        console.log(`ikd-buy-sell-signal-${timestamp}.png`);
     } else {
         console.log('No screenshot taken.');
         console.log('');
