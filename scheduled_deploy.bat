@@ -27,6 +27,6 @@ rmdir /s /q dist-temp
 cd /d "D:\Code\iKD\dist\"
 git add -A
 git commit -m 'deploy'
-git push -f https://github.com/17kobe/iKD.git master:gh-pages
+git push -f origin gh-pages
 cd ..
 git restore .
