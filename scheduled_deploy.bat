@@ -2,7 +2,7 @@
 setlocal
 cd /d "%~dp0"
 :: 先將 遠端部份檔案備份回來
-cd /d "D:\Code\iKD\dist\"
+cd dist
 :: 因為dist資料夾預設是被ignore的，因此在進入dist資料夾後初始化git
 git fetch origin gh-pages
 git reset --hard origin/gh-pages
@@ -24,7 +24,7 @@ xcopy /s /e /i /y dist-temp\assets\data dist\assets\data
 xcopy /s /e /i /y dist-temp\assets\images dist\assets\images
 rmdir /s /q dist-temp
 :: curl --proxy http://10.160.3.88:8080 -o ./dist/assets/data/my_localstorage.json https://17kobe.github.io/iKD/assets/data/my_localstorage.json
-cd /d "D:\Code\iKD\dist\"
+cd dist
 git add -A
 git commit -m 'deploy'
 git push -f origin gh-pages
