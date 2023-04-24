@@ -5,15 +5,15 @@
 set -e
 # 先將 遠端部份檔案備份回來
 cd dist
-# 因為dist資料夾預設是被ignore的，因此在進入dist資料夾後初始化git
+# 因為dist資料夾預設是被ignore的，因此在進入dist資料夾後初始化git，先取回 dist 的 my_localstorage.json
 git init
 git pull https://github.com/17kobe/iKD.git gh-pages --force
-# 先拉碼，也可以用在店裡
+# 先強制拉碼，公司也可以更新家裡已commit內容
 cd -
 git pull origin master --force
 # 更新美金匯率及基金每日淨值至JSON檔案內
 node updateJsonFile.js
-# 備份 dist data及images目錄
+# 備份 dist data/my_localstorage.json及images目錄
 mkdir dist-temp
 cp -r dist/assets/data/* dist-temp/assets/data/
 cp -r dist/assets/images/* dist-temp/assets/images/

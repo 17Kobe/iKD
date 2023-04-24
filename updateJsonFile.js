@@ -69,10 +69,10 @@ function getPromise(url) {
 
 Promise.all(urls.map(getPromise)).then(function (stats) {
     // 載入 JSON 資料，後面加日期是為了避免手機用快取下載，而非真正抓最新的資料
-    const myLocalstorageFile = fs.readFileSync('./dist/assets/data/my_localstorage.json');
+    const myLocalstorageFile = JSON.parse(fs.readFileSync('./dist/assets/data/my_localstorage.json'));
     // let rawdata = fs.readFileSync('./src/store/data/default-stock-list.json');
     // console.log(myLocalstorageFile);
-    let defaultStockList = JSON.parse(JSON.parse(myLocalstorageFile).stockList);
+    let defaultStockList = JSON.parse(myLocalstorageFile.stockList);
     // console.log(myLocalstorageFile);
     // console.log(typeof defaultStockList.stockList);
     // console.log(defaultStockList);
@@ -88,6 +88,12 @@ Promise.all(urls.map(getPromise)).then(function (stats) {
     let writeData = JSON.stringify(defaultStockList, null, 4); //t, null, 2
 
     fs.writeFile('./src/store/data/default-stock-list.json', writeData, (err) => {
+        if (err) throw err;
+        console.log('Data written to file');
+    });
+
+    myLocalstorageFile.stockList = JSON.stringify(defaultStockList);
+    fs.writeFile('./dist/assets/data/my_localstorage.json', JSON.stringify(myLocalstorageFile), (err) => {
         if (err) throw err;
         console.log('Data written to file');
     });
@@ -126,5 +132,4 @@ Promise.all(urls.map(getPromise)).then(function (stats) {
             console.log('error!');
             console.log(err);
         });
-
 });
