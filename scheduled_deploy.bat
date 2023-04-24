@@ -20,8 +20,8 @@ call npm run build
 :: 同 mv dist-temp/images dist-temp/data dist/assets/ && rm -rf dist-temp
 :: Move-Item -Path dist-temp/images, dist-temp/data -Destination dist/assets/
 :: Remove-Item -Path dist-temp -Recurse
-xcopy /s /e /i /y dist\assets\data dist-temp\assets\data
-xcopy /s /e /i /y dist\assets\images dist-temp\assets\images
+xcopy /s /e /i /y dist-temp\assets\data dist\assets\data
+xcopy /s /e /i /y dist-temp\assets\images dist\assets\images
 rmdir /s /q dist-temp
 :: curl --proxy http://10.160.3.88:8080 -o ./dist/assets/data/my_localstorage.json https://17kobe.github.io/iKD/assets/data/my_localstorage.json
 cd /d "D:\Code\iKD\dist\"
