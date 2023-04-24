@@ -19,3 +19,7 @@ git add -A
 git commit -m 'images'
 git push -f origin gh-pages
 cd ..
+
+IF NOT "%lastLine%"=="" (
+    node image-to-line.js "%lastLine%"
+)
