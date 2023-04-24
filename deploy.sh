@@ -22,8 +22,10 @@ cp -r dist/assets/images/* dist-temp/assets/images/ 2>/dev/null || :
 # 打包
 npm run build
 # 還原 dist data及images目錄
-cp -rf dist-temp/assets/data/* dist/assets/data/
-cp -rf dist-temp/assets/images/* dist/assets/images/
+mkdir -p dist/assets/data
+mkdir -p dist/assets/images
+cp -rf dist-temp/assets/data/* dist/assets/data/ || :
+cp -rf dist-temp/assets/images/* dist/assets/images/ || :
 rm -rf dist-temp
 # 下載回來 my_localstorage.json 這個檔案，一定要在 npm run build 後面才執行，不然 dist 資料夾會被刪除
 # curl -o ./dist/assets/my_localstorage.json https://17kobe.github.io/iKD/assets/data/my_localstorage.json
@@ -34,7 +36,7 @@ git add -A
 # 預計在遠端 ph-pages 分支新增 commit，實際仍是 master 裡面 dist 分支的commit
 git commit -m 'deploy'
 # 部署到 https://github.com/17kobe/iKD.git 分支為 gh-pages
-git push -f https://github.com/17kobe/iKD.git master:gh-pages
+git push -f origin gh-pages
 # 將dist資料夾中的內容推送至遠端 iKD 的 gh-pages 分支中，並強制無條件將舊有的內容取代成目前的內容（指令 git push -f)
 # 分支名稱會叫gh-pages是因為Github在部署時只允許三種來源(master, gh-pages, master/docs)
 cd -
