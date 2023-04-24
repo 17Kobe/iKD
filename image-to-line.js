@@ -16,8 +16,8 @@ const data = {
     messages: [
         {
             type: 'image',
-            originalContentUrl: `https://17kobe.github.io/iKD/#/assets/images/${imageName}`,
-            previewImageUrl: `https://17kobe.github.io/iKD/#/assets/images/${imageName}`,
+            originalContentUrl: `https://17kobe.github.io/iKD/assets/images/${imageName}`,
+            previewImageUrl: `https://17kobe.github.io/iKD/assets/images/${imageName}`,
         },
     ],
 };

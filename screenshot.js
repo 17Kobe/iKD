@@ -4,7 +4,7 @@ const fs = require('fs');
 const moment = require('moment');
 
 const now = moment();
-const timestamp = now.format('YYYYMMDDHH');
+const timestamp = now.format('YYYYMMDDHHmm');
 const filename = `D:\\Code\\ikd\\dist\\assets\\images\\ikd-buy-sell-signal-${timestamp}.png`;
 
 console.log('Deleting existing file...');
