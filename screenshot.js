@@ -1,8 +1,11 @@
 const chromePaths = require('chrome-paths');
 const puppeteer = require('puppeteer-core');
 const fs = require('fs');
+const moment = require('moment');
 
-const filename = 'D:\\Code\\ikd\\ikd-buy-sell-signal.png';
+const now = moment();
+const timestamp = now.format('YYYYMMDDHH');
+const filename = `D:\\Code\\ikd\\dist\\assets\\images\\ikd-buy-sell-signal-${timestamp}.png`;
 
 console.log('Deleting existing file...');
 // 這樣寫法是讓刪除一定要在 puppeteer 前執行
@@ -20,7 +23,7 @@ fs.unlink(filename, (err) => {
             // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
             ignoreHTTPSErrors: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox'],
-            headless: false,
+            headless: true,
         });
         const page = await browser.newPage();
         await page.setViewport({ width: 1366, height: 768 });
@@ -42,14 +45,14 @@ fs.unlink(filename, (err) => {
         } else {
             console.log('No screenshot taken.');
         }
-        // await browser.close();
+        await browser.close();
 
-        fs.unlink(filename, (err) => {
-            if (err) {
-                console.log('No existing file to delete.');
-            } else {
-                console.log('Existing file deleted.');
-            }
-        });
+        // fs.unlink(filename, (err) => {
+        //     if (err) {
+        //         console.log('No existing file to delete.');
+        //     } else {
+        //         console.log('Existing file deleted.');
+        //     }
+        // });
     })();
 });
