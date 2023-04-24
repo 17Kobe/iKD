@@ -42,8 +42,10 @@ console.log('Launching Puppeteer...');
         await page.waitForTimeout(1000); // 等待 1 秒以讓所有元素出現在屏幕上
         await page.screenshot({ path: filename, fullPage: true });
         console.log(`Screenshot saved to ${filename}.`);
+        console.log(`${filename}`);
     } else {
         console.log('No screenshot taken.');
+        console.log('');
     }
     await browser.close();
 
