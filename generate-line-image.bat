@@ -9,6 +9,6 @@ echo Screenshot saved to D:\Code\ikd\dist\assets\images\
 
 cd dist
 git add -A
-git commit -m 'deploy images'
+git commit -m 'images'
 git push -f origin gh-pages
 cd ..
