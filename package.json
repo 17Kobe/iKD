@@ -2,8 +2,7 @@
     "version": "0.0.0",
     "scripts": {
         "dev": "vite",
-        "prebuild": "mkdir dist-temp && cp -r dist/assets/images dist/assets/data dist-temp/",
-        "build": "vite build && mv dist-temp/images dist-temp/data dist/assets/ && rm -rf dist-temp",
+        "build": "vite build",
         "serve": "vite preview"
     },
     "dependencies": {
