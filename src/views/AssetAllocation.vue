@@ -2,12 +2,12 @@
     <div>
         <el-row>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 2px 0 4px">
-                <el-card shadow="hover">
+                <el-card shadow="hover" ref="leftCard">
                     <BarChart :chartData="barData" :options="barOptions" />
                 </el-card>
             </el-col>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
-                <el-card shadow="hover" style="height: 201px; text-align: right">
+                <el-card shadow="hover" :style="{ height: leftCardHeight + 'px', textAlign: 'right' }" >
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
                         資產走勢
                     </div>
@@ -265,6 +265,7 @@ export default {
     data() {
         return {
             assetList: [],
+            leftCardHeight: 0,
             barOptions: {
                 scales: {
                     y: {
@@ -435,6 +436,9 @@ export default {
             },
         };
     },
+    mounted() {
+    this.leftCardHeight = this.$refs.leftCard.$el.offsetHeight;
+  },
     computed: {
         historyAssetList() {
             return this.$store.getters.getHistoryAssetList();
