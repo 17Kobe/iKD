@@ -426,7 +426,15 @@ export default {
                                 );
                             },
                             label(context) {
-                                return ' $ ' + context.parsed.y.toLocaleString('en-US');
+                                console.log(context);
+                                return (
+                                    ' $ ' +
+                                    context.parsed.y.toLocaleString('en-US') +
+                                    ' (' +
+                                    (context.raw.diff > 0 ? '+' : '') +
+                                    context.raw.diff.toLocaleString('en-US') +
+                                    ')'
+                                );
                             },
                         },
                     },

@@ -62,12 +62,18 @@ const asset = {
         getHistoryAssetList: (state) => () => {
             console.log('getHistoryAssetList');
             const sixMonthAgo = moment().subtract(6, 'months');
+            let prevY = 0; // 紀錄前一個元素的y值
             return state.historyAssetList.reduce((acc, array) => {
-                if (moment(array[0]).isSameOrAfter(sixMonthAgo))
+                if (moment(array[0]).isSameOrAfter(sixMonthAgo)) {
+                    const y = array[1];
+                    const diff = y - prevY; // 計算diff
                     acc.push({
                         x: moment(array[0]),
-                        y: array[1],
+                        y: y,
+                        diff: prevY === 0 ? 0 : diff, // 若前一個元素為0則diff為0
                     });
+                    prevY = y; // 更新prevY
+                }
                 return acc;
             }, []);
         },
