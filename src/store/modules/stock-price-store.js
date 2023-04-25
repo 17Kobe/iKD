@@ -1294,7 +1294,7 @@ const stock = {
             let filteredList = state.stockList;
             if (query && query.export) {
                 filteredList = _.filter(filteredList, (stock) => {
-                    return stock.badge === '買' || stock.badge === '賣' || stock.badge === '準買' || stock.badge === '準賣';
+                    return stock.badge === '買' || stock.badge === '賣';
                 });
             }
             return _.orderBy(filteredList, ['order'], ['asc']);

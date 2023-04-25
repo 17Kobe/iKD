@@ -26,7 +26,7 @@ console.log('Launching Puppeteer...');
         headless: true,
     });
     const page = await browser.newPage();
-    await page.setViewport({ width: 1366, height: 768 });
+    await page.setViewport({ width: 1295, height: 512 });
 
     const url = 'https://17kobe.github.io/iKD/#/?export=true';
     await page.goto(url, { timeout: 60000 }); // 設置等待時間為 60 秒
