@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-row class="row-bg" justify="space-between" style="align-items: center; max-width: 650px;">
+        <el-row class="row-bg" justify="space-between" style="align-items: center; max-width: 650px">
             <el-col :span="8" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">價差&nbsp;&nbsp;</span>
                 <el-radio-group v-model="modeSpread" size="small" fill="#dedede" text-color="#373737">
@@ -181,7 +181,7 @@
         </el-table>
 
         <!-- ================================ 股利 -->
-        <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center; max-width: 650px;">
+        <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center; max-width: 650px">
             <el-col :span="8" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">股利&nbsp;&nbsp;</span>
                 <el-radio-group v-model="modeDividend" size="small" fill="#dedede" text-color="#373737">
@@ -436,5 +436,5 @@ export default {
 
 // 使用 element plus  beta版在用 table 時 cell 有時最後一列的第一欄會有一半高度的白色區塊會擋住
 .el-table__fixed
-    height: -webkit-fill-available!important
+    height: 100%!important
 </style>
