@@ -11,20 +11,22 @@
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
                         資產走勢
                     </div>
-                    <el-tag class="my-1" size="large" style="width: 100%; text-align: right"
-                        >總計
-                        <span style="font-size: 20px"> $ </span>
-                        <span style="font-size: 24px; font-weight: bold">
-                            <number
-                                :from="0"
-                                :to="assets"
-                                :format="currencyFormat"
-                                :duration="1"
-                                :delay="0"
-                                easing="Power1.easeOut"
-                            /> </span
-                        >&nbsp;元
-                    </el-tag>
+                    <el-tooltip class="box-item" effect="dark" :content="`今日增減 ${todayAsset}`" placement="bottom">
+                        <el-tag class="my-1" size="large" style="width: 100%; text-align: right"
+                            >總計
+                            <span style="font-size: 20px"> $ </span>
+                            <span style="font-size: 24px; font-weight: bold">
+                                <number
+                                    :from="0"
+                                    :to="assets"
+                                    :format="currencyFormat"
+                                    :duration="1"
+                                    :delay="0"
+                                    easing="Power1.easeOut"
+                                /> </span
+                            >&nbsp;元
+                        </el-tag>
+                    </el-tooltip>
                     <!-- <el-tag class="ml-2" size="small" style="margin: 1px 0px"
                         >股票損益 <span style="font-size: 20px; font-weight: bold">$ {{ assets.toLocaleString('en-US') }}</span>
                     </el-tag> -->
@@ -438,6 +440,11 @@ export default {
     computed: {
         historyAssetList() {
             return this.$store.getters.getHistoryAssetList();
+        },
+        todayAsset() {
+            const last = _.last(this.historyAssetList);
+            const secondLast = _.nth(this.historyAssetList, -2);
+            return last.y - secondLast.y;
         },
         spreadList() {
             return this.$store.getters.getSpreadList('目前');
