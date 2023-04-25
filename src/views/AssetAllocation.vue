@@ -11,7 +11,7 @@
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
                         資產走勢
                     </div>
-                    <el-tag class="ml-2 my-1" size="large"
+                    <el-tag class="my-1" size="large" style="width: 100%; text-align: right"
                         >總計
                         <span style="font-size: 20px"> $ </span>
                         <span style="font-size: 24px; font-weight: bold">
