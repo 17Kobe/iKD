@@ -7,7 +7,7 @@
                 </el-card>
             </el-col>
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
-                <el-card shadow="hover" :style="{ height: leftCardHeight + 'px', textAlign: 'right' }" >
+                <el-card shadow="hover" :style="{ height: leftCardHeight + 'px', textAlign: 'right' }">
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
                         資產走勢
                     </div>
@@ -57,7 +57,11 @@
                             ><span style="font-size: 10px"> 元</span>
                         </el-tag>
                     </span> -->
-                    <LineChart :chartData="lineData" :options="lineOptions" />
+                    <LineChart
+                        :chartData="lineData"
+                        :options="lineOptions"
+                        :style="{ height: leftCardHeight - 65 + 'px', 'min-height': '137px' }"
+                    />
                 </el-card>
             </el-col>
         </el-row>
@@ -437,8 +441,8 @@ export default {
         };
     },
     mounted() {
-    this.leftCardHeight = this.$refs.leftCard.$el.offsetHeight;
-  },
+        this.leftCardHeight = this.$refs.leftCard.$el.offsetHeight;
+    },
     computed: {
         historyAssetList() {
             return this.$store.getters.getHistoryAssetList();
