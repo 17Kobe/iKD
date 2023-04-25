@@ -437,4 +437,7 @@ export default {
 // 使用 element plus  beta版在用 table 時 cell 有時最後一列的第一欄會有一半高度的白色區塊會擋住
 .el-table__fixed
     height: 100%!important
+
+.el-radio-button__original-radio:checked+.el-radio-button__inner
+    font-weight: bold
 </style>
