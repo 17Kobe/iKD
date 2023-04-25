@@ -1,13 +1,25 @@
 const chromePaths = require('chrome-paths');
 const puppeteer = require('puppeteer-core');
 const fs = require('fs');
+const path = require('path');
 const moment = require('moment');
 
 const now = moment();
 const timestamp = now.format('YYYYMMDDHH');
 const filename = `D:\\Code\\ikd\\dist\\assets\\images\\ikd-buy-sell-signal-${timestamp}.png`;
 
-console.log('Deleting existing file...');
+console.log('Delete image files older than one month...');
+const imageDirectory = './dist/assets/images';
+const files = fs.readdirSync(imageDirectory);
+const oneMonthAgo = moment().subtract(1, 'month');
+files.forEach((image) => {
+    const imagePath = path.join(imageDirectory, image);
+    const imageDate = moment(image.match(/(\d{10})/)[1], 'YYYYMMDDHH');
+    if (imageDate.isBefore(oneMonthAgo)) {
+        fs.unlinkSync(imagePath);
+        console.log(`Image ${image} has been deleted.`);
+    }
+});
 // 這樣寫法是讓刪除一定要在 puppeteer 前執行
 // fs.unlink(filename, (err) => {
 //     if (err) {
