@@ -91,17 +91,27 @@ export default {
                     cathy.getKobe()
                 ).toString(CryptoJS.enc.Utf8);
 
-                const data = JSON.stringify(window.localStorage);
+                // const dataString = JSON.stringify(window.localStorage); // 舊作法會在 value 時出現 /"，因為 value 都是字串，而非JSON物件
+                // 正確應先 parse 好正確的 JSON 物件，其中 key==='crawlerDividendLastDate' 是字串
+                const data = {};
+                for (let key in window.localStorage) {
+                    if (key==='crawlerDividendLastDate')
+                        data[key] = localStorage.getItem(key);
+                    // localStorage 會有這些key
+                    else if (key !== "length" && key !== "clear" && key !== "getItem" && key !== "key" && key !== "removeItem" && key !== "setItem")
+                        data[key] = JSON.parse(localStorage.getItem(key));
+                }
+                const dataString = JSON.stringify(data);
+
+                console.log(dataString);
 
                 // 將資料轉換成 Blob 物件
-                const blob = new Blob([data], { type: 'application/json' });
+                const blob = new Blob([dataString], { type: 'application/json' });
 
                 // 讀取 Blob 內容，並使用 FileReader 轉換成 Base64 編碼
                 const reader = new FileReader();
                 reader.readAsDataURL(blob);
                 reader.onloadend = async () => {
-                    const contentBase64 = reader.result.split(',')[1];
-
                     // 取得現有檔案的 SHA 值
                     const url = 'https://api.github.com/repos/17Kobe/iKD/contents/assets/data/my_localstorage.json';
                     const response = await axios.get(url, {
@@ -116,6 +126,7 @@ export default {
                     const sha = response.data.sha;
 
                     // 在這裡上傳到 Github
+                    const contentBase64 = reader.result.split(',')[1];
                     const uploadResponse = await axios.put(
                         'https://api.github.com/repos/17Kobe/iKD/contents/assets/data/my_localstorage.json',
                         {
@@ -158,10 +169,12 @@ export default {
                         .then((data) => {
                             // 將 JSON 資料存儲到 localStorage
                             try {
-                                Object.keys(data).forEach((key) => {
-                                    localStorage.setItem(key, data[key]);
-                                    console.log('localStorage 已更新', localStorage);
-                                });
+                                for (const key in data) {
+                                    if (key==='crawlerDividendLastDate')
+                                        localStorage.setItem(key, data[key]);
+                                    else
+                                        localStorage.setItem(key, JSON.stringify(data[key]));
+                                }
                                 ElMessage({
                                     type: 'success',
                                     message: '完成同步線上的所有資料!',

@@ -72,7 +72,7 @@ Promise.all(urls.map(getPromise)).then(function (stats) {
     const myLocalstorageFile = JSON.parse(fs.readFileSync('./dist/assets/data/my_localstorage.json'));
     // let rawdata = fs.readFileSync('./src/store/data/default-stock-list.json');
     // console.log(myLocalstorageFile);
-    let defaultStockList = JSON.parse(myLocalstorageFile.stockList);
+    let defaultStockList = myLocalstorageFile.stockList;
     // console.log(myLocalstorageFile);
     // console.log(typeof defaultStockList.stockList);
     // console.log(defaultStockList);
@@ -92,7 +92,7 @@ Promise.all(urls.map(getPromise)).then(function (stats) {
         console.log('Data written to file');
     });
 
-    myLocalstorageFile.stockList = JSON.stringify(defaultStockList);
+    myLocalstorageFile.stockList = defaultStockList;
     fs.writeFile('./dist/assets/data/my_localstorage.json', JSON.stringify(myLocalstorageFile), (err) => {
         if (err) throw err;
         console.log('Data written to file');
