@@ -9,6 +9,7 @@
             :row-class-name="tableRowClassName"
             style="width: 100%"
             empty-text="無資料"
+            id="stock-list"
         >
             <el-table-column
                 fixed

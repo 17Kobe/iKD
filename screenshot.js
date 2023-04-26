@@ -42,9 +42,14 @@ console.log('Launching Puppeteer...');
 
     const url = 'https://17kobe.github.io/iKD/#/?export=true';
     await page.goto(url, { timeout: 60000 }); // 設置等待時間為 60 秒
-    await page.waitForSelector('.el-table__fixed-body-wrapper > .el-table__body > tbody tr', { timeout: 60000 }); // 設置等待時間為 60 秒
-
-    const trs = await page.$$('.el-table__fixed-body-wrapper > .el-table__body > tbody tr');
+    try {
+        await page.waitForSelector('#stock-list > .el-table__body-wrapper > table > tbody tr', { timeout: 60000 }); // 設置等待時間為 60 秒
+    } catch (error) { // 若都沒有元素時
+        console.error('等待元素超時:', error);
+        // 可以在這裡添加重試操作或其他處理代碼
+    }
+    const trs = await page.$$('#stock-list > .el-table__body-wrapper > table > tbody tr');
+    console.log('tr length = ' + trs.length);
     if (trs.length > 0) {
         // 確保所有元素都出現在屏幕上
         await page.evaluate(() => {
@@ -53,11 +58,11 @@ console.log('Launching Puppeteer...');
         });
         await page.waitForTimeout(1000); // 等待 1 秒以讓所有元素出現在屏幕上
         await page.screenshot({ path: filename, fullPage: true });
-        console.log(`Screenshot saved to ${filename}.`);
-        console.log(`ikd-buy-sell-signal-${timestamp}.png`);
+        console.log(`Screenshot saved to ${filename}`);
+        console.log(`ikd-buy-sell-signal-${timestamp}.png`); //這個回傳給bat
     } else {
         console.log('No screenshot taken.');
-        console.log('');
+        console.log(''); //這個回傳給bat
     }
     await browser.close();
 
