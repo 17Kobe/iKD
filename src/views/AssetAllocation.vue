@@ -452,7 +452,8 @@ export default {
         todayAsset() {
             const last = _.last(this.historyAssetList);
             const secondLast = _.nth(this.historyAssetList, -2);
-            return last.y - secondLast.y;
+            const diff = last.y - secondLast.y;
+            return diff > 0 ? '+' + diff : diff;
         },
         spreadList() {
             return this.$store.getters.getSpreadList('目前');
