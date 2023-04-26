@@ -450,8 +450,12 @@ export default {
             return this.$store.getters.getHistoryAssetList();
         },
         todayAsset() {
-            const last = _.last(this.historyAssetList);
-            const secondLast = _.nth(this.historyAssetList, -2);
+            const historyAssetList = this.historyAssetList;
+            if (_.size(historyAssetList) === 1) {
+                return 0;
+            }
+            const last = _.last(historyAssetList);
+            const secondLast = _.nth(historyAssetList, -2);
             const diff = last.y - secondLast.y;
             return diff > 0 ? '+' + diff : diff;
         },
