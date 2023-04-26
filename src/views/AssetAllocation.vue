@@ -426,7 +426,7 @@ export default {
                                 );
                             },
                             label(context) {
-                                console.log(context);
+                                // console.log(context);
                                 return (
                                     ' $ ' +
                                     context.parsed.y.toLocaleString('en-US') +
@@ -476,7 +476,7 @@ export default {
                     return acc;
                 }, 0);
 
-            console.log('=======assets');
+            // console.log('=======assets');
 
             // 存到歷史存款去
             this.$store.commit('ADD_OR_UPDATE_HISTORY_ASSET_LIST', [
@@ -609,7 +609,7 @@ export default {
                     },
                     datalabels: {
                         formatter: (value, ctx) => {
-                            console.log(ctx);
+                            // console.log(ctx);
 
                             let sum = 0;
                             const dataArr = ctx.chart.data.datasets[0].data;
@@ -617,7 +617,7 @@ export default {
                                 sum += data;
                             });
                             const itemName = ['現金', '定存', '股票', '其它'];
-                            console.log(value);
+                            // console.log(value);
                             if (value === 0) return '';
                             const percentage = `  ${itemName[ctx.dataIndex]}\n${((value * 100) / sum).toFixed(2)} %`;
                             return percentage;
@@ -627,7 +627,7 @@ export default {
                     tooltip: {
                         callbacks: {
                             label(context) {
-                                console.log(context);
+                                // console.log(context);
                                 let label = context.label || '';
                                 if (label) {
                                     label += ': ';
@@ -700,12 +700,12 @@ export default {
                     tooltip: {
                         callbacks: {
                             label(context) {
-                                console.log(context);
-                                console.log(stockList);
-                                console.log(this.stockList);
+                                // console.log(context);
+                                // console.log(stockList);
+                                // console.log(this.stockList);
                                 // 用股票名稱去找
                                 const foundStock = _.find(stockList, { name: context.label });
-                                console.log(foundStock);
+                                // console.log(foundStock);
 
                                 let label = context.dataset.label || '';
 
@@ -864,7 +864,7 @@ export default {
             });
         },
         onDelAsset(index, assetName) {
-            console.log(index);
+            // console.log(index);
             if (assetName) {
                 ElMessageBox.confirm(`將要刪除[${assetName}]?`, '刪除', {
                     confirmButtonText: '刪除',
@@ -897,17 +897,17 @@ export default {
             localStorage.removeItem('crawlerDividendLastDate');
         },
         onChangeAccount(e, index) {
-            console.log('onChangeAccount');
-            console.log(index);
-            console.log(e);
+            // console.log('onChangeAccount');
+            // console.log(index);
+            // console.log(e);
             // console.log(e.target.value);
             this.assetList[index].account = e;
             this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
         },
         onChangeAmount(e, index) {
-            console.log('onChangeAmount');
-            console.log(index);
-            console.log(e.target.value);
+            // console.log('onChangeAmount');
+            // console.log(index);
+            // console.log(e.target.value);
             this.assetList[index].amount = e.target.value ? parseInt(e.target.value, 10) : 0;
             this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
         },

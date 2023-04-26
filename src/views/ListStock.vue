@@ -562,7 +562,7 @@ export default {
         },
     },
     created() {
-        console.log('created');
+        // console.log('created');
         this.$store.commit('SAVE_GLOBAL_SETTINGS', GlobalSettings);
         // 8秒後再畫全部
         // setInterval(() => {
@@ -599,7 +599,7 @@ export default {
                         const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
                         tempStockObj.data.daily = _.cloneDeep(foundStock.data.daily);
                     }
-                    console.log(tempStockObj);
+                    // console.log(tempStockObj);
                     this.queueStockDataList.push(tempStockObj);
                 } else if (obj.type === 'fund') {
                     // 無資料，且是基金時，但無資料還是蠻怪，localstorage不可能無資料

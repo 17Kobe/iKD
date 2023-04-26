@@ -157,8 +157,8 @@ export default {
 
         onAdd() {
             console.log('onAdd');
-            console.log(this.form.stockId);
-            console.log(this.stockOptions);
+            // console.log(this.form.stockId);
+            // console.log(this.stockOptions);
 
             this.$refs.formSearchRef.validate((valid) => {
                 if (valid) {

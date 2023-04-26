@@ -303,13 +303,13 @@ const stock = {
     mutations: {
         SAVE_GLOBAL_SETTINGS(state, data) {
             console.log('SAVE_GLOBAL_SETTINGS');
-            console.log(data);
+            // console.log(data);
             state.usdExchange = data.usd_exchange;
         },
         // 將該股票的淨值儲存到 state 上
         SAVE_STOCK_LIST(state, data) {
             console.log('SAVE_STOCK_LIST');
-            console.log(data);
+            // console.log(data);
             console.log(typeof data);
             state.stockList = data;
             // console.log(state.currStockDayData);
@@ -428,7 +428,7 @@ const stock = {
                 if (_.has(foundStock, 'cost.settings')) delete foundStock.cost;
             } else {
                 console.log('costList.length> 0');
-                console.log(costList);
+                // console.log(costList);
                 foundStock.cost = {};
                 foundStock.cost.settings = [];
                 foundStock.cost.settings = costList; // 複製數據複本
@@ -568,7 +568,7 @@ const stock = {
 
                 // theArray[index].data.daily.push(...res.data.data); // 塞入股價資料
             }
-            console.log(foundStock.data);
+            // console.log(foundStock.data);
             if (
                 foundStock.data &&
                 foundStock.data.daily.length > 0 &&

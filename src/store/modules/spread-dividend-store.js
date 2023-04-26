@@ -122,7 +122,7 @@ const dividend = {
             let isSaveHistoryToLocalStorage = false;
 
             const today = moment().startOf('day');
-            console.log(data);
+            // console.log(data);
             console.log(stockCrawlerDividendLastDate);
 
             if (_.has(data, 'data') && data.data.length > 0) {
@@ -283,7 +283,7 @@ const dividend = {
                 });
                 tempSpreadList = _.orderBy(tempSpreadList, ['sell_date'], ['desc']);
             }
-            console.log(tempSpreadList);
+            // console.log(tempSpreadList);
             return tempSpreadList;
         },
         // 該股票的股數，是另外再去撈的，如此才能當股數改變時又能即時反應

@@ -208,8 +208,7 @@ export default {
                                 str += `<div>開：${point.point.open} <span style="color: #3333ee">收</span>：<span style="color: ${fontColor}; font-weight:bold;">${point.y}</span></div>`;
                                 str += `<div>高：${point.point.high} 低：${point.point.low}</div>`;
                             } else {
-                                console.log(component);
-
+                                // console.log(component);
                                 // const color = index === 1 ? '#834beb' : '#e6a23c';
                                 // const limit = index === 1 ? component.ma_policy.ma_buy_limit : component.ma_policy.ma_sell_limit;
                                 // str += `<span><span style="color: ${color}">MA(${limit})</span>: ${point.y.toFixed(2)}
