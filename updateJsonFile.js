@@ -72,27 +72,35 @@ Promise.all(urls.map(getPromise)).then(function (stats) {
     const myLocalstorageFile = JSON.parse(fs.readFileSync('./dist/assets/data/my_localstorage.json'));
     // let rawdata = fs.readFileSync('./src/store/data/default-stock-list.json');
     // console.log(myLocalstorageFile);
-    let defaultStockList = myLocalstorageFile.stockList;
+    let myLocalstorageStockList = myLocalstorageFile.stockList;
     // console.log(myLocalstorageFile);
-    // console.log(typeof defaultStockList.stockList);
-    // console.log(defaultStockList);
-    // console.log(defaultStockList);
+    // console.log(typeof myLocalstorage.stockList);
+    // console.log(myLocalstorage);
+    // console.log(myLocalstorage);
 
     stats.forEach((price, index) => {
-        const foundStock = defaultStockList.find((obj) => obj.name === fundName[index]);
+        const foundStock = myLocalstorageStockList.find((obj) => obj.name === fundName[index]);
         foundStock.data = foundStock.data || {};
         foundStock.data.daily = foundStock.data.daily || [];
         foundStock.data.daily = price;
     });
 
-    let writeData = JSON.stringify(defaultStockList, null, 4); //t, null, 2
+    const defaultStockList = _.map(myLocalstorageStockList, (item) => {
+        if (_.includes(item.name, '基金')) {
+            return item;
+        } else {
+            return _.omit(item, ['data', 'cost', 'calc_policy_date', 'crawler_dividend_last_date']);
+        }
+    });
+
+    let writeData = JSON.stringify(defaultStockList); //t, null, 2
 
     fs.writeFile('./src/store/data/default-stock-list.json', writeData, (err) => {
         if (err) throw err;
         console.log('Data written to file');
     });
 
-    myLocalstorageFile.stockList = defaultStockList;
+    myLocalstorageFile.stockList = myLocalstorageStockList;
     fs.writeFile('./dist/assets/data/my_localstorage.json', JSON.stringify(myLocalstorageFile), (err) => {
         if (err) throw err;
         console.log('Data written to file');
