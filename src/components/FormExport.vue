@@ -21,13 +21,13 @@
         <el-tooltip class="box-item" effect="dark" content="使用在星期六也要補班的時候" placement="top">
             <el-button type="success" @click="onForceRefresh"><i class="el-icon-refresh-right"></i> 立即更新股價</el-button>
         </el-tooltip>
-        <br /><br />
+        <!-- <br /><br />
         &nbsp;
         <el-tooltip class="box-item" effect="dark" content="當網站的預設基金有增加時，可以執行更新後增加自選股" placement="top">
             <el-button type="success" @click="onUpdateDefaultStockList"
                 ><i class="el-icon-refresh-right"></i> 更新預設自選股</el-button
             >
-        </el-tooltip>
+        </el-tooltip> -->
         <!-- <el-button type="primary" @click="onImport"><i class="el-icon-upload2"></i> 匯入設定檔</el-button> -->
     </el-drawer>
 </template>
@@ -38,7 +38,7 @@ import _ from 'lodash';
 import axios from 'axios';
 import CryptoJS from 'crypto-js';
 import { ElMessageBox, ElMessage } from 'element-plus';
-import DefaultStockList from '../store/data/default-stock-list.json';
+// import DefaultStockList from '../store/data/default-stock-list.json';
 
 export default {
     name: 'component-form-search',
@@ -95,10 +95,16 @@ export default {
                 // 正確應先 parse 好正確的 JSON 物件，其中 key==='crawlerDividendLastDate' 是字串
                 const data = {};
                 for (let key in window.localStorage) {
-                    if (key==='crawlerDividendLastDate')
-                        data[key] = localStorage.getItem(key);
+                    if (key === 'crawlerDividendLastDate') data[key] = localStorage.getItem(key);
                     // localStorage 會有這些key
-                    else if (key !== "length" && key !== "clear" && key !== "getItem" && key !== "key" && key !== "removeItem" && key !== "setItem")
+                    else if (
+                        key !== 'length' &&
+                        key !== 'clear' &&
+                        key !== 'getItem' &&
+                        key !== 'key' &&
+                        key !== 'removeItem' &&
+                        key !== 'setItem'
+                    )
                         data[key] = JSON.parse(localStorage.getItem(key));
                 }
                 const dataString = JSON.stringify(data);
@@ -170,10 +176,8 @@ export default {
                             // 將 JSON 資料存儲到 localStorage
                             try {
                                 for (const key in data) {
-                                    if (key==='crawlerDividendLastDate')
-                                        localStorage.setItem(key, data[key]);
-                                    else
-                                        localStorage.setItem(key, JSON.stringify(data[key]));
+                                    if (key === 'crawlerDividendLastDate') localStorage.setItem(key, data[key]);
+                                    else localStorage.setItem(key, JSON.stringify(data[key]));
                                 }
                                 ElMessage({
                                     type: 'success',
@@ -245,30 +249,30 @@ export default {
             });
         },
 
-        onUpdateDefaultStockList() {
-            console.log(DefaultStockList);
-            const storeStockList = this.stockList;
+        // onUpdateDefaultStockList() {
+        //     console.log(DefaultStockList);
+        //     const storeStockList = this.stockList;
 
-            // 找出儲存有缺少的key
-            storeStockList.forEach((obj) => {
-                const foundStock = DefaultStockList.find((v) => v.id === obj.id);
-                if (foundStock && foundStock.is_dividend && !obj.is_dividend)
-                    // 加 foundStock 是因為有可能是後來自己加的股票
-                    this.$store.commit('ADD_A_STOCK_KEY', {
-                        stockId: obj.id,
-                        isDvidend: foundStock.is_dividend,
-                    });
-            });
+        //     // 找出儲存有缺少的key
+        //     storeStockList.forEach((obj) => {
+        //         const foundStock = DefaultStockList.find((v) => v.id === obj.id);
+        //         if (foundStock && foundStock.is_dividend && !obj.is_dividend)
+        //             // 加 foundStock 是因為有可能是後來自己加的股票
+        //             this.$store.commit('ADD_A_STOCK_KEY', {
+        //                 stockId: obj.id,
+        //                 isDvidend: foundStock.is_dividend,
+        //             });
+        //     });
 
-            // 找出預設清單有但儲存是沒有id的新增加的清單
-            const newStockList = _.filter(DefaultStockList, function (obj) {
-                return !_.find(storeStockList, { id: obj.id });
-            });
-            console.log(newStockList);
-            newStockList.forEach((obj) => {
-                this.$store.commit('SAVE_A_STOCK', obj);
-            });
-        },
+        //     // 找出預設清單有但儲存是沒有id的新增加的清單
+        //     const newStockList = _.filter(DefaultStockList, function (obj) {
+        //         return !_.find(storeStockList, { id: obj.id });
+        //     });
+        //     console.log(newStockList);
+        //     newStockList.forEach((obj) => {
+        //         this.$store.commit('SAVE_A_STOCK', obj);
+        //     });
+        // },
         // 讀檔參考 https://blog.csdn.net/qq_40729514/article/details/109677411
         openFile(file) {
             const reader = new FileReader();
