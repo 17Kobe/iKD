@@ -205,9 +205,9 @@ export default {
         },
         onOpend() {
             // set focus 要寫在這不能寫在 onInit，否則會影響動畫lag
-            this.$nextTick(() => {
-                this.$refs.search.focus();
-            });
+            // this.$nextTick(() => {
+            //     this.$refs.search.focus();
+            // });
         },
         onClosed() {
             // console.log(this.form);
