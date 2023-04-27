@@ -11,7 +11,7 @@
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
                         資產走勢
                     </div>
-                    <el-tooltip class="box-item" effect="dark" :content="`今日增減 ${todayAsset}`" placement="bottom">
+                    <el-tooltip class="box-item" effect="dark" :content="`今日增減： ${todayAsset}`" placement="bottom">
                         <el-tag class="my-1" size="large" style="width: 100%; text-align: right"
                             >總計
                             <span style="font-size: 20px"> $ </span>
@@ -430,10 +430,10 @@ export default {
                                 return (
                                     ' $ ' +
                                     context.parsed.y.toLocaleString('en-US') +
-                                    ' (' +
-                                    (context.raw.diff > 0 ? '+' : '') +
+                                    ' ( ' +
+                                    (context.raw.diff >= 0 ? '+' : '') +
                                     context.raw.diff.toLocaleString('en-US') +
-                                    ')'
+                                    ' )'
                                 );
                             },
                         },
@@ -457,7 +457,7 @@ export default {
             const last = _.last(historyAssetList);
             const secondLast = _.nth(historyAssetList, -2);
             const diff = last.y - secondLast.y;
-            return diff > 0 ? '+' + diff : diff;
+            return diff >= 0 ? '+' + diff : diff;
         },
         spreadList() {
             return this.$store.getters.getSpreadList('目前');
