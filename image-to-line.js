@@ -2,7 +2,8 @@ const axios = require('axios');
 
 const imageName = process.argv[2];
 
-const LINE_API_URL = 'https://api.line.me/v2/bot/message/push';
+// const LINE_API_URL = 'https://api.line.me/v2/bot/message/push';
+const LINE_API_URL = 'https://api.line.me/v2/bot/message/multicast';
 
 const config = {
     headers: {
@@ -16,7 +17,8 @@ const config = {
 };
 
 const data = {
-    to: 'Ue0b74720348c4831431c1a3dbd2ddb8a',
+    // to: 'Ue0b74720348c4831431c1a3dbd2ddb8a',
+    to: ['Ue0b74720348c4831431c1a3dbd2ddb8a'],
     messages: [
         {
             type: 'image',
