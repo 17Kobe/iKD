@@ -12,13 +12,13 @@ const config = {
     },
     proxy: {
         host: '10.160.3.88',
-        port: '8080'
-    }
+        port: '8080',
+    },
 };
 
 const data = {
     // to: 'Ue0b74720348c4831431c1a3dbd2ddb8a',
-    to: ['Ue0b74720348c4831431c1a3dbd2ddb8a'],
+    to: ['Ue0b74720348c4831431c1a3dbd2ddb8a', 'Udc4570841bf424d5429758d74b7dfd36'],
     messages: [
         {
             type: 'image',
