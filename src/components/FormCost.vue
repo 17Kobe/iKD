@@ -194,7 +194,7 @@ export default {
             let sellNumber = this.sellNumber; // 總共賣出的股數
             this.checkedSellSrc = [];
             // buy_date 是因為價格若一樣，則先買的日期要先賣
-            return _.orderBy(this.form, ['cost', 'buy_date'], ['desc', 'asc']).reduce((acc, { cost, number }, index) => {
+            return _.orderBy(this.form, ['buy_date', 'cost'], ['asc','desc']).reduce((acc, { cost, number }, index) => {
                 // 該價格總共有的股數
                 // 計算可以賣的股數
                 // console.log('sellNumber =' + sellNumber);
