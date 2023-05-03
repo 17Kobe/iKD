@@ -159,9 +159,69 @@ const stock = {
                 ]);
             }
         },
+        async CALC_STOCK_WEEKLY({ state }, stockId) {
+            console.log('CALC_STOCK_WEEKLY');
+            // 塞入股價週線資料
+            // const firstStockDate = moment(_.first(currStock[index].data.daily)[0]); // [] 不可能 undefined。因為是二維陣列，還要取第二維[0]代表date
+            // const lastStockDate = moment(_.last(currStock[index].data.daily)[0]);
+
+            // console.log(firstStockDate.format('YYYY-MM-DD HH:mm:ss'));
+            // console.log(lastStockDate.format('YYYY-MM-DD HH:mm:ss'));
+
+            // for moment 參考 https://stackoverflow.com/questions/52936352/javascript-for-loop-to-add-days-in-a-month-object-moment-js
+            // lastStockDate.subtract(7, 'days') 因為我第一個要拿到就是減7天的值
+            // 這裡要用 -6 才能最後面的資料也都算進去，不過可能實際因沒有資料而加上也沒到完整一週都有資料，
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            let resData = [];
+
+            let i = foundStock.data.daily.length - 1;
+            let j = i;
+            const lastStockDate = moment(_.last(foundStock.data.daily)[0]);
+            let firstDayOfWeek = lastStockDate.startOf('isoWeek');
+            while (i >= 0) {
+                // console.log(i);
+                // console.log(moment(currStock[index].data.daily[i][0]).format('YYYY-MM-DD'));
+                // console.log(firstDayOfWeek.format('YYYY-MM-DD'));
+                // 不能用 isSame 因為有可能那週沒資料，或那週星期一也放假，所以要用 isBefore
+                if (moment(foundStock.data.daily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
+                    // console.log('isBefore');
+                    // 0最後一個也要跑進來
+
+                    // startIndex 值要小於等於 endIndex，for 是由大到小, i<j
+                    const startIndex = i + 1; // 因為是找到前一個才算後面1個
+                    const endIndex = j; // 因為外層array 是從日期最現在，往以前日期去掃。endIndex應該是最現在日期. i比n大
+                    const range2dArray = _.slice(foundStock.data.daily, startIndex, endIndex + 1);
+                    const rangeHighArray = _.map(range2dArray, (v) => v[2]);
+                    const rangeLowArray = _.map(range2dArray, (v) => v[3]);
+                    // const rangeVolumeArray = _.map(range2dArray, (v) => v[5]);
+
+                    const date = foundStock.data.daily[endIndex][0];
+                    const open = foundStock.data.daily[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
+                    const close = foundStock.data.daily[endIndex][4]; // 之前的i，還沒i=n是下一個
+                    const low = _.min(rangeLowArray);
+                    const high = _.max(rangeHighArray);
+                    // const volume = _.sum(rangeVolumeArray);
+
+                    resData.push([date, open, high, low, close]);
+                    j = startIndex - 1;
+
+                    // 要採用下個i值的該週第一天，不能用firstDayOfWeek-7天，因為有可能該週都沒值
+                    firstDayOfWeek = moment(foundStock.data.daily[i][0]).startOf('isoWeek');
+                }
+                i -= 1;
+            }
+
+            // console.log(resData);
+            // 必需要反轉，最小的值在最前面，最大的值在最後面，否則highcharts會只畫1個點
+            // currStock[index].data.weekly = _.reverse(resData);
+            // Vue.set(foundStock.data, 'weekly', _.reverse(resData));
+            // foundStock.data.weekly = _.reverse(resData);
+            return _.reverse(resData);
+        },
+
         async CALC_STOCK_WEEKLY_KD({ state }, stockId) {
             console.log('CALC_STOCK_WEEKLY_KD');
-            const foundStock = state.stockList.find((v) => v.id === stockId);
+            const foundStock = state.tempStockList.find((v) => v.id === stockId);
             let weeklyKdData = [];
             let rsv = 0;
             let preK = 0;
@@ -194,7 +254,7 @@ const stock = {
         async CALC_STOCK_WEEKLY_RSI({ state }, stockId) {
             const period = 5;
             console.log('CALC_STOCK_WEEKLY_RSI');
-            const foundStock = state.stockList.find((v) => v.id === stockId);
+            const foundStock = state.tempStockList.find((v) => v.id === stockId);
             let weeklyRsiData = [];
             let gains = [];
             let losses = [];
@@ -233,7 +293,7 @@ const stock = {
             console.log('CALC_STOCK_WEEKLY_MA');
 
             // const index = _.findIndex(state.stockList, ['id', stockId]);
-            const foundStock = state.stockList.find((v) => v.id === stockId);
+            const foundStock = state.tempStockList.find((v) => v.id === stockId);
 
             let weeklyMaData = { ma5: [], ma10: [], ma20: [] };
             [5, 10, 20].forEach((limit) => {
@@ -256,7 +316,8 @@ const stock = {
         async CALC_STOCK_WEEKLY_COST_LINE({ state }, stockId) {
             // 平均成本線
             console.log('CALC_STOCK_WEEKLY_COST_LINE');
-            const foundStock = state.stockList.find((v) => v.id === stockId);
+            const foundStock = state.tempStockList.find((v) => v.id === stockId);
+            const foundStockWithCost = state.stockList.find((v) => v.id === stockId);
 
             let weeklyCostLineData = [];
             if (
@@ -276,8 +337,8 @@ const stock = {
                     const endDate = moment(foundStock.data.weekly[endIndex][0]);
 
                     // 目前加總總金額 除 目前總股數 就是 目前成本
-                    while (i <= foundStock.cost.settings.length - 1) {
-                        const costDate = moment(foundStock.cost.settings[i].buy_date);
+                    while (i <= foundStockWithCost.cost.settings.length - 1) {
+                        const costDate = moment(foundStockWithCost.cost.settings[i].buy_date);
                         // console.log('=============');
                         // console.log(i);
                         // console.log(costDate.format('YYYY-MM-DD'));
@@ -286,8 +347,8 @@ const stock = {
                         if (costDate.isAfter(endDate)) break;
                         else if (costDate.isSameOrAfter(startDate) && costDate.isSameOrBefore(endDate)) {
                             // found
-                            sumNumber += foundStock.cost.settings[i].number;
-                            sumCost += foundStock.cost.settings[i].number * foundStock.cost.settings[i].cost;
+                            sumNumber += foundStockWithCost.cost.settings[i].number;
+                            sumCost += foundStockWithCost.cost.settings[i].number * foundStockWithCost.cost.settings[i].cost;
                             i += 1;
                         } else i += 1;
                     }
@@ -591,63 +652,11 @@ const stock = {
 
                 foundStock.last_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
 
-                // 塞入股價週線資料
-                // const firstStockDate = moment(_.first(currStock[index].data.daily)[0]); // [] 不可能 undefined。因為是二維陣列，還要取第二維[0]代表date
-                // const lastStockDate = moment(_.last(currStock[index].data.daily)[0]);
-
-                // console.log(firstStockDate.format('YYYY-MM-DD HH:mm:ss'));
-                // console.log(lastStockDate.format('YYYY-MM-DD HH:mm:ss'));
-
-                // for moment 參考 https://stackoverflow.com/questions/52936352/javascript-for-loop-to-add-days-in-a-month-object-moment-js
-                // lastStockDate.subtract(7, 'days') 因為我第一個要拿到就是減7天的值
-                // 這裡要用 -6 才能最後面的資料也都算進去，不過可能實際因沒有資料而加上也沒到完整一週都有資料，
-                let resData = [];
-
-                let i = foundStock.data.daily.length - 1;
-                let j = i;
-                const lastStockDate = moment(_.last(foundStock.data.daily)[0]);
-                let firstDayOfWeek = lastStockDate.startOf('isoWeek');
-                while (i >= 0) {
-                    // console.log(i);
-                    // console.log(moment(currStock[index].data.daily[i][0]).format('YYYY-MM-DD'));
-                    // console.log(firstDayOfWeek.format('YYYY-MM-DD'));
-                    // 不能用 isSame 因為有可能那週沒資料，或那週星期一也放假，所以要用 isBefore
-                    if (moment(foundStock.data.daily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
-                        // console.log('isBefore');
-                        // 0最後一個也要跑進來
-
-                        // startIndex 值要小於等於 endIndex，for 是由大到小, i<j
-                        const startIndex = i + 1; // 因為是找到前一個才算後面1個
-                        const endIndex = j; // 因為外層array 是從日期最現在，往以前日期去掃。endIndex應該是最現在日期. i比n大
-                        const range2dArray = _.slice(foundStock.data.daily, startIndex, endIndex + 1);
-                        const rangeHighArray = _.map(range2dArray, (v) => v[2]);
-                        const rangeLowArray = _.map(range2dArray, (v) => v[3]);
-                        // const rangeVolumeArray = _.map(range2dArray, (v) => v[5]);
-
-                        const date = foundStock.data.daily[endIndex][0];
-                        const open = foundStock.data.daily[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
-                        const close = foundStock.data.daily[endIndex][4]; // 之前的i，還沒i=n是下一個
-                        const low = _.min(rangeLowArray);
-                        const high = _.max(rangeHighArray);
-                        // const volume = _.sum(rangeVolumeArray);
-
-                        resData.push([date, open, high, low, close]);
-                        j = startIndex - 1;
-
-                        // 要採用下個i值的該週第一天，不能用firstDayOfWeek-7天，因為有可能該週都沒值
-                        firstDayOfWeek = moment(foundStock.data.daily[i][0]).startOf('isoWeek');
-                    }
-                    i -= 1;
-                }
-
-                // console.log(resData);
-                // 必需要反轉，最小的值在最前面，最大的值在最後面，否則highcharts會只畫1個點
-                // currStock[index].data.weekly = _.reverse(resData);
-                // Vue.set(foundStock.data, 'weekly', _.reverse(resData));
-                foundStock.data.weekly = _.reverse(resData);
-                // this.$set(foundStock.data, 'weekly', _.reverse(resData));
-
                 // ===================塞入股價週線KD資料===================
+                let tempStockListStockData = {};
+                const weekly_data = await this.dispatch('CALC_STOCK_WEEKLY', stockId);
+                tempStockListStockData.weekly = weekly_data;
+                state.tempStockList.push({ id: stockId, data: tempStockListStockData });
 
                 const [weekly_kd_data, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
                     this.dispatch('CALC_STOCK_WEEKLY_KD', stockId),
@@ -656,15 +665,19 @@ const stock = {
                     this.dispatch('CALC_STOCK_WEEKLY_COST_LINE', stockId),
                 ]);
 
-                let tempStockListStockData = {};
+                tempStockListStockData = {};
                 tempStockListStockData.weekly_kd = weekly_kd_data;
                 tempStockListStockData.weekly_rsi = weekly_rsi_data;
                 tempStockListStockData.ma5 = weekly_ma_data.ma5;
                 tempStockListStockData.ma10 = weekly_ma_data.ma10;
                 tempStockListStockData.ma20 = weekly_ma_data.ma20;
                 tempStockListStockData.cost = weekly_cost_line_data;
-                state.tempStockList.push({ id: stockId, data: tempStockListStockData });
+                const targetStock = _.find(state.tempStockList, { id: stockId });
+                if (targetStock) {
+                    _.assign(targetStock.data, tempStockListStockData);
+                }
 
+                foundStock.data.weekly = _.slice(weekly_data, -26);
                 foundStock.data.weekly_kd = _.slice(weekly_kd_data, -26);
                 foundStock.data.weekly_rsi = _.slice(weekly_rsi_data, -26);
                 foundStock.data.ma5 = _.takeRight(weekly_ma_data.ma5, 26);
@@ -692,18 +705,27 @@ const stock = {
             // 像是從 UI改policy會沒有 tempStockList，需要重新計算
             let foundTempStock = state.tempStockList.find((v) => v.id === stockId);
             if (typeof foundTempStock === 'undefined') {
+                let tempStockListStockData = {};
+                const weekly_data = await this.dispatch('CALC_STOCK_WEEKLY', stockId);
+                tempStockListStockData.weekly = weekly_data;
+                state.tempStockList.push({ id: stockId, data: tempStockListStockData });
+
                 const [weekly_kd_data, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
                     this.dispatch('CALC_STOCK_WEEKLY_KD', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_RSI', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_MA', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_COST_LINE', stockId),
                 ]);
-                let tempStockListStockData = {};
+
+                tempStockListStockData = {};
                 tempStockListStockData.weekly_kd = weekly_kd_data;
                 tempStockListStockData.weekly_rsi = weekly_rsi_data;
                 _.merge(tempStockListStockData, weekly_ma_data);
                 tempStockListStockData.cost = weekly_cost_line_data;
-                state.tempStockList.push({ id: stockId, data: tempStockListStockData });
+                const targetStock = _.find(state.tempStockList, { id: stockId });
+                if (targetStock) {
+                    _.assign(targetStock.data, tempStockListStockData);
+                }
 
                 foundTempStock = state.tempStockList.find((v) => v.id === stockId);
             }
@@ -760,7 +782,7 @@ const stock = {
                         if (k <= foundKdGold.limit && k >= d && kdGoldReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
@@ -785,7 +807,7 @@ const stock = {
                         if (k <= foundKdTurnUp.limit && k >= preK && kdTurnUpReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
@@ -811,7 +833,7 @@ const stock = {
                         if (k >= foundKdDead.limit && k <= d && kdDeadReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
@@ -836,7 +858,7 @@ const stock = {
                         if (k >= foundKdTurnDown.limit && k <= preK && kdTurnDownReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
@@ -869,7 +891,7 @@ const stock = {
                         if (rsi <= foundRsiOverSold.limit) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
@@ -893,7 +915,7 @@ const stock = {
                         if (preRsi <= foundRsiTurnUp.limit && rsi >= preRsi && rsiTurnUpReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
@@ -916,7 +938,7 @@ const stock = {
                         if (rsi >= foundRsiOverBought.limit) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
@@ -940,7 +962,7 @@ const stock = {
                         if (preRsi >= foundRsiTurnDown.limit && rsi <= preRsi && rsiTurnDownReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundStock.data.weekly[dataIndex][4];
+                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
