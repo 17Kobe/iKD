@@ -1054,8 +1054,24 @@ const stock = {
                     if (foundCostDown && numberOfBuy >= 1) {
                         // 因為當前的雖然要=2，但是還沒有寫入，所以1時，也代表第2次了
                         // 會在買超過1次才會進來判斷，因為這樣才有之前報酬率
+                        // foundCostDown.limit * numberOfBuy 代表，第二次是 limit *1, 第三次是 limit *2，
                         const rateOfReturn = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
-                        if (rateOfReturn * 100 > -foundCostDown.limit) {
+
+                        // x=10, y=1,2,3,4,5
+
+                        // 我想要得到方程式，用js寫，輸出是z
+                        // y=1, z=10     -> z=x
+                        // y=2, z=10+round(10/2)
+                        // y=3, z=10+round(10/2)+round(10/3)
+                        // answer: 10 15 18 21
+                        let limitRateOfReturn = 0;
+                        for (let x = 1; x <= numberOfBuy; x++) {
+                            limitRateOfReturn += Math.round(foundCostDown.limit / x);
+                        }
+                        // console.log('====================');
+                        // console.log(numberOfBuy);
+                        // console.log(limitRateOfReturn);
+                        if (rateOfReturn * 100 > -(limitRateOfReturn)) {
                             // 比負10還大，就是沒超過，就不買了。foundCostDown都是正值，但實際人認知是負值
                             isCancelToBuy = true;
                             obj.is_buy_cancel = true;
