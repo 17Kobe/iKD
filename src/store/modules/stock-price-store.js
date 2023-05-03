@@ -996,7 +996,7 @@ const stock = {
                 foundStock.policy.result = [];
                 foundStock.policy.result.push(...policyResult);
                 // save to localstorage
-                localStorage.setItem('stockList', JSON.stringify(state.stockList));
+                // localStorage.setItem('stockList', JSON.stringify(state.stockList));
 
                 this.commit('SAVE_STOCK_POLICY_RETURN_RESULT', stockId); // 計算policy且有關報酬率的結果
             }
@@ -1071,7 +1071,7 @@ const stock = {
                         // console.log('====================');
                         // console.log(numberOfBuy);
                         // console.log(limitRateOfReturn);
-                        if (rateOfReturn * 100 > -(limitRateOfReturn)) {
+                        if (rateOfReturn * 100 > -limitRateOfReturn) {
                             // 比負10還大，就是沒超過，就不買了。foundCostDown都是正值，但實際人認知是負值
                             isCancelToBuy = true;
                             obj.is_buy_cancel = true;
@@ -1164,7 +1164,7 @@ const stock = {
 
             foundStock.policy.stats = {};
 
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.commit('SAVE_STOCK_POLICY_RETURN_STATS', stockId);
 
             console.log('SAVE_STOCK_POLICY_RETURN_RESULT OK');
@@ -1243,7 +1243,7 @@ const stock = {
             } else if (_.has(foundStock, 'policy.stats')) {
                 delete foundStock.policy.stats;
             }
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.commit('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE', stockId);
         },
         SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE(state, stockId) {
