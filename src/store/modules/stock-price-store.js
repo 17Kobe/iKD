@@ -321,11 +321,12 @@ const stock = {
 
             let weeklyCostLineData = [];
             if (
-                _.has(foundStock, 'cost') &&
-                _.has(foundStock, 'data.daily') &&
-                foundStock.data.daily.length > 0 &&
-                _.has(foundStock, 'cost.settings')
+                _.has(foundStockWithCost, 'cost') &&
+                _.has(foundStockWithCost, 'data.daily') &&
+                foundStockWithCost.data.daily.length > 0 &&
+                _.has(foundStockWithCost, 'cost.settings')
             ) {
+                console.log('CALC_STOCK_WEEKLY_COST_LINE ING');
                 let i = 0;
                 let averageCost = 0;
                 let sumCost = 0;
@@ -366,13 +367,13 @@ const stock = {
             const foundTempStock = state.tempStockList.find((v) => v.id === stockId);
 
             // 黃金交叉、死亡交叉
-            let policyResult = [];
-
+            let policyResult = null;
             if (
                 (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell')) &&
                 (foundStock.calc_policy_date !== foundStock.last_price_date || !_.has(foundStock, 'policy.result')) // 日期判斷是有可能上回有淨值(此回沒有)，上回卻沒有計算完policy
                 //曾經發現有policy.settings，但都沒有算 policy.result
             ) {
+                policyResult = [];
                 // 訊號開關
                 console.log('SAVE_STOCK_POLICY_RESULT foundStock');
                 let foundKdGold = false;
@@ -873,6 +874,7 @@ const stock = {
                 foundStock.data.weekly_kd = foundStock.data.weekly_kd || []; // 有可能是 null 就變成 []
                 foundStock.data.ma_buy = foundStock.data.ma_buy || []; // 有可能是 null 就變成 [] 第一條MA線
                 foundStock.data.ma_sell = foundStock.data.ma_sell || []; // 有可能是 null 就變成 [] 第二條MA線
+                foundStock.data.cost = foundStock.data.cost || []; // 有可能是 null 就變成 [] 第二條MA線
                 foundStock.last_price = foundStock.last_price || null;
                 foundStock.last_price_date = foundStock.last_price_date || null;
                 foundStock.last_price_spread = foundStock.last_price_spread || null;
@@ -1018,15 +1020,17 @@ const stock = {
                 const targetStock = _.find(state.tempStockList, { id: stockId });
                 if (targetStock) {
                     _.assign(targetStock.data, tempStockListStockData); // 修改 state.tempStockList 資料
-                }
+                }  
             }
 
             const foundStock = state.stockList.find((v) => v.id === stockId);
             const policyResult = await this.dispatch('CALC_STOCK_INDICATORS_RESULT', stockId);
 
-            if (_.has(foundStock, 'policy')) {
+            if (policyResult !== null) {
+                // policyResult 有可能因為是calc一樣所以沒計算，此時就不要去異動 result
                 foundStock.policy.result = [];
                 foundStock.policy.result.push(...policyResult);
+                // foundStock.policy.result.push(...policyResult);
                     // save to localstorage
                     // localStorage.setItem('stockList', JSON.stringify(state.stockList));
                 if (Array.isArray(policyResult) && policyResult.length > 0) {
