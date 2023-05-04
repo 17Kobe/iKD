@@ -100,6 +100,13 @@ const dividend = {
             console.log('SAVE_HISTORY_DIVIDEND_LIST');
             state.historyDividendList = data;
         },
+        DEL_A_STOCK_DIVIDENDLIST(state, data) {
+            // data 是 object {name: XXX, id: XXX}
+            console.log('DEL_A_STOCK_DIVIDENDLIST');
+            // 移除某個自選股
+            _.remove(state.dividendList, (obj) => obj.id === data);
+            localStorage.setItem('dividendList', JSON.stringify(state.dividendList));
+        },
         DELETE_DUPLICATE_HISTORY_DIVIDEND_DATA(state, data) {
             console.log('DELETE_DUPLICATE_HISTORY_DIVIDEND_DATA');
             const isEqual = (obj1, obj2) => {
@@ -297,6 +304,7 @@ const dividend = {
             // 若沒有股數，則加上股數
             tempDividendList.forEach((obj, index) => {
                 const foundStock = _.find(rootState.price.stockList, ['id', obj.id]);
+                // 有可能清掉股票了，但 dividendlist 還保留著，所以要判斷 
                 if (!tempDividendList[index].number_of_shares) tempDividendList[index].number_of_shares = foundStock.cost.total;
             });
             return _.orderBy(tempDividendList, ['trading_date'], ['asc']);

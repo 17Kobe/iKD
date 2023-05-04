@@ -181,6 +181,7 @@ export default {
                 .then(() => {
                     console.log(stockId);
                     this.$store.commit('DEL_A_STOCK', stockId);
+                    this.$store.commit('DEL_A_STOCK_DIVIDENDLIST', stockId);
                     ElMessage({
                         type: 'success',
                         message: '完成刪除!',

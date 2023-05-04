@@ -1034,7 +1034,7 @@ const stock = {
                 }
             }
             // 算完就清除，如此不占用記憶體
-            state.tempStockList = [];
+            _.remove(state.tempStockList, (obj) => obj.id === stockId);
 
             // 刪除台達電
             // _.remove(state.stockList, (obj) => obj.id === '2308');
