@@ -1041,8 +1041,8 @@ const stock = {
             _.remove(state.tempStockList, (obj) => obj.id === stockId);
 
             // 刪除台達電
-            // _.remove(state.stockList, (obj) => obj.id === '2308');
-            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            _.remove(state.stockList, (obj) => obj.id === '2308');
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
 
             console.log('SAVE_STOCK_POLICY_RESULT OK');
         },
