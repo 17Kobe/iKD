@@ -1354,8 +1354,9 @@ const stock = {
         },
         // object of array to filter
         getStock: (state) => (id) => {
-            console.log('getStock');
-            return _.find(state.stockList, ['id', id]);
+            // console.log('getStock');
+            // return _.find(state.stockList, ['id', id]);
+            return state.stockList.find(stock => stock.id === id);
         },
         getStockLastPrice: (state, getters) => (id) => {
             console.log('getStockLastPrice');
