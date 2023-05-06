@@ -83,7 +83,7 @@ export default {
             );
         },
         stockDataOfPolicyResultSell() {
-            console.log('stockDataOfPolicyResultBuy');
+            console.log('stockDataOfPolicyResultSell');
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 需要小於365天，1年
@@ -102,7 +102,7 @@ export default {
             );
         },
         stockDataOfPolicyResultBuyOrSellCancel() {
-            console.log('stockDataOfPolicyResultBuy');
+            console.log('stockDataOfPolicyResultBuyOrSellCancel');
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 需要小於365天，1年
@@ -297,9 +297,7 @@ export default {
                                 )}(<span style="color: #3333ee; font-weight:bold;">${
                                     dayOfWeek[moment(point.x).day()]
                                 }</span>)</div>`;
-                                str += `<div><span style="color: #4286f5; font-weight:bold;">K</span>: ${Number(
-                                    point.y.toFixed(2)
-                                )} `;
+                                str += `<span style="color: #4286f5; font-weight:bold;">K</span>: ${Number(point.y.toFixed(2))} `;
                             } else if (index === 1) {
                                 const found = _.find(
                                     component.stockData.data.weekly,
@@ -310,7 +308,24 @@ export default {
                                 str += `<span style="color: #e75c9a; font-weight:bold;">D</span>: ${Number(
                                     point.y.toFixed(2)
                                 )}<br><span style="color: #834beb; font-weight:bold;">股價</span>: ${found[4]}
-                                </div>`;
+                                `;
+
+                                const foundPolicyResult = _.find(component.stockData.policy.result, {
+                                    date: moment(point.x).format('YYYY-MM-DD'),
+                                });
+                                if (foundPolicyResult) {
+                                    let showSignals = [];
+                                    if (foundPolicyResult.reason.includes('kd_gold')) showSignals.push('[KD黃金]');
+                                    if (foundPolicyResult.reason.includes('kd_dead')) showSignals.push('[KD死亡]');
+                                    if (foundPolicyResult.reason.includes('kd_turn_down')) showSignals.push('[KD下折]');
+                                    if (foundPolicyResult.reason.includes('kd_turn_up')) showSignals.push('[KD上折]');
+                                    if (foundPolicyResult.reason.includes('cost_down')) showSignals.push('[成本價跌過]');
+                                    if (foundPolicyResult.reason.includes('earn')) showSignals.push('[絕對正報酬]');
+                                    if (showSignals.length > 0)
+                                        str += `<br><span style="color: #e75c9a; font-weight:bold;">訊號</span>: ${showSignals.join(
+                                            ', '
+                                        )}`;
+                                }
                             }
                         });
 
