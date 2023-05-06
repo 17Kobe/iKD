@@ -322,7 +322,7 @@ export default {
                                     if (foundPolicyResult.reason.includes('cost_down')) showSignals.push('[成本價跌過]');
                                     if (foundPolicyResult.reason.includes('earn')) showSignals.push('[絕對正報酬]');
                                     if (showSignals.length > 0)
-                                        str += `<br><span style="color: #e75c9a; font-weight:bold;">訊號</span>: ${showSignals.join(
+                                        str += `<br><span style="color: #e75c9a; font-weight:bold;">策略</span>: ${showSignals.join(
                                             ', '
                                         )}`;
                                 }
