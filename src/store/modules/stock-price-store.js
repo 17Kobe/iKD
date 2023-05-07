@@ -751,6 +751,19 @@ const stock = {
             _.remove(state.stockList, (obj) => obj.id === data);
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
+        DEL_10_YEARS_OLD(state, data) {
+            // data 是 object {name: XXX, id: XXX}
+            console.log('DEL_10_YEARS_OLD');
+            _.forEach(state.stockList, (item) => {
+                _.remove(item.data.daily, (daily) => {
+                    const date = moment(daily[0]);
+                    return date.isBefore(moment().subtract(10, 'years'), 'day');
+                });
+            });
+
+            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+        },
+
         SAVE_STOCK_STAR(state, { stockId, star }) {
             // object of array 去 find 並 update
             const found = state.stockList.find((v) => v.id === stockId);

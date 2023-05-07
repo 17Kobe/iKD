@@ -21,6 +21,12 @@
         <el-tooltip class="box-item" effect="dark" content="使用在星期六也要補班的時候" placement="top">
             <el-button type="success" @click="onForceRefresh"><i class="el-icon-refresh-right"></i> 立即更新股價</el-button>
         </el-tooltip>
+        <br />
+        <br />
+        &nbsp;
+        <el-tooltip class="box-item" effect="dark" content="避免手機 localstorage 5M 限制" placement="top">
+            <el-button type="danger" @click="onDel10YearsOld"><i class="el-icon-refresh-right"></i> 刪除10年前舊資料</el-button>
+        </el-tooltip>
         <!-- <br /><br />
         &nbsp;
         <el-tooltip class="box-item" effect="dark" content="當網站的預設基金有增加時，可以執行更新後增加自選股" placement="top">
@@ -249,6 +255,14 @@ export default {
             });
         },
 
+        onDel10YearsOld() {
+            this.$store.commit('DEL_10_YEARS_OLD');
+
+            ElMessage({
+                type: 'success',
+                message: '完成刪除10年前舊資料!',
+            });
+        },
         // onUpdateDefaultStockList() {
         //     console.log(DefaultStockList);
         //     const storeStockList = this.stockList;
