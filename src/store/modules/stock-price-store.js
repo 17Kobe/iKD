@@ -31,7 +31,7 @@ const stock = {
                     // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
                     const stockStartDate = moment(
                         stockDataDaily.length === 0
-                            ? '2010-01-01'
+                            ? moment().subtract(10, 'years').format('YYYY-MM-DD')
                             : moment(stockDataDaily[stockDataDaily.length - 1][0]).add(1, 'days')
                     ).format('YYYY-MM-DD');
 
@@ -650,11 +650,9 @@ const stock = {
                         }
                     }
                 });
-
             }
-            return policyResult
+            return policyResult;
         },
-        
     },
     mutations: {
         SAVE_GLOBAL_SETTINGS(state, data) {
@@ -1020,7 +1018,7 @@ const stock = {
                 const targetStock = _.find(state.tempStockList, { id: stockId });
                 if (targetStock) {
                     _.assign(targetStock.data, tempStockListStockData); // 修改 state.tempStockList 資料
-                }  
+                }
             }
 
             const foundStock = state.stockList.find((v) => v.id === stockId);
@@ -1031,8 +1029,8 @@ const stock = {
                 foundStock.policy.result = [];
                 foundStock.policy.result.push(...policyResult);
                 // foundStock.policy.result.push(...policyResult);
-                    // save to localstorage
-                    // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+                // save to localstorage
+                // localStorage.setItem('stockList', JSON.stringify(state.stockList));
                 if (Array.isArray(policyResult) && policyResult.length > 0) {
                     this.commit('SAVE_STOCK_POLICY_RETURN_RESULT', stockId); // 計算policy且有關報酬率的結果
                 }
@@ -1356,7 +1354,7 @@ const stock = {
         getStock: (state) => (id) => {
             // console.log('getStock');
             // return _.find(state.stockList, ['id', id]);
-            return state.stockList.find(stock => stock.id === id);
+            return state.stockList.find((stock) => stock.id === id);
         },
         getStockLastPrice: (state, getters) => (id) => {
             console.log('getStockLastPrice');
@@ -1370,13 +1368,7 @@ const stock = {
             const found = getters.getStock(id);
             // const found = getters.getStock(id);
             return found.data && found.data.weekly
-                ? found.data.weekly.map((value) => [
-                      moment(value[0]).valueOf(),
-                      value[1],
-                      value[2],
-                      value[3],
-                      value[4],
-                  ])
+                ? found.data.weekly.map((value) => [moment(value[0]).valueOf(), value[1], value[2], value[3], value[4]])
                 : [];
             // kd 一定要去直取 policy，而非取 stock，才能Policy有改有連動
             // getStockPolicy: (state, getters) => (id) => _.has(getters.getStock(id), 'policy') ? getters.getStock(id).policy : null,
@@ -1402,25 +1394,19 @@ const stock = {
             console.log('getStockDataWeeklyMa5');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.ma5
-                ? found.data.ma5.map((value) => [moment(value[0]).valueOf(), value[1]])
-                : [];
+            return found.data && found.data.ma5 ? found.data.ma5.map((value) => [moment(value[0]).valueOf(), value[1]]) : [];
         },
         getStockDataWeeklyMa10: (state, getters) => (id) => {
             console.log('getStockDataWeeklyMa10');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.ma10
-                ? found.data.ma10.map((value) => [moment(value[0]).valueOf(), value[1]])
-                : [];
+            return found.data && found.data.ma10 ? found.data.ma10.map((value) => [moment(value[0]).valueOf(), value[1]]) : [];
         },
         getStockDataWeeklyMa20: (state, getters) => (id) => {
             console.log('getStockDataWeeklyMa20');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.ma20
-                ? found.data.ma20.map((value) => [moment(value[0]).valueOf(), value[1]])
-                : [];
+            return found.data && found.data.ma20 ? found.data.ma20.map((value) => [moment(value[0]).valueOf(), value[1]]) : [];
         },
         getStockDataWeeklyMaBuy: (state, getters) => (id) => {
             console.log('getStockDataWeeklyMaBuy');
@@ -1442,9 +1428,7 @@ const stock = {
             console.log('getStockDataWeeklyCost');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.cost
-                ? found.data.cost.map((value) => [moment(value[0]).valueOf(), value[1]])
-                : [];
+            return found.data && found.data.cost ? found.data.cost.map((value) => [moment(value[0]).valueOf(), value[1]]) : [];
         },
         getStockPolicyMa: (state, getters) => (id) => {
             console.log('getStockPolicyMa');
