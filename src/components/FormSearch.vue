@@ -18,6 +18,8 @@
                     placeholder="輸入股票名稱 或 代號"
                     :remote-method="remoteMethod"
                     :loading="loading"
+                    @hook:mounted="cancelReadOnly"
+                    @visible-change="cancelReadOnly"
                     ref="search"
                 >
                     <el-option v-for="item in stockOptions" :key="item.value" :label="item.label" :value="item.value">
@@ -220,6 +222,15 @@ export default {
             //     sumCost: this.sumCost,
             // });
         },
+        cancelReadOnly(value) {
+            this.$nextTick(() => {
+                if (!value) {
+                    const { search } = this.$refs;
+                    const input = search.$el.querySelector('.el-input__inner');
+                    input.removeAttribute('readonly');
+                }
+            });
+        },
     },
 };
 // 父傳子參考 https://its201.com/article/weixin_49035434/119852222 方法1，的emit似乎 vue 3有改語法而不行了。但方法2沒用 emit仍正常
@@ -228,4 +239,7 @@ export default {
 <style lang="sass" scoped>
 .el-button+.el-button
     margin-left: 5px
+
+.el-input__inner
+    pointer-events: auto
 </style>
