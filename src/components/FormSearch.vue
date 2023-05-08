@@ -89,7 +89,7 @@ export default {
         };
         return {
             isShow: false,
-            title: '新增自選股',
+            title: '新增股票',
 
             loading: false,
             stockOptions: [],

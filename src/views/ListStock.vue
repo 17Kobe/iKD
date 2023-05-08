@@ -494,10 +494,10 @@
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
         <el-button v-if="!showStockAnalysis" style="margin-top: 10px" type="info" plain @click="doShowSearch()"
-            ><i class="el-icon-plus"></i>&nbsp;新增自選股</el-button
+            ><i class="el-icon-plus"></i>&nbsp;股票</el-button
         >
         <el-button v-if="!showStockAnalysis" style="margin-top: 10px" type="info" plain @click="doShowExport()"
-            ><i class="el-icon-place"></i>&nbsp;進階設定</el-button
+            ><i class="el-icon-place"></i>&nbsp;進階功能</el-button
         >
         <br /><br />
         <br /><br />

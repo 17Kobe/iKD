@@ -51,7 +51,7 @@ export default {
     data() {
         return {
             isShow: false,
-            title: '匯出/入 設定檔',
+            title: '進階功能',
         };
     },
     computed: {
