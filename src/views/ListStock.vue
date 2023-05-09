@@ -493,7 +493,7 @@
                 <el-table-column prop="city" label="本益比" width="120" />
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
-        <el-button v-if="!showStockAnalysis" style="margin-top: 10px" type="info" plain @click="doShowSearch()"
+        &nbsp;&nbsp;<el-button v-if="!showStockAnalysis" style="margin-top: 10px" type="info" plain @click="doShowSearch()"
             ><i class="el-icon-plus"></i>&nbsp;股票</el-button
         >
         <el-button v-if="!showStockAnalysis" style="margin-top: 10px" type="info" plain @click="doShowExport()"
