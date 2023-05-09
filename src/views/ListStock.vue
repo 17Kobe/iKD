@@ -283,7 +283,7 @@
                     </el-button>
                 </template>
             </el-table-column>
-            <el-table-column prop="city" label="策略歷史報酬" width="290" align="center">
+            <el-table-column prop="city" label="策略歷史報酬" width="320" align="center">
                 <template #default="scope">
                     <el-popover
                         placement="left-start"
@@ -383,7 +383,7 @@
                             <div>
                                 <div v-if="scope.row.policy && scope.row.policy.stats" style="font-size: 13px">
                                     <el-row>
-                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
+                                        <el-col :span="7" style="padding: 0 0 0 30px; text-align: left"
                                             ><span>賣出次數</span></el-col
                                         >
                                         <el-col :span="5" style="padding: 0; text-align: right"
@@ -394,10 +394,10 @@
                                                 >次</el-tag
                                             ></el-col
                                         >
-                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
+                                        <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
                                             ><span>&nbsp;年化報酬率</span></el-col
                                         >
-                                        <el-col :span="5" style="padding: 0; text-align: right"
+                                        <el-col :span="5" style="padding-right: 20px; text-align: right"
                                             ><el-tag class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
                                                     Number((scope.row.policy.stats.internal_of_return * 100).toFixed(1))
@@ -407,7 +407,7 @@
                                         </el-col>
                                     </el-row>
                                     <el-row>
-                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
+                                        <el-col :span="7" style="padding: 0 0 0 30px; text-align: left"
                                             ><span>每回天數</span></el-col
                                         >
                                         <el-col :span="5" style="padding: 0; text-align: right"
@@ -419,10 +419,10 @@
                                             >
                                         </el-col>
 
-                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
+                                        <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
                                             ><span>&nbsp;每回報酬率</span></el-col
                                         >
-                                        <el-col :span="5" style="padding: 0; text-align: right"
+                                        <el-col :span="5" style="padding-right: 20px; text-align: right"
                                             ><span style="color: #4386f5; font-size: 14px">{{
                                                 Number((scope.row.policy.stats.average_of_returns * 100).toFixed(1))
                                             }}</span
@@ -437,7 +437,7 @@
                                         > -->
                                     </el-row>
                                     <el-row>
-                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
+                                        <el-col :span="7" style="padding: 0 0 0 30px; text-align: left"
                                             ><span>最大賺幅</span></el-col
                                         >
                                         <el-col :span="5" style="padding: 0; text-align: right"
@@ -448,10 +448,10 @@
                                                 >%</el-tag
                                             >
                                         </el-col>
-                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
+                                        <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
                                             ><span>&nbsp;累積報酬率</span></el-col
                                         >
-                                        <el-col :span="5" style="padding: 0; text-align: right"
+                                        <el-col :span="5" style="padding-right: 20px; text-align: right"
                                             ><span style="color: #4386f5; font-size: 14px">{{
                                                 Number((scope.row.policy.stats.sum_of_returns * 100).toFixed(1))
                                             }}</span
@@ -459,7 +459,7 @@
                                         >
                                     </el-row>
                                     <el-row>
-                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
+                                        <el-col :span="7" style="padding: 0 0 0 30px; text-align: left"
                                             ><span>最大賠幅</span></el-col
                                         >
                                         <el-col :span="5" style="padding: 0; text-align: right"
@@ -470,10 +470,10 @@
                                                 >%</el-tag
                                             ></el-col
                                         >
-                                        <el-col :span="7" style="padding: 0 0 0 12px; text-align: left"
+                                        <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
                                             ><span>&nbsp;計算期間</span></el-col
                                         >
-                                        <el-col :span="5" style="padding: 0; text-align: right"
+                                        <el-col :span="5" style="padding-right: 20px; text-align: right"
                                             ><span style="color: #4386f5; font-size: 14px">{{
                                                 Number(scope.row.policy.stats.diff_years.toFixed(1))
                                             }}</span
