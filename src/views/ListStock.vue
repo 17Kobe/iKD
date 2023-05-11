@@ -246,9 +246,9 @@
                                         >買</span
                                     >
                                     <span>
-                                        &nbsp;{{ item.label }}&nbsp;<span style="color: #4386f5; font-size: 14px">{{
-                                            item.limit
-                                        }}</span
+                                        &nbsp;{{ item.label.replace('買', '') }}&nbsp;<span
+                                            style="color: #4386f5; font-size: 14px"
+                                            >{{ item.limit }}</span
                                         >&nbsp;{{ item.limit_desc }}</span
                                     >
                                 </div>
@@ -266,9 +266,9 @@
                                         >賣</span
                                     >
                                     <span>
-                                        &nbsp;{{ item.label }}&nbsp;<span style="color: #4386f5; font-size: 14px">{{
-                                            item.limit
-                                        }}</span
+                                        &nbsp;{{ item.label.replace('賣', '') }}&nbsp;<span
+                                            style="color: #4386f5; font-size: 14px"
+                                            >{{ item.limit }}</span
                                         >&nbsp;{{ item.limit_desc }}</span
                                     >
                                 </div>
@@ -369,11 +369,13 @@
                                     <span v-if="item.reason.includes('kd_turn_up')">KD往 上轉折</span>
                                     <span v-if="item.reason.includes('rsi_over_sold')">RSI 超賣</span>
                                     <span v-if="item.reason.includes('rsi_turn_up')">RSI 往上轉折</span>
+                                    <span v-if="item.reason.includes('annual_fixed_date_buy')">每年固定日買</span>
 
                                     <span v-if="item.reason.includes('kd_dead')">KD 死亡交叉</span>
                                     <span v-if="item.reason.includes('kd_turn_down')">KD 往下轉折</span>
                                     <span v-if="item.reason.includes('rsi_over_bought')">RSI 超買</span>
                                     <span v-if="item.reason.includes('rsi_turn_down')">RSI 往下轉折</span>
+                                    <span v-if="item.reason.includes('annual_fixed_date_sell')">每年固定日賣</span>
 
                                     <span v-if="item.reason.includes('latest')">現在</span>
                                 </span>

@@ -386,12 +386,16 @@ const stock = {
                 let foundRsiTurnDown = false;
                 let foundMaBuy = false;
                 let foundMaSell = false;
+                let foundAnnualFixedDateBuy = false;
+                let foundAnnualFixedDateSell = false;
+
                 if (_.has(foundStock, 'policy.settings.buy')) {
                     foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
                     foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
                     foundRsiOverSold = _.find(foundStock.policy.settings.buy, ['method', 'rsi_over_sold']);
                     foundRsiTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'rsi_turn_up']);
                     foundMaBuy = _.find(foundStock.policy.settings.buy, ['method', 'ma_buy']);
+                    foundAnnualFixedDateBuy = _.find(foundStock.policy.settings.buy, ['method', 'annual_fixed_date_buy']);
                 }
                 if (_.has(foundStock, 'policy.settings.sell')) {
                     foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
@@ -399,6 +403,7 @@ const stock = {
                     foundRsiOverBought = _.find(foundStock.policy.settings.sell, ['method', 'rsi_over_bought']);
                     foundRsiTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'rsi_turn_down']);
                     foundMaSell = _.find(foundStock.policy.settings.sell, ['method', 'ma_sell']);
+                    foundAnnualFixedDateSell = _.find(foundStock.policy.settings.sell, ['method', 'annual_fixed_date_sell']);
                 }
 
                 // KD 相關訊號
@@ -407,6 +412,30 @@ const stock = {
                 let preK = 0;
                 let kdTurnUpReady = false;
                 let kdTurnDownReady = false;
+
+                let preDate = null;
+                if (foundTempStock.data.weekly_kd.length > 0)
+                    preDate = moment(foundTempStock.data.weekly_kd[0][0], 'YYYY-MM-DD').subtract(6, 'days');
+                let annualFixedDateBuyCurrDate = null;
+                if (foundAnnualFixedDateBuy && foundTempStock.data.weekly_kd.length > 0) {
+                    // weekly 是記錄該週最後一天，也有可能星期三，但記著是最後一天
+                    // 固定日期買，正顯要用daily來算，但我想畫在 weekly kd 上，所以在那週範圍的就買了
+                    annualFixedDateBuyCurrDate = moment(
+                        foundTempStock.data.weekly_kd[0][0].substring(0, 4) + '/' + foundAnnualFixedDateBuy.limit,
+                        'YYYY/MM/DD'
+                    );
+                    if (moment(foundTempStock.data.weekly_kd[0][0], 'YYYY-MM-DD').isAfter(annualFixedDateBuyCurrDate))
+                        annualFixedDateBuyCurrDate.add(1, 'years');
+                }
+                let annualFixedDateSellCurrDate = null;
+                if (foundAnnualFixedDateSell && foundTempStock.data.weekly_kd.length > 0) {
+                    annualFixedDateSellCurrDate = moment(
+                        foundTempStock.data.weekly_kd[0][0].substring(0, 4) + '/' + foundAnnualFixedDateSell.limit,
+                        'YYYY/MM/DD'
+                    );
+                    if (moment(foundTempStock.data.weekly_kd[0][0], 'YYYY-MM-DD').isAfter(annualFixedDateSellCurrDate))
+                        annualFixedDateSellCurrDate.add(1, 'years');
+                }
                 foundTempStock.data.weekly_kd.forEach((item, dataIndex) => {
                     const k = item[1];
                     const d = item[2];
@@ -512,6 +541,68 @@ const stock = {
                         }
                     }
                     preK = k;
+
+                    // 固定日期 買進訊號
+                    // length =3 , 0, 1, 2，但到2時就不行
+                    const nextDate =
+                        dataIndex + 1 < foundTempStock.data.weekly_kd.length
+                            ? foundTempStock.data.weekly_kd[dataIndex + 1][0]
+                            : moment(foundTempStock.data.weekly_kd[dataIndex][0], 'YYYY-MM-DD')
+                                  .add(7, 'days')
+                                  .format('YYYY-MM-DD');
+                    // console.log('==================');
+                    // console.log(foundTempStock.data.weekly_kd);
+                    // console.log(dataIndex);
+                    // console.log(item[0]);
+                    // console.log(nextDate);
+                    if (foundAnnualFixedDateBuy) {
+                        if (
+                            // 在該週內的日期就買了
+                            annualFixedDateBuyCurrDate.isAfter(preDate) &&
+                            annualFixedDateBuyCurrDate.isSameOrBefore(moment(item[0], 'YYYY-MM-DD')) &&
+                            moment(nextDate, 'YYYY-MM-DD').isAfter(annualFixedDateBuyCurrDate)
+                        ) {
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
+                            if (index === -1)
+                                policyResult.push({
+                                    date: item[0],
+                                    is_buy: true,
+                                    price: dataWeeklyPrice,
+                                    reason: ['annual_fixed_date_buy'],
+                                });
+                            else {
+                                policyResult[index].is_buy = true;
+                                policyResult[index].reason.push('annual_fixed_date_buy');
+                            }
+                            annualFixedDateBuyCurrDate.add(1, 'years');
+                        }
+                    }
+                    if (foundAnnualFixedDateSell) {
+                        if (
+                            // 在該週內的日期就買了
+                            annualFixedDateSellCurrDate.isAfter(preDate) &&
+                            annualFixedDateSellCurrDate.isSameOrBefore(moment(item[0], 'YYYY-MM-DD')) &&
+                            moment(nextDate, 'YYYY-MM-DD').isAfter(annualFixedDateSellCurrDate)
+                        ) {
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
+                            if (index === -1)
+                                policyResult.push({
+                                    date: item[0],
+                                    is_sell: true,
+                                    price: dataWeeklyPrice,
+                                    reason: ['annual_fixed_date_sell'],
+                                });
+                            else {
+                                policyResult[index].is_sell = true;
+                                policyResult[index].reason.push('annual_fixed_date_sell');
+                            }
+                            annualFixedDateSellCurrDate.add(1, 'years');
+                        }
+                    }
+
+                    preDate = moment(item[0], 'YYYY-MM-DD');
                 });
 
                 // RSI 相關訊號

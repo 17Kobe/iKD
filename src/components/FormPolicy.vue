@@ -14,7 +14,17 @@
                 </el-col>
                 <el-col :xs="8" :sm="6" :md="5" :lg="4" :xl="2" style="padding-left: 3px; position: relative; top: 4px">
                     <el-form-item>
+                        <el-date-picker
+                            v-if="typeof item.limit === 'object'"
+                            v-model="item.limit"
+                            size="small"
+                            type="date"
+                            placeholder="選擇日期"
+                            style="vertical-align: top; width: 100%"
+                        >
+                        </el-date-picker>
                         <el-input
+                            v-else
                             size="small"
                             v-model="item.limit"
                             placeholder="ex: 33.43"
@@ -53,7 +63,12 @@
             <el-row v-for="(item, index) in form.sell" :key="index">
                 <el-col :xs="12" :sm="6" :md="4" :lg="5" :xl="3" style="padding-left: 3px">
                     <el-form-item>
-                        <el-select size="small" v-model="item.method" @change="onChangeSellMethod($event, index)">
+                        <el-select
+                            size="small"
+                            multiple-limit="10"
+                            v-model="item.method"
+                            @change="onChangeSellMethod($event, index)"
+                        >
                             <el-option v-for="item in sellOptions" :key="item.value" :label="item.label" :value="item.value">
                             </el-option>
                         </el-select>
@@ -61,7 +76,17 @@
                 </el-col>
                 <el-col :xs="8" :sm="6" :md="5" :lg="4" :xl="2" style="padding-left: 3px; position: relative; top: 4px">
                     <el-form-item>
+                        <el-date-picker
+                            v-if="typeof item.limit === 'object'"
+                            v-model="item.limit"
+                            size="small"
+                            type="date"
+                            placeholder="選擇日期"
+                            style="vertical-align: top; width: 100%"
+                        >
+                        </el-date-picker>
                         <el-input
+                            v-else
                             size="small"
                             v-model="item.limit"
                             placeholder="ex: 33.43"
@@ -95,6 +120,7 @@
 
 <script>
 import _ from 'lodash';
+import moment from 'moment';
 import { ElMessageBox, ElMessage } from 'element-plus';
 
 export default {
@@ -142,8 +168,14 @@ export default {
                 {
                     value: 'cost_down',
                     label: '搭配 成本價跌超過',
-                    default_limit: '10',
+                    default_limit: 10,
                     default_limit_desc: '% 以上',
+                },
+                {
+                    value: 'annual_fixed_date_buy',
+                    label: '每年固定日買',
+                    default_limit: '10/01',
+                    default_limit_desc: '買',
                 },
                 // {
                 //     value: 'fixed_Date',
@@ -177,24 +209,18 @@ export default {
                     default_limit: 90,
                     default_limit_desc: '以上',
                 },
-                {
-                    value: 'ma_sell',
-                    label: '搭配 MA 均線',
-                    default_limit: 14,
-                    default_limit_desc: '日之下', // 均線之下或均線之上，先做均線之上好了
-                },
+                // {
+                //     value: 'ma_sell',
+                //     label: '搭配 MA 均線',
+                //     default_limit: 14,
+                //     default_limit_desc: '日之下', // 均線之下或均線之上，先做均線之上好了
+                // },
                 {
                     value: 'earn',
                     label: '搭配 絕對正報酬',
                     default_limit: 0,
                     default_limit_desc: '% 以上',
                 },
-                // {
-                //     value: 'Option5',
-                //     label: '每年固定日期',
-                //     default_limit: '2021-10-28',
-                //     default_limit_desc: '',
-                // },
                 {
                     value: 'take_profit',
                     label: '停利',
@@ -206,6 +232,12 @@ export default {
                     label: '停損',
                     default_limit: '10',
                     default_limit_desc: '%',
+                },
+                {
+                    value: 'annual_fixed_date_sell',
+                    label: '每年固定日賣',
+                    default_limit: '5/01',
+                    default_limit_desc: '賣',
                 },
             ],
         };
@@ -319,8 +351,17 @@ export default {
             // console.log(index);
             // 用選到的 method 先找到 value，再去看其它值設進去
             const found = _.find(this.buyOptions, ['value', selValue]);
+
+            // 若有包括 /，則要轉成 日期格式
+            let limit = found.default_limit;
+            if (typeof limit === 'string' && limit.includes('/')) {
+                const year = moment().year();
+                const newDateString = `${year}/${limit}`;
+                limit = moment(newDateString, 'YYYY/MM/DD');
+            }
+
             this.form.buy[index].label = found.label;
-            this.form.buy[index].limit = found.default_limit;
+            this.form.buy[index].limit = limit;
             this.form.buy[index].limit_desc = found.default_limit_desc;
         },
         onChangeSellMethod(selValue, index) {
@@ -328,8 +369,17 @@ export default {
             // console.log(index);
             // 用選到的 method 先找到 value，再去看其它值設進去
             const found = _.find(this.sellOptions, ['value', selValue]);
+
+            // 若有包括 /，則要轉成 日期格式
+            let limit = found.default_limit;
+            if (typeof limit === 'string' && limit.includes('/')) {
+                const year = moment().year();
+                const newDateString = `${year}/${limit}`;
+                limit = moment(newDateString, 'YYYY/MM/DD');
+            }
+
             this.form.sell[index].label = found.label;
-            this.form.sell[index].limit = found.default_limit;
+            this.form.sell[index].limit = limit;
             this.form.sell[index].limit_desc = found.default_limit_desc;
         },
         onInit(stockId) {
@@ -342,14 +392,33 @@ export default {
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定買賣策略`;
 
             // 深拷貝，不然一直畫KD的橫線
-            if (_.has(this.stockData, 'policy.settings')) this.form = _.cloneDeep(this.stockData.policy.settings);
-            else this.form = { buy: [], sell: [] };
+            if (_.has(this.stockData, 'policy.settings')) {
+                this.form = _.cloneDeep(this.stockData.policy.settings);
+                _.forEach([...this.form.buy, ...this.form.sell], (item) => {
+                    if (item.method === 'annual_fixed_date_buy' || item.method === 'annual_fixed_date_sell') {
+                        const year = moment().year();
+                        const newDateString = `${year}/${item.limit}`;
+                        item.limit = moment(newDateString, 'YYYY/MM/DD');
+                    }
+                });
+            } else this.form = { buy: [], sell: [] };
 
             // this.$nextTick(() => {
             // this.$refs.cost0[0].focus();
             // });
         },
         onClosed() {
+            // 將日期轉成 'MM/DD'，方便顯示及計算
+            _.forEach([...this.form.buy, ...this.form.sell], (item) => {
+                if (
+                    (item.method === 'annual_fixed_date_buy' || item.method === 'annual_fixed_date_sell') &&
+                    moment(item.limit).isValid()
+                ) {
+                    const newLimit = moment(item.limit).format('MM/DD');
+                    item.limit = newLimit;
+                }
+            });
+
             this.$store.commit('SAVE_STOCK_POLICY', {
                 stockId: this.stockId,
                 policyList: this.form,
@@ -367,4 +436,6 @@ export default {
     padding: 0 17px 0 4px
 .el-input-group__prepend
     padding: 0 2px !important
+.el-input--small.el-date-editor .el-input__inner
+    padding: 0 17px 0 35px
 </style>
