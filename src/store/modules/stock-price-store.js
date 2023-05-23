@@ -876,7 +876,7 @@ const stock = {
             // save to localstorage
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
         },
-        SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
+        async SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
             console.log('SAVE_STOCK_COST');
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
@@ -896,6 +896,15 @@ const stock = {
 
                 // save to localstorage
             }
+
+            let tempStockListStockData = {};
+            const weekly_data = await this.dispatch('CALC_STOCK_WEEKLY', stockId);
+            tempStockListStockData.weekly = weekly_data;
+            state.tempStockList.push({ id: stockId, data: tempStockListStockData });
+
+            const weekly_cost_line_data = await this.dispatch('CALC_STOCK_WEEKLY_COST_LINE', stockId);
+
+            foundStock.data.cost = _.slice(weekly_cost_line_data, -26);
 
             // save to localstorage
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
