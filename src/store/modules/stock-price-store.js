@@ -1472,7 +1472,13 @@ const stock = {
             const found = getters.getStock(id);
             // const found = getters.getStock(id);
             return found.data && found.data.weekly
-                ? found.data.weekly.map((value) => [moment(value[0]).valueOf(), value[1], value[2], value[3], value[4]])
+                ? _.slice(found.data.weekly, -26).map((value) => [
+                      moment(value[0]).valueOf(),
+                      value[1],
+                      value[2],
+                      value[3],
+                      value[4],
+                  ])
                 : [];
             // kd 一定要去直取 policy，而非取 stock，才能Policy有改有連動
             // getStockPolicy: (state, getters) => (id) => _.has(getters.getStock(id), 'policy') ? getters.getStock(id).policy : null,
@@ -1483,7 +1489,7 @@ const stock = {
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
             return found.data && found.data.weekly_kd
-                ? found.data.weekly_kd.map((value) => [moment(value[0]).valueOf(), value[1], value[2]])
+                ? _.slice(found.data.weekly_kd, -26).map((value) => [moment(value[0]).valueOf(), value[1], value[2]])
                 : [];
         },
         getStockDataWeeklyRsi: (state, getters) => (id) => {
@@ -1491,26 +1497,32 @@ const stock = {
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
             return found.data && found.data.weekly_rsi
-                ? found.data.weekly_rsi.map((value) => [moment(value[0]).valueOf(), value[1]])
+                ? _.slice(found.data.weekly_rsi, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
                 : [];
         },
         getStockDataWeeklyMa5: (state, getters) => (id) => {
             console.log('getStockDataWeeklyMa5');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.ma5 ? found.data.ma5.map((value) => [moment(value[0]).valueOf(), value[1]]) : [];
+            return found.data && found.data.ma5
+                ? _.slice(found.data.ma5, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
+                : [];
         },
         getStockDataWeeklyMa10: (state, getters) => (id) => {
             console.log('getStockDataWeeklyMa10');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.ma10 ? found.data.ma10.map((value) => [moment(value[0]).valueOf(), value[1]]) : [];
+            return found.data && found.data.ma10
+                ? _.slice(found.data.ma10, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
+                : [];
         },
         getStockDataWeeklyMa20: (state, getters) => (id) => {
             console.log('getStockDataWeeklyMa20');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.ma20 ? found.data.ma20.map((value) => [moment(value[0]).valueOf(), value[1]]) : [];
+            return found.data && found.data.ma20
+                ? _.slice(found.data.ma20, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
+                : [];
         },
         getStockDataWeeklyMaBuy: (state, getters) => (id) => {
             console.log('getStockDataWeeklyMaBuy');
@@ -1532,7 +1544,9 @@ const stock = {
             console.log('getStockDataWeeklyCost');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.cost ? found.data.cost.map((value) => [moment(value[0]).valueOf(), value[1]]) : [];
+            return found.data && found.data.cost
+                ? _.slice(found.data.cost, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
+                : [];
         },
         getStockPolicyMa: (state, getters) => (id) => {
             console.log('getStockPolicyMa');
