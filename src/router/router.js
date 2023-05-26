@@ -15,6 +15,14 @@ const router = createRouter({
                 dividend: ListSpreadDividend, // 點到 tab 時，會顯示 router-view 的 name
             },
         },
+        {
+            path: '/clear-localstorage',
+            name: 'clearLocalStorage',
+            beforeEnter: (to, from, next) => {
+                localStorage.clear();
+                next('/');
+            },
+        },
     ],
 });
 
