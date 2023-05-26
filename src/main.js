@@ -19,8 +19,19 @@ import VueNumber from 'vue-number-animation';
 import store from '@/store/store';
 import router from '@/router/router';
 
+import _ from 'lodash';
 import App from '@/App.vue';
+localStorage.clear();
+let localStockList = JSON.parse(localStorage.getItem('stockList')) || [];
 
+// _.remove(localStockList, (obj) => obj.id === '2886');
+// _.remove(localStockList, (obj) => obj.id === 'F0GBR04D20');
+// _.remove(localStockList, (obj) => obj.id === 'F000001V09');
+_.remove(localStockList, (obj) => obj.id === 'F0GBR04K8F');
+_.remove(localStockList, (obj) => obj.id === 'F0GBR04AR8');
+// localStorage.setItem('stockList', JSON.stringify(state.stockList));
+
+localStorage.setItem('stockList', JSON.stringify(localStockList));
 // 因為 series 是股票圖，所以要導入 stock 模組，才能有 type: 'candlestick'
 loadStock(Highcharts);
 loadIndicatorsAll(Highcharts);

@@ -1152,7 +1152,7 @@ const stock = {
             _.remove(state.tempStockList, (obj) => obj.id === stockId);
 
             // 刪除台達電
-            // _.remove(state.stockList, (obj) => obj.id === '2308');
+            // _.remove(state.stockList, (obj) => obj.id === '2886');
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
 
             console.log('SAVE_STOCK_POLICY_RESULT OK');
@@ -1497,6 +1497,11 @@ const stock = {
             console.log('getStockDataWeeklyKd');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
+            console.log(id);
+            console.log(found.data);
+            // console.log(found.data.weekly_kd);
+            if (found.data && found.data.weekly_kd) console.log(found.data.weekly_kd);
+
             return found.data && found.data.weekly_kd
                 ? _.slice(found.data.weekly_kd, -26).map((value) => [moment(value[0]).valueOf(), value[1], value[2]])
                 : [];
