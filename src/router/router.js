@@ -19,6 +19,7 @@ const router = createRouter({
             path: '/clear-localstorage',
             name: 'clearLocalStorage',
             beforeEnter: (to, from, next) => {
+                console.log('clear localstorage');
                 localStorage.clear();
                 next('/');
             },
