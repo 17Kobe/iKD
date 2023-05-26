@@ -72,6 +72,9 @@ Promise.all(urls.map(getPromise)).then(function (stats) {
     // console.log(myLocalstorage);
     // console.log(myLocalstorage);
 
+    _.remove(myLocalstorageStockList, (obj) => obj.id === 'F0GBR04K8F');
+    _.remove(myLocalstorageStockList, (obj) => obj.id === 'F0GBR04AR8');
+
     stats.forEach((price, index) => {
         const foundStock = myLocalstorageStockList.find((obj) => obj.name === fundName[index]);
         foundStock.data = foundStock.data || {};
