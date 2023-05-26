@@ -21,7 +21,7 @@ import router from '@/router/router';
 
 // import _ from 'lodash';
 import App from '@/App.vue';
-localStorage.clear();
+// localStorage.clear();
 // let localStockList = JSON.parse(localStorage.getItem('stockList')) || [];
 
 // _.remove(localStockList, (obj) => obj.id === '2886');
