@@ -111,7 +111,7 @@
                                 ? 'N/A'
                                 : scope.row.cost.rate_of_return >= 1000
                                 ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
-                                : scope.row.cost.rate_of_return.toFixed(1)
+                                : Math.round(scope.row.cost.rate_of_return * 10) / 10
                         }}<span style="margin-left: 2px" v-if="scope.row.cost.rate_of_return !== null">%</span></span
                     >
                 </template>
@@ -124,7 +124,7 @@
                         style="margin: 1px 0px"
                         :type="scope.row.cost.return >= 0 ? 'primary' : 'danger'"
                         ><span style="font-size: 14px; font-weight: bold">
-                            $ {{ scope.row.cost.return.toLocaleString('en-US') }}
+                            $ {{ scope.row.cost.return === 0 ? 0 : scope.row.cost.return.toLocaleString('en-US') }}
                         </span></el-tag
                     >
                 </template>
@@ -380,10 +380,10 @@ export default {
     },
     methods: {
         currencyFormat(number) {
-            return Number(number.toFixed(0)).toLocaleString('en-US');
+            return !number || number === 0 ? '0' : Number(Math.round(number)).toLocaleString('en-US');
         },
         currencyPointFormat(number) {
-            return Number(number.toFixed(1)).toLocaleString('en-US');
+            return !number || number === 0 ? '0' : Number(number.toFixed(1)).toLocaleString('en-US');
         },
     },
 };

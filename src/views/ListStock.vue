@@ -105,14 +105,18 @@
                                         scope.row.cost.return >= 0 ? { color: '#2cc8fb' } : { color: '#f56c70' },
                                         { 'font-size': '13px', 'font-weight': 'bold' },
                                     ]"
-                                    >$ {{ Number(scope.row.cost.return.toFixed(1)).toLocaleString('en-US') }}</span
-                                >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #545454">{{
-                                    scope.row.cost.rate_of_return === null
-                                        ? 'N/A'
-                                        : Math.abs(scope.row.cost.rate_of_return) >= 1000
-                                        ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
-                                        : Number(scope.row.cost.rate_of_return.toFixed(1))
-                                }}</span>
+                                    >$ {{ Number(Math.round(scope.row.cost.return * 10) / 10).toLocaleString('en-US') }}</span
+                                >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #545454"
+                                    >{{
+                                        scope.row.cost.rate_of_return === 0
+                                            ? '0'
+                                            : scope.row.cost.rate_of_return === null
+                                            ? 'N/A'
+                                            : Math.abs(scope.row.cost.rate_of_return) >= 1000
+                                            ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
+                                            : Number(Math.round(scope.row.cost.rate_of_return * 10) / 10)
+                                    }}}</span
+                                >
                                 <span style="color: #999999" v-if="scope.row.cost.rate_of_return !== null">%</span>
                             </span>
                         </el-progress>
