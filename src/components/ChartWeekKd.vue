@@ -309,26 +309,27 @@ export default {
                                     point.y.toFixed(2)
                                 )}<br><span style="color: #834beb; font-weight:bold;">股價</span>: ${found[4]}
                                 `;
-
-                                const foundPolicyResult = _.find(component.stockData.policy.result, {
-                                    date: moment(point.x).format('YYYY-MM-DD'),
-                                });
-                                if (foundPolicyResult) {
-                                    let showSignals = [];
-                                    if (foundPolicyResult.reason.includes('kd_gold')) showSignals.push('[KD黃金]');
-                                    if (foundPolicyResult.reason.includes('kd_dead')) showSignals.push('[KD死亡]');
-                                    if (foundPolicyResult.reason.includes('kd_turn_down')) showSignals.push('[KD下折]');
-                                    if (foundPolicyResult.reason.includes('kd_turn_up')) showSignals.push('[KD上折]');
-                                    if (foundPolicyResult.reason.includes('cost_down')) showSignals.push('[成本未跌過]');
-                                    if (foundPolicyResult.reason.includes('earn')) showSignals.push('[絕對正報酬]');
-                                    if (foundPolicyResult.reason.includes('annual_fixed_date_buy'))
-                                        showSignals.push('[每年固定日買]');
-                                    if (foundPolicyResult.reason.includes('annual_fixed_date_sell'))
-                                        showSignals.push('[每年固定日賣]');
-                                    if (showSignals.length > 0)
-                                        str += `<br><span style="color: #e75c9a; font-weight:bold;">策略</span>: ${showSignals.join(
-                                            ', '
-                                        )}`;
+                                if (component.stockData.policy && component.stockData.policy.result) {
+                                    const foundPolicyResult = _.find(component.stockData.policy.result, {
+                                        date: moment(point.x).format('YYYY-MM-DD'),
+                                    });
+                                    if (foundPolicyResult) {
+                                        let showSignals = [];
+                                        if (foundPolicyResult.reason.includes('kd_gold')) showSignals.push('[KD黃金]');
+                                        if (foundPolicyResult.reason.includes('kd_dead')) showSignals.push('[KD死亡]');
+                                        if (foundPolicyResult.reason.includes('kd_turn_down')) showSignals.push('[KD下折]');
+                                        if (foundPolicyResult.reason.includes('kd_turn_up')) showSignals.push('[KD上折]');
+                                        if (foundPolicyResult.reason.includes('cost_down')) showSignals.push('[成本未跌過]');
+                                        if (foundPolicyResult.reason.includes('earn')) showSignals.push('[絕對正報酬]');
+                                        if (foundPolicyResult.reason.includes('annual_fixed_date_buy'))
+                                            showSignals.push('[每年固定日買]');
+                                        if (foundPolicyResult.reason.includes('annual_fixed_date_sell'))
+                                            showSignals.push('[每年固定日賣]');
+                                        if (showSignals.length > 0)
+                                            str += `<br><span style="color: #e75c9a; font-weight:bold;">策略</span>: ${showSignals.join(
+                                                ', '
+                                            )}`;
+                                    }
                                 }
                             }
                         });

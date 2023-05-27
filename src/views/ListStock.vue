@@ -495,17 +495,10 @@
                 <el-table-column prop="city" label="本益比" width="120" />
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
-        &nbsp;&nbsp;<el-button v-if="!showStockAnalysis" style="margin-top: 10px" type="info" plain @click="doShowSearch()"
-            ><i class="el-icon-plus"></i>&nbsp;股票</el-button
-        >
-        <el-button v-if="!showStockAnalysis" style="margin-top: 10px" type="info" plain @click="doShowExport()"
-            ><i class="el-icon-place"></i>&nbsp;進階功能</el-button
-        >
         <br /><br />
-        <br /><br />
+        <br />
         <FormCost ref="childFormCost" />
         <FormPolicy ref="childFormPolicy" />
-        <FormSearch ref="childFormSearch" />
         <FormExport ref="childFormExport" />
     </div>
 </template>
@@ -518,8 +511,6 @@ import ChartWeekRsi from '@/components/ChartWeekRsi.vue';
 import ChartWeekK from '@/components/ChartWeekK.vue';
 import FormCost from '@/components/FormCost.vue';
 import FormPolicy from '@/components/FormPolicy.vue';
-import FormSearch from '@/components/FormSearch.vue';
-import FormExport from '@/components/FormExport.vue';
 import StockAnalysis from '@/components/StockAnalysis.vue';
 import DefaultStockList from '../store/data/default-stock-list.json';
 import GlobalSettings from '../store/data/global-settings.json';
@@ -528,7 +519,7 @@ import GlobalSettings from '../store/data/global-settings.json';
 
 export default {
     name: 'component-list',
-    components: { ChartWeekKd, ChartWeekRsi, ChartWeekK, FormCost, FormPolicy, FormSearch, FormExport, StockAnalysis },
+    components: { ChartWeekKd, ChartWeekRsi, ChartWeekK, FormCost, FormPolicy, StockAnalysis },
     data() {
         return {
             // rateOfReturn: 0,
@@ -686,17 +677,6 @@ export default {
             // 父傳一堆變數給子也不太好
             // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
             this.$refs.childFormPolicy.onInit(id);
-        },
-        doShowSearch() {
-            // console.log(this.$refs);
-            // 父改子去顯示 drawer 變數 不好，子要被改值
-            // 父傳一堆變數給子也不太好
-            // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
-            this.$store.dispatch('GET_TAIWAN_STOCK');
-            this.$refs.childFormSearch.onInit();
-        },
-        doShowExport() {
-            this.$refs.childFormExport.onInit();
         },
         onChangeStar(selValue, index) {
             this.$store.commit('SAVE_STOCK_STAR', { stockId: index, star: selValue });

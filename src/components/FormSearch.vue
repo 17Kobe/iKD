@@ -67,6 +67,37 @@
             </el-table-column>
         </el-table>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;總數量：{{ customStockList.length }}
+        <br />
+        <br />
+        <br />
+        <el-collapse>
+            <el-collapse-item title="&nbsp;&nbsp;&nbsp;&nbsp;進階設定">
+                &nbsp;&nbsp;<el-button type="warning" @click="onUploadSync"
+                    ><i class="el-icon-upload2"></i> 上傳同步資料</el-button
+                >
+                <br />
+                <br />
+                &nbsp;&nbsp;<el-button type="warning" @click="onDownloadSync"
+                    ><i class="el-icon-download"></i> 下載同步資料</el-button
+                >
+                <br />
+                <br />
+                &nbsp;
+                <el-tooltip class="box-item" effect="dark" content="使用在星期六也要補班的時候" placement="top">
+                    <el-button type="success" @click="onForceRefresh"
+                        ><i class="el-icon-refresh-right"></i> 立即更新股價</el-button
+                    >
+                </el-tooltip>
+                <br />
+                <br />
+                &nbsp;
+                <el-tooltip class="box-item" effect="dark" content="避免手機 localstorage 5M 限制" placement="top">
+                    <el-button type="danger" @click="onDel10YearsOld"
+                        ><i class="el-icon-refresh-right"></i> 刪除10年前舊資料</el-button
+                    >
+                </el-tooltip>
+            </el-collapse-item>
+        </el-collapse>
     </el-drawer>
 </template>
 
@@ -229,6 +260,139 @@ export default {
                     const input = search.$el.querySelector('.el-input__inner');
                     input.removeAttribute('readonly');
                 }
+            });
+        },
+        async onUploadSync() {
+            console.log('onUploadSync');
+            try {
+                const cathy = this.createCathy();
+                // 取得 localstorage 中的資料
+                const GITHUB_ACCESS_TOKEN = CryptoJS.AES.decrypt(
+                    'U2FsdGVkX1/f4v8wb4AfQPIrmo7wQJBv7EnT8VZ8qX1cbglnDPNZL9n87xZvyuPPifZLkkDBAIKf8wAnWaMXHQ==',
+                    cathy.getKobe()
+                ).toString(CryptoJS.enc.Utf8);
+
+                // const dataString = JSON.stringify(window.localStorage); // 舊作法會在 value 時出現 /"，因為 value 都是字串，而非JSON物件
+                // 正確應先 parse 好正確的 JSON 物件，其中 key==='crawlerDividendLastDate' 是字串
+                const data = {};
+                for (let key in window.localStorage) {
+                    if (key === 'crawlerDividendLastDate') data[key] = localStorage.getItem(key);
+                    // localStorage 會有這些key
+                    else if (
+                        key !== 'length' &&
+                        key !== 'clear' &&
+                        key !== 'getItem' &&
+                        key !== 'key' &&
+                        key !== 'removeItem' &&
+                        key !== 'setItem'
+                    )
+                        data[key] = JSON.parse(localStorage.getItem(key));
+                }
+                const dataString = JSON.stringify(data);
+
+                console.log(dataString);
+
+                // 將資料轉換成 Blob 物件
+                const blob = new Blob([dataString], { type: 'application/json' });
+
+                // 讀取 Blob 內容，並使用 FileReader 轉換成 Base64 編碼
+                const reader = new FileReader();
+                reader.readAsDataURL(blob);
+                reader.onloadend = async () => {
+                    // 取得現有檔案的 SHA 值
+                    const url = 'https://api.github.com/repos/17Kobe/iKD/contents/assets/data/my_localstorage.json';
+                    const response = await axios.get(url, {
+                        headers: {
+                            Authorization: `Bearer ${GITHUB_ACCESS_TOKEN}`,
+                        },
+                        params: {
+                            ref: 'gh-pages', // 指定分支為 gh-pages
+                        },
+                    });
+                    console.log(response);
+                    const sha = response.data.sha;
+
+                    // 在這裡上傳到 Github
+                    const contentBase64 = reader.result.split(',')[1];
+                    const uploadResponse = await axios.put(
+                        'https://api.github.com/repos/17Kobe/iKD/contents/assets/data/my_localstorage.json',
+                        {
+                            message: 'Upload iKD localstorage data',
+                            content: contentBase64,
+                            sha: sha,
+                            branch: 'gh-pages',
+                        },
+                        {
+                            headers: {
+                                Authorization: `Bearer ${GITHUB_ACCESS_TOKEN}`,
+                            },
+                        }
+                    );
+                    console.log(uploadResponse);
+                    ElMessage({
+                        type: 'success',
+                        message: '完成上傳同步資料至線上!',
+                    });
+                };
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        onDownloadSync() {
+            console.log('onDownloadSync');
+            ElMessageBox.confirm(`確認將要同步線上的所有資料，本地資料會消失?`, '同步', {
+                confirmButtonText: '同步',
+                cancelButtonText: '取消',
+                type: 'warning',
+            })
+                .then(() => {
+                    // 清除 localStorage 資料
+                    localStorage.clear();
+
+                    // 載入 JSON 資料，後面加日期是為了避免手機用快取下載，而非真正抓最新的資料
+                    const url = 'https://17kobe.github.io/iKD/assets/data/my_localstorage.json?' + new Date().getTime();
+                    fetch(url)
+                        .then((response) => response.json())
+                        .then((data) => {
+                            // 將 JSON 資料存儲到 localStorage
+                            try {
+                                for (const key in data) {
+                                    if (key === 'crawlerDividendLastDate') localStorage.setItem(key, data[key]);
+                                    else localStorage.setItem(key, JSON.stringify(data[key]));
+                                }
+                                ElMessage({
+                                    type: 'success',
+                                    message: '完成同步線上的所有資料!',
+                                });
+                                location.reload();
+                            } catch (e) {
+                                console.log('localStorage 儲存失敗：', e);
+                            }
+                        })
+                        .catch((error) => console.error(error));
+                })
+                .catch(() => {
+                    ElMessage({
+                        type: 'info',
+                        message: '取消同步線上的所有資料!',
+                    });
+                });
+        },
+        onForceRefresh() {
+            this.$store.dispatch('GET_STOCK_PRICE', true);
+
+            ElMessage({
+                type: 'success',
+                message: '完成立即更新股價!',
+            });
+        },
+
+        onDel10YearsOld() {
+            this.$store.commit('DEL_10_YEARS_OLD');
+
+            ElMessage({
+                type: 'success',
+                message: '完成刪除10年前舊資料!',
             });
         },
     },
