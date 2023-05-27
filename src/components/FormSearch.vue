@@ -262,6 +262,16 @@ export default {
                 }
             });
         },
+        createCathy() {
+            let elva = '';
+
+            return {
+                getKobe: function () {
+                    elva = '5KZ493uKLWlakctmu9NAzQ012VUgpZ1iwE4u';
+                    return elva;
+                },
+            };
+        },
         async onUploadSync() {
             console.log('onUploadSync');
             try {
