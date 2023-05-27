@@ -104,6 +104,7 @@
 <script>
 import _ from 'lodash';
 import { ElMessageBox, ElMessage } from 'element-plus';
+import CryptoJS from 'crypto-js';
 
 export default {
     name: 'component-form-search',
