@@ -349,11 +349,12 @@ export default {
                         fillColor: 'rgba(54, 162, 235, 0.2)', // 設定填滿顏色
                         data: this.cost,
                         // dashStyle: 'ShortDash',
-                        step: 'left',
+                        step: 'right',
                         threshold: null, // 設置為 null，使 Y 軸動態範圍與其他圖表類型相同。否則會從0開始
                         dataGrouping: {
                             // anchor: 'end',
                             // firstAnchor: 'end',
+                            // lastAnchor: 'lastPoint',
                             lastAnchor: 'lastPoint',
                             units: [['day', [1]]],
                         },
