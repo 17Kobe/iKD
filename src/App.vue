@@ -10,16 +10,16 @@
         </main>
         <footer class="footer">
             <el-menu default-active="default" :router="false" mode="horizontal" active-text-color="#409EFF">
-                <el-menu-item index="default" @click="onMenuItemClick('default')" style="padding: 0 18px">
+                <el-menu-item index="default" @click="onMenuItemClick('default')" style="padding: 0 16px">
                     <i class="el-icon-star-off" style="position: relative; top: -2px"></i>自選股　
                 </el-menu-item>
-                <el-menu-item index="dividend" @click="onMenuItemClick('dividend')" style="padding: 0 18px">
+                <el-menu-item index="dividend" @click="onMenuItemClick('dividend')" style="padding: 0 16px">
                     <i class="el-icon-sugar" style="position: relative; top: -2px"></i>價差股利
                 </el-menu-item>
-                <el-menu-item index="asset" @click="onMenuItemClick('asset')" style="padding: 0 18px">
+                <el-menu-item index="asset" @click="onMenuItemClick('asset')" style="padding: 0 16px">
                     <i class="el-icon-pie-chart" style="position: relative; top: -2px"></i>資產表
                 </el-menu-item>
-                <el-menu-item index="add" @click="doShowSearch()" style="padding: 0 18px">
+                <el-menu-item index="add" @click="doShowSearch()" style="padding: 0 16px">
                     <i class="el-icon-circle-plus-outline" style="position: relative; top: -2px"></i>
                 </el-menu-item>
             </el-menu>
