@@ -106,17 +106,15 @@
                                         { 'font-size': '13px', 'font-weight': 'bold' },
                                     ]"
                                     >$ {{ Number(Math.round(scope.row.cost.return * 10) / 10).toLocaleString('en-US') }}</span
-                                >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #545454"
-                                    >{{
-                                        scope.row.cost.rate_of_return === 0
-                                            ? '0'
-                                            : scope.row.cost.rate_of_return === null
-                                            ? 'N/A'
-                                            : Math.abs(scope.row.cost.rate_of_return) >= 1000
-                                            ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
-                                            : Number(Math.round(scope.row.cost.rate_of_return * 10) / 10)
-                                    }}}</span
-                                >
+                                >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #545454">{{
+                                    scope.row.cost.rate_of_return === 0
+                                        ? '0'
+                                        : scope.row.cost.rate_of_return === null
+                                        ? 'N/A'
+                                        : Math.abs(scope.row.cost.rate_of_return) >= 1000
+                                        ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
+                                        : Number(Math.round(scope.row.cost.rate_of_return * 10) / 10)
+                                }}</span>
                                 <span style="color: #999999" v-if="scope.row.cost.rate_of_return !== null">%</span>
                             </span>
                         </el-progress>
