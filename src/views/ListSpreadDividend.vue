@@ -383,7 +383,7 @@ export default {
             return !number || number === 0 ? '0' : Number(Math.round(number)).toLocaleString('en-US');
         },
         currencyPointFormat(number) {
-            return !number || number === 0 ? '0' : Number(number.toFixed(1)).toLocaleString('en-US');
+            return !number || number === 0 ? '0' : Number(Math.round(number * 10) / 10).toLocaleString('en-US');
         },
     },
 };
