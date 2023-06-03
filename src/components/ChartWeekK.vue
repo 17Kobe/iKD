@@ -84,8 +84,41 @@ export default {
         //     console.log('ma_policy');
         //     return this.$store.getters.getStockPolicyMa(this.parentData);
         // },
+        chartMinMaxValues() {
+            // 用 minValue及 maxValue 來判斷，若maxValue<100，則用小數2位數。minValue>=100則用小數0位數
+            const ohlcHighValues = this.ohlc.map((value) => value[2]);
+            const ohlcLowValues = this.ohlc.map((value) => value[3]);
+            const ma5Values = this.ma5.map((value) => value[1]);
+            const ma10Values = this.ma10.map((value) => value[1]);
+            const ma20Values = this.ma20.map((value) => value[1]);
+            const costValues = this.cost.map((value) => value[1]);
+
+            const allHighValues = [...ohlcHighValues, ...ma5Values, ...ma10Values, ...ma20Values, ...costValues];
+            const allLowValues = [...ohlcLowValues, ...ma5Values, ...ma10Values, ...ma20Values, ...costValues];
+            const minValue = Math.min(...allLowValues);
+            const maxValue = Math.max(...allHighValues);
+
+            let tickMin;
+            let tickMax;
+
+            if (maxValue < 100) {
+                tickMin = Math.floor(minValue * 100) / 100;
+                tickMax = Math.ceil(maxValue * 100) / 100;
+            } else if (minValue >= 100) {
+                tickMin = Math.floor(minValue);
+                tickMax = Math.ceil(maxValue);
+            } else {
+                const decimalPlaces = 2;
+                const multiplier = Math.pow(10, decimalPlaces);
+                tickMin = Math.floor(minValue * multiplier) / multiplier;
+                tickMax = Math.ceil(maxValue * multiplier) / multiplier;
+            }
+
+            return { tickMin, tickMax };
+        },
         chartOptions() {
             const component = this;
+            const { tickMin, tickMax } = this.chartMinMaxValues;
             return {
                 chart: {
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
@@ -133,6 +166,7 @@ export default {
                         lineColor: '#4f9900',
                         // 紅棒上下的線
                         upLineColor: '#af0b0b', // docs
+                        pointWidth: 4, // 設定每個紅黑棒的寬度，以像素為單位
                     },
                 },
                 rangeSelector: {
@@ -260,29 +294,27 @@ export default {
                         // 調整 y 軸 tick的間距，運用到高度最大化，不浪費
                         tickPositioner() {
                             const positions = [];
-                            // 一開始時 dataMax 及 dataMin會是null，然後再用 toFixed就會有錯，所以加 if 來避免
-                            if (this.dataMin && this.dataMax) {
-                                let tick = 0;
-                                let increment = (this.dataMax - this.dataMin) / 2;
-                                // const max = this.dataMax;
-                                const min = this.dataMin;
-                                if (this.dataMin > 20 && increment > 1) {
-                                    increment = Math.ceil(increment);
-                                    tick = Math.floor(this.dataMin);
-                                    for (tick; tick <= this.dataMax + increment / 2; tick += increment) {
-                                        // let tmpTick = tick;
-                                        // if (tick > this.dataMax) tmpTick = this.dataMax + increment / 10;
-                                        // positions.push(tmpTick);
-                                        positions.push(tick);
-                                    }
+                            const tickCount = 4; // 刻度數量
+                            const tickInterval = (tickMax - tickMin) / (tickCount - 1); // 計算刻度間隔
+
+                            // 取得最大的小數位數
+                            const decimalPlaces = Math.max(
+                                tickMax.toString().split('.')[1]?.length || 0,
+                                tickMin.toString().split('.')[1]?.length || 0
+                            );
+
+                            for (let i = 0; i < tickCount; i++) {
+                                let tickValue;
+                                if (i === 3) {
+                                    tickValue = tickMax;
                                 } else {
-                                    tick = Number(min.toFixed(1));
-                                    increment = Number(increment.toFixed(3));
-                                    for (tick; tick - increment <= this.dataMax; tick += increment) {
-                                        positions.push(Number(tick.toFixed(2)));
-                                    }
+                                    tickValue = tickMin + i * tickInterval;
                                 }
+
+                                tickValue = Number(tickValue.toFixed(decimalPlaces)); // 將刻度值限制小數位數
+                                positions.push(tickValue);
                             }
+
                             return positions;
                         },
                     },
