@@ -129,13 +129,25 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="週RSI" width="230" align="center" :visible="!isMobile" v-if="!isMobile">
+            <el-table-column
+                label="週RSI"
+                width="230"
+                align="center"
+                :visible="!isMobile || showWeekRSI"
+                v-if="showWeekRSI || !isMobile"
+            >
+                <template #header>
+                    <span @click="toggleWeekRSI">週RSI</span>
+                </template>
                 <template #default="scope">
                     <ChartWeekRsi :parentData="scope.row.id" />
                 </template>
             </el-table-column>
 
-            <el-table-column label="週K線" width="250" align="center">
+            <el-table-column label="週K線" width="250" align="center" v-if="showWeekK">
+                <template #header>
+                    <span @click="toggleWeekK">週K線</span>
+                </template>
                 <template #default="scope">
                     <ChartWeekK :parentData="scope.row.id" />
                     <!-- <ChartWeekK :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
@@ -530,6 +542,8 @@ export default {
             showStockAnalysis: false,
             queueStockDataList: [],
             isMobile: true, // 預設要先隱藏再顯示，否則手機看有的股票的KD會拉長
+            showWeekK: true,
+            showWeekRSI: false,
             currentStockId: null,
         };
     },
@@ -690,6 +704,14 @@ export default {
         goToStockAnalysis(id) {
             this.showStockAnalysis = true;
             this.currentStockId = id;
+        },
+        toggleWeekK() {
+            this.showWeekK = !this.showWeekK;
+            this.showWeekRSI = !this.showWeekRSI;
+        },
+        toggleWeekRSI() {
+            this.showWeekRSI = !this.showWeekRSI;
+            this.showWeekK = !this.showWeekK;
         },
     },
 };
