@@ -1498,8 +1498,8 @@ const stock = {
             // getStockPolicy: (state, getters) => (id) => _.has(getters.getStock(id), 'policy') ? getters.getStock(id).policy : null,
             // _.has(_.find(state.stockList, ['id', id]), 'policy') ? _.find(state.stockList, ['id', id]).policy : null,
         },
-        getStockDataWeeklyKd: (state, getters) => (id) => {
-            console.log('getStockDataWeeklyKd');
+        getStockDataWeeklyKdj: (state, getters) => (id) => {
+            console.log('getStockDataWeeklyKdj');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
             console.log(id);
@@ -1508,11 +1508,11 @@ const stock = {
             if (found.data && found.data.weekly_kdj) console.log(found.data.weekly_kdj);
 
             return found.data && found.data.weekly_kdj
-                ? _.slice(found.data.weekly_kdj, -26).map((value) => [moment(value[0]).valueOf(), value[1], value[2]])
+                ? _.slice(found.data.weekly_kdj, -26).map((value) => [moment(value[0]).valueOf(), value[1], value[2], value[3]])
                 : [];
         },
         getStockDataWeeklyRsi: (state, getters) => (id) => {
-            console.log('getStockDataWeeklyKd');
+            console.log('getStockDataWeeklyRsi');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
             return found.data && found.data.weekly_rsi

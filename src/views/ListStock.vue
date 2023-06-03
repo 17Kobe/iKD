@@ -124,7 +124,7 @@
 
             <el-table-column label="週KD" width="230" align="center">
                 <template #default="scope">
-                    <ChartWeekKd :parentData="scope.row.id" />
+                    <ChartWeekKdj :parentData="scope.row.id" />
                     <!-- <ChartWeekKd :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
                 </template>
             </el-table-column>
@@ -520,7 +520,7 @@
 <script>
 import _ from 'lodash';
 import moment from 'moment';
-import ChartWeekKd from '@/components/ChartWeekKd.vue';
+import ChartWeekKdj from '@/components/ChartWeekKdj.vue';
 import ChartWeekRsi from '@/components/ChartWeekRsi.vue';
 import ChartWeekK from '@/components/ChartWeekK.vue';
 import FormCost from '@/components/FormCost.vue';
@@ -533,7 +533,7 @@ import GlobalSettings from '../store/data/global-settings.json';
 
 export default {
     name: 'component-list',
-    components: { ChartWeekKd, ChartWeekRsi, ChartWeekK, FormCost, FormPolicy, StockAnalysis },
+    components: { ChartWeekKdj, ChartWeekRsi, ChartWeekK, FormCost, FormPolicy, StockAnalysis },
     data() {
         return {
             // rateOfReturn: 0,

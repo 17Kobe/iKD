@@ -7,9 +7,10 @@
             style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 80px; left: 97px; font-size: 12px" v-if="k && k.length > 0">
+        <div style="position: absolute; top: 80px; left: 75px; font-size: 12px" v-if="k && k.length > 0">
             <span style="color: #4286f5">K</span>: {{ k[k.length - 1][1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
-            {{ d[d.length - 1][1].toFixed(2) }}
+            {{ d[d.length - 1][1].toFixed(2) }} <span style="color: #febd09">J</span>:
+            {{ j[j.length - 1][1].toFixed(2) }}
         </div>
 
         <!-- :updateArgs="[true, true, true]" -->
@@ -33,10 +34,31 @@ export default {
     computed: {
         // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
         k() {
-            return this.stockDataOfKdPrice.map((value) => [value[0], value[1]]);
+            return this.stockDataOfKdjPrice.map((value) => [value[0], value[1]]);
         },
         d() {
-            return this.stockDataOfKdPrice.map((value) => [value[0], value[2]]);
+            return this.stockDataOfKdjPrice.map((value) => [value[0], value[2]]);
+        },
+        j() {
+            return this.stockDataOfKdjPrice.map((value) => [value[0], value[3]]);
+        },
+        // 如果您希望最大值和最小值使用天花板和地板的十進位值，而不使用偏移量，您可以將 chartMinMaxValues 函數修改如下：
+        chartMinMaxValues() {
+            const kValues = this.k.map((value) => value[1]);
+            const dValues = this.d.map((value) => value[1]);
+            const jValues = this.j.map((value) => value[1]);
+
+            const allValues = [...kValues, ...dValues, ...jValues];
+            const minValue = Math.min(...allValues);
+            const maxValue = Math.max(...allValues);
+
+            // 最小值使用地板的十進位值
+            const tickMin = Math.floor(minValue / 10) * 10;
+
+            // 最大值使用天花板的十進位值
+            const tickMax = Math.ceil(maxValue / 10) * 10;
+
+            return { tickMin, tickMax };
         },
         stockData() {
             console.log('stockData');
@@ -44,8 +66,8 @@ export default {
             return this.$store.getters.getStock(this.parentData);
         },
 
-        stockDataOfKdPrice() {
-            console.log('stockDataOfKdPrice');
+        stockDataOfKdjPrice() {
+            console.log('stockDataOfKdjPrice');
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 只取出最後52筆的週KD資料出來，約1年，因為1年52週
@@ -59,7 +81,7 @@ export default {
             //         ])) ||
             //     []
             // );
-            return this.$store.getters.getStockDataWeeklyKd(this.parentData);
+            return this.$store.getters.getStockDataWeeklyKdj(this.parentData);
         },
 
         stockDataOfPolicyResultBuy() {
@@ -166,6 +188,8 @@ export default {
         chartOptions() {
             // component 參考 https://stackoverflow.com/questions/68381856/how-to-access-highcharts-stock-tooltip-data-in-vue
             const component = this;
+            const { tickMin, tickMax } = this.chartMinMaxValues;
+
             let plotBands = [];
             if (this.kdTurnDownLmit !== -999) {
                 plotBands.push({
@@ -369,10 +393,9 @@ export default {
                 },
                 yAxis: [
                     {
-                        min: 0,
-                        max: 100,
+                        min: tickMin, // 設定 y 軸的最小值
+                        max: tickMax, // 設定 y 軸的最大值
                         plotBands: plotBands,
-                        startOnTick: false,
                         showLastLabel: true,
                         // endOnTick: false,
                         resize: {
@@ -381,27 +404,23 @@ export default {
                         // 調整 y 軸 tick的間距，運用到高度最大化，不浪費
                         tickPositioner() {
                             const positions = [];
-                            // 一開始時 dataMax 及 dataMin會是null，然後再用 toFixed就會有錯，所以加 if 來避免
-                            if (this.dataMin && this.dataMax) {
-                                let tick = 0;
-                                let increment = (this.dataMax - this.dataMin) / 2;
-                                // const max = this.dataMax;
-                                const min = this.dataMin;
-                                if (increment > 1) {
-                                    increment = Math.ceil(increment);
-                                    tick = Math.floor(this.dataMin);
-                                    for (tick; tick - increment <= this.dataMax; tick += increment) {
-                                        if (tick > 100) tick = 100;
-                                        else if (tick < 0) tick = 0;
-                                        positions.push(tick);
-                                    }
+                            const tickCount = 4; // 刻度數量
+
+                            const tickInterval = Math.ceil((tickMax - tickMin) / (tickCount - 1)); // 計算刻度間隔
+
+                            for (let i = 0; i < tickCount; i++) {
+                                let tickValue;
+
+                                if (i === 1 || i === 2) {
+                                    tickValue = Math.round(tickMin + i * tickInterval); // 四捨五入到下一個個位數是0十位數是上述的值
+                                    tickValue = Math.ceil(tickValue / 10) * 10; // 取十位數
+                                } else if (i === 3) {
+                                    tickValue = tickMax;
                                 } else {
-                                    tick = Number(min.toFixed(1));
-                                    increment = Number(increment.toFixed(3));
-                                    for (tick; tick - increment <= this.dataMax; tick += increment) {
-                                        positions.push(Number(tick.toFixed(2)));
-                                    }
+                                    tickValue = tickMin + i * tickInterval;
                                 }
+
+                                positions.push(tickValue);
                             }
                             return positions;
                         },
@@ -419,9 +438,14 @@ export default {
                         data: this.d,
                     },
                     {
+                        name: 'J線',
+                        color: '#febd09',
+                        data: this.j,
+                    },
+                    {
                         type: 'scatter',
 
-                        color: 'rgba(223, 83, 83, 0.9',
+                        color: 'rgba(223, 83, 83, 0.9)',
 
                         marker: {
                             symbol: 'circle',
@@ -433,7 +457,7 @@ export default {
                     {
                         type: 'scatter',
 
-                        color: 'rgba(82, 157, 1, 0.9',
+                        color: 'rgba(82, 157, 1, 0.9)',
 
                         marker: {
                             symbol: 'circle',
@@ -445,7 +469,7 @@ export default {
                     {
                         type: 'scatter',
 
-                        color: 'rgba(153, 153, 153, 0.9',
+                        color: 'rgba(153, 153, 153, 0.9)',
 
                         marker: {
                             symbol: 'circle',
