@@ -329,9 +329,17 @@ export default {
                                 );
 
                                 // 取得該股價並且顯示
-                                str += `<span style="color: #e75c9a; font-weight:bold;">D</span>: ${Number(
+                                str += `<span style="color: #e75c9a; font-weight:bold;">D</span>: ${Number(point.y.toFixed(2))}`;
+                            } else if (index === 2) {
+                                const found = _.find(
+                                    component.stockData.data.weekly,
+                                    (array) => array[0] === moment(point.x).format('YYYY-MM-DD')
+                                );
+
+                                // 取得該股價並且顯示
+                                str += `<br><span style="color: #febd09; font-weight:bold;">J</span>: ${Number(
                                     point.y.toFixed(2)
-                                )}<br><span style="color: #834beb; font-weight:bold;">股價</span>: ${found[4]}
+                                )} <span style="color: #834beb; font-weight:bold;">股價</span>: ${found[4]}
                                 `;
                                 if (component.stockData.policy && component.stockData.policy.result) {
                                     const foundPolicyResult = _.find(component.stockData.policy.result, {

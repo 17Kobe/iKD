@@ -122,7 +122,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="週KD" width="230" align="center">
+            <el-table-column label="週KDJ" width="230" align="center">
                 <template #default="scope">
                     <ChartWeekKdj :parentData="scope.row.id" />
                     <!-- <ChartWeekKd :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
