@@ -51,8 +51,8 @@ export default {
             // 只取出最後52筆的週KD資料出來，約1年，因為1年52週
             // return (
             //     (this.stockData.data &&
-            //         this.stockData.data.weekly_kd &&
-            //         _.slice(this.stockData.data.weekly_kd, -52).map((value) => [
+            //         this.stockData.data.weekly_kdj &&
+            //         _.slice(this.stockData.data.weekly_kdj, -52).map((value) => [
             //             moment(value[0]).valueOf(),
             //             value[1],
             //             value[2],

@@ -219,8 +219,8 @@ const stock = {
             return _.reverse(resData);
         },
 
-        async CALC_STOCK_WEEKLY_KD({ state }, stockId) {
-            console.log('CALC_STOCK_WEEKLY_KD');
+        async CALC_STOCK_WEEKLY_KDJ({ state }, stockId) {
+            console.log('CALC_STOCK_WEEKLY_KDJ');
             const foundStock = state.tempStockList.find((v) => v.id === stockId);
             let weeklyKdData = [];
             let rsv = 0;
@@ -228,6 +228,7 @@ const stock = {
             let preD = 0;
             let todayK = 0;
             let todayD = 0;
+            let todayJ = 0;
 
             // 從最早日期開始算，因為公式有用昨天
             for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
@@ -242,11 +243,12 @@ const stock = {
                 rsv = ((foundStock.data.weekly[k][4] - low) / (high - low)) * 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
                 todayK = (2 / 3) * preK + (1 / 3) * rsv; // k=2/3 * 昨日的k值 + 1/3*今日的RSV
                 todayD = (2 / 3) * preD + (1 / 3) * todayK; // d=2/3 * 昨日的d值 + 1/3*今日的k值
+                todayJ = 3 * todayD - 2 * todayK;
                 preK = todayK;
                 preD = todayD;
                 const date = foundStock.data.weekly[endIndex][0];
 
-                weeklyKdData.push([date, todayK, todayD]);
+                weeklyKdData.push([date, todayK, todayD, todayJ]);
             }
             return weeklyKdData;
             // commit('SAVE_STOCK_WEEKLY_KD', { stockId: stockId, data: weeklyKdData });
@@ -414,29 +416,29 @@ const stock = {
                 let kdTurnDownReady = false;
 
                 let preDate = null;
-                if (foundTempStock.data.weekly_kd.length > 0)
-                    preDate = moment(foundTempStock.data.weekly_kd[0][0], 'YYYY-MM-DD').subtract(6, 'days');
+                if (foundTempStock.data.weekly_kdj.length > 0)
+                    preDate = moment(foundTempStock.data.weekly_kdj[0][0], 'YYYY-MM-DD').subtract(6, 'days');
                 let annualFixedDateBuyCurrDate = null;
-                if (foundAnnualFixedDateBuy && foundTempStock.data.weekly_kd.length > 0) {
+                if (foundAnnualFixedDateBuy && foundTempStock.data.weekly_kdj.length > 0) {
                     // weekly 是記錄該週最後一天，也有可能星期三，但記著是最後一天
                     // 固定日期買，正顯要用daily來算，但我想畫在 weekly kd 上，所以在那週範圍的就買了
                     annualFixedDateBuyCurrDate = moment(
-                        foundTempStock.data.weekly_kd[0][0].substring(0, 4) + '/' + foundAnnualFixedDateBuy.limit,
+                        foundTempStock.data.weekly_kdj[0][0].substring(0, 4) + '/' + foundAnnualFixedDateBuy.limit,
                         'YYYY/MM/DD'
                     );
-                    if (moment(foundTempStock.data.weekly_kd[0][0], 'YYYY-MM-DD').isAfter(annualFixedDateBuyCurrDate))
+                    if (moment(foundTempStock.data.weekly_kdj[0][0], 'YYYY-MM-DD').isAfter(annualFixedDateBuyCurrDate))
                         annualFixedDateBuyCurrDate.add(1, 'years');
                 }
                 let annualFixedDateSellCurrDate = null;
-                if (foundAnnualFixedDateSell && foundTempStock.data.weekly_kd.length > 0) {
+                if (foundAnnualFixedDateSell && foundTempStock.data.weekly_kdj.length > 0) {
                     annualFixedDateSellCurrDate = moment(
-                        foundTempStock.data.weekly_kd[0][0].substring(0, 4) + '/' + foundAnnualFixedDateSell.limit,
+                        foundTempStock.data.weekly_kdj[0][0].substring(0, 4) + '/' + foundAnnualFixedDateSell.limit,
                         'YYYY/MM/DD'
                     );
-                    if (moment(foundTempStock.data.weekly_kd[0][0], 'YYYY-MM-DD').isAfter(annualFixedDateSellCurrDate))
+                    if (moment(foundTempStock.data.weekly_kdj[0][0], 'YYYY-MM-DD').isAfter(annualFixedDateSellCurrDate))
                         annualFixedDateSellCurrDate.add(1, 'years');
                 }
-                foundTempStock.data.weekly_kd.forEach((item, dataIndex) => {
+                foundTempStock.data.weekly_kdj.forEach((item, dataIndex) => {
                     const k = item[1];
                     const d = item[2];
                     // 週 KD 黃金交叉 買進訊號
@@ -545,13 +547,13 @@ const stock = {
                     // 固定日期 買進訊號
                     // length =3 , 0, 1, 2，但到2時就不行
                     const nextDate =
-                        dataIndex + 1 < foundTempStock.data.weekly_kd.length
-                            ? foundTempStock.data.weekly_kd[dataIndex + 1][0]
-                            : moment(foundTempStock.data.weekly_kd[dataIndex][0], 'YYYY-MM-DD')
+                        dataIndex + 1 < foundTempStock.data.weekly_kdj.length
+                            ? foundTempStock.data.weekly_kdj[dataIndex + 1][0]
+                            : moment(foundTempStock.data.weekly_kdj[dataIndex][0], 'YYYY-MM-DD')
                                   .add(7, 'days')
                                   .format('YYYY-MM-DD');
                     // console.log('==================');
-                    // console.log(foundTempStock.data.weekly_kd);
+                    // console.log(foundTempStock.data.weekly_kdj);
                     // console.log(dataIndex);
                     // console.log(item[0]);
                     // console.log(nextDate);
@@ -985,7 +987,7 @@ const stock = {
                 foundStock.data = foundStock.data || {};
                 foundStock.data.daily = foundStock.data.daily || []; // 有可能是 null 就變成 []
                 foundStock.data.weekly = foundStock.data.weekly || []; // 有可能是 null 就變成 []
-                foundStock.data.weekly_kd = foundStock.data.weekly_kd || []; // 有可能是 null 就變成 []
+                foundStock.data.weekly_kdj = foundStock.data.weekly_kdj || []; // 有可能是 null 就變成 []
                 foundStock.data.ma_buy = foundStock.data.ma_buy || []; // 有可能是 null 就變成 [] 第一條MA線
                 foundStock.data.ma_sell = foundStock.data.ma_sell || []; // 有可能是 null 就變成 [] 第二條MA線
                 foundStock.data.cost = foundStock.data.cost || []; // 有可能是 null 就變成 [] 第二條MA線
@@ -1068,15 +1070,15 @@ const stock = {
                 tempStockListStockData.weekly = weekly_data;
                 state.tempStockList.push({ id: stockId, data: tempStockListStockData });
 
-                const [weekly_kd_data, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
-                    this.dispatch('CALC_STOCK_WEEKLY_KD', stockId),
+                const [weekly_kdj_data, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
+                    this.dispatch('CALC_STOCK_WEEKLY_KDJ', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_RSI', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_MA', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_COST_LINE', stockId),
                 ]);
 
                 tempStockListStockData = {};
-                tempStockListStockData.weekly_kd = weekly_kd_data;
+                tempStockListStockData.weekly_kdj = weekly_kdj_data;
                 tempStockListStockData.weekly_rsi = weekly_rsi_data;
                 tempStockListStockData.ma5 = weekly_ma_data.ma5;
                 tempStockListStockData.ma10 = weekly_ma_data.ma10;
@@ -1088,7 +1090,7 @@ const stock = {
                 }
 
                 foundStock.data.weekly = _.slice(weekly_data, -26);
-                foundStock.data.weekly_kd = _.slice(weekly_kd_data, -26);
+                foundStock.data.weekly_kdj = _.slice(weekly_kdj_data, -26);
                 foundStock.data.weekly_rsi = _.slice(weekly_rsi_data, -26);
                 foundStock.data.ma5 = _.takeRight(weekly_ma_data.ma5, 26);
                 foundStock.data.ma10 = _.takeRight(weekly_ma_data.ma10, 26);
@@ -1119,15 +1121,15 @@ const stock = {
                 tempStockListStockData.weekly = weekly_data;
                 state.tempStockList.push({ id: stockId, data: tempStockListStockData }); // 新增 state.tempStockList 資料
 
-                const [weekly_kd_data, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
-                    this.dispatch('CALC_STOCK_WEEKLY_KD', stockId),
+                const [weekly_kdj_data, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
+                    this.dispatch('CALC_STOCK_WEEKLY_KDJ', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_RSI', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_MA', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_COST_LINE', stockId),
                 ]);
 
                 tempStockListStockData = {};
-                tempStockListStockData.weekly_kd = weekly_kd_data;
+                tempStockListStockData.weekly_kdj = weekly_kdj_data;
                 tempStockListStockData.weekly_rsi = weekly_rsi_data;
                 _.merge(tempStockListStockData, weekly_ma_data);
                 tempStockListStockData.cost = weekly_cost_line_data;
@@ -1413,14 +1415,14 @@ const stock = {
                     foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
                     foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
                     if (foundKdGold) {
-                        const lastArray = foundTempStock.data.weekly_kd[foundTempStock.data.weekly_kd.length - 1];
+                        const lastArray = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1];
                         const lastK = lastArray[1];
                         const lastD = lastArray[2];
                         if (lastK <= foundKdGold.limit && lastK < lastD) foundStock.badge = '準買'; // K要小於D，才是訊號前的準備
                     }
                     if (foundKdTurnUp) {
-                        const lastK = foundTempStock.data.weekly_kd[foundTempStock.data.weekly_kd.length - 1][1];
-                        const lastSecondK = foundTempStock.data.weekly_kd[foundTempStock.data.weekly_kd.length - 2][1];
+                        const lastK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
+                        const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
                         if (lastK <= foundKdTurnUp.limit && lastK < lastSecondK) foundStock.badge = '準買';
                     }
                 }
@@ -1436,14 +1438,14 @@ const stock = {
                         foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
                         foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
                         if (foundKdDead) {
-                            const lastArray = foundTempStock.data.weekly_kd[foundTempStock.data.weekly_kd.length - 1];
+                            const lastArray = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1];
                             const lastK = lastArray[1];
                             const lastD = lastArray[2];
                             if (lastK >= foundKdDead.limit && lastK > lastD) foundStock.badge = '準賣'; // K要大於D，才是訊號前的準備
                         }
                         if (foundKdTurnDown) {
-                            const lastestK = foundTempStock.data.weekly_kd[foundTempStock.data.weekly_kd.length - 1][1];
-                            const lastSecondK = foundTempStock.data.weekly_kd[foundTempStock.data.weekly_kd.length - 2][1];
+                            const lastestK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
+                            const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
                             if (lastestK >= foundKdTurnDown.limit && lastestK > lastSecondK) foundStock.badge = '準賣';
                         }
                     }
@@ -1502,11 +1504,11 @@ const stock = {
             const found = getters.getStock(id);
             console.log(id);
             console.log(found.data);
-            // console.log(found.data.weekly_kd);
-            if (found.data && found.data.weekly_kd) console.log(found.data.weekly_kd);
+            // console.log(found.data.weekly_kdj);
+            if (found.data && found.data.weekly_kdj) console.log(found.data.weekly_kdj);
 
-            return found.data && found.data.weekly_kd
-                ? _.slice(found.data.weekly_kd, -26).map((value) => [moment(value[0]).valueOf(), value[1], value[2]])
+            return found.data && found.data.weekly_kdj
+                ? _.slice(found.data.weekly_kdj, -26).map((value) => [moment(value[0]).valueOf(), value[1], value[2]])
                 : [];
         },
         getStockDataWeeklyRsi: (state, getters) => (id) => {
