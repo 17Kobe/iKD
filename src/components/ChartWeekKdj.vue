@@ -7,10 +7,14 @@
             style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 80px; left: 75px; font-size: 12px" v-if="k && k.length > 0">
+        <div
+            style="position: absolute; top: 80px; font-size: 12px"
+            :style="{ left: showJLine ? '75px' : '121px' }"
+            v-if="k && k.length > 0"
+        >
             <span style="color: #4286f5">K</span>: {{ k[k.length - 1][1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
-            {{ d[d.length - 1][1].toFixed(2) }} <span style="color: #febd09">J</span>:
-            {{ j[j.length - 1][1].toFixed(2) }}
+            {{ d[d.length - 1][1].toFixed(2) }}
+            <span v-if="showJLine"><span style="color: #febd09">J</span>: {{ j[j.length - 1][1].toFixed(2) }}</span>
         </div>
 
         <!-- :updateArgs="[true, true, true]" -->
