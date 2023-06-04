@@ -359,7 +359,7 @@ export default {
                 (this.modeSpread === '目前' && this.show5CurrentSpreadData) ||
                 (this.modeSpread === '歷史' && this.show5HistorySpreadData)
             )
-                return this.spreadList.slice(0, 4);
+                return this.spreadList.slice(0, 5);
             else return this.spreadList;
         },
         dividendList() {
@@ -370,7 +370,7 @@ export default {
                 (this.modeDividend === '未來' && this.show5FutureDividendData) ||
                 (this.modeDividend === '歷史' && this.show5HistoryDividendData)
             )
-                return this.dividendList.slice(0, 4);
+                return this.dividendList.slice(0, 5);
             else return this.dividendList;
         },
         noBuyList() {
