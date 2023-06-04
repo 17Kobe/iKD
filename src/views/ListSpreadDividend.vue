@@ -9,13 +9,8 @@
                 </el-radio-group>
 
                 &nbsp;<el-link href="#" style="text-decoration: underline; color: #409eff" @click="toggleShowSpreadData">
-                    <span
-                        v-if="
-                            (modeSpread === '目前' && show5CurrentSpreadData) || (modeSpread === '歷史' && show5HistorySpreadData)
-                        "
-                        >5筆</span
-                    >
-                    <span v-else>全部</span></el-link
+                    <span v-if="modeSpread === '歷史' && show5HistorySpreadData">5筆</span>
+                    <span v-else-if="modeSpread === '歷史'">全部</span></el-link
                 >
             </el-col>
             <el-col :span="12" style="margin-right: 4px">
@@ -344,7 +339,6 @@ export default {
         return {
             modeSpread: '目前',
             modeDividend: '未來',
-            show5CurrentSpreadData: false,
             show5HistorySpreadData: true,
             show5FutureDividendData: true,
             show5HistoryDividendData: true,
@@ -355,11 +349,7 @@ export default {
             return this.$store.getters.getSpreadList(this.modeSpread);
         },
         showSpreadList() {
-            if (
-                (this.modeSpread === '目前' && this.show5CurrentSpreadData) ||
-                (this.modeSpread === '歷史' && this.show5HistorySpreadData)
-            )
-                return this.spreadList.slice(0, 5);
+            if (this.modeSpread === '歷史' && this.show5HistorySpreadData) return this.spreadList.slice(0, 5);
             else return this.spreadList;
         },
         dividendList() {
@@ -426,8 +416,7 @@ export default {
             return !number || number === 0 ? '0' : Number(Math.round(number * 10) / 10).toLocaleString('en-US');
         },
         toggleShowSpreadData() {
-            if (this.modeSpread === '目前') this.show5CurrentSpreadData = !this.show5CurrentSpreadData;
-            else if (this.modeSpread === '歷史') this.show5HistorySpreadData = !this.show5HistorySpreadData;
+            if (this.modeSpread === '歷史') this.show5HistorySpreadData = !this.show5HistorySpreadData;
         },
         toggleShowDividendData() {
             if (this.modeDividend === '未來') this.show5FutureDividendData = !this.show5FutureDividendData;
