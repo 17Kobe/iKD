@@ -1,19 +1,23 @@
 <template>
     <div>
         <el-row class="row-bg" justify="space-between" style="align-items: center; max-width: 650px">
-            <el-col :span="11" style="margin-left: 6px; font-size: 18px"
+            <el-col :span="10" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">價差&nbsp;&nbsp;</span>
                 <el-radio-group v-model="modeSpread" size="small" fill="#dedede" text-color="#373737">
                     <el-radio-button label="目前" />
                     <el-radio-button label="歷史" />
                 </el-radio-group>
 
-                &nbsp;<el-link href="#" style="text-decoration: underline; color: #409eff" @click="toggleShowSpreadData">
+                <el-link
+                    href="#"
+                    style="margin-left: 3px; text-decoration: underline; color: #409eff"
+                    @click="toggleShowSpreadData"
+                >
                     <span v-if="modeSpread === '歷史' && show5HistorySpreadData">5筆</span>
                     <span v-else-if="modeSpread === '歷史'">全部</span></el-link
                 >
             </el-col>
-            <el-col :span="12" style="margin-right: 4px">
+            <el-col :span="13" style="margin-right: 4px">
                 <el-tag
                     class="ml-2"
                     size="large"
@@ -187,13 +191,17 @@
 
         <!-- ================================ 股利 -->
         <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center; max-width: 650px">
-            <el-col :span="11" style="margin-left: 6px; font-size: 18px"
+            <el-col :span="10" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">股利&nbsp;&nbsp;</span>
                 <el-radio-group v-model="modeDividend" size="small" fill="#dedede" text-color="#373737">
                     <el-radio-button label="未來" />
                     <el-radio-button label="歷史" />
                 </el-radio-group>
-                &nbsp;<el-link href="#" style="text-decoration: underline; color: #409eff" @click="toggleShowDividendData">
+                <el-link
+                    href="#"
+                    style="margin-left: 3px; text-decoration: underline; color: #409eff"
+                    @click="toggleShowDividendData"
+                >
                     <span
                         v-if="
                             (modeDividend === '未來' && show5FutureDividendData) ||
@@ -204,7 +212,7 @@
                     <span v-else>全部</span></el-link
                 >
             </el-col>
-            <el-col :span="12" style="margin-right: 4px">
+            <el-col :span="13" style="margin-right: 4px">
                 <el-tag class="ml-2" size="large" style="margin: 5px 2px; padding: 0 4px; float: right"
                     >總計
                     <span style="font-size: 24px"> $ </span>
