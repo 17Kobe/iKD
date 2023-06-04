@@ -8,7 +8,7 @@
         >
         </highcharts>
         <div style="position: absolute; top: 80px; left: 128px; font-size: 12px" v-if="rsi5 && rsi5.length > 0">
-            <span style="color: #4286f5">RSI5</span>: {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
+            <span style="color: #834beb">RSI5</span>: {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
         </div>
 
         <!-- :updateArgs="[true, true, true]" -->
@@ -294,7 +294,7 @@ export default {
                                 )}(<span style="color: #3333ee; font-weight:bold;">${
                                     dayOfWeek[moment(point.x).day()]
                                 }</span>)</div>`;
-                                str += `<div><span style="color: #4286f5; font-weight:bold;">RSI</span>: ${Number(
+                                str += `<div><span style="color: #834beb; font-weight:bold;">RSI</span>: ${Number(
                                     point.y.toFixed(2)
                                 )} `;
 
@@ -303,7 +303,7 @@ export default {
                                     component.stockData.data.weekly,
                                     (array) => array[0] === moment(point.x).format('YYYY-MM-DD')
                                 );
-                                str += `<br><span style="color: #834beb; font-weight:bold;">股價</span>: ${found[4]}
+                                str += `<br><span style="color: #4286f5; font-weight:bold;">股價</span>: ${found[4]}
                                 </div>`;
                             }
                         });
@@ -391,7 +391,7 @@ export default {
                 series: [
                     {
                         name: 'RSI5',
-                        color: '#4286f5',
+                        color: '#834beb',
                         data: this.rsi5,
                     },
                     {
