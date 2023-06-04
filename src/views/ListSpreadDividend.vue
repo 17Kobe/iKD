@@ -249,7 +249,9 @@
                         v-if="!scope.row.isSure"
                     >
                     </el-badge>
-                    <span style="font-weight: bold; color: #a8a8a8">{{ scope.row.earnings_distribution }}</span>
+                    <span style="font-weight: bold; color: #a8a8a8">{{
+                        Math.round(scope.row.earnings_distribution * 100) / 100
+                    }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="發放日" :width="modeDividend === '未來' ? 42 : 82" align="center">
