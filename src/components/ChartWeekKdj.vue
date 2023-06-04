@@ -24,7 +24,7 @@ import _ from 'lodash';
 
 export default {
     components: { highcharts: Chart },
-    props: ['parentData'],
+    props: ['parentData', 'showJLine'],
     data() {
         return {
             // chartOptions: {
@@ -46,9 +46,15 @@ export default {
         chartMinMaxValues() {
             const kValues = this.k.map((value) => value[1]);
             const dValues = this.d.map((value) => value[1]);
-            const jValues = this.j.map((value) => value[1]);
+            let allValues;
 
-            const allValues = [...kValues, ...dValues, ...jValues];
+            if (this.showJLine) {
+                const jValues = this.j.map((value) => value[1]);
+
+                allValues = [...kValues, ...dValues, ...jValues];
+            } else {
+                allValues = [...kValues, ...dValues];
+            }
             const minValue = Math.min(...allValues);
             const maxValue = Math.max(...allValues);
 
@@ -449,6 +455,7 @@ export default {
                         name: 'J線',
                         color: '#febd09',
                         data: this.j,
+                        visible: this.showJLine,
                     },
                     {
                         type: 'scatter',

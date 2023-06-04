@@ -123,8 +123,11 @@
             </el-table-column>
 
             <el-table-column label="週KDJ" width="230" align="center">
+                <template #header>
+                    <span @click="toggleChildJLine">{{ showJLine ? '週KDJ' : '週KD' }}</span>
+                </template>
                 <template #default="scope">
-                    <ChartWeekKdj :parentData="scope.row.id" />
+                    <ChartWeekKdj :parentData="scope.row.id" :showJLine="showJLine" />
                     <!-- <ChartWeekKd :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
                 </template>
             </el-table-column>
@@ -544,6 +547,7 @@ export default {
             isMobile: true, // 預設要先隱藏再顯示，否則手機看有的股票的KD會拉長
             showWeekK: true,
             showWeekRSI: false,
+            showJLine: true,
             currentStockId: null,
         };
     },
@@ -712,6 +716,9 @@ export default {
         toggleWeekRSI() {
             this.showWeekRSI = !this.showWeekRSI;
             this.showWeekK = !this.showWeekK;
+        },
+        toggleChildJLine() {
+            this.showJLine = !this.showJLine;
         },
     },
 };
