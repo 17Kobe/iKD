@@ -1,14 +1,24 @@
 <template>
     <div>
         <el-row class="row-bg" justify="space-between" style="align-items: center; max-width: 650px">
-            <el-col :span="8" style="margin-left: 6px; font-size: 18px"
+            <el-col :span="11" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">價差&nbsp;&nbsp;</span>
                 <el-radio-group v-model="modeSpread" size="small" fill="#dedede" text-color="#373737">
                     <el-radio-button label="目前" />
                     <el-radio-button label="歷史" />
                 </el-radio-group>
+
+                &nbsp;<el-link href="#" style="text-decoration: underline; color: #409eff" @click="toggleShowSpreadData">
+                    <span
+                        v-if="
+                            (modeSpread === '目前' && show5CurrentSpreadData) || (modeSpread === '歷史' && show5HistorySpreadData)
+                        "
+                        >5筆</span
+                    >
+                    <span v-else>全部</span></el-link
+                >
             </el-col>
-            <el-col :span="15" style="margin-right: 4px">
+            <el-col :span="12" style="margin-right: 4px">
                 <el-tag
                     class="ml-2"
                     size="large"
@@ -62,7 +72,7 @@
             </el-col>
         </el-row>
 
-        <el-table :data="spreadList" style="width: 100%" empty-text="無資料">
+        <el-table :data="showSpreadList" style="width: 100%" empty-text="無資料">
             <el-table-column label="名稱" width="90" align="center" fixed>
                 <template #default="scope">
                     <el-badge
@@ -182,14 +192,24 @@
 
         <!-- ================================ 股利 -->
         <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center; max-width: 650px">
-            <el-col :span="8" style="margin-left: 6px; font-size: 18px"
+            <el-col :span="11" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">股利&nbsp;&nbsp;</span>
                 <el-radio-group v-model="modeDividend" size="small" fill="#dedede" text-color="#373737">
                     <el-radio-button label="未來" />
                     <el-radio-button label="歷史" />
                 </el-radio-group>
+                &nbsp;<el-link href="#" style="text-decoration: underline; color: #409eff" @click="toggleShowDividendData">
+                    <span
+                        v-if="
+                            (modeDividend === '未來' && show5FutureDividendData) ||
+                            (modeDividend === '歷史' && show5HistoryDividendData)
+                        "
+                        >5筆</span
+                    >
+                    <span v-else>全部</span></el-link
+                >
             </el-col>
-            <el-col :span="15" style="margin-right: 4px">
+            <el-col :span="12" style="margin-right: 4px">
                 <el-tag class="ml-2" size="large" style="margin: 5px 2px; padding: 0 4px; float: right"
                     >總計
                     <span style="font-size: 24px"> $ </span>
@@ -209,7 +229,7 @@
             </el-col>
         </el-row>
 
-        <el-table :data="dividendList" style="width: 100%" empty-text="無資料">
+        <el-table :data="showDividendList" style="width: 100%" empty-text="無資料">
             <el-table-column label="名稱" prop="name" width="90" align="center"> </el-table-column>
             <el-table-column label="除息日" width="42" align="center" v-if="modeDividend === '未來'">
                 <template #default="scope">
@@ -324,14 +344,34 @@ export default {
         return {
             modeSpread: '目前',
             modeDividend: '未來',
+            show5CurrentSpreadData: false,
+            show5HistorySpreadData: true,
+            show5FutureDividendData: true,
+            show5HistoryDividendData: true,
         };
     },
     computed: {
         spreadList() {
             return this.$store.getters.getSpreadList(this.modeSpread);
         },
+        showSpreadList() {
+            if (
+                (this.modeSpread === '目前' && this.show5CurrentSpreadData) ||
+                (this.modeSpread === '歷史' && this.show5HistorySpreadData)
+            )
+                return this.spreadList.slice(0, 4);
+            else return this.spreadList;
+        },
         dividendList() {
             return this.$store.getters.getDividendList(this.modeDividend);
+        },
+        showDividendList() {
+            if (
+                (this.modeDividend === '未來' && this.show5FutureDividendData) ||
+                (this.modeDividend === '歷史' && this.show5HistoryDividendData)
+            )
+                return this.dividendList.slice(0, 4);
+            else return this.dividendList;
         },
         noBuyList() {
             return this.$store.getters.getNoBuyList();
@@ -384,6 +424,14 @@ export default {
         },
         currencyPointFormat(number) {
             return !number || number === 0 ? '0' : Number(Math.round(number * 10) / 10).toLocaleString('en-US');
+        },
+        toggleShowSpreadData() {
+            if (this.modeSpread === '目前') this.show5CurrentSpreadData = !this.show5CurrentSpreadData;
+            else if (this.modeSpread === '歷史') this.show5HistorySpreadData = !this.show5HistorySpreadData;
+        },
+        toggleShowDividendData() {
+            if (this.modeDividend === '未來') this.show5FutureDividendData = !this.show5FutureDividendData;
+            else if (this.modeDividend === '歷史') this.show5HistoryDividendData = !this.show5HistoryDividendData;
         },
     },
 };

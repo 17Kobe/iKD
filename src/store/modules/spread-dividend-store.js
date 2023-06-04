@@ -304,7 +304,7 @@ const dividend = {
             // 若沒有股數，則加上股數
             tempDividendList.forEach((obj, index) => {
                 const foundStock = _.find(rootState.price.stockList, ['id', obj.id]);
-                // 有可能清掉股票了，但 dividendlist 還保留著，所以要判斷 
+                // 有可能清掉股票了，但 dividendlist 還保留著，所以要判斷
                 if (!tempDividendList[index].number_of_shares) tempDividendList[index].number_of_shares = foundStock.cost.total;
             });
             return _.orderBy(tempDividendList, ['trading_date'], ['asc']);
