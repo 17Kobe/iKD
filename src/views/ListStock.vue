@@ -159,170 +159,209 @@
 
             <el-table-column label="實際買賣" width="190" header-align="center" align="center">
                 <template #default="scope">
-                    <el-popover
-                        placement="left-start"
-                        title="實際買賣歷史"
-                        width="500"
-                        trigger="hover"
-                        :hide-after="0"
-                        :ref="`popover-${scope.row.id}`"
-                    >
-                        <div v-if="scope.row.cost && scope.row.cost.settings && scope.row.cost.settings.length >= 1">
-                            <span
-                                style="
-                                    background-color: #eeeeee;
-                                    font-size: 14px;
-                                    display: inline-block;
-                                    width: 100px;
-                                    text-align: center;
-                                "
-                                >{{ today }}</span
-                            >
-                            &nbsp;
-                            <span
-                                style="
-                                    background-color: #82e725;
-                                    font-size: 14px;
-                                    display: inline-block;
-                                    width: 30px;
-                                    text-align: center;
-                                    color: white;
-                                    border-radius: 10px 100px / 120px;
-                                    padding: 5px;
-                                "
-                                >今</span
-                            >
-                            &nbsp;&nbsp;
-                            <span
-                                style="
-                                    background-color: #eeeeee;
-                                    font-size: 14px;
-                                    display: inline-block;
-                                    width: 60px;
-                                    text-align: center;
-                                "
-                                >{{ scope.row.last_price }}</span
-                            >
-                            &nbsp;&nbsp;<span
-                                style="
-                                    background-color: #eeeeee;
-                                    font-size: 14px;
-                                    display: inline-block;
-                                    width: 60px;
-                                    text-align: center;
-                                "
-                            ></span>
-                            &nbsp;&nbsp;<span
-                                :style="[
-                                    scope.row.last_price_spread < 0 ? { color: '#01aa00' } : { color: '#ee3333' },
-                                    { 'font-size': '14px', display: 'inline-block', width: '50px', 'text-align': 'right' },
-                                ]"
-                                >{{ scope.row.last_price_spread }}%</span
-                            >
-
-                            <div v-for="(item, index) in scope.row.cost.settings" :key="index">
+                    <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1">
+                        <el-popover
+                            placement="left-start"
+                            title="實際買賣歷史"
+                            width="500"
+                            trigger="hover"
+                            :hide-after="0"
+                            :ref="`popover-${scope.row.id}`"
+                        >
+                            <div v-if="scope.row.cost && scope.row.cost.settings && scope.row.cost.settings.length >= 1">
                                 <span
-                                    :style="[
-                                        index % 2 === 1 ? { 'background-color': '#eeeeee' } : { 'background-color': '#ffffff' },
-                                        { 'font-size': '14px', display: 'inline-block', width: '100px', 'text-align': 'center' },
-                                    ]"
-                                    >{{ item.buy_date }}</span
-                                >&nbsp;&nbsp;
+                                    style="
+                                        background-color: #eeeeee;
+                                        font-size: 14px;
+                                        display: inline-block;
+                                        width: 100px;
+                                        text-align: center;
+                                    "
+                                    >{{ today }}</span
+                                >
+                                &nbsp;
                                 <span
+                                    style="
+                                        background-color: #82e725;
+                                        font-size: 14px;
+                                        display: inline-block;
+                                        width: 30px;
+                                        text-align: center;
+                                        color: white;
+                                        border-radius: 10px 100px / 120px;
+                                        padding: 5px;
+                                    "
+                                    >今</span
+                                >
+                                &nbsp;&nbsp;
+                                <span
+                                    style="
+                                        background-color: #eeeeee;
+                                        font-size: 14px;
+                                        display: inline-block;
+                                        width: 60px;
+                                        text-align: center;
+                                    "
+                                    >{{ scope.row.last_price }}</span
+                                >
+                                &nbsp;&nbsp;<span
+                                    style="
+                                        background-color: #eeeeee;
+                                        font-size: 14px;
+                                        display: inline-block;
+                                        width: 60px;
+                                        text-align: center;
+                                    "
+                                ></span>
+                                &nbsp;&nbsp;<span
                                     :style="[
-                                        item.buy_date ? { 'background-color': '#f28b82' } : { 'background-color': '#82d125' },
+                                        scope.row.last_price_spread < 0 ? { color: '#01aa00' } : { color: '#ee3333' },
                                         {
                                             'font-size': '14px',
                                             display: 'inline-block',
-                                            width: '30px',
-                                            'text-align': 'center',
-                                            color: 'white',
-                                            'border-radius': '10px 100px / 120px',
-                                            padding: '5px',
+                                            width: '50px',
+                                            'text-align': 'right',
                                         },
                                     ]"
-                                    >買</span
+                                    >{{ scope.row.last_price_spread }}%</span
                                 >
-                                &nbsp;&nbsp;<span
-                                    :style="[
-                                        index % 2 === 1 ? { 'background-color': '#eeeeee' } : { 'background-color': '#ffffff' },
-                                        { 'font-size': '14px', display: 'inline-block', width: '60px', 'text-align': 'center' },
-                                    ]"
-                                    >{{ item.cost }}</span
-                                >
-                                &nbsp;&nbsp;<span
-                                    :style="[
-                                        index % 2 === 1 ? { 'background-color': '#eeeeee' } : { 'background-color': '#ffffff' },
-                                        { 'font-size': '14px', display: 'inline-block', width: '60px', 'text-align': 'center' },
-                                    ]"
-                                    >{{ item.number }}</span
-                                >
+
+                                <div v-for="(item, index) in scope.row.cost.settings" :key="index">
+                                    <span
+                                        :style="[
+                                            index % 2 === 1
+                                                ? { 'background-color': '#eeeeee' }
+                                                : { 'background-color': '#ffffff' },
+                                            {
+                                                'font-size': '14px',
+                                                display: 'inline-block',
+                                                width: '100px',
+                                                'text-align': 'center',
+                                            },
+                                        ]"
+                                        >{{ item.buy_date }}</span
+                                    >&nbsp;&nbsp;
+                                    <span
+                                        :style="[
+                                            item.buy_date ? { 'background-color': '#f28b82' } : { 'background-color': '#82d125' },
+                                            {
+                                                'font-size': '14px',
+                                                display: 'inline-block',
+                                                width: '30px',
+                                                'text-align': 'center',
+                                                color: 'white',
+                                                'border-radius': '10px 100px / 120px',
+                                                padding: '5px',
+                                            },
+                                        ]"
+                                        >買</span
+                                    >
+                                    &nbsp;&nbsp;<span
+                                        :style="[
+                                            index % 2 === 1
+                                                ? { 'background-color': '#eeeeee' }
+                                                : { 'background-color': '#ffffff' },
+                                            {
+                                                'font-size': '14px',
+                                                display: 'inline-block',
+                                                width: '60px',
+                                                'text-align': 'center',
+                                            },
+                                        ]"
+                                        >{{ item.cost }}</span
+                                    >
+                                    &nbsp;&nbsp;<span
+                                        :style="[
+                                            index % 2 === 1
+                                                ? { 'background-color': '#eeeeee' }
+                                                : { 'background-color': '#ffffff' },
+                                            {
+                                                'font-size': '14px',
+                                                display: 'inline-block',
+                                                width: '60px',
+                                                'text-align': 'center',
+                                            },
+                                        ]"
+                                        >{{ item.number }}</span
+                                    >
+                                </div>
                             </div>
-                        </div>
-                        <template #reference>
-                            <el-button
-                                size="small"
-                                type="info"
-                                plain
-                                @click="doShowCost(scope.row.id)"
-                                :style="[
-                                    scope.row.cost && scope.row.cost.settings.length >= 1 ? { width: 'auto' } : {},
-                                    { 'text-align': 'left', 'line-height': '18px', padding: '3px 9px' },
-                                ]"
-                            >
-                                <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1" style="font-size: 13px">
-                                    <div>
-                                        成 <span style="margin-left: 4px">本</span>
-                                        <span style="margin-left: 5px">價</span>&nbsp;&nbsp;<el-tag
-                                            :type="scope.row.cost.avg <= scope.row.last_price ? 'primary' : 'danger'"
-                                            class="ml-2"
-                                            size="small"
-                                            effect="plain"
-                                            style="margin: 1px 0px"
-                                            ><span style="font-size: 14px; font-weight: bold">{{
-                                                scope.row.cost.avg >= 100
-                                                    ? Number(scope.row.cost.avg.toFixed(1)).toLocaleString('en-US')
-                                                    : Number(scope.row.cost.avg.toFixed(2)).toLocaleString('en-US')
-                                            }}</span>
-                                            元</el-tag
-                                        >
-                                    </div>
-                                    <div>
-                                        累積股數&nbsp;&nbsp;<el-tag
-                                            type="info"
-                                            effect="plain"
-                                            class="ml-2"
-                                            size="small"
-                                            style="margin: 1px 0px"
-                                            ><span style="font-size: 14px; font-weight: bold">{{
-                                                scope.row.cost.total.toLocaleString('en-US')
-                                            }}</span>
-                                            股</el-tag
-                                        >
-                                    </div>
-                                    <div>
-                                        本　　金&nbsp;&nbsp;<el-tag
-                                            class="ml-2"
-                                            type="info"
-                                            size="small"
-                                            effect="dark"
-                                            style="margin: 1px 0px"
-                                            ><span style="font-size: 14px; font-weight: bold">{{
-                                                scope.row.cost.sum.toLocaleString('en-US')
-                                            }}</span>
-                                            元</el-tag
-                                        >
+                            <template #reference>
+                                <el-button
+                                    size="small"
+                                    type="info"
+                                    plain
+                                    @click="doShowCost(scope.row.id)"
+                                    :style="[
+                                        scope.row.cost && scope.row.cost.settings.length >= 1 ? { width: 'auto' } : {},
+                                        { 'text-align': 'left', 'line-height': '18px', padding: '3px 9px' },
+                                    ]"
+                                >
+                                    <div style="font-size: 13px">
+                                        <div>
+                                            成 <span style="margin-left: 4px">本</span>
+                                            <span style="margin-left: 5px">價</span>&nbsp;&nbsp;<el-tag
+                                                :type="scope.row.cost.avg <= scope.row.last_price ? 'primary' : 'danger'"
+                                                class="ml-2"
+                                                size="small"
+                                                effect="plain"
+                                                style="margin: 1px 0px"
+                                                ><span style="font-size: 14px; font-weight: bold">{{
+                                                    scope.row.cost.avg >= 100
+                                                        ? Number(scope.row.cost.avg.toFixed(1)).toLocaleString('en-US')
+                                                        : Number(scope.row.cost.avg.toFixed(2)).toLocaleString('en-US')
+                                                }}</span>
+                                                元</el-tag
+                                            >
+                                        </div>
+                                        <div>
+                                            累積股數&nbsp;&nbsp;<el-tag
+                                                type="info"
+                                                effect="plain"
+                                                class="ml-2"
+                                                size="small"
+                                                style="margin: 1px 0px"
+                                                ><span style="font-size: 14px; font-weight: bold">{{
+                                                    scope.row.cost.total.toLocaleString('en-US')
+                                                }}</span>
+                                                股</el-tag
+                                            >
+                                        </div>
+                                        <div>
+                                            本　　金&nbsp;&nbsp;<el-tag
+                                                class="ml-2"
+                                                type="info"
+                                                size="small"
+                                                effect="dark"
+                                                style="margin: 1px 0px"
+                                                ><span style="font-size: 14px; font-weight: bold">{{
+                                                    scope.row.cost.sum.toLocaleString('en-US')
+                                                }}</span>
+                                                元</el-tag
+                                            >
+                                        </div>
                                     </div>
 
                                     <!-- {{ parseFloat((scope.row.cost.total / 1000).toFixed(2)) }} 張) -->
-                                </div>
+                                </el-button>
+                            </template>
+                        </el-popover>
+                    </div>
 
-                                <div v-else>
-                                    <i class="el-icon-s-tools text-xl"></i>
-                                </div>
-                            </el-button>
-                        </template>
-                    </el-popover>
+                    <div v-else>
+                        <el-button
+                            size="small"
+                            type="info"
+                            plain
+                            @click="doShowCost(scope.row.id)"
+                            :style="[
+                                scope.row.cost && scope.row.cost.settings.length >= 1 ? { width: 'auto' } : {},
+                                { 'text-align': 'left', 'line-height': '18px', padding: '3px 9px' },
+                            ]"
+                        >
+                            <i class="el-icon-s-tools text-xl"></i>
+                        </el-button>
+                    </div>
                 </template>
             </el-table-column>
             <el-table-column label="買賣策略" width="225" align="center">
