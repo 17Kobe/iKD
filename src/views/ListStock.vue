@@ -220,7 +220,7 @@
                                     >{{ scope.row.last_price_spread }}%</span
                                 >
 
-                                <div v-for="(item, index) in scope.row.cost.settings" :key="index">
+                                <div v-for="(item, index) in getReversedItems(scope.row.cost.settings)" :key="index">
                                     <span
                                         :style="[
                                             index % 2 === 1
@@ -849,15 +849,18 @@ export default {
             this.currentStockId = id;
         },
         toggleWeekK() {
-            this.showWeekK = !this.showWeekK;
-            this.showWeekRSI = !this.showWeekRSI;
+            // this.showWeekK = !this.showWeekK;
+            // this.showWeekRSI = !this.showWeekRSI;
         },
         toggleWeekRSI() {
-            this.showWeekRSI = !this.showWeekRSI;
-            this.showWeekK = !this.showWeekK;
+            // this.showWeekRSI = !this.showWeekRSI;
+            // this.showWeekK = !this.showWeekK;
         },
         toggleChildJLine() {
             this.showJLine = !this.showJLine;
+        },
+        getReversedItems(array) {
+            return array.slice().reverse();
         },
     },
 };
