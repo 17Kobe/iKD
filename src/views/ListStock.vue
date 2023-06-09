@@ -157,7 +157,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="成本" width="190" header-align="center" align="center">
+            <el-table-column label="實際買賣" width="190" header-align="center" align="center">
                 <template #default="scope">
                     <el-button
                         size="small"
@@ -300,11 +300,11 @@
                     </el-button>
                 </template>
             </el-table-column>
-            <el-table-column prop="city" label="策略歷史報酬" width="330" align="center">
+            <el-table-column prop="city" label="策略回測統計" width="330" align="center">
                 <template #default="scope">
                     <el-popover
                         placement="left-start"
-                        title="策略歷史記錄"
+                        title="策略回測歷史"
                         width="500"
                         trigger="hover"
                         :hide-after="0"
