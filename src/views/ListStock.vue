@@ -132,13 +132,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column
-                label="週RSI"
-                width="230"
-                align="center"
-                :visible="!isMobile || showWeekRSI"
-                v-if="showWeekRSI || !isMobile"
-            >
+            <el-table-column label="週RSI" width="230" align="center" :visible="showWeekRSI" v-if="showWeekRSI">
                 <template #header>
                     <span @click="toggleWeekRSI">週RSI</span>
                 </template>
@@ -688,7 +682,7 @@ export default {
             queueStockDataList: [],
             isMobile: true, // 預設要先隱藏再顯示，否則手機看有的股票的KD會拉長
             showWeekK: true,
-            showWeekRSI: false,
+            showWeekRSI: true,
             showJLine: false,
             currentStockId: null,
         };
