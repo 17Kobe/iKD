@@ -364,7 +364,7 @@
                     </div>
                 </template>
             </el-table-column>
-            <el-table-column label="買賣策略" width="225" align="center">
+            <el-table-column label="策略買賣" width="225" align="center">
                 <template #default="scope">
                     <el-button
                         size="small"
