@@ -547,7 +547,7 @@ export default {
             isMobile: true, // 預設要先隱藏再顯示，否則手機看有的股票的KD會拉長
             showWeekK: true,
             showWeekRSI: false,
-            showJLine: true,
+            showJLine: false,
             currentStockId: null,
         };
     },
