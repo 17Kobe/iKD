@@ -391,8 +391,21 @@ export default {
                 series: [
                     {
                         name: 'RSI(5)',
-                        color: '#e65596',
                         data: this.rsi5,
+                        zones: [
+                            {
+                                value: 10,
+                                color: '#e65596',
+                            },
+                            {
+                                value: 90,
+                                color: '#4286f5',
+                            },
+                            {
+                                color: '#e65596',
+                            },
+                        ],
+                        threshold: 0,
                     },
                     {
                         type: 'scatter',
