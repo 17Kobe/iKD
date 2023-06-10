@@ -209,7 +209,7 @@
                                 ></span>
                                 &nbsp;&nbsp;<span
                                     :style="[
-                                        scope.row.last_price_spread < 0 ? { color: '#01aa00' } : { color: '#ee3333' },
+                                        scope.row.cost.rate_of_return < 0 ? { color: '#01aa00' } : { color: '#ee3333' },
                                         {
                                             'font-size': '14px',
                                             display: 'inline-block',
@@ -217,7 +217,7 @@
                                             'text-align': 'right',
                                         },
                                     ]"
-                                    >{{ scope.row.last_price_spread }}%</span
+                                    >{{ Number(Math.round(scope.row.cost.rate_of_return * 10) / 10) }}%</span
                                 >
 
                                 <div v-for="(item, index) in getReversedItems(scope.row.cost.settings)" :key="index">
