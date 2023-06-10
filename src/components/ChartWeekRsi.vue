@@ -7,8 +7,8 @@
             style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 80px; left: 128px; font-size: 12px" v-if="rsi5 && rsi5.length > 0">
-            <span style="color: #e65596">RSI(5)</span>: {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
+        <div style="position: absolute; top: 80px; left: 57px; font-size: 12px" v-if="rsi5 && rsi5.length > 0">
+            <span style="color: #e65596">RSI(5)</span>: {{ rsi5[rsi5.length - 1][1].toFixed(2) }} (最高: {{ rsi5Max }})
         </div>
 
         <!-- :updateArgs="[true, true, true]" -->
@@ -33,6 +33,9 @@ export default {
         // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
         rsi5() {
             return this.stockDataOfRsiPrice.map((value) => [value[0], value[1]]);
+        },
+        rsi5Max() {
+            return this.stockData.data && this.stockData.data.weekly_rsi_max ? this.stockData.data.weekly_rsi_max.toFixed(2) : '';
         },
         stockData() {
             console.log('stockData');
