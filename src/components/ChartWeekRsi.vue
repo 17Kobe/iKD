@@ -8,7 +8,7 @@
         >
         </highcharts>
         <div style="position: absolute; top: 80px; left: 57px; font-size: 12px" v-if="rsi5 && rsi5.length > 0">
-            <span style="color: #e65596">RSI(5)</span>: {{ rsi5[rsi5.length - 1][1].toFixed(2) }} (最高: {{ rsi5Max }})
+            <span style="color: #4286f5">RSI(5)</span>: {{ rsi5[rsi5.length - 1][1].toFixed(2) }} (最高: {{ rsi5Max }})
         </div>
 
         <!-- :updateArgs="[true, true, true]" -->
