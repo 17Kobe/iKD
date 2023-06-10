@@ -8,7 +8,7 @@
         >
         </highcharts>
         <div style="position: absolute; top: 80px; left: 128px; font-size: 12px" v-if="rsi5 && rsi5.length > 0">
-            <span style="color: #834beb">RSI(5)</span>: {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
+            <span style="color: #e65596">RSI(5)</span>: {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
         </div>
 
         <!-- :updateArgs="[true, true, true]" -->
@@ -294,7 +294,7 @@ export default {
                                 )}(<span style="color: #3333ee; font-weight:bold;">${
                                     dayOfWeek[moment(point.x).day()]
                                 }</span>)</div>`;
-                                str += `<div><span style="color: #834beb; font-weight:bold;">RSI(5)</span>: ${Number(
+                                str += `<div><span style="color: #e65596; font-weight:bold;">RSI(5)</span>: ${Number(
                                     point.y.toFixed(2)
                                 )} `;
 
@@ -391,7 +391,7 @@ export default {
                 series: [
                     {
                         name: 'RSI(5)',
-                        color: '#834beb',
+                        color: '#e65596',
                         data: this.rsi5,
                     },
                     {
