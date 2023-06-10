@@ -409,7 +409,7 @@ export default {
                             {
                                 value: 100,
                                 color: '#e65596',
-                                fillColor: '#e65596',
+                                fillColor: 'rgba(255, 99, 132, 0.2)',
                             },
                         ],
                     },
