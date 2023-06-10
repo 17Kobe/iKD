@@ -297,7 +297,7 @@ export default {
                                 )}(<span style="color: #3333ee; font-weight:bold;">${
                                     dayOfWeek[moment(point.x).day()]
                                 }</span>)</div>`;
-                                str += `<div><span style="color: #e65596; font-weight:bold;">RSI(5)</span>: ${Number(
+                                str += `<div><span style="color: #4286f5; font-weight:bold;">RSI(5)</span>: ${Number(
                                     point.y.toFixed(2)
                                 )} `;
 
@@ -306,7 +306,7 @@ export default {
                                     component.stockData.data.weekly,
                                     (array) => array[0] === moment(point.x).format('YYYY-MM-DD')
                                 );
-                                str += `<br><span style="color: #4286f5; font-weight:bold;">股價</span>: ${found[4]}
+                                str += `<br><span style="color: #834beb; font-weight:bold;">股價</span>: ${found[4]}
                                 </div>`;
                             }
                         });
