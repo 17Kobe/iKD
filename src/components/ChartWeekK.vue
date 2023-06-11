@@ -12,24 +12,55 @@
             <span v-if="last_price"
                 ><span style="color: #000000" title="股價">&nbsp;&nbsp;{{ last_price }}</span></span
             >
-            <span v-if="cost && cost.length > 0"
-                ><span style="color: #4286f5" title="平均成本線"
-                    >&nbsp;&nbsp;{{ Number(cost[cost.length - 1][1].toFixed(2)) }}</span
+            <span v-if="cost && cost.length > 0">
+                &nbsp;&nbsp;
+                <span
+                    title="平均成本線"
+                    :style="[
+                        last_price > cost[cost.length - 1][1]
+                            ? { 'background-color': 'rgba(255, 159, 64, 0.2)' }
+                            : { 'background-color': 'none' },
+                        { color: '#4286f5' },
+                    ]"
+                    >{{ Number(cost[cost.length - 1][1].toFixed(2)) }}</span
                 ></span
             >
-            <span v-if="ma5 && ma5.length > 0"
-                ><span style="color: #834beb" title="MA(5)"
-                    >&nbsp;&nbsp;{{ Number(ma5[ma5.length - 1][1].toFixed(2)) }}</span
+            <span v-if="ma5 && ma5.length > 0">
+                &nbsp;&nbsp;
+                <span
+                    title="MA(5)"
+                    :style="[
+                        last_price > ma5[ma5.length - 1][1]
+                            ? { 'background-color': 'rgba(255, 159, 64, 0.2)' }
+                            : { 'background-color': 'none' },
+                        { color: '#834beb' },
+                    ]"
+                    >{{ Number(ma5[ma5.length - 1][1].toFixed(2)) }}</span
                 ></span
             >
-            <span v-if="ma10 && ma10.length > 0"
-                ><span style="color: #febd09" title="MA(10)"
-                    >&nbsp;&nbsp;{{ Number(ma10[ma10.length - 1][1].toFixed(2)) }}</span
+            <span v-if="ma10 && ma10.length > 0">
+                &nbsp;&nbsp;<span
+                    title="MA(10)"
+                    :style="[
+                        last_price > ma10[ma10.length - 1][1]
+                            ? { 'background-color': 'rgba(255, 159, 64, 0.2)' }
+                            : { 'background-color': 'none' },
+                        { color: '#febd09' },
+                    ]"
+                    >{{ Number(ma10[ma10.length - 1][1].toFixed(2)) }}</span
                 ></span
             >
-            <span v-if="ma20 && ma20.length > 0"
-                ><span style="color: #fc7742" title="MA(20)"
-                    >&nbsp;&nbsp;{{ Number(ma20[ma20.length - 1][1].toFixed(2)) }}</span
+            <span v-if="ma20 && ma20.length > 0">
+                &nbsp;&nbsp;
+                <span
+                    title="MA(20)"
+                    :style="[
+                        last_price > ma20[ma20.length - 1][1]
+                            ? { 'background-color': 'rgba(255, 159, 64, 0.2)' }
+                            : { 'background-color': 'none' },
+                        { color: '#fc7742' },
+                    ]"
+                    >{{ Number(ma20[ma20.length - 1][1].toFixed(2)) }}</span
                 ></span
             >
         </div>
