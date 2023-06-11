@@ -1089,11 +1089,13 @@ const stock = {
                     _.assign(targetStock.data, tempStockListStockData);
                 }
                 const weekly_rsi_max = _.maxBy(weekly_rsi_data, (element) => element[1])[1];
+                const weekly_rsi_min = _.minBy(weekly_rsi_data, (element) => element[1])[1];
 
                 foundStock.data.weekly = _.slice(weekly_data, -26);
                 foundStock.data.weekly_kdj = _.slice(weekly_kdj_data, -26);
                 foundStock.data.weekly_rsi = _.slice(weekly_rsi_data, -26);
                 foundStock.data.weekly_rsi_max = weekly_rsi_max;
+                foundStock.data.weekly_rsi_min = weekly_rsi_min;
                 foundStock.data.ma5 = _.takeRight(weekly_ma_data.ma5, 26);
                 foundStock.data.ma10 = _.takeRight(weekly_ma_data.ma10, 26);
                 foundStock.data.ma20 = _.takeRight(weekly_ma_data.ma20, 26);
@@ -1117,6 +1119,7 @@ const stock = {
 
             // 像是從 UI改policy會沒有 tempStockList，需要重新計算
             let weekly_rsi_max = 0;
+            let weekly_rsi_min = 0;
             let foundTempStock = state.tempStockList.find((v) => v.id === stockId);
             if (typeof foundTempStock === 'undefined') {
                 let tempStockListStockData = {};
@@ -1135,6 +1138,7 @@ const stock = {
                 tempStockListStockData.weekly_kdj = weekly_kdj_data;
                 tempStockListStockData.weekly_rsi = weekly_rsi_data;
                 weekly_rsi_max = _.maxBy(weekly_rsi_data, (element) => element[1])[1];
+                weekly_rsi_min = _.minBy(weekly_rsi_data, (element) => element[1])[1];
                 // console.log('max');
                 // console.log(weekly_rsi_max);
                 _.merge(tempStockListStockData, weekly_ma_data);
@@ -1147,6 +1151,7 @@ const stock = {
 
             const foundStock = state.stockList.find((v) => v.id === stockId);
             foundStock.data.weekly_rsi_max = weekly_rsi_max;
+            foundStock.data.weekly_rsi_min = weekly_rsi_min;
             const policyResult = await this.dispatch('CALC_STOCK_INDICATORS_RESULT', stockId);
 
             if (policyResult !== null) {

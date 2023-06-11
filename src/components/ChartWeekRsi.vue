@@ -8,9 +8,10 @@
         >
         </highcharts>
         <div style="position: absolute; top: 80px; left: 57px; font-size: 12px" v-if="rsi5 && rsi5.length > 0">
-            <span style="color: #4286f5">RSI(5)</span>: {{ rsi5[rsi5.length - 1][1].toFixed(2) }} (最高: {{ rsi5Max }})
+            <span style="color: #4286f5">RSI(5)</span>:
+            {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
+            ({{ rsi5[rsi5.length - 1][1] >= 50 ? '最高: ' + rsi5Max : '最低: ' + rsi5Min }})
         </div>
-
         <!-- :updateArgs="[true, true, true]" -->
     </div>
 </template>
@@ -36,6 +37,9 @@ export default {
         },
         rsi5Max() {
             return this.stockData.data && this.stockData.data.weekly_rsi_max ? this.stockData.data.weekly_rsi_max.toFixed(2) : '';
+        },
+        rsi5Min() {
+            return this.stockData.data && this.stockData.data.weekly_rsi_min ? this.stockData.data.weekly_rsi_min.toFixed(2) : '';
         },
         stockData() {
             console.log('stockData');
