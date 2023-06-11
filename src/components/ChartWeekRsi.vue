@@ -401,15 +401,15 @@ export default {
                         // color: '#e65596',
                         data: this.rsi5,
                         type: 'area',
-                        threshold: 90,
+                        threshold: 80,
                         zones: [
                             {
-                                value: 10,
+                                value: 20,
                                 color: '#e65596',
                                 fillColor: 'none',
                             },
                             {
-                                value: 90.01,
+                                value: 80.01,
                                 color: '#4286f5',
                                 fillColor: 'none',
                             },
