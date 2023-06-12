@@ -7,8 +7,21 @@
             style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 80px; left: 57px; font-size: 12px" v-if="rsi5 && rsi5.length > 0">
-            <span style="color: #4286f5">RSI(5)</span>:
+        <div style="position: absolute; top: 80px; left: 10px; font-size: 12px" v-if="rsi5 && rsi5.length > 0">
+            <span
+                style="
+                    display: inline-block;
+                    min-width: 48px;
+                    background-color: rgb(103, 194, 58);
+                    color: white;
+                    padding: 0px 3px;
+                    border-radius: 10px;
+                    font-size 12px;
+                    opacity: 0.83;
+                    line-height: 1.7;
+                "
+                >{{ rsi5Hint }}</span
+            >&nbsp;<span style="color: #4286f5">RSI(5)</span>:
             {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
             ({{ rsi5[rsi5.length - 1][1] >= 50 ? '最高: ' + rsi5Max : '最低: ' + rsi5Min }})
         </div>
@@ -40,6 +53,13 @@ export default {
         },
         rsi5Min() {
             return this.stockData.data && this.stockData.data.weekly_rsi_min ? this.stockData.data.weekly_rsi_min.toFixed(2) : '';
+        },
+        rsi5Hint() {
+            let str = '';
+            const lastRsi = _.last(this.rsi5)[1];
+            if (lastRsi < this.rsi5Max && this.rsi5Max - lastRsi <= 3) str = '接近最高';
+            else if (lastRsi >= this.rsi5Max) str = '歷史最高';
+            return str;
         },
         stockData() {
             console.log('stockData');
