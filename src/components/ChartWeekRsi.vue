@@ -18,7 +18,7 @@
                     border-radius: 10px;
                     font-size 12px;
                     opacity: 0.83;
-                    line-height: 1.7;
+                    line-height: 1.6;
                 "
                 >{{ rsi5Hint }}</span
             >&nbsp;<span style="color: #4286f5">RSI(5)</span>:
@@ -57,8 +57,10 @@ export default {
         rsi5Hint() {
             let str = '';
             const lastRsi = _.last(this.rsi5)[1];
-            if (lastRsi < this.rsi5Max && this.rsi5Max - lastRsi <= 3) str = '接近最高';
-            else if (lastRsi >= this.rsi5Max) str = '歷史最高';
+            if (this.rsi5Max !== '') {
+                if (lastRsi < this.rsi5Max && this.rsi5Max - lastRsi <= 3) str = '接近最高';
+                else if (lastRsi >= this.rsi5Max) str = '歷史最高';
+            }
             return str;
         },
         stockData() {

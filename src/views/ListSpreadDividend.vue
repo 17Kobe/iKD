@@ -3,7 +3,7 @@
         <el-row class="row-bg" justify="space-between" style="align-items: center; max-width: 650px">
             <el-col :span="10" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">價差&nbsp;&nbsp;</span>
-                <el-radio-group v-model="modeSpread" size="small" fill="#373737" text-color="#dedede">
+                <el-radio-group v-model="modeSpread" size="small" fill="#dedede" text-color="#373737">
                     <el-radio-button label="目前" />
                     <el-radio-button label="歷史" />
                 </el-radio-group>
@@ -193,7 +193,7 @@
         <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center; max-width: 650px">
             <el-col :span="10" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">股利&nbsp;&nbsp;</span>
-                <el-radio-group v-model="modeDividend" size="small" fill="#373737" text-color="#dedede">
+                <el-radio-group v-model="modeDividend" size="small" fill="#dedede" text-color="#373737">
                     <el-radio-button label="未來" />
                     <el-radio-button label="歷史" />
                 </el-radio-group>
