@@ -1531,6 +1531,20 @@ const stock = {
                 ? _.slice(found.data.weekly_rsi, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
                 : [];
         },
+        getStockDataWeeklyRsiMax: (state, getters) => (id) => {
+            console.log('getStockDataWeeklyRsi');
+            const found = getters.getStock(id);
+            return found.data && found.data.weekly_rsi
+                ? found.data.weekly_rsi_max
+                : null;
+        },
+        getStockDataWeeklyRsiMin: (state, getters) => (id) => {
+            console.log('getStockDataWeeklyRsi');
+            const found = getters.getStock(id);
+            return found.data && found.data.weekly_rsi
+                ? found.data.weekly_rsi_min
+                : null;
+        },
         getStockDataWeeklyMa5: (state, getters) => (id) => {
             console.log('getStockDataWeeklyMa5');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);

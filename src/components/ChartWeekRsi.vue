@@ -49,10 +49,13 @@ export default {
             return this.stockDataOfRsiPrice.map((value) => [value[0], value[1]]);
         },
         rsi5Max() {
-            return this.stockData.data && this.stockData.data.weekly_rsi_max ? this.stockData.data.weekly_rsi_max.toFixed(2) : '';
+            const value = this.$store.getters.getStockDataWeeklyRsiMax(this.parentData)
+            return value !== null ? value.toFixed(2) : '';
+            // return this.stockData.data && this.stockData.data.weekly_rsi_max ? this.stockData.data.weekly_rsi_max.toFixed(2) : '';
         },
         rsi5Min() {
-            return this.stockData.data && this.stockData.data.weekly_rsi_min ? this.stockData.data.weekly_rsi_min.toFixed(2) : '';
+            const value = this.$store.getters.getStockDataWeeklyRsiMin(this.parentData) !== null
+            return value ? value.toFixed(2) : '';
         },
         rsi5Hint() {
             let str = '';
