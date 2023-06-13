@@ -1116,10 +1116,8 @@ const stock = {
             console.log('SAVE_STOCK_POLICY_RESULT');
 
             // object of array 去 find 並 update
-
+            const foundStock = state.stockList.find((v) => v.id === stockId);
             // 像是從 UI改policy會沒有 tempStockList，需要重新計算
-            let weekly_rsi_max = 0;
-            let weekly_rsi_min = 0;
             let foundTempStock = state.tempStockList.find((v) => v.id === stockId);
             if (typeof foundTempStock === 'undefined') {
                 let tempStockListStockData = {};
@@ -1137,8 +1135,13 @@ const stock = {
                 tempStockListStockData = {};
                 tempStockListStockData.weekly_kdj = weekly_kdj_data;
                 tempStockListStockData.weekly_rsi = weekly_rsi_data;
+
+                let weekly_rsi_max = 0;
+                let weekly_rsi_min = 0;
                 weekly_rsi_max = _.maxBy(weekly_rsi_data, (element) => element[1])[1];
                 weekly_rsi_min = _.minBy(weekly_rsi_data, (element) => element[1])[1];
+                foundStock.data.weekly_rsi_max = weekly_rsi_max;
+                foundStock.data.weekly_rsi_min = weekly_rsi_min;
                 // console.log('max');
                 // console.log(weekly_rsi_max);
                 _.merge(tempStockListStockData, weekly_ma_data);
@@ -1149,9 +1152,6 @@ const stock = {
                 }
             }
 
-            const foundStock = state.stockList.find((v) => v.id === stockId);
-            foundStock.data.weekly_rsi_max = weekly_rsi_max;
-            foundStock.data.weekly_rsi_min = weekly_rsi_min;
             const policyResult = await this.dispatch('CALC_STOCK_INDICATORS_RESULT', stockId);
 
             if (policyResult !== null) {
@@ -1532,14 +1532,14 @@ const stock = {
                 : [];
         },
         getStockDataWeeklyRsiMax: (state, getters) => (id) => {
-            console.log('getStockDataWeeklyRsi');
+            console.log('getStockDataWeeklyRsiMax');
             const found = getters.getStock(id);
             return found.data && found.data.weekly_rsi
                 ? found.data.weekly_rsi_max
                 : null;
         },
         getStockDataWeeklyRsiMin: (state, getters) => (id) => {
-            console.log('getStockDataWeeklyRsi');
+            console.log('getStockDataWeeklyRsiMin');
             const found = getters.getStock(id);
             return found.data && found.data.weekly_rsi
                 ? found.data.weekly_rsi_min
