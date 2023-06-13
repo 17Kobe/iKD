@@ -54,8 +54,8 @@ export default {
             // return this.stockData.data && this.stockData.data.weekly_rsi_max ? this.stockData.data.weekly_rsi_max.toFixed(2) : '';
         },
         rsi5Min() {
-            const value = this.$store.getters.getStockDataWeeklyRsiMin(this.parentData) !== null
-            return value ? value.toFixed(2) : '';
+            const value = this.$store.getters.getStockDataWeeklyRsiMin(this.parentData)
+            return value !== null ? value.toFixed(2) : '';
         },
         rsi5Hint() {
             let str = '';
