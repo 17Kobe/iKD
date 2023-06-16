@@ -18,7 +18,7 @@
                     title="平均成本線"
                     :style="[
                         last_price > cost[cost.length - 1][1]
-                            ? { 'background-color': '在4口金土竹口' }
+                            ? { 'background-color': '#ededed' }
                             : { 'background-color': 'none' },
                         { color: '#4286f5' },
                     ]"
@@ -31,7 +31,7 @@
                     title="MA(5)"
                     :style="[
                         last_price > ma5[ma5.length - 1][1]
-                            ? { 'background-color': '在4口金土竹口' }
+                            ? { 'background-color': '#ededed' }
                             : { 'background-color': 'none' },
                         { color: '#834beb' },
                     ]"
@@ -43,7 +43,7 @@
                     title="MA(10)"
                     :style="[
                         last_price > ma10[ma10.length - 1][1]
-                            ? { 'background-color': '在4口金土竹口' }
+                            ? { 'background-color': '#ededed' }
                             : { 'background-color': 'none' },
                         { color: '#febd09' },
                     ]"
@@ -56,7 +56,7 @@
                     title="MA(20)"
                     :style="[
                         last_price > ma20[ma20.length - 1][1]
-                            ? { 'background-color': '在4口金土竹口' }
+                            ? { 'background-color': '#ededed' }
                             : { 'background-color': 'none' },
                         { color: '#fc7742' },
                     ]"
