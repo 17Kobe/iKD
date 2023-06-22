@@ -23,7 +23,7 @@
                 >{{ rsi5Hint }}</span
             >&nbsp;<span style="color: #4286f5">RSI(5)</span>:
             {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
-            ({{ rsi5[rsi5.length - 1][1] >= 50 ? '最高: ' + rsi5Max : '最低: ' + rsi5Min }})
+            ({{ rsi5[rsi5.length - 1][1] >= 50 ? '最高: ' + (Math.round(rsi5Max * 100) / 100) : '最低: ' + (Math.round(rsi5Min * 100) / 100) }})
         </div>
         <!-- :updateArgs="[true, true, true]" -->
     </div>
@@ -49,15 +49,18 @@ export default {
             return this.stockDataOfRsiPrice.map((value) => [value[0], value[1]]);
         },
         rsi5Max() {
-            return this.stockData.data && this.stockData.data.weekly_rsi_max ? this.stockData.data.weekly_rsi_max.toFixed(2) : '';
+            return this.$store.getters.getStockDataWeeklyRsiMax(this.parentData);
+            // return this.stockData.data && this.stockData.data.weekly_rsi_max ? this.stockData.data.weekly_rsi_max.toFixed(2) : '';
         },
         rsi5Min() {
-            return this.stockData.data && this.stockData.data.weekly_rsi_min ? this.stockData.data.weekly_rsi_min.toFixed(2) : '';
+            return this.$store.getters.getStockDataWeeklyRsiMin(this.parentData);
         },
         rsi5Hint() {
             let str = '';
             const lastRsi = _.last(this.rsi5)[1];
             if (this.rsi5Max !== '') {
+                console.log(this.rsi5Max);
+                console.log(lastRsi);
                 if (lastRsi < this.rsi5Max && this.rsi5Max - lastRsi <= 3) str = '接近最高';
                 else if (lastRsi >= this.rsi5Max) str = '歷史最高';
             }
