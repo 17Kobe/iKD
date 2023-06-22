@@ -308,7 +308,13 @@ const dividend = {
                 if (!tempDividendList[index].number_of_shares) tempDividendList[index].number_of_shares = foundStock.cost.total;
             });
             if (mode === '歷史') return _.orderBy(tempDividendList, ['payment_date'], ['desc']);
-            else return _.orderBy(tempDividendList, ['trading_date'], ['asc']);
+            else return _.orderBy(tempDividendList, ['trading_date'], ['desc']);
+        },
+        getStockDividendList: (state) => (stockId) => {
+            console.log('getStockDividendList');
+            const allDividendList = _.concat(state.dividendList, state.historyDividendList);
+
+            return _.orderBy(_.filter(allDividendList, { id: stockId }), ['trading_date'], ['asc']);
         },
     },
 };

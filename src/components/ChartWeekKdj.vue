@@ -153,6 +153,21 @@ export default {
             );
         },
 
+        allDividendList() {
+            const dividendList = this.$store.getters.getStockDividendList(this.parentData);
+            console.log(this.parentData);
+            return _.filter(this.k, (entry, index) => {
+                const startDate = index > 0 ? moment(this.k[index - 1][0]).add(1, 'day') : null;
+                const endDate = moment(entry[0]);
+
+                return Boolean(
+                    _.find(dividendList, function (o) {
+                        return moment(o.trading_date).isBetween(startDate, endDate);
+                    })
+                );
+            });
+        },
+
         kdGoldLimit() {
             // 黃金交叉，值要畫橫線
             console.log('kdGoldLimit');
@@ -500,6 +515,18 @@ export default {
                         // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
                         data: this.stockDataOfPolicyResultBuyOrSellCancel,
+                    },
+                    {
+                        type: 'scatter',
+
+                        color: 'rgba(255, 193, 7, 0.9)',
+
+                        marker: {
+                            symbol: 'triangle-down',
+                        },
+                        // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
+                        enableMouseTracking: false,
+                        data: this.allDividendList,
                     },
                 ],
             };
