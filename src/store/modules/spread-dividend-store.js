@@ -307,7 +307,8 @@ const dividend = {
                 // 有可能清掉股票了，但 dividendlist 還保留著，所以要判斷
                 if (!tempDividendList[index].number_of_shares) tempDividendList[index].number_of_shares = foundStock.cost.total;
             });
-            return _.orderBy(tempDividendList, ['trading_date'], ['asc']);
+            if (mode === '歷史') return _.orderBy(tempDividendList, ['payment_date'], ['desc']);
+            else return _.orderBy(tempDividendList, ['trading_date'], ['asc']);
         },
     },
 };

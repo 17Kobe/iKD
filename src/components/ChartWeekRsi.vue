@@ -18,7 +18,7 @@
                     border-radius: 10px;
                     font-size 12px;
                     opacity: 0.83;
-                    line-height: 1.6;
+                    line-height: 1.5;
                 "
                 >{{ rsi5Hint }}</span
             >&nbsp;<span style="color: #4286f5">RSI(5)</span>:
