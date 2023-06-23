@@ -421,7 +421,7 @@ export default {
                             title(context) {
                                 const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
                                 return (
-                                    moment(context[0].parsed.x).format('YYYY-MM-DD') +
+                                    moment(context[0].parsed.x).format('M/DD') +
                                     '(' +
                                     dayOfWeek[moment(context[0].parsed.x).day()] +
                                     ')'
