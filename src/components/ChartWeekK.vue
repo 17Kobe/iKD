@@ -22,7 +22,11 @@
                             : { 'background-color': 'none' },
                         { color: '#4286f5' },
                     ]"
-                    >{{ Number(cost[cost.length - 1][1].toFixed(2)) }}</span
+                    >{{
+                        cost[cost.length - 1][1] >= 100
+                            ? Number(cost[cost.length - 1][1].toFixed(0))
+                            : Number(cost[cost.length - 1][1].toFixed(2))
+                    }}</span
                 ></span
             >
             <span v-if="ma5 && ma5.length > 0">
@@ -30,12 +34,14 @@
                 <span
                     title="MA(5)"
                     :style="[
-                        last_price > ma5[ma5.length - 1][1]
-                            ? { 'background-color': '#ededed' }
-                            : { 'background-color': 'none' },
+                        last_price > ma5[ma5.length - 1][1] ? { 'background-color': '#ededed' } : { 'background-color': 'none' },
                         { color: '#834beb' },
                     ]"
-                    >{{ Number(ma5[ma5.length - 1][1].toFixed(2)) }}</span
+                    >{{
+                        ma5[ma5.length - 1][1] >= 100
+                            ? Number(ma5[ma5.length - 1][1].toFixed(0))
+                            : Number(ma5[ma5.length - 1][1].toFixed(2))
+                    }}</span
                 ></span
             >
             <span v-if="ma10 && ma10.length > 0">
@@ -47,7 +53,11 @@
                             : { 'background-color': 'none' },
                         { color: '#febd09' },
                     ]"
-                    >{{ Number(ma10[ma10.length - 1][1].toFixed(2)) }}</span
+                    >{{
+                        ma10[ma10.length - 1][1] >= 100
+                            ? Number(ma10[ma10.length - 1][1].toFixed(0))
+                            : Number(ma10[ma10.length - 1][1].toFixed(2))
+                    }}</span
                 ></span
             >
             <span v-if="ma20 && ma20.length > 0">
@@ -60,7 +70,11 @@
                             : { 'background-color': 'none' },
                         { color: '#fc7742' },
                     ]"
-                    >{{ Number(ma20[ma20.length - 1][1].toFixed(2)) }}</span
+                    >{{
+                        ma20[ma20.length - 1][1] >= 100
+                            ? Number(ma20[ma20.length - 1][1].toFixed(0))
+                            : Number(ma20[ma20.length - 1][1].toFixed(2))
+                    }}</span
                 ></span
             >
         </div>
