@@ -66,7 +66,7 @@ export default {
                 console.log(this.rsi5Max);
                 console.log(lastRsi);
                 if (lastRsi < this.rsi5Max && this.rsi5Max - lastRsi <= 3) str = '接近最高';
-                else if (lastRsi >= this.rsi5Max) str = '最高了';
+                else if (lastRsi >= this.rsi5Max) str = '最高囉';
             }
             return str;
         },
