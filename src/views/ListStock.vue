@@ -607,7 +607,7 @@
                                             ><span>&nbsp;累積報酬率</span></el-col
                                         >
                                         <el-col :span="5" style="padding-right: 16px; text-align: right"
-                                            ><span style="color: #4386f5; font-size: 14px">{{
+                                            ><span style="color: #4386f5; font-size: 14px; font-weight: bold">{{
                                                 Number((scope.row.policy.stats.sum_of_returns * 100).toFixed(1))
                                             }}</span
                                             >%</el-col
