@@ -234,9 +234,9 @@
 
         <el-table :data="showDividendList" style="width: 100%" empty-text="無資料">
             <el-table-column label="名稱" prop="name" width="90" align="center"> </el-table-column>
-            <el-table-column label="除息日" width="42" align="center" v-if="modeDividend === '未來'">
+            <el-table-column label="除息日" width="42" align="right" v-if="modeDividend === '未來'">
                 <template #default="scope">
-                    {{ scope.row.trading_date.substr(5, 5).replace('-', '/') }}
+                    {{ scope.row.trading_date.substr(5).replace(/^0+/, '').replace('-', '/') }}
                 </template>
             </el-table-column>
             <el-table-column label="現金股利&nbsp;" width="65" align="right" header-align="right">
@@ -254,9 +254,13 @@
                     }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="發放日" :width="modeDividend === '未來' ? 42 : 82" align="center">
+            <el-table-column label="發放日" :width="modeDividend === '未來' ? 42 : 82" align="right">
                 <template #default="scope">
-                    {{ modeDividend === '未來' ? scope.row.payment_date.substr(5, 5).replace('-', '/') : scope.row.payment_date }}
+                    {{
+                        modeDividend === '未來'
+                            ? scope.row.payment_date.substr(5).replace(/^0+/, '').replace('-', '/')
+                            : scope.row.payment_date
+                    }}
                 </template>
             </el-table-column>
             <el-table-column label="累積股數" width="70" align="right" header-align="right">

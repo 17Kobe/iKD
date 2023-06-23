@@ -422,21 +422,14 @@ export default {
                                         const startDate = moment(this.points[0].series.xData[point_index - 1]);
                                         const endDate = moment(point.x);
                                         var foundDate = _.find(component.allDividendList, function (o) {
-                                            // console.log(moment(o[0]).format('YYYY-MM-DD'));
-                                            // console.log(startDate.format('YYYY-MM-DD'));
-                                            // console.log(endDate.format('YYYY-MM-DD'));
-
-                                            // if (moment(o[0]).isBetween(startDate, endDate, undefined, '[]')) {
-                                            //     console.log('ok');
-                                            // } else {
-                                            //     console.log('not ok');
-                                            // }
                                             return moment(o[0]).isBetween(startDate, endDate, undefined, '[]');
                                         });
                                         if (foundDate)
                                             str += `<br>除息日: <span style="color: #FFC107; font-weight:bold;">${moment(
                                                 foundDate[0]
-                                            ).format('MM/DD')}</span>`;
+                                            ).format('M/DD')}</span>(<span style="color: #3333ee; font-weight:bold;">${
+                                                dayOfWeek[moment(foundDate[0]).day()]
+                                            }</span>)`;
                                     }
                                 }
                             }

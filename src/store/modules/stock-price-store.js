@@ -1266,9 +1266,15 @@ const stock = {
                     // 去累加買入訊號單位
                     const rateOfReturn = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
 
-                    // 搭配 絕對正報酬
+                    // console.log('rateOfReturn');
+                    // console.log(rateOfReturn);
+                    // console.log(rateOfReturn * 100);
+                    // console.log(foundEarn.limit);
+                    // console.log(obj.is_sell);
+                    // console.log(obj.is_latest);
+                    // 搭配 絕對正報酬，應該是要該天要有賣，有遇到 is_lastest=true，但沒有is_sell，最終有earn
                     let isCancelToSell = false;
-                    if (foundEarn && rateOfReturn * 100 < foundEarn.limit) {
+                    if (foundEarn && obj.is_sell && rateOfReturn * 100 < foundEarn.limit) {
                         isCancelToSell = true;
                         obj.is_sell_cancel = true;
                         obj.reason.push('earn');
@@ -1534,16 +1540,12 @@ const stock = {
         getStockDataWeeklyRsiMax: (state, getters) => (id) => {
             console.log('getStockDataWeeklyRsiMax');
             const found = getters.getStock(id);
-            return found.data && found.data.weekly_rsi
-                ? found.data.weekly_rsi_max
-                : null;
+            return found.data && found.data.weekly_rsi ? found.data.weekly_rsi_max : null;
         },
         getStockDataWeeklyRsiMin: (state, getters) => (id) => {
             console.log('getStockDataWeeklyRsiMin');
             const found = getters.getStock(id);
-            return found.data && found.data.weekly_rsi
-                ? found.data.weekly_rsi_min
-                : null;
+            return found.data && found.data.weekly_rsi ? found.data.weekly_rsi_min : null;
         },
         getStockDataWeeklyMa5: (state, getters) => (id) => {
             console.log('getStockDataWeeklyMa5');
