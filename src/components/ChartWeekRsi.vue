@@ -23,7 +23,11 @@
                 >{{ rsi5Hint }}</span
             >&nbsp;<span style="color: #4286f5">RSI(5)</span>:
             {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
-            ({{ rsi5[rsi5.length - 1][1] >= 50 ? '最高: ' + (Math.round(rsi5Max * 100) / 100) : '最低: ' + (Math.round(rsi5Min * 100) / 100) }})
+            ({{
+                rsi5[rsi5.length - 1][1] >= 50
+                    ? '最高: ' + Math.round(rsi5Max * 100) / 100
+                    : '最低: ' + Math.round(rsi5Min * 100) / 100
+            }})
         </div>
         <!-- :updateArgs="[true, true, true]" -->
     </div>
@@ -62,7 +66,7 @@ export default {
                 console.log(this.rsi5Max);
                 console.log(lastRsi);
                 if (lastRsi < this.rsi5Max && this.rsi5Max - lastRsi <= 3) str = '接近最高';
-                else if (lastRsi >= this.rsi5Max) str = '歷史最高';
+                else if (lastRsi >= this.rsi5Max) str = '最高了';
             }
             return str;
         },
