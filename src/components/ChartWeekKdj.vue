@@ -337,8 +337,12 @@ export default {
                     formatter() {
                         let str = '<div>';
                         const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+                        console.log('point');
+                        console.log(this.points);
                         // 在畫買賣訊號有可能沒有 points，是 undefined
                         this.points.forEach((point, index) => {
+                            console.log(point);
+                            console.log(index);
                             // const fontColor = point.y > point.point.open ? '#ee3333' : '#01aa00';
                             if (index === 0) {
                                 str += `<div style="text-align:center;">${moment(point.x).format(
@@ -346,7 +350,7 @@ export default {
                                 )}(<span style="color: #3333ee; font-weight:bold;">${
                                     dayOfWeek[moment(point.x).day()]
                                 }</span>)</div>`;
-                                str += `<span style="color: #4286f5; font-weight:bold;">K</span>: ${Number(point.y.toFixed(2))} `;
+                                str += `K: <span style="color: #4286f5; font-weight:bold;">${Number(point.y.toFixed(2))}</span> `;
                             } else if (index === 1) {
                                 const found = _.find(
                                     component.stockData.data.weekly,
@@ -354,12 +358,12 @@ export default {
                                 );
 
                                 // 取得該股價並且顯示
-                                str += `<span style="color: #e75c9a; font-weight:bold;">D</span>: ${Number(point.y.toFixed(2))}`;
+                                str += `D: <span style="color: #e75c9a; font-weight:bold;">${Number(point.y.toFixed(2))}</span>`;
                             } else if (index === 2) {
                                 // 取得該股價並且顯示
-                                str += `<br><span style="color: #febd09; font-weight:bold;">J</span>: ${Number(
+                                str += `<br>J: <span style="color: #febd09; font-weight:bold;">${Number(
                                     point.y.toFixed(2)
-                                )} `;
+                                )}</span> `;
                             }
 
                             if (this.points.length - 1 == index) {
@@ -368,7 +372,7 @@ export default {
                                     (array) => array[0] === moment(point.x).format('YYYY-MM-DD')
                                 );
                                 if (index === 1) str += '<br>';
-                                str += `<span style="color: #834beb; font-weight:bold;">股價</span>: ${found[4]}
+                                str += `股價: <span style="color: #834beb; font-weight:bold;">${found[4]}</span>
                                 `;
                                 if (component.stockData.policy && component.stockData.policy.result) {
                                     const foundPolicyResult = _.find(component.stockData.policy.result, {
@@ -376,20 +380,63 @@ export default {
                                     });
                                     if (foundPolicyResult) {
                                         let showSignals = [];
-                                        if (foundPolicyResult.reason.includes('kd_gold')) showSignals.push('[KD黃金]');
-                                        if (foundPolicyResult.reason.includes('kd_dead')) showSignals.push('[KD死亡]');
-                                        if (foundPolicyResult.reason.includes('kd_turn_down')) showSignals.push('[KD下折]');
-                                        if (foundPolicyResult.reason.includes('kd_turn_up')) showSignals.push('[KD上折]');
-                                        if (foundPolicyResult.reason.includes('cost_down')) showSignals.push('[成本未跌過]');
-                                        if (foundPolicyResult.reason.includes('earn')) showSignals.push('[絕對正報酬]');
+                                        if (foundPolicyResult.reason.includes('kd_gold'))
+                                            showSignals.push(
+                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px;">KD黃金</span>'
+                                            );
+                                        if (foundPolicyResult.reason.includes('kd_dead'))
+                                            showSignals.push(
+                                                '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px;">KD死亡</span>'
+                                            );
+                                        if (foundPolicyResult.reason.includes('kd_turn_down'))
+                                            showSignals.push(
+                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px;">KD下折</span>'
+                                            );
+                                        if (foundPolicyResult.reason.includes('kd_turn_up'))
+                                            showSignals.push(
+                                                '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px;">KD上折</span>'
+                                            );
+                                        if (foundPolicyResult.reason.includes('cost_down'))
+                                            showSignals.push(
+                                                '<span style="background-color:#999999; color:#ffffff; padding: 0 1px; border-radius:5px;">成本未跌過</span>'
+                                            );
+                                        if (foundPolicyResult.reason.includes('earn'))
+                                            showSignals.push(
+                                                '<span style="background-color:#999999; color:#ffffff; padding: 0 1px; border-radius:5px;">絕對正報酬</span>'
+                                            );
                                         if (foundPolicyResult.reason.includes('annual_fixed_date_buy'))
-                                            showSignals.push('[每年固定日買]');
+                                            showSignals.push(
+                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px;">每年固定日買</span>'
+                                            );
                                         if (foundPolicyResult.reason.includes('annual_fixed_date_sell'))
-                                            showSignals.push('[每年固定日賣]');
-                                        if (showSignals.length > 0)
-                                            str += `<br><span style="color: #e75c9a; font-weight:bold;">策略</span>: ${showSignals.join(
-                                                ', '
-                                            )}`;
+                                            showSignals.push(
+                                                '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px;">每年固定日賣</span>'
+                                            );
+                                        if (showSignals.length > 0) str += `<br>策略: ${showSignals.join(', ')}`;
+                                    }
+                                }
+
+                                if (component.allDividendList && component.allDividendList.length > 0) {
+                                    const point_index = this.points[0].point.index;
+                                    if (point_index > 0) {
+                                        const startDate = moment(this.points[0].series.xData[point_index - 1]);
+                                        const endDate = moment(point.x);
+                                        var foundDate = _.find(component.allDividendList, function (o) {
+                                            // console.log(moment(o[0]).format('YYYY-MM-DD'));
+                                            // console.log(startDate.format('YYYY-MM-DD'));
+                                            // console.log(endDate.format('YYYY-MM-DD'));
+
+                                            // if (moment(o[0]).isBetween(startDate, endDate, undefined, '[]')) {
+                                            //     console.log('ok');
+                                            // } else {
+                                            //     console.log('not ok');
+                                            // }
+                                            return moment(o[0]).isBetween(startDate, endDate, undefined, '[]');
+                                        });
+                                        if (foundDate)
+                                            str += `<br>除息日: <span style="color: #FFC107; font-weight:bold;">${moment(
+                                                foundDate[0]
+                                            ).format('MM/DD')}</span>`;
                                     }
                                 }
                             }

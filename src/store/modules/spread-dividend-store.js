@@ -308,7 +308,7 @@ const dividend = {
                 if (!tempDividendList[index].number_of_shares) tempDividendList[index].number_of_shares = foundStock.cost.total;
             });
             if (mode === '歷史') return _.orderBy(tempDividendList, ['payment_date'], ['desc']);
-            else return _.orderBy(tempDividendList, ['trading_date'], ['desc']);
+            else return _.orderBy(tempDividendList, ['trading_date'], ['asc']);
         },
         getStockDividendList: (state) => (stockId) => {
             console.log('getStockDividendList');
