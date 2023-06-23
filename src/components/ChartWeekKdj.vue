@@ -382,35 +382,35 @@ export default {
                                         let showSignals = [];
                                         if (foundPolicyResult.reason.includes('kd_gold'))
                                             showSignals.push(
-                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px;">KD黃金</span>'
+                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">KD黃金</span>'
                                             );
                                         if (foundPolicyResult.reason.includes('kd_dead'))
                                             showSignals.push(
-                                                '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px;">KD死亡</span>'
+                                                '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">KD死亡</span>'
                                             );
                                         if (foundPolicyResult.reason.includes('kd_turn_down'))
                                             showSignals.push(
-                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px;">KD下折</span>'
+                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">KD下折</span>'
                                             );
                                         if (foundPolicyResult.reason.includes('kd_turn_up'))
                                             showSignals.push(
-                                                '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px;">KD上折</span>'
+                                                '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">KD上折</span>'
                                             );
                                         if (foundPolicyResult.reason.includes('cost_down'))
                                             showSignals.push(
-                                                '<span style="background-color:#999999; color:#ffffff; padding: 0 1px; border-radius:5px;">成本未跌過</span>'
+                                                '<span style="background-color:#999999; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">成本未跌過</span>'
                                             );
                                         if (foundPolicyResult.reason.includes('earn'))
                                             showSignals.push(
-                                                '<span style="background-color:#999999; color:#ffffff; padding: 0 1px; border-radius:5px;">絕對正報酬</span>'
+                                                '<span style="background-color:#999999; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">絕對正報酬</span>'
                                             );
                                         if (foundPolicyResult.reason.includes('annual_fixed_date_buy'))
                                             showSignals.push(
-                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px;">每年固定日買</span>'
+                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">每年固定日買</span>'
                                             );
                                         if (foundPolicyResult.reason.includes('annual_fixed_date_sell'))
                                             showSignals.push(
-                                                '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px;">每年固定日賣</span>'
+                                                '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">每年固定日賣</span>'
                                             );
                                         if (showSignals.length > 0) str += `<br>策略: ${showSignals.join(', ')}`;
                                     }
