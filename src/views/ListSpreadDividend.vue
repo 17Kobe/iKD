@@ -72,7 +72,7 @@
         </el-row>
 
         <el-table :data="showSpreadList" style="width: 100%" empty-text="無資料">
-            <el-table-column label="名稱" width="90" align="center" fixed>
+            <el-table-column label="名稱" width="95" align="center" fixed>
                 <template #default="scope">
                     <el-badge
                         :value="scope.row.badge"
@@ -90,11 +90,11 @@
                         ]"
                         :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
                     >
-                        {{ scope.row.name.replace('A2', '') }}
+                        {{ scope.row.name.replace('基金', '').replace('A2', '') }}
                     </el-badge>
                 </template>
             </el-table-column>
-            <el-table-column label="漲跌幅" width="80" align="right" header-align="right" v-if="modeSpread === '目前'">
+            <el-table-column label="漲跌幅" width="70" align="right" header-align="right" v-if="modeSpread === '目前'">
                 <template #default="scope">
                     <span
                         :style="[
@@ -285,7 +285,7 @@
         </el-row>
 
         <el-table :data="noBuyList" style="width: 100%" empty-text="無資料" class="i-table">
-            <el-table-column label="名稱" width="130" align="center">
+            <el-table-column label="名稱" width="145" align="center">
                 <template #default="scope">
                     <el-badge
                         :value="scope.row.badge"
@@ -301,7 +301,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="漲跌幅" width="80" align="right" header-align="right">
+            <el-table-column label="漲跌幅" width="70" align="right" header-align="right">
                 <template #default="scope">
                     <span
                         :style="[
