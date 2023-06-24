@@ -300,7 +300,7 @@
                     </el-badge>
                 </template>
             </el-table-column>
-            <el-table-column label="現價" prop="last_price" width="45" align="right" header-align="right"> </el-table-column>
+
             <el-table-column label="漲跌幅" width="80" align="right" header-align="right">
                 <template #default="scope">
                     <span
@@ -335,6 +335,7 @@
                     </span>
                 </template>
             </el-table-column>
+            <el-table-column label="現價" prop="last_price" width="45" align="right" header-align="right"> </el-table-column>
         </el-table>
 
         <br /><br />
