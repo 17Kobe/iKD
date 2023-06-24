@@ -94,50 +94,6 @@
                     </el-badge>
                 </template>
             </el-table-column>
-            <el-table-column label="成本價" width="45" align="center">
-                <template #default="scope">
-                    <span>
-                        {{
-                            scope.row.cost.avg >= 100
-                                ? Number(scope.row.cost.avg.toFixed(1))
-                                : Number(scope.row.cost.avg.toFixed(2))
-                        }}
-                    </span>
-                </template>
-            </el-table-column>
-            <el-table-column :label="modeSpread === '目前' ? '現價' : '賣價'" prop="last_price" width="45" align="center">
-            </el-table-column>
-            <el-table-column label="本金&nbsp;" width="75" align="right" header-align="right">
-                <template #default="scope">
-                    <span> $ {{ scope.row.cost.sum.toLocaleString('en-US') }} </span>
-                </template>
-            </el-table-column>
-            <el-table-column label="報酬率" width="53" align="right" header-align="right">
-                <template #default="scope">
-                    <span style="font-weight: bold; color: #a8a8a8"
-                        >{{
-                            scope.row.cost.rate_of_return === null
-                                ? 'N/A'
-                                : scope.row.cost.rate_of_return >= 1000
-                                ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
-                                : Math.round(scope.row.cost.rate_of_return * 10) / 10
-                        }}<span style="margin-left: 2px" v-if="scope.row.cost.rate_of_return !== null">%</span></span
-                    >
-                </template>
-            </el-table-column>
-            <el-table-column label="價差&nbsp;&nbsp;" width="81" align="right" header-align="right">
-                <template #default="scope">
-                    <el-tag
-                        class="ml-2"
-                        size="small"
-                        style="margin: 1px 0px"
-                        :type="scope.row.cost.return >= 0 ? 'primary' : 'danger'"
-                        ><span style="font-size: 14px; font-weight: bold">
-                            $ {{ scope.row.cost.return === 0 ? 0 : scope.row.cost.return.toLocaleString('en-US') }}
-                        </span></el-tag
-                    >
-                </template>
-            </el-table-column>
             <el-table-column label="漲跌幅" width="80" align="right" header-align="right" v-if="modeSpread === '目前'">
                 <template #default="scope">
                     <span
@@ -171,6 +127,51 @@
                         </span>
                     </span>
                 </template>
+            </el-table-column>
+            <el-table-column label="本金&nbsp;" width="80" align="right" header-align="right">
+                <template #default="scope">
+                    <span> $ {{ scope.row.cost.sum.toLocaleString('en-US') }} </span>
+                </template>
+            </el-table-column>
+            <el-table-column label="報酬率" width="60" align="right" header-align="right">
+                <template #default="scope">
+                    <span style="font-weight: bold; color: #a8a8a8"
+                        >{{
+                            scope.row.cost.rate_of_return === null
+                                ? 'N/A'
+                                : scope.row.cost.rate_of_return >= 1000
+                                ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
+                                : Math.round(scope.row.cost.rate_of_return * 10) / 10
+                        }}<span style="margin-left: 2px" v-if="scope.row.cost.rate_of_return !== null">%</span></span
+                    >
+                </template>
+            </el-table-column>
+            <el-table-column label="價差&nbsp;&nbsp;" width="81" align="right" header-align="right">
+                <template #default="scope">
+                    <el-tag
+                        class="ml-2"
+                        size="small"
+                        style="margin: 1px 0px"
+                        :type="scope.row.cost.return >= 0 ? 'primary' : 'danger'"
+                        ><span style="font-size: 14px; font-weight: bold">
+                            $ {{ scope.row.cost.return === 0 ? 0 : scope.row.cost.return.toLocaleString('en-US') }}
+                        </span></el-tag
+                    >
+                </template>
+            </el-table-column>
+
+            <el-table-column label="成本價" width="55" align="center">
+                <template #default="scope">
+                    <span>
+                        {{
+                            scope.row.cost.avg >= 100
+                                ? Number(scope.row.cost.avg.toFixed(1))
+                                : Number(scope.row.cost.avg.toFixed(2))
+                        }}
+                    </span>
+                </template>
+            </el-table-column>
+            <el-table-column :label="modeSpread === '目前' ? '現價' : '賣價'" prop="last_price" width="55" align="center">
             </el-table-column>
             <el-table-column
                 :label="modeSpread === '目前' ? '累積股數&nbsp;&nbsp;' : '賣出股數&nbsp;&nbsp;'"
