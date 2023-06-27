@@ -9,9 +9,14 @@
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="display: flex; padding: 4px 4px 0 2px">
                 <el-card shadow="hover" style="flex: 1" id="line-chart-card">
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
-                        資產走勢
+                        資產走勢 (今日增減: $ {{ todayAsset.toLocaleString('en-US') }})
                     </div>
-                    <el-tooltip class="box-item" effect="dark" :content="`今日增減： ${todayAsset}`" placement="bottom">
+                    <el-tooltip
+                        class="box-item"
+                        effect="dark"
+                        :content="`今日增減： ${todayAsset.toLocaleString('en-US')}`"
+                        placement="bottom"
+                    >
                         <el-tag class="my-1" size="large" style="width: 100%; text-align: right"
                             >總計
                             <span style="font-size: 20px"> $ </span>
