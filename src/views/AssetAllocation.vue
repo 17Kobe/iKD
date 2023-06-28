@@ -9,7 +9,11 @@
             <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="display: flex; padding: 4px 4px 0 2px">
                 <el-card shadow="hover" style="flex: 1" id="line-chart-card">
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
-                        資產走勢 (今日: $ {{ todayAsset.toLocaleString('en-US') }})
+                        資產走勢 (今日: $
+                        <span :style="[todayAsset > 0 ? { color: '#409eff' } : { color: '#f56c6c' }]">{{
+                            (todayAsset >= 0 ? '+' : '') + todayAsset.toLocaleString('en-US')
+                        }}</span
+                        >)
                     </div>
                     <el-tooltip
                         class="box-item"
@@ -464,7 +468,7 @@ export default {
             const last = _.last(historyAssetList);
             const secondLast = _.nth(historyAssetList, -2);
             const diff = last.y - secondLast.y;
-            return diff >= 0 ? '+' + diff : diff;
+            return diff;
         },
         spreadList() {
             return this.$store.getters.getSpreadList('目前');

@@ -41,7 +41,7 @@
                 <el-tag
                     size="small"
                     style="float: right; position: relative; left: 7px; top: 2px; padding: 0 2px; border-radius: 10px"
-                    :type="totalRateOfReturn >= 0 ? 'danger' : 'success '"
+                    :type="totalRateOfReturn >= 0 ? 'primary' : 'danger '"
                 >
                     <span style="font-size: 14px"
                         ><i
