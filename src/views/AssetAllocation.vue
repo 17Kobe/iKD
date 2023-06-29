@@ -10,7 +10,7 @@
                 <el-card shadow="hover" style="flex: 1" id="line-chart-card">
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
                         資產走勢 (今日: $
-                        <span :style="[todayAsset > 0 ? { color: '#409eff' } : { color: '#f56c6c' }]">{{
+                        <span :style="[todayAsset >= 0 ? { color: '#409eff' } : { color: '#f56c6c' }]">{{
                             (todayAsset >= 0 ? '+' : '') + todayAsset.toLocaleString('en-US')
                         }}</span
                         >)
