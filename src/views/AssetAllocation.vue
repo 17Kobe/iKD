@@ -278,62 +278,6 @@ export default {
     data() {
         return {
             assetList: [],
-            barOptions: {
-                scales: {
-                    y: {
-                        ticks: {
-                            callback(value, index, ticks) {
-                                if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
-                                else return `$ ${value}`;
-                            },
-                        },
-                    },
-                },
-                plugins: {
-                    legend: {
-                        display: false,
-                    },
-                    title: {
-                        display: true,
-                        text: '資產和負債',
-                        // align: 'start',
-                        padding: {
-                            top: 5,
-                            bottom: 20,
-                        },
-                        // color: 'blue',
-                    },
-                    datalabels: {
-                        anchor: 'end', // remove this line to get label in middle of the bar
-                        align: 'end',
-                        formatter: (val) => {
-                            if (!val || val === 0) return '';
-                            return `$ ${Number((val / 10000).toFixed(1))} 萬`;
-                        },
-                        labels: {
-                            // value: {
-                            //     color: 'blue',
-                            // },
-                        },
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label(context) {
-                                let label = context.dataset.label || '';
-
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += `$ ${context.parsed.y.toLocaleString('en-US')}`;
-                                }
-                                return label;
-                            },
-                        },
-                    },
-                },
-            },
-
             lineOptions: {
                 // 隱藏點
                 elements: {
@@ -503,6 +447,9 @@ export default {
                 return acc;
             }, 0);
         },
+        netAssets() {
+            return this.assets - this.liabilities;
+        },
         demandDeposit() {
             // 活存 sum
             return this.assetList.reduce((acc, { account, amount }) => {
@@ -590,6 +537,63 @@ export default {
                         },
                     },
                 ],
+            };
+        },
+        barOptions() {
+            return {
+                scales: {
+                    y: {
+                        ticks: {
+                            callback(value, index, ticks) {
+                                if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                else return `$ ${value}`;
+                            },
+                        },
+                    },
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    title: {
+                        display: true,
+                        text: `資產和負債 (淨資產: $ ${Number((this.netAssets / 10000).toFixed(1))} 萬)`,
+                        // align: 'start',
+                        padding: {
+                            top: 5,
+                            bottom: 20,
+                        },
+                        // color: 'blue',
+                    },
+                    datalabels: {
+                        anchor: 'end', // remove this line to get label in middle of the bar
+                        align: 'end',
+                        formatter: (val) => {
+                            if (!val || val === 0) return '';
+                            return `$ ${Number((val / 10000).toFixed(1))} 萬`;
+                        },
+                        labels: {
+                            // value: {
+                            //     color: 'blue',
+                            // },
+                        },
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                let label = context.dataset.label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += `$ ${context.parsed.y.toLocaleString('en-US')}`;
+                                }
+                                return label;
+                            },
+                        },
+                    },
+                },
             };
         },
         pieOptions() {
