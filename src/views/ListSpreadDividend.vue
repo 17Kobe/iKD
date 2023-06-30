@@ -43,7 +43,7 @@
                     style="float: right; position: relative; left: 7px; top: 2px; padding: 0 2px; border-radius: 10px"
                     :type="totalRateOfReturn >= 0 ? 'primary' : 'danger '"
                 >
-                    <span style="font-size: 14px"
+                    <!-- <span style="font-size: 14px"
                         ><i
                             :class="[
                                 totalRateOfReturn < 0 ? 'el-icon-caret-bottom' : totalRateOfReturn > 0 ? 'el-icon-caret-top' : '',
@@ -54,12 +54,12 @@
                                     : { position: 'relative', top: '1px' },
                             ]"
                         ></i
-                    ></span>
+                    ></span> -->
                     <span style="font-size: 14px; font-weight: bold">
                         <!-- <number :from="0" :to="totalSpread" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
                         <number
                             :from="0"
-                            :to="Math.abs(totalRateOfReturn)"
+                            :to="totalRateOfReturn"
                             :format="currencyPointFormat"
                             :duration="1"
                             :delay="0"
