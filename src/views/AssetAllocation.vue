@@ -132,7 +132,7 @@
                         v-model="item.account"
                         :ref="`deposit${index}`"
                         :class="[
-                            item.account.includes('活存')
+                            item.account.includes('活存') || item.account.includes('現金')
                                 ? 'demand-deposit-bg'
                                 : item.account.includes('定存')
                                 ? 'fixed-deposit-bg'
@@ -152,7 +152,7 @@
                         v-model="item.amount"
                         @keyup="onChangeAmount($event, index)"
                         :class="[
-                            item.account.includes('活存')
+                            item.account.includes('活存') || item.account.includes('現金')
                                 ? 'demand-deposit-bg'
                                 : item.account.includes('定存')
                                 ? 'fixed-deposit-bg'
@@ -247,7 +247,8 @@
 
         <div style="font-size: 14px; color: #999; margin: 20px">
             <div>
-                【帳戶】請輸入帳戶名稱，輸入若包括關鍵字(活存、 定存)時會自動分類統計(現金、定存)至資產配置。股票則會自動同步。
+                【帳戶】請輸入帳戶名稱，輸入若包括關鍵字(活存|現金、
+                定存)時會自動分類統計(現金、定存)至資產配置。股票則會自動同步。
             </div>
             <div>【$】請輸入帳戶目前金額。</div>
         </div>
@@ -453,7 +454,7 @@ export default {
         demandDeposit() {
             // 活存 sum
             return this.assetList.reduce((acc, { account, amount }) => {
-                if (account.includes('活存')) return acc + Math.abs(amount);
+                if (account.includes('活存') || account.includes('現金')) return acc + Math.abs(amount);
                 return acc;
             }, 0);
         },
@@ -481,7 +482,8 @@ export default {
         otherDeposit() {
             // 其它 sum
             return this.assetList.reduce((acc, { account, amount, isPositive }) => {
-                if (!account.includes('定存') && !account.includes('活存') && isPositive) return acc + Math.abs(amount);
+                if (!account.includes('定存') && !account.includes('活存') && !account.includes('現金') && isPositive)
+                    return acc + Math.abs(amount);
                 return acc;
             }, 0);
         },
