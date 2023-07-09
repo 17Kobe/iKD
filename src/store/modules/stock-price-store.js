@@ -621,17 +621,20 @@ const stock = {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
                             const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
+                            const mappedToK = _.find(foundTempStock.data.weekly_kdj, (array) => array[0] === item[0])?.[1]; // 為了顯示在KDJ圖上
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
                                     is_buy: true,
                                     rsi,
+                                    k: mappedToK,
                                     price: dataWeeklyPrice,
                                     reason: ['rsi_over_sold'],
                                 });
                             else {
                                 policyResult[index].is_buy = true;
                                 policyResult[index].rsi = rsi;
+                                policyResult[index].k = mappedToK;
                                 policyResult[index].reason.push('rsi_over_sold');
                             }
                         }
@@ -645,17 +648,20 @@ const stock = {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
                             const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
+                            const mappedToK = _.find(foundTempStock.data.weekly_kdj, (array) => array[0] === item[0])?.[1]; // 為了顯示在KDJ圖上
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
                                     is_buy: true,
                                     rsi,
+                                    k: mappedToK,
                                     price: dataWeeklyPrice,
                                     reason: ['rsi_turn_up'],
                                 });
                             else {
                                 policyResult[index].is_buy = true;
                                 policyResult[index].rsi = rsi;
+                                policyResult[index].k = mappedToK;
                                 policyResult[index].reason.push('rsi_turn_up');
                             }
                             rsiTurnUpReady = false;
@@ -668,17 +674,20 @@ const stock = {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
                             const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
+                            const mappedToK = _.find(foundTempStock.data.weekly_kdj, (array) => array[0] === item[0])?.[1]; // 為了顯示在KDJ圖上
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
                                     is_sell: true,
                                     rsi,
+                                    k: mappedToK,
                                     price: dataWeeklyPrice,
                                     reason: ['rsi_over_bought'],
                                 });
                             else {
                                 policyResult[index].is_sell = true;
                                 policyResult[index].rsi = rsi;
+                                policyResult[index].k = mappedToK;
                                 policyResult[index].reason.push('rsi_over_bought');
                             }
                         }
@@ -692,17 +701,20 @@ const stock = {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
                             const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
+                            const mappedToK = _.find(foundTempStock.data.weekly_kdj, (array) => array[0] === item[0])?.[1]; // 為了顯示在KDJ圖上
                             if (index === -1)
                                 policyResult.push({
                                     date: item[0],
                                     is_sell: true,
                                     rsi,
+                                    k: mappedToK,
                                     price: dataWeeklyPrice,
                                     reason: ['rsi_turn_down'],
                                 });
                             else {
                                 policyResult[index].is_sell = true;
                                 policyResult[index].rsi = rsi;
+                                policyResult[index].k = mappedToK;
                                 policyResult[index].reason.push('rsi_turn_down');
                             }
                             rsiTurnDownReady = false;

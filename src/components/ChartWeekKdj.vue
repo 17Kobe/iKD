@@ -108,7 +108,7 @@ export default {
                         this.stockData.policy.result,
                         (o) =>
                             moment().diff(moment(o.date), 'days') <= 365 &&
-                            _.some(o.reason, (el) => _.includes(el, 'kd')) && // 必需有 kd 的訊號設定
+                            _.some(o.reason, (el) => _.includes(el, 'kd') || _.includes(el, 'rsi')) && // 必需有 kd 的訊號設定
                             o.is_sure_buy
                     ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
                 []
@@ -127,7 +127,7 @@ export default {
                         this.stockData.policy.result,
                         (o) =>
                             moment().diff(moment(o.date), 'days') <= 365 &&
-                            _.some(o.reason, (el) => _.includes(el, 'kd')) && // 必需有 kd 的訊號設定
+                            _.some(o.reason, (el) => _.includes(el, 'kd') || _.includes(el, 'rsi')) && // 必需有 kd 的訊號設定
                             o.is_sure_sell
                     ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
                 []
@@ -395,6 +395,22 @@ export default {
                                         if (foundPolicyResult.reason.includes('kd_turn_up'))
                                             showSignals.push(
                                                 '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">KD上折</span>'
+                                            );
+                                        if (foundPolicyResult.reason.includes('rsi_over_sold'))
+                                            showSignals.push(
+                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">RSI超賣</span>'
+                                            );
+                                        if (foundPolicyResult.reason.includes('rsi_over_bought'))
+                                            showSignals.push(
+                                                '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">RSI超買</span>'
+                                            );
+                                        if (foundPolicyResult.reason.includes('rsi_turn_down'))
+                                            showSignals.push(
+                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">RSI下折</span>'
+                                            );
+                                        if (foundPolicyResult.reason.includes('rsi_turn_up'))
+                                            showSignals.push(
+                                                '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">RSI上折</span>'
                                             );
                                         if (foundPolicyResult.reason.includes('cost_down'))
                                             showSignals.push(
