@@ -130,7 +130,9 @@
             </el-table-column>
             <el-table-column label="本金&nbsp;" width="80" align="right" header-align="right">
                 <template #default="scope">
-                    <span> $ {{ scope.row.cost.sum.toLocaleString('en-US') }} </span>
+                    <span
+                        ><span> $ {{ scope.row.cost.sum.toLocaleString('en-US') }} </span></span
+                    >
                 </template>
             </el-table-column>
             <el-table-column label="報酬率" width="60" align="right" header-align="right">
