@@ -2,6 +2,8 @@
     <el-page-header @back="$emit('back')">
         <template #content>
             <span class="text-large font-600 mr-3"> {{ greeting }} {{ id }} </span>
+            <el-input v-model="memo" :rows="5" type="textarea" placeholder="請輸入備註" />
+
             <FormPolicy ref="childFormPolicy" />
         </template>
     </el-page-header>
@@ -21,6 +23,7 @@ export default {
     data() {
         return {
             greeting: 'Stock Analysis',
+            memo: '',
         };
     },
 };

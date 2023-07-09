@@ -441,7 +441,7 @@ export default {
                                             return moment(o[0]).isBetween(startDate, endDate, undefined, '[]');
                                         });
                                         if (foundDate)
-                                            str += `<br>除息日: <span style="background-color: #FFC107; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">${moment(
+                                            str += `<br>除息日: <span style="background-color: #999999; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">${moment(
                                                 foundDate[0]
                                             ).format('M/DD')}(${dayOfWeek[moment(foundDate[0]).day()]})</span>`;
                                     }
@@ -573,7 +573,7 @@ export default {
                     {
                         type: 'scatter',
 
-                        color: 'rgba(255, 193, 7, 0.9)',
+                        color: 'rgba(153, 153, 153, 0.9)',
 
                         marker: {
                             symbol: 'triangle-down',
