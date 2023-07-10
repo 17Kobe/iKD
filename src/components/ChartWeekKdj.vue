@@ -435,7 +435,7 @@ export default {
                                 if (component.allDividendList && component.allDividendList.length > 0) {
                                     const point_index = this.points[0].point.index;
                                     if (point_index > 0) {
-                                        const startDate = moment(this.points[0].series.xData[point_index - 1]);
+                                        const startDate = moment(this.points[0].series.xData[point_index - 1]).add(1, 'days');
                                         const endDate = moment(point.x);
                                         var foundDate = _.find(component.allDividendList, function (o) {
                                             return moment(o[0]).isBetween(startDate, endDate, undefined, '[]');

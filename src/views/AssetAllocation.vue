@@ -451,6 +451,9 @@ export default {
         netAssets() {
             return this.assets - this.liabilities;
         },
+        leverageAssetsd() {
+            return ((this.liabilities * 100) / this.assets).toFixed(1);
+        },
         demandDeposit() {
             // 活存 sum
             return this.assetList.reduce((acc, { account, amount }) => {
@@ -559,7 +562,7 @@ export default {
                     },
                     title: {
                         display: true,
-                        text: `資產和負債 (淨資產: $ ${Number((this.netAssets / 10000).toFixed(1))} 萬)`,
+                        text: `淨資產: $ ${Number((this.netAssets / 10000).toFixed(1))} 萬; 桿杆率: ${this.leverageAssetsd} %`,
                         // align: 'start',
                         padding: {
                             top: 5,
@@ -616,9 +619,15 @@ export default {
                         align: 'end',
                         position: 'bottom',
                         text: [
-                            '現金：$ ' + this.demandDeposit.toLocaleString('en-US') + ' 元          ',
-                            '定存：$ ' + this.fixedDeposit.toLocaleString('en-US') + ' 元          ',
-                            '股票：$ ' + this.stockDeposit.toLocaleString('en-US') + ' 元          ',
+                            `現金：$ ${Number((this.demandDeposit / 10000).toFixed(1))} 萬 ( ${this.demandDeposit.toLocaleString(
+                                'en-US'
+                            )} 元 ) `,
+                            `定存：$ ${Number((this.fixedDeposit / 10000).toFixed(1))} 萬 ( ${this.fixedDeposit.toLocaleString(
+                                'en-US'
+                            )} 元 ) `,
+                            `股票：$ ${Number((this.stockDeposit / 10000).toFixed(1))} 萬 ( ${this.stockDeposit.toLocaleString(
+                                'en-US'
+                            )} 元 ) `,
                         ],
                         font: {
                             size: 13,

@@ -18,26 +18,33 @@
                 >
             </el-col>
             <el-col :span="13" style="margin-right: 4px">
-                <el-tag
-                    class="ml-2"
-                    size="large"
-                    style="margin: 5px 2px; padding: 0 4px; float: right"
-                    :type="totalSpread >= 0 ? 'primary' : 'danger'"
-                    >總計
-                    <span style="font-size: 24px"> $ </span>
-                    <span style="font-size: 28px; font-weight: bold">
-                        <!-- <number :from="0" :to="totalSpread" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
-                        <number
-                            :from="0"
-                            :to="totalSpread"
-                            :format="currencyFormat"
-                            :duration="1"
-                            :delay="0"
-                            easing="Power1.easeOut"
-                            ref="totalSpread"
-                        /> </span
-                    >&nbsp;元
-                </el-tag>
+                <el-tooltip
+                    class="box-item"
+                    effect="dark"
+                    :content="`累計本金： ${totalBuySpend.toLocaleString('en-US')}`"
+                    placement="bottom"
+                >
+                    <el-tag
+                        class="ml-2"
+                        size="large"
+                        style="margin: 5px 2px; padding: 0 4px; float: right"
+                        :type="totalSpread >= 0 ? 'primary' : 'danger'"
+                        >總計
+                        <span style="font-size: 24px"> $ </span>
+                        <span style="font-size: 28px; font-weight: bold">
+                            <!-- <number :from="0" :to="totalSpread" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
+                            <number
+                                :from="0"
+                                :to="totalSpread"
+                                :format="currencyFormat"
+                                :duration="1"
+                                :delay="0"
+                                easing="Power1.easeOut"
+                                ref="totalSpread"
+                            /> </span
+                        >&nbsp;元
+                    </el-tag>
+                </el-tooltip>
                 <el-tag
                     size="small"
                     style="float: right; position: relative; left: 7px; top: 2px; padding: 0 2px; border-radius: 10px"
@@ -75,6 +82,7 @@
             <el-table-column label="名稱" width="95" align="center" fixed>
                 <template #default="scope">
                     <el-badge
+                        v-if="modeSpread === '目前'"
                         :value="scope.row.badge"
                         class="item"
                         :class="[
@@ -92,6 +100,7 @@
                     >
                         {{ scope.row.name.replace('基金', '').replace('A2', '') }}
                     </el-badge>
+                    <span v-else>{{ scope.row.name.replace('基金', '').replace('A2', '') }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="漲跌幅" width="70" align="right" header-align="right" v-if="modeSpread === '目前'">
@@ -386,6 +395,9 @@ export default {
         },
         totalSpread() {
             return this.spreadList.reduce((acc, { cost }) => acc + cost.return, 0);
+        },
+        totalBuySpend() {
+            return this.spreadList.reduce((acc, { cost }) => acc + cost.sum, 0);
         },
         totalRateOfReturn() {
             return this.totalSpread == 0
