@@ -1465,6 +1465,7 @@ const stock = {
                     if (_.has(foundStock, 'policy.settings.sell')) {
                         let foundKdDead = false;
                         let foundKdTurnDown = false;
+                        let foundRsiOverBought = false;
                         foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
                         foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
                         foundRsiOverBought = _.find(foundStock.policy.settings.sell, ['method', 'rsi_over_bought']);
