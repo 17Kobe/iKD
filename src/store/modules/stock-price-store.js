@@ -1467,6 +1467,7 @@ const stock = {
                         let foundKdTurnDown = false;
                         foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
                         foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
+                        foundRsiOverBought = _.find(foundStock.policy.settings.sell, ['method', 'rsi_over_bought']);
                         if (foundKdDead) {
                             const lastArray = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1];
                             const lastK = lastArray[1];
@@ -1477,6 +1478,11 @@ const stock = {
                             const lastestK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
                             const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
                             if (lastestK >= foundKdTurnDown.limit && lastestK > lastSecondK) foundStock.badge = '準賣';
+                        }
+                        if (foundRsiOverBought) {
+                            const lastArray = foundTempStock.data.weekly_rsi[foundTempStock.data.weekly_rsi.length - 1];
+                            const lastRsi = lastArray[1];
+                            if (lastRsi >= foundRsiOverBought.limit - 3) foundStock.badge = '準賣'; // K要大於D，才是訊號前的準備
                         }
                     }
                 }
