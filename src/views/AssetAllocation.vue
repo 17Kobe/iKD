@@ -619,15 +619,15 @@ export default {
                         align: 'end',
                         position: 'bottom',
                         text: [
-                            `現金：$ ${(this.demandDeposit / 10000).toFixed(1)} 萬 ( ${this.demandDeposit.toLocaleString(
-                                'en-US'
-                            )} 元 ) `,
-                            `定存：$ ${(this.fixedDeposit / 10000).toFixed(1)} 萬 ( ${this.fixedDeposit.toLocaleString(
-                                'en-US'
-                            )} 元 ) `,
-                            `股票：$ ${(this.stockDeposit / 10000).toFixed(1)} 萬 ( ${this.stockDeposit.toLocaleString(
-                                'en-US'
-                            )} 元 ) `,
+                            `現金：$ ${this.demandDeposit.toLocaleString('en-US')} 元 ( ${(this.demandDeposit / 10000).toFixed(
+                                1
+                            )} 萬 ) `,
+                            `定存：$ ${this.fixedDeposit.toLocaleString('en-US')} 元 ( ${(this.fixedDeposit / 10000).toFixed(
+                                1
+                            )} 萬 ) `,
+                            `股票：$ ${this.stockDeposit.toLocaleString('en-US')} 元 ( ${(this.stockDeposit / 10000).toFixed(
+                                1
+                            )} 萬 ) `,
                         ],
                         font: {
                             size: 13,

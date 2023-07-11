@@ -373,7 +373,7 @@
                             (scope.row.policy.settings.buy.length >= 1 || scope.row.policy.settings.sell.length >= 1)
                                 ? { width: 'auto' }
                                 : {},
-                            { 'text-align': 'left', 'line-height': '18px', padding: '6px 9px' },
+                            { 'text-align': 'left', 'line-height': '18px', padding: '3px 9px' },
                         ]"
                     >
                         <div
@@ -387,13 +387,13 @@
                             style="font-size: 13px"
                         >
                             <div v-for="(item, index) in scope.row.policy.settings.buy" :key="index">
-                                <div style="line-height: 24px">
+                                <div style="line-height: 18px">
                                     <span
                                         style="
                                             font-size: 14px;
                                             color: white;
                                             background-color: #f28b82;
-                                            padding: 5px;
+                                            padding: 2px 4px;
                                             border-radius: 10px 100px / 120px;
                                         "
                                         >買</span
@@ -407,13 +407,13 @@
                                 </div>
                             </div>
                             <div v-for="(item, index) in scope.row.policy.settings.sell" :key="index">
-                                <div style="line-height: 24px">
+                                <div style="line-height: 18px">
                                     <span
                                         style="
                                             font-size: 14px;
                                             color: white;
                                             background-color: #82d125;
-                                            padding: 5px;
+                                            padding: 2px 4px;
                                             border-radius: 10px 100px / 120px;
                                         "
                                         >賣</span
