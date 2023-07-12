@@ -168,8 +168,10 @@ export default {
                 this.loading = false;
                 const optionList = [];
                 found.forEach((item) => {
-                    // console.log(item);
-                    optionList.push({ label: item.stock_name, value: item.stock_id });
+                    console.log(item);
+                    if (item.type && item.type === 'exchange')
+                        optionList.push({ label: item.stock_name, value: item.stock_id, type: 'exchange' });
+                    else optionList.push({ label: item.stock_name, value: item.stock_id, type: 'stock' });
                 });
                 // 因為同一公司，可能屬不同產業，但同一個代碼，所以要過濾掉
                 this.stockOptions = _.uniqBy(optionList, 'value');
@@ -200,7 +202,7 @@ export default {
                     // 需要判斷是不存在，不能是空的才能加入
                     // 選到的
                     const selected = _.find(this.stockOptions, ['value', this.form.stockId]);
-                    this.$store.commit('SAVE_A_STOCK', { name: selected.label, id: selected.value });
+                    this.$store.commit('SAVE_A_STOCK', { name: selected.label, id: selected.value, type: selected.type });
                     return true;
                 }
                 console.log('error submit!!');

@@ -24,7 +24,9 @@ const stock = {
                     // console.log(stcokObj);
 
                     // console.log(currStock[index]);
-                    const isFund = stcokObj.type === 'fund'; // 判斷是否為基金
+                    let stcokObjType = 'stock';
+                    if (stcokObj.type) stcokObjType = stcokObj.type; // 'fund' or 'exchange';
+
                     console.log('GET_STOCK_PRICE 1');
                     const stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
                     // console.log(stockDataDaily);
@@ -67,7 +69,7 @@ const stock = {
                         console.log('GET_STOCK_PRICE 3');
 
                         // 股票
-                        if (!isFund) {
+                        if (stcokObjType === 'stock') {
                             console.log('GET_STOCK_PRICE 31');
                             // 因為 axios 是非同步，但我要確實等它執行完才 resolve
                             await axios
@@ -90,7 +92,30 @@ const stock = {
                                     commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                                     console.log(err);
                                 });
-                        } else {
+                        } else if (stcokObjType === 'exchange') {
+                            console.log('GET_STOCK_PRICE 31');
+                            // 因為 axios 是非同步，但我要確實等它執行完才 resolve
+                            await axios
+                                .get('https://api.finmindtrade.com/api/v4/data', {
+                                    params: {
+                                        dataset: 'TaiwanExchangeRate',
+                                        data_id: stcokObj.id,
+                                        start_date: stockStartDate,
+                                        token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
+                                    },
+                                })
+                                // 成功
+                                .then((res) => {
+                                    console.log('GET_STOCK_PRICE 4');
+                                    commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: res.data });
+                                })
+                                // 失敗
+                                .catch((err) => {
+                                    console.log('GET_STOCK_PRICE error. ' + stcokObj.id);
+                                    commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
+                                    console.log(err);
+                                });
+                        } else if (stcokObjType === 'fund') {
                             console.log('GET_STOCK_PRICE 32');
                             // 基金
                             commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
@@ -119,9 +144,9 @@ const stock = {
                         }
                     } else {
                         // 股票
-                        if (!isFund) {
+                        if (stcokObjType === 'stock' || stcokObjType === 'exchange') {
                             commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
-                        } else {
+                        } else if (stcokObjType === 'fund') {
                             // 基金
                             commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
                         }
@@ -1009,10 +1034,12 @@ const stock = {
 
                 // 塞入股價日線資料
                 // console.log(res.data.data);
-                const isFund = foundStock.type === 'fund'; // 判斷是否為基金
+                let stcokObjType = 'stock';
+                if (foundStock.type) stcokObjType = foundStock.type; // 'fund' or 'exchange';
+
                 const values = [];
                 // 股票
-                if (!isFund) {
+                if (stcokObjType === 'stock') {
                     data.data.forEach((element) => {
                         values.push([
                             element.date,
@@ -1023,7 +1050,20 @@ const stock = {
                             // element.Trading_Volume,
                         ]);
                     });
-                } else {
+                } else if (stcokObjType === 'exchange') {
+                    //匯率
+                    data.data.forEach((element) => {
+                        const closePrice = Math.round(((element.spot_buy + element.spot_sell) / 2) * 1000) / 1000;
+                        values.push([
+                            element.date,
+                            closePrice,
+                            closePrice,
+                            closePrice,
+                            closePrice,
+                            // element.Trading_Volume,
+                        ]);
+                    });
+                } else if (stcokObjType === 'fund') {
                     //基金
                     data.datas.forEach((date, index) => {
                         const closePrice = data.closePrices[index];
