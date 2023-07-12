@@ -78,7 +78,7 @@
             </el-col>
         </el-row>
 
-        <el-table :data="showSpreadList" style="width: 100%" empty-text="無資料">
+        <el-table :data="showSpreadList" style="width: 100%" empty-text="無資料" row-class-name="table-custom-row">
             <el-table-column label="名稱" width="107" align="center" fixed>
                 <template #default="scope">
                     <el-badge
@@ -455,4 +455,7 @@ export default {
 
 .el-radio-button__original-radio:checked+.el-radio-button__inner
     font-weight: bold
+
+.table-custom-row
+    height: 26px
 </style>
