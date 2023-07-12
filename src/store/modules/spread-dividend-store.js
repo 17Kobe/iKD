@@ -264,35 +264,63 @@ const dividend = {
         },
     },
     getters: {
-        getSpreadList: (state, getters, rootState) => (mode) => {
-            console.log('getSpreadList');
-            // console.log(mode);
-            // const { SpreadList } = state;
-            let tempSpreadList = undefined;
-            if (mode === '目前')
-                tempSpreadList = _.orderBy(
-                    _.filter(rootState.price.stockList, function (obj) {
-                        return obj.cost;
-                    }),
-                    ['cost.sum'],
-                    ['desc']
-                );
-            else {
-                // 歷史
-                tempSpreadList = state.historySpreadList;
-                tempSpreadList.forEach(function (obj, index) {
-                    tempSpreadList[index].cost = {};
-                    tempSpreadList[index].cost.avg = obj.buy_average_cost; // 成本價
-                    tempSpreadList[index].cost.sum = obj.buy_spend; // 本金
-                    tempSpreadList[index].cost.rate_of_return = obj.sell_rate_of_return; // 報酬率
-                    tempSpreadList[index].cost.return = obj.sell_return; // 價差
-                    tempSpreadList[index].cost.total = obj.sell_number; // 累積股數
-                });
-                tempSpreadList = _.orderBy(tempSpreadList, ['sell_date'], ['desc']);
-            }
-            // console.log(tempSpreadList);
-            return tempSpreadList;
-        },
+        getSpreadList:
+            (state, getters, rootState) =>
+            (mode, isCurrentAndOnlyBuy = false) => {
+                console.log('getSpreadList');
+                // console.log(mode);
+                // const { SpreadList } = state;
+                let tempSpreadList = undefined;
+                if (mode === '目前') {
+                    tempSpreadList = _.orderBy(
+                        _.filter(rootState.price.stockList, function (obj) {
+                            return obj.cost;
+                        }),
+                        ['cost.sum'],
+                        ['desc']
+                    );
+                    if (!isCurrentAndOnlyBuy) {
+                        let noBuyList = _.orderBy(
+                            _.filter(rootState.price.stockList, function (obj) {
+                                return !obj.cost;
+                            }),
+                            [
+                                (obj) => {
+                                    if (obj.badge === '買') {
+                                        return 0;
+                                    } else if (obj.badge === '準買') {
+                                        return 2;
+                                    } else if (obj.badge === '賣') {
+                                        return 3;
+                                    } else if (obj.badge === '準賣') {
+                                        return 4;
+                                    } else {
+                                        return 5;
+                                    }
+                                },
+                                ,
+                                'order',
+                            ],
+                            ['asc', 'asc']
+                        );
+                        tempSpreadList = _.concat(tempSpreadList, noBuyList);
+                    }
+                } else {
+                    // 歷史
+                    tempSpreadList = state.historySpreadList;
+                    tempSpreadList.forEach(function (obj, index) {
+                        tempSpreadList[index].cost = {};
+                        tempSpreadList[index].cost.avg = obj.buy_average_cost; // 成本價
+                        tempSpreadList[index].cost.sum = obj.buy_spend; // 本金
+                        tempSpreadList[index].cost.rate_of_return = obj.sell_rate_of_return; // 報酬率
+                        tempSpreadList[index].cost.return = obj.sell_return; // 價差
+                        tempSpreadList[index].cost.total = obj.sell_number; // 累積股數
+                    });
+                    tempSpreadList = _.orderBy(tempSpreadList, ['sell_date'], ['desc']);
+                }
+                // console.log(tempSpreadList);
+                return tempSpreadList;
+            },
         // 該股票的股數，是另外再去撈的，如此才能當股數改變時又能即時反應
         getDividendList: (state, getters, rootState) => (mode) => {
             console.log('getDividendList');

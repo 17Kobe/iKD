@@ -34,7 +34,7 @@ const taiwan = {
     },
     mutations: {
         SAVE_TAIWAN_STOCK(state, data) {
-            state.taiwanStockList = [];
+            state.taiwanStockList = [{ stock_id: 'USD', stock_name: '美金匯率', type: 'exchange' }];
             if (_.has(data, 'data') && data.data.length > 0) {
                 state.taiwanStockList.push(...data.data);
             }

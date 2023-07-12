@@ -79,7 +79,7 @@
         </el-row>
 
         <el-table :data="showSpreadList" style="width: 100%" empty-text="無資料">
-            <el-table-column label="名稱" width="95" align="center" fixed>
+            <el-table-column label="名稱" width="107" align="center" fixed>
                 <template #default="scope">
                     <el-badge
                         v-if="modeSpread === '目前'"
@@ -140,13 +140,13 @@
             <el-table-column label="本金&nbsp;" width="80" align="right" header-align="right">
                 <template #default="scope">
                     <span
-                        ><span> $ {{ scope.row.cost.sum.toLocaleString('en-US') }} </span></span
+                        ><span v-if="scope.row.cost"> $ {{ scope.row.cost.sum.toLocaleString('en-US') }} </span></span
                     >
                 </template>
             </el-table-column>
             <el-table-column label="報酬率" width="60" align="right" header-align="right">
                 <template #default="scope">
-                    <span style="font-weight: bold; color: #a8a8a8"
+                    <span n v-if="scope.row.cost" style="font-weight: bold; color: #a8a8a8"
                         >{{
                             scope.row.cost.rate_of_return === null
                                 ? 'N/A'
@@ -160,6 +160,7 @@
             <el-table-column label="價差&nbsp;&nbsp;" width="81" align="right" header-align="right">
                 <template #default="scope">
                     <el-tag
+                        v-if="scope.row.cost"
                         class="ml-2"
                         size="small"
                         style="margin: 1px 0px"
@@ -171,9 +172,11 @@
                 </template>
             </el-table-column>
 
+            <el-table-column :label="modeSpread === '目前' ? '現價' : '賣價'" prop="last_price" width="55" align="center">
+            </el-table-column>
             <el-table-column label="成本價" width="55" align="center">
                 <template #default="scope">
-                    <span>
+                    <span v-if="scope.row.cost">
                         {{
                             scope.row.cost.avg >= 100
                                 ? Number(scope.row.cost.avg.toFixed(1))
@@ -182,19 +185,23 @@
                     </span>
                 </template>
             </el-table-column>
-            <el-table-column :label="modeSpread === '目前' ? '現價' : '賣價'" prop="last_price" width="55" align="center">
-            </el-table-column>
             <el-table-column
                 :label="modeSpread === '目前' ? '累積股數&nbsp;&nbsp;' : '賣出股數&nbsp;&nbsp;'"
                 width="80"
                 align="right"
                 header-align="right"
             >
-                <template #default="scope"> {{ scope.row.cost.total.toLocaleString('en-US') }} 股&nbsp;&nbsp; </template>
+                <template #default="scope"
+                    ><span v-if="scope.row.cost"
+                        >{{ scope.row.cost.total.toLocaleString('en-US') }} 股&nbsp;&nbsp;
+                    </span></template
+                >
             </el-table-column>
             <el-table-column label="市值&nbsp;" width="75" align="right" header-align="right">
                 <template #default="scope">
-                    $ {{ (scope.row.cost.sum + scope.row.cost.return).toLocaleString('en-US') }}
+                    <span v-if="scope.row.cost"
+                        >$ {{ (scope.row.cost.sum + scope.row.cost.return).toLocaleString('en-US') }}</span
+                    >
                 </template>
             </el-table-column>
             <el-table-column label="賣出日期" prop="sell_date" width="90" align="center" v-if="modeSpread === '歷史'">
@@ -290,65 +297,6 @@
             </el-table-column>
         </el-table>
 
-        <!-- ================================ 未買進的股票 -->
-        <el-row class="row-bg" justify="space-between" style="margin-top: 17px; align-items: center">
-            <el-col :span="11" style="margin-left: 6px; font-size: 18px; font-weight: bold">追蹤中</el-col>
-        </el-row>
-
-        <el-table :data="noBuyList" style="width: 100%" empty-text="無資料" class="i-table">
-            <el-table-column label="名稱" width="145" align="center">
-                <template #default="scope">
-                    <el-badge
-                        :value="scope.row.badge"
-                        class="item"
-                        :class="[
-                            scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '',
-                            ['item', 'signal', 'signal-pos'],
-                        ]"
-                        :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
-                    >
-                        {{ scope.row.name.replace('A2', '') }}
-                    </el-badge>
-                </template>
-            </el-table-column>
-
-            <el-table-column label="漲跌幅" width="70" align="right" header-align="right">
-                <template #default="scope">
-                    <span
-                        :style="[
-                            scope.row.last_price_spread < 0
-                                ? { color: '#01aa00' }
-                                : scope.row.last_price_spread > 0
-                                ? { color: '#ee3333' }
-                                : { color: '#495057' },
-                            { 'font-size': '14px' },
-                        ]"
-                    >
-                        <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
-                        <i
-                            :class="[
-                                scope.row.last_price_spread < 0
-                                    ? 'el-icon-caret-bottom'
-                                    : scope.row.last_price_spread > 0
-                                    ? 'el-icon-caret-top'
-                                    : '',
-                            ]"
-                            :style="[
-                                scope.row.last_price_spread > 0
-                                    ? { position: 'relative', top: '2px' }
-                                    : { position: 'relative', top: '1px' },
-                            ]"
-                        ></i>
-                        <!-- 漲跌幅 如，2.53% -->
-                        <span style="font-size: 14px">
-                            {{ scope.row.last_price_spread }}<span style="margin-left: 2px">%</span>
-                        </span>
-                    </span>
-                </template>
-            </el-table-column>
-            <el-table-column label="現價" prop="last_price" width="45" align="right" header-align="right"> </el-table-column>
-        </el-table>
-
         <br /><br />
         <br /><br />
     </div>
@@ -390,19 +338,19 @@ export default {
                 return this.dividendList.slice(0, 5);
             else return this.dividendList;
         },
-        noBuyList() {
-            return this.$store.getters.getNoBuyList();
-        },
+        // noBuyList() {
+        //     return this.$store.getters.getNoBuyList();
+        // },
         totalSpread() {
-            return this.spreadList.reduce((acc, { cost }) => acc + cost.return, 0);
+            return this.spreadList.reduce((acc, { cost }) => acc + (cost ? cost.return : 0), 0);
         },
         totalBuySpend() {
-            return this.spreadList.reduce((acc, { cost }) => acc + cost.sum, 0);
+            return this.spreadList.reduce((acc, { cost }) => acc + (cost ? cost.sum : 0), 0);
         },
         totalRateOfReturn() {
             return this.totalSpread == 0
                 ? 0
-                : (this.totalSpread * 100) / this.spreadList.reduce((acc, { cost }) => acc + cost.sum, 0);
+                : (this.totalSpread * 100) / this.spreadList.reduce((acc, { cost }) => acc + (cost ? cost.sum : 0), 0);
         },
         totalDividend() {
             return this.dividendList.reduce(

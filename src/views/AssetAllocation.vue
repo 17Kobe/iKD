@@ -416,7 +416,7 @@ export default {
             return diff;
         },
         spreadList() {
-            return this.$store.getters.getSpreadList('目前');
+            return this.$store.getters.getSpreadList('目前', true);
         },
         stockList() {
             return this.$store.state.price.stockList;
