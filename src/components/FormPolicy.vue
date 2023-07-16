@@ -148,6 +148,12 @@ export default {
                     default_limit_desc: '以下',
                 },
                 {
+                    value: 'kd_w',
+                    label: '週 KD 形成 W 底 (2+n倍買)',
+                    default_limit: 2,
+                    default_limit_desc: '個底以上',
+                },
+                {
                     value: 'rsi_over_sold',
                     label: '週 RSI 超賣',
                     default_limit: 5,
@@ -199,7 +205,7 @@ export default {
                 },
                 {
                     value: 'rsi_over_bought',
-                    label: '週 RSI 超買',
+                    label: '週 RSI 超買 (全賣)',
                     default_limit: 95,
                     default_limit_desc: '以上',
                 },

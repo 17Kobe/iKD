@@ -396,10 +396,10 @@
                                             padding: 2px 4px;
                                             border-radius: 10px 100px / 120px;
                                         "
-                                        >買</span
+                                        >{{ item.label.includes('2+n倍') ? '倍買' : '買' }}</span
                                     >
                                     <span>
-                                        &nbsp;{{ item.label.replace('買', '') }}&nbsp;<span
+                                        &nbsp;{{ item.label.replace('買', '').replace(' 底 (2+n倍)', '') }}&nbsp;<span
                                             style="color: #4386f5; font-size: 14px"
                                             >{{ item.limit }}</span
                                         >&nbsp;{{ item.limit_desc }}</span
@@ -416,14 +416,24 @@
                                             padding: 2px 4px;
                                             border-radius: 10px 100px / 120px;
                                         "
-                                        >賣</span
+                                        >{{
+                                            scope.row.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought') &&
+                                            (item.method === 'kd_dead' || item.method === 'kd_turn_down')
+                                                ? '半賣'
+                                                : '賣'
+                                        }}</span
                                     >
+                                    <!-- : scope.row.policy.settings.sell.some(
+                                                      (obj) => obj.method === 'kd_dead' || obj.method === 'kd_turn_down'
+                                                  ) && item.method === 'rsi_over_bought'
+                                                ? '全賣' -->
+
                                     <span>
                                         &nbsp;{{ item.label.replace('賣', '') }}&nbsp;<span
                                             style="color: #4386f5; font-size: 14px"
                                             >{{ item.limit }}</span
-                                        >&nbsp;{{ item.limit_desc }}</span
-                                    >
+                                        >&nbsp;{{ item.limit_desc }}
+                                    </span>
                                 </div>
                             </div>
 

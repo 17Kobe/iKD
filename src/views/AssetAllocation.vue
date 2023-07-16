@@ -150,6 +150,7 @@
                         size="small"
                         placeholder=""
                         v-model="item.amount"
+                        :ref="`deposit2${index}`"
                         @keyup="onChangeAmount($event, index)"
                         :class="[
                             item.account.includes('活存') || item.account.includes('現金')
@@ -199,7 +200,7 @@
                         size="small"
                         placeholder=""
                         v-model="item.account"
-                        :ref="`deposit${index}`"
+                        :ref="`debt${index}`"
                         class="liabilities-deposit-bg"
                         @change="onChangeAccount($event, index)"
                     >
