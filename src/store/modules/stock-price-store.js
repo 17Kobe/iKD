@@ -203,37 +203,72 @@ const stock = {
             let j = i;
             const lastStockDate = moment(_.last(foundStock.data.daily)[0]);
             let firstDayOfWeek = lastStockDate.startOf('isoWeek');
-            while (i >= 0) {
-                // console.log(i);
-                // console.log(moment(currStock[index].data.daily[i][0]).format('YYYY-MM-DD'));
-                // console.log(firstDayOfWeek.format('YYYY-MM-DD'));
-                // 不能用 isSame 因為有可能那週沒資料，或那週星期一也放假，所以要用 isBefore
-                if (moment(foundStock.data.daily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
-                    // console.log('isBefore');
-                    // 0最後一個也要跑進來
+            if (foundStock.data.daily[0].length === 2) { // [date, close]
+                while (i >= 0) {
+                    // console.log(i);
+                    // console.log(moment(currStock[index].data.daily[i][0]).format('YYYY-MM-DD'));
+                    // console.log(firstDayOfWeek.format('YYYY-MM-DD'));
+                    // 不能用 isSame 因為有可能那週沒資料，或那週星期一也放假，所以要用 isBefore
+                    if (moment(foundStock.data.daily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
+                        // console.log('isBefore');
+                        // 0最後一個也要跑進來
 
-                    // startIndex 值要小於等於 endIndex，for 是由大到小, i<j
-                    const startIndex = i + 1; // 因為是找到前一個才算後面1個
-                    const endIndex = j; // 因為外層array 是從日期最現在，往以前日期去掃。endIndex應該是最現在日期. i比n大
-                    const range2dArray = _.slice(foundStock.data.daily, startIndex, endIndex + 1);
-                    const rangeHighArray = _.map(range2dArray, (v) => v[2]);
-                    const rangeLowArray = _.map(range2dArray, (v) => v[3]);
-                    // const rangeVolumeArray = _.map(range2dArray, (v) => v[5]);
+                        // startIndex 值要小於等於 endIndex，for 是由大到小, i<j
+                        const startIndex = i + 1; // 因為是找到前一個才算後面1個
+                        const endIndex = j; // 因為外層array 是從日期最現在，往以前日期去掃。endIndex應該是最現在日期. i比n大
+                        const range2dArray = _.slice(foundStock.data.daily, startIndex, endIndex + 1);
+                        const rangeCloseArray = _.map(range2dArray, (v) => v[1]);
+                        // const rangeVolumeArray = _.map(range2dArray, (v) => v[5]);
 
-                    const date = foundStock.data.daily[endIndex][0];
-                    const open = foundStock.data.daily[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
-                    const close = foundStock.data.daily[endIndex][4]; // 之前的i，還沒i=n是下一個
-                    const low = _.min(rangeLowArray);
-                    const high = _.max(rangeHighArray);
-                    // const volume = _.sum(rangeVolumeArray);
+                        const date = foundStock.data.daily[endIndex][0];
+                        const open = foundStock.data.daily[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
+                        const close = foundStock.data.daily[endIndex][1]; // 之前的i，還沒i=n是下一個
+                        const low = _.min(rangeCloseArray);
+                        const high = _.max(rangeCloseArray);
+                        // const volume = _.sum(rangeVolumeArray);
 
-                    resData.push([date, open, high, low, close]);
-                    j = startIndex - 1;
+                        resData.push([date, open, high, low, close]);
+                        j = startIndex - 1;
 
-                    // 要採用下個i值的該週第一天，不能用firstDayOfWeek-7天，因為有可能該週都沒值
-                    firstDayOfWeek = moment(foundStock.data.daily[i][0]).startOf('isoWeek');
+                        // 要採用下個i值的該週第一天，不能用firstDayOfWeek-7天，因為有可能該週都沒值
+                        firstDayOfWeek = moment(foundStock.data.daily[i][0]).startOf('isoWeek');
+                    }
+                    i -= 1;
                 }
-                i -= 1;
+            }
+            else { // [date, open high low close]
+                while (i >= 0) {
+                    // console.log(i);
+                    // console.log(moment(currStock[index].data.daily[i][0]).format('YYYY-MM-DD'));
+                    // console.log(firstDayOfWeek.format('YYYY-MM-DD'));
+                    // 不能用 isSame 因為有可能那週沒資料，或那週星期一也放假，所以要用 isBefore
+                    if (moment(foundStock.data.daily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
+                        // console.log('isBefore');
+                        // 0最後一個也要跑進來
+
+                        // startIndex 值要小於等於 endIndex，for 是由大到小, i<j
+                        const startIndex = i + 1; // 因為是找到前一個才算後面1個
+                        const endIndex = j; // 因為外層array 是從日期最現在，往以前日期去掃。endIndex應該是最現在日期. i比n大
+                        const range2dArray = _.slice(foundStock.data.daily, startIndex, endIndex + 1);
+                        const rangeHighArray = _.map(range2dArray, (v) => v[2]);
+                        const rangeLowArray = _.map(range2dArray, (v) => v[3]);
+                        // const rangeVolumeArray = _.map(range2dArray, (v) => v[5]);
+
+                        const date = foundStock.data.daily[endIndex][0];
+                        const open = foundStock.data.daily[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
+                        const close = foundStock.data.daily[endIndex][4]; // 之前的i，還沒i=n是下一個
+                        const low = _.min(rangeLowArray);
+                        const high = _.max(rangeHighArray);
+                        // const volume = _.sum(rangeVolumeArray);
+
+                        resData.push([date, open, high, low, close]);
+                        j = startIndex - 1;
+
+                        // 要採用下個i值的該週第一天，不能用firstDayOfWeek-7天，因為有可能該週都沒值
+                        firstDayOfWeek = moment(foundStock.data.daily[i][0]).startOf('isoWeek');
+                    }
+                    i -= 1;
+                }
             }
 
             // console.log(resData);
@@ -960,7 +995,8 @@ const stock = {
             const foundStock = state.stockList.find((v) => v.id === stockId);
 
             if (_.has(foundStock, 'cost') && _.has(foundStock, 'data.daily') && foundStock.data.daily.length > 0) {
-                const close = foundStock.data.daily[foundStock.data.daily.length - 1][4];
+                const closeValueIndex = foundStock.data.daily[0].length === 2 ? 1 : 4;
+                const close = foundStock.data.daily[foundStock.data.daily.length - 1][closeValueIndex];
                 console.log(close);
                 console.log(foundStock.cost.sum);
 
@@ -1057,9 +1093,9 @@ const stock = {
                         values.push([
                             element.date,
                             closePrice,
-                            closePrice,
-                            closePrice,
-                            closePrice,
+                            // closePrice,
+                            // closePrice,
+                            // closePrice,
                             // element.Trading_Volume,
                         ]);
                     });
@@ -1070,9 +1106,9 @@ const stock = {
                         values.push([
                             date,
                             closePrice,
-                            closePrice,
-                            closePrice,
-                            closePrice,
+                            // closePrice,
+                            // closePrice,
+                            // closePrice,
                             // element.Trading_Volume,
                         ]);
                     });
@@ -1106,8 +1142,10 @@ const stock = {
             ) {
                 console.log('weekly');
                 // 塞入漲跌幅、最後股價
-                const v1 = foundStock.data.daily[foundStock.data.daily.length - 1][4];
-                const v2 = foundStock.data.daily[foundStock.data.daily.length - 2][4];
+                const closeValueIndex = foundStock.data.daily[0].length === 2 ? 1 : 4;
+                const v1 = foundStock.data.daily[foundStock.data.daily.length - 1][closeValueIndex];
+                const v2 = foundStock.data.daily[foundStock.data.daily.length - 2][closeValueIndex];
+
                 foundStock.last_price = v1;
 
                 const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
@@ -1247,11 +1285,12 @@ const stock = {
                 const policyResultLastDate = moment(foundStock.policy.result[foundStock.policy.result.length - 1].date);
                 dataDailyLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
 
+                const closeValueIndex = foundStock.data.daily[0].length === 2 ? 1 : 4;
                 if (dataDailyLastDate.isAfter(policyResultLastDate)) {
                     foundStock.policy.result.push({
                         date: dataDailyLastDate.format('YYYY-MM-DD'),
                         is_latest: true,
-                        price: foundStock.data.daily[foundStock.data.daily.length - 1][4],
+                        price: foundStock.data.daily[foundStock.data.daily.length - 1][closeValueIndex],
                         reason: ['latest'],
                     });
                 }

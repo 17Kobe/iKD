@@ -52,7 +52,7 @@ function getPromise(url) {
                 if (body.data.dates.length > 0) {
                     body.data.dates.forEach((date, index) => {
                         const closePrice = parseFloat(body.data.closePrices[index]);
-                        values.push([date, closePrice, closePrice, closePrice, closePrice]);
+                        values.push([date, closePrice]);
                     });
                 }
                 resolve(response.statusCode === 200 ? values : []);
@@ -84,8 +84,10 @@ Promise.all(urls.map(getPromise)).then(function (stats) {
 
     const defaultStockList = _.map(myLocalstorageStockList, (item) => {
         if (_.includes(item.name, '基金')) {
+            item.data.daily = _.map(item.data.daily, ([date, value]) => [date, value]); // 移掉open close high low 節省空間
             return item;
         } else {
+            // 非基金，刪除 data, cost, calc_policy_date, crawler_dividend_last_date
             return _.omit(item, ['data', 'cost', 'calc_policy_date', 'crawler_dividend_last_date']);
         }
     });
