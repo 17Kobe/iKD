@@ -396,7 +396,7 @@
                                             padding: 2px 4px;
                                             border-radius: 10px 100px / 120px;
                                         "
-                                        >{{ item.label.includes('2+n倍') ? '倍買' : '買' }}</span
+                                        >{{ item.label.includes('2+n倍') ? 'x2買' : '買' }}</span
                                     >
                                     <span>
                                         &nbsp;{{ item.label.replace('買', '').replace(' 底 (2+n倍)', '') }}&nbsp;<span
@@ -419,7 +419,7 @@
                                         >{{
                                             scope.row.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought') &&
                                             (item.method === 'kd_dead' || item.method === 'kd_turn_down')
-                                                ? '半賣'
+                                                ? '½賣'
                                                 : '賣'
                                         }}</span
                                     >
