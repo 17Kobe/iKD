@@ -396,7 +396,7 @@
                                             padding: 2px 4px;
                                             border-radius: 10px 100px / 120px;
                                         "
-                                        >{{ item.label.includes('2+n倍') ? 'x2買' : '買' }}</span
+                                        ><span v-if="item.label.includes('2+n倍')" style="font-size: 10px">x2</span>買</span
                                     >
                                     <span>
                                         &nbsp;{{ item.label.replace('買', '').replace(' 底 (2+n倍)', '') }}&nbsp;<span
