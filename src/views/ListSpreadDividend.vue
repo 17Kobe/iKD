@@ -78,7 +78,7 @@
             </el-col>
         </el-row>
 
-        <el-table :data="showSpreadList" style="width: 100%" empty-text="無資料" row-class-name="table-custom-row">
+        <el-table :data="showSpreadList" style="width: 100%" empty-text="無資料" :row-class-name="tableRowClassName">
             <el-table-column label="名稱" width="107" align="center" fixed>
                 <template #default="scope">
                     <el-badge
@@ -399,6 +399,12 @@ export default {
         toggleShowDividendData() {
             if (this.modeDividend === '未來') this.show5FutureDividendData = !this.show5FutureDividendData;
             else if (this.modeDividend === '歷史') this.show5HistoryDividendData = !this.show5HistoryDividendData;
+        },
+        tableRowClassName(row) {
+            if (row.row.background) {
+                return 'table-custom-row color-row';
+            }
+            return 'table-custom-row';
         },
     },
 };
