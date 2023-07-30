@@ -1388,7 +1388,9 @@ const stock = {
                         // console.log('====================');
                         // console.log(numberOfBuy);
                         // console.log(limitRateOfReturn);
-                        if (rateOfReturn * 100 > -limitRateOfReturn) {
+                        if (rateOfReturn * 100 > -limitRateOfReturn && !obj.reason.includes('kd_w')) {
+                            // 搭配成本價跌超過，W底不取消
+                            // W不取消
                             // 比負10還大，就是沒超過，就不買了。foundCostDown都是正值，但實際人認知是負值
                             isCancelToBuy = true;
                             obj.is_buy_cancel = true;
