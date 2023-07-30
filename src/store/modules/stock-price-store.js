@@ -474,6 +474,7 @@ const stock = {
                 // KD 相關訊號
                 let kdGoldReady = false;
                 let kdWReady = false;
+                let kdWReady2 = true;
                 let kdWGoldTimes = 0;
                 let preKdWGoldDate = '';
 
@@ -538,7 +539,11 @@ const stock = {
                         if (k < preK) {
                             kdWReady = true;
                         }
-                        if (k <= 20 && k >= preK && kdWReady) {
+                        if (k > 20) {
+                            kdWReady2 = true;
+                        }
+
+                        if (kdWReady2 && k <= 20 && k >= preK && kdWReady) {
                             kdWGoldTimes += 1;
                             console.log(kdWGoldTimes);
                             console.log(item[0]);
@@ -562,15 +567,14 @@ const stock = {
                                     // policyResult[index].number_of_buy = 2; 後面才加
                                     policyResult[index].reason.push('kd_w');
                                 }
-                                preKdWGoldDate = item[0];
                             } else if (preKdWGoldDate !== '' && moment(item[0]).diff(moment(preKdWGoldDate), 'days') > 365) {
                                 kdWGoldTimes = 1; // 大於365天則重新來了
-                                preKdWGoldDate = '';
-                            } else {
-                                preKdWGoldDate = item[0];
+                                console.log('reset W底');
                             }
+                            preKdWGoldDate = item[0];
 
                             kdWReady = false;
+                            kdWReady2 = false;
                         }
                     }
                     // 週 KD 往上轉折 買進訊號
