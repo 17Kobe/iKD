@@ -539,7 +539,8 @@ const stock = {
                         if (k < preK) {
                             kdWReady = true;
                         }
-                        if (k > 20) {
+                        if (k > 30) {
+                            // 30 以上，看起來比較合理，因為若30以下，那山峰看來太矮
                             kdWReady2 = true;
                         }
 
