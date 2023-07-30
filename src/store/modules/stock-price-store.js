@@ -203,7 +203,8 @@ const stock = {
             let j = i;
             const lastStockDate = moment(_.last(foundStock.data.daily)[0]);
             let firstDayOfWeek = lastStockDate.startOf('isoWeek');
-            if (foundStock.data.daily[0].length === 2) { // [date, close]
+            if (foundStock.data.daily[0].length === 2) {
+                // [date, close]
                 while (i >= 0) {
                     // console.log(i);
                     // console.log(moment(currStock[index].data.daily[i][0]).format('YYYY-MM-DD'));
@@ -235,8 +236,8 @@ const stock = {
                     }
                     i -= 1;
                 }
-            }
-            else { // [date, open high low close]
+            } else {
+                // [date, open high low close]
                 while (i >= 0) {
                     // console.log(i);
                     // console.log(moment(currStock[index].data.daily[i][0]).format('YYYY-MM-DD'));
@@ -439,6 +440,7 @@ const stock = {
                 // 訊號開關
                 console.log('SAVE_STOCK_POLICY_RESULT foundStock');
                 let foundKdGold = false;
+                let foundKdW = false;
                 let foundKdTurnUp = false;
                 let foundKdDead = false;
                 let foundKdTurnDown = false;
@@ -453,6 +455,7 @@ const stock = {
 
                 if (_.has(foundStock, 'policy.settings.buy')) {
                     foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
+                    foundKdW = _.find(foundStock.policy.settings.buy, ['method', 'kd_w']);
                     foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
                     foundRsiOverSold = _.find(foundStock.policy.settings.buy, ['method', 'rsi_over_sold']);
                     foundRsiTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'rsi_turn_up']);
@@ -470,6 +473,10 @@ const stock = {
 
                 // KD 相關訊號
                 let kdGoldReady = false;
+                let kdWReady = false;
+                let kdWGoldTimes = 0;
+                let preKdWGoldDate = '';
+
                 let kdDeadReady = false;
                 let preK = 0;
                 let kdTurnUpReady = false;
@@ -524,6 +531,46 @@ const stock = {
                                 policyResult[index].reason.push('kd_gold');
                             }
                             kdGoldReady = false;
+                        }
+                    }
+                    // 週 KD 形成 W 底 (2+n倍買)黃金交叉 買進訊號
+                    if (foundKdW) {
+                        if (k < preK) {
+                            kdWReady = true;
+                        }
+                        if (k <= 20 && k >= preK && kdWReady) {
+                            kdWGoldTimes += 1;
+                            console.log(kdWGoldTimes);
+                            console.log(item[0]);
+                            console.log(preKdWGoldDate);
+                            if (kdWGoldTimes >= foundKdW.limit && moment(item[0]).diff(moment(preKdWGoldDate), 'days') <= 365) {
+                                // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                                const index = _.findIndex(policyResult, ['date', item[0]]);
+                                const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
+                                if (index === -1)
+                                    policyResult.push({
+                                        date: item[0],
+                                        is_buy: true,
+                                        k,
+                                        // number_of_buy: 2, 後面才加
+                                        price: dataWeeklyPrice,
+                                        reason: ['kd_w'],
+                                    });
+                                else {
+                                    policyResult[index].is_buy = true;
+                                    policyResult[index].k = k;
+                                    // policyResult[index].number_of_buy = 2; 後面才加
+                                    policyResult[index].reason.push('kd_w');
+                                }
+                                preKdWGoldDate = item[0];
+                            } else if (preKdWGoldDate !== '' && moment(item[0]).diff(moment(preKdWGoldDate), 'days') > 365) {
+                                kdWGoldTimes = 1; // 大於365天則重新來了
+                                preKdWGoldDate = '';
+                            } else {
+                                preKdWGoldDate = item[0];
+                            }
+
+                            kdWReady = false;
                         }
                     }
                     // 週 KD 往上轉折 買進訊號
@@ -1272,11 +1319,15 @@ const stock = {
 
             let foundCostDown = false;
             let foundEarn = false;
+            let foundRsiOverBought = false;
             if (_.has(foundStock, 'policy.settings.buy')) {
                 foundCostDown = _.find(foundStock.policy.settings.buy, ['method', 'cost_down']);
             }
             if (_.has(foundStock, 'policy.settings.sell')) {
                 foundEarn = _.find(foundStock.policy.settings.sell, ['method', 'earn']);
+            }
+            if (_.has(foundStock, 'policy.settings.sell')) {
+                foundRsiOverBought = _.find(foundStock.policy.settings.sell, ['method', 'rsi_over_bought']);
             }
 
             // 最後一天強制再多塞入一個is_latest來計算最新的報酬率
@@ -1297,9 +1348,11 @@ const stock = {
             }
 
             let isReadyToSell = false;
-            let numberOfBuy = 0;
-            let accPriceOfBuy = 0;
+            // let numberOfBuy = 0;
+            // let accPriceOfBuy = 0;
             let dateOfFirstBuy = '';
+            let buyList = [];
+            let preSellReason = [];
             foundStock.badge = null;
             foundStock.policy.result.forEach((obj) => {
                 // 必需有買才要在第一次賣時算報酬率
@@ -1307,11 +1360,15 @@ const stock = {
                     // !isReadyToSell && 不需要這個判斷，因為隨時都可買
                     // 如果有 搭配 成本價跌超過，則在此決定那個買是否真的要買
                     let isCancelToBuy = false;
-                    if (foundCostDown && numberOfBuy >= 1) {
+                    const currBuyList = [...buyList];
+                    const currSumNumberOfBuy = _.sumBy(currBuyList, 'numberOfBuy');
+                    if (foundCostDown && currSumNumberOfBuy >= 1) {
+                        // cost_down = 搭配 成本價跌超過；算現階段報酬率，沒超過就取消買
                         // 因為當前的雖然要=2，但是還沒有寫入，所以1時，也代表第2次了
                         // 會在買超過1次才會進來判斷，因為這樣才有之前報酬率
                         // foundCostDown.limit * numberOfBuy 代表，第二次是 limit *1, 第三次是 limit *2，
-                        const rateOfReturn = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
+                        const currAccPriceOfbuy = _.sumBy(currBuyList, (obj) => obj.numberOfBuy * obj.price);
+                        const rateOfReturn = (obj.price * currSumNumberOfBuy - currAccPriceOfbuy) / currAccPriceOfbuy;
 
                         // x=10, y=1,2,3,4,5
 
@@ -1321,7 +1378,7 @@ const stock = {
                         // y=3, z=10+round(10/2)+round(10/3)
                         // answer: 10 15 18 21
                         let limitRateOfReturn = 0;
-                        for (let x = 1; x <= numberOfBuy; x++) {
+                        for (let x = 1; x <= currSumNumberOfBuy; x++) {
                             limitRateOfReturn += Math.round(foundCostDown.limit / x);
                         }
                         // console.log('====================');
@@ -1338,24 +1395,100 @@ const stock = {
                     // console.log(obj);
                     // console.log(isCancelToBuy);
                     if (!isCancelToBuy) {
-                        numberOfBuy += 1;
+                        buyList.push({ date: obj.date, numberOfBuy: obj.reason.includes('kd_w') ? 2 : 1, price: obj.price });
+
+                        const currBuyList2 = [...buyList];
+                        const currSumNumberOfBuy2 = _.sumBy(currBuyList2, 'numberOfBuy');
+                        const currAccPriceOfbuy2 = _.sumBy(currBuyList2, (obj) => obj.numberOfBuy * obj.price);
+
+                        // numberOfBuy += 1;
                         // console.log(numberOfBuy);
-                        if (numberOfBuy === 1) dateOfFirstBuy = obj.date; // 賣出要記，之後可以知道該次賣出最早的買進時間，然後再算總期間累計報酬
-                        accPriceOfBuy += obj.price;
+                        if (currBuyList2.length === 1) dateOfFirstBuy = obj.date; // 賣出要記，之後可以知道該次賣出最早的買進時間，然後再算總期間累計報酬
+                        // accPriceOfBuy += obj.price;
+                        obj.number_of_buy = obj.reason.includes('kd_w') ? 2 : 1;
                         obj.is_sure_buy = true;
                         isReadyToSell = true;
+                        preSellReason = [];
                         // 如果最後一天剛好也是買，那也需要算報酬率, 但算完可能也是0(也許不用算直接給0)
                         if (dataDailyLastDate.isSame(moment(obj.date))) {
                             obj.date_of_first_buy = dateOfFirstBuy;
-                            obj.rate_of_return = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
-                            obj.number_of_buy = numberOfBuy;
+                            obj.rate_of_return = (obj.price * currSumNumberOfBuy2 - currAccPriceOfbuy2) / currAccPriceOfbuy2;
+                            obj.number_of_sell = currSumNumberOfBuy2;
+                            obj.total_unit_cost = currAccPriceOfbuy2;
+                            obj.unit = currSumNumberOfBuy2;
                             foundStock.badge = '買'; // 必定買
                         }
                     }
-                } else if (isReadyToSell && ((obj.is_sell && !obj.is_buy && !obj.is_sell_cancel) || obj.is_latest)) {
+                } else if (
+                    isReadyToSell &&
+                    ((!preSellReason.includes('kd_dead') && !preSellReason.includes('kd_turn_down')) ||
+                        obj.reason.includes('rsi_over_bought')) &&
+                    ((obj.is_sell && !obj.is_buy && !obj.is_sell_cancel) || obj.is_latest)
+                ) {
+                    // 若有RSI，則KD賣的策略都要賣一半
+                    const currBuyList = [...buyList];
+                    buyList = [];
+                    const totalNumberOfBuy = _.sumBy(currBuyList, 'numberOfBuy');
+                    let thisNumberOfSell = totalNumberOfBuy;
+                    console.log('=====================');
+                    console.log(foundRsiOverBought);
+                    console.log(obj.reason);
+                    var unit = 1; // 有可能絕對正報酬後才能確定賣的單位數要儲存進 obj
+                    if (
+                        foundRsiOverBought &&
+                        (obj.reason.includes('kd_dead') || obj.reason.includes('kd_turn_down')) &&
+                        !obj.reason.includes('rsi_over_bought')
+                    ) {
+                        thisNumberOfSell = totalNumberOfBuy / 2;
+                        console.log('RSI，且有 KD');
+                        unit = 0.5;
+                    }
+                    console.log('currBuyList=', currBuyList);
+                    console.log('thisNumberOfSell=', thisNumberOfSell);
+                    let remainingNumberOfSell = thisNumberOfSell;
+                    let totalPrice = 0;
+                    const remainingBuyList = _.reduce(
+                        currBuyList,
+                        (result, obj) => {
+                            const { date, numberOfBuy, price } = obj;
+                            let realNumberOfBuy = numberOfBuy;
+                            let remainingNumberOfBuy = numberOfBuy;
+                            if (remainingNumberOfSell > 0) {
+                                console.log('numberOfBuy=', numberOfBuy);
+                                console.log('remainingNumberOfSell=', remainingNumberOfSell);
+                                if (numberOfBuy > remainingNumberOfSell) {
+                                    // 1，0.5     1，1    1，0.75
+                                    realNumberOfBuy = remainingNumberOfSell;
+                                    remainingNumberOfBuy = numberOfBuy - remainingNumberOfSell;
+                                    remainingNumberOfSell = 0;
+                                    console.log('1');
+                                } else {
+                                    // 2，6
+                                    remainingNumberOfBuy = numberOfBuy - remainingNumberOfSell;
+                                    remainingNumberOfSell -= numberOfBuy;
+                                    console.log('2');
+                                }
+                                console.log('remainingNumberOfSell=', remainingNumberOfSell);
+                                console.log('realNumberOfBuy=', realNumberOfBuy);
+                                console.log('price=', price);
+                                console.log('remainingNumberOfBuy=', remainingNumberOfBuy);
+                                totalPrice += realNumberOfBuy * price;
+                            }
+                            if (remainingNumberOfSell === 0 && remainingNumberOfBuy > 0) {
+                                // 這一圈已變 0 也要跑，所以用 if 而不用 else if
+                                result.push({ date, numberOfBuy: remainingNumberOfBuy, price });
+                            }
+                            console.log(result);
+                            return result;
+                        },
+                        []
+                    );
+                    // console.log(buyList);
+                    console.log(remainingBuyList);
+
                     // 不能同時當天有買也有賣，這樣也會取消
                     // 去累加買入訊號單位
-                    const rateOfReturn = (obj.price * numberOfBuy - accPriceOfBuy) / accPriceOfBuy;
+                    const rateOfReturn = (obj.price * thisNumberOfSell - totalPrice) / totalPrice;
 
                     // console.log('rateOfReturn');
                     // console.log(rateOfReturn);
@@ -1364,22 +1497,37 @@ const stock = {
                     // console.log(obj.is_sell);
                     // console.log(obj.is_latest);
                     // 搭配 絕對正報酬，應該是要該天要有賣，有遇到 is_lastest=true，但沒有is_sell，最終有earn
+                    console.log('rateOfReturn=', rateOfReturn);
                     let isCancelToSell = false;
-                    if (foundEarn && obj.is_sell && rateOfReturn * 100 < foundEarn.limit) {
+                    if (foundEarn && obj.is_sell && rateOfReturn * 100 <= foundEarn.limit) {
+                        // 絕對正報酬
                         isCancelToSell = true;
                         obj.is_sell_cancel = true;
                         obj.reason.push('earn');
+                        buyList = _.concat(currBuyList, buyList);
                     }
                     if (!isCancelToSell || obj.is_latest) {
+                        buyList = _.concat(remainingBuyList, buyList);
+                        console.log(buyList);
+
                         // 就算是取消賣，最後一天也是要去算最新報酬喔
                         obj.rate_of_return = rateOfReturn;
-                        obj.number_of_buy = numberOfBuy;
+                        obj.number_of_sell = thisNumberOfSell;
                         obj.date_of_first_buy = dateOfFirstBuy;
+                        obj.total_unit_cost = totalPrice;
+                        obj.unit = unit;
+                        // 這裡故意不是真正first buy date，是為了避免重覆算時間
+                        if (unit === 0.5) dateOfFirstBuy = obj.date;
+                        else dateOfFirstBuy = '';
+
                         if (obj.is_sell) obj.is_sure_sell = true; // 最後一個日期如果真的是賣才會有確定賣，
-                        dateOfFirstBuy = '';
-                        numberOfBuy = 0;
-                        accPriceOfBuy = 0;
-                        isReadyToSell = false;
+
+                        // numberOfBuy = finalNumberOfSell;
+                        // accPriceOfBuy = 0;
+                        isReadyToSell = remainingBuyList.length > 0;
+
+                        preSellReason = obj.reason; // 為了避免連續賣都是KD
+                        console.log('isReadyToSell=', isReadyToSell);
 
                         // 如果最後一天剛好也是賣
                         if (obj.is_sure_sell && dataDailyLastDate.isSame(moment(obj.date))) {
@@ -1413,13 +1561,21 @@ const stock = {
                               } else if (obj.is_sure_buy) {
                                   buyOrSell = '買';
                               }
-                              return {
+                              const result = {
                                   date: obj.date,
                                   buy_or_sell: buyOrSell,
                                   price: obj.price,
-                                  rate_of_return: obj.rate_of_return ? `${Number((obj.rate_of_return * 100).toFixed(1))}%` : '',
+                                  rate_of_return: obj.rate_of_return,
                                   reason: obj.reason,
                               };
+
+                              if (obj.number_of_sell) result.number_of_sell = obj.number_of_sell;
+                              if (obj.number_of_buy) result.number_of_buy = obj.number_of_buy;
+
+                              if (obj.unit) result.unit = obj.unit;
+                              if (obj.total_unit_cost) result.total_unit_cost = obj.total_unit_cost;
+                              if (obj.date_of_first_buy) result.date_of_first_buy = obj.date_of_first_buy;
+                              return result;
                           }
                       )
                     : [];
@@ -1443,65 +1599,81 @@ const stock = {
                 (_.has(foundStock, 'policy.settings.sell') && foundStock.policy.settings.sell.length > 0)
             ) {
                 foundStock.policy.stats = {};
-                let numberOfSell = 0;
-                let sumOfReturns = 0;
-                let dateOfFirstBuy = '';
-                let holdDays = 0;
-                let sumOfBuyNumber = 0;
                 let maxEarn = -999999;
                 let maxLose = 999999;
-                let compoundOfReturns = 1; // 複利報酬率，為了算年均及年化報酬率，本是1
+                let sumOfSellNumber = 0;
+                let totalRateOfRuturn = 0;
+                let accRateOfRuturn = 0;
+                let sumOfSellIntervalDays = 0; // 賣出間隔時間總和，不包括"現在"
+                let numberOfSell = 0; // 賣出次數，不包括"現在"
+                let earliestBuyDate = '';
+                let lastSellDate = '';
+                let totalBuyCost = 0; // 總計買進成本
+                let totalSellCost = 0; // 總計賣出金額
+                // 使用 Array.filter() 過濾只保留 buy_or_sell 為 "現在" 或 "賣" 的元素
 
-                foundStock.policy.result.forEach((obj) => {
-                    if (moment().diff(obj.date, 'years') <= 9) {
-                        if (obj.is_sure_sell || obj.is_latest) {
-                            numberOfSell += 1;
-                            // 為了算"計算期間"，第一個買入的日期要知道
-                            sumOfReturns += obj.rate_of_return;
-                            if (numberOfSell === 1) {
-                                // 賣的第一個要計時間
-                                dateOfFirstBuy = obj.date_of_first_buy;
-                            }
-                            holdDays += moment(obj.date).diff(moment(obj.date_of_first_buy), 'days');
-                            sumOfBuyNumber += obj.number_of_buy;
+                _.eachRight(foundStock.policy.history, (obj, index) => {
+                    if (['賣'].includes(obj.buy_or_sell)) {
+                        // 回測不包括 '現在',
+                        // 在這裡處理每個元素
+                        console.log(obj);
+                        if (obj.rate_of_return > maxEarn) maxEarn = obj.rate_of_return;
+                        if (obj.rate_of_return < maxLose) maxLose = obj.rate_of_return;
 
-                            // 算最大賺及最大賠
-                            if (obj.rate_of_return > maxEarn) maxEarn = obj.rate_of_return;
-                            if (obj.rate_of_return < maxLose) maxLose = obj.rate_of_return;
+                        // 單位報酬率，先算總單位報酬率
+                        totalBuyCost += obj.total_unit_cost;
+                        totalSellCost += obj.price * obj.number_of_sell;
 
-                            compoundOfReturns += compoundOfReturns * obj.rate_of_return;
-                        }
-                        // 如今天是2022-02-25，則會算到2012-02-26。2012-02-25就不算了
+                        // 平均報酬率
+                        totalRateOfRuturn += obj.rate_of_return; // 報酬率總和，為了算每回報酬率
+                        sumOfSellNumber += obj.number_of_sell; // 總共賣的單位數
+
+                        // 累積報酬率
+                        accRateOfRuturn += obj.number_of_sell * obj.rate_of_return;
+
+                        // 每回天數
+                        numberOfSell += 1;
+                        sumOfSellIntervalDays += moment(obj.date).diff(moment(obj.date_of_first_buy), 'days');
+
+                        // 為了計算期間，起迄要知道
+                        if (earliestBuyDate === '') earliestBuyDate = obj.date_of_first_buy;
+                        lastSellDate = obj.date;
                     }
                 });
-                let diffYearsFloat = 0;
-
-                foundStock.policy.stats.diff_years = 0;
-                foundStock.policy.stats.diff_remaining_days = 0;
-                if (dateOfFirstBuy !== '') {
-                    const diffDays = moment().diff(moment(dateOfFirstBuy), 'days');
-                    const diffYears = diffDays / 365 > 0 ? diffDays / 365 : 0;
-                    const diffRemainingDays = diffDays % 365 > 0 ? diffDays % 365 : 0;
-                    foundStock.policy.stats.diff_years = diffYears;
-                    foundStock.policy.stats.diff_remaining_days = diffRemainingDays;
-                    diffYearsFloat = diffDays / 365;
-                }
-
-                foundStock.policy.stats.sum_of_returns = sumOfReturns;
-                foundStock.policy.stats.average_of_returns = numberOfSell === 0 ? 0 : sumOfReturns / numberOfSell;
-                foundStock.policy.stats.average_hold_days = numberOfSell === 0 ? 0 : Math.floor(holdDays / numberOfSell);
-                foundStock.policy.stats.average_buy_number = numberOfSell === 0 ? 0 : sumOfBuyNumber / numberOfSell;
 
                 // 若真的都沒有買賣，則顯示為0
-                if (maxEarn === -999999) maxEarn = 0;
-                if (maxLose === 999999) maxLose = 0;
-                foundStock.policy.stats.max_earn = maxEarn;
-                foundStock.policy.stats.max_lose = maxLose;
                 foundStock.policy.stats.number_of_sell = numberOfSell;
-                // foundStock.policy.stats.average_annual_return = (compoundOfReturns - 1) / diffYearsFloat;
-                foundStock.policy.stats.average_annual_return = sumOfReturns / diffYearsFloat;
-                foundStock.policy.stats.internal_of_return =
-                    diffYearsFloat === 0 ? 0 : compoundOfReturns ** (1 / diffYearsFloat) - 1;
+                foundStock.policy.stats.average_sell_interval = numberOfSell > 0 ? sumOfSellIntervalDays / numberOfSell : 0;
+                foundStock.policy.stats.max_earn = maxEarn === -999999 ? 0 : maxEarn * 100;
+                foundStock.policy.stats.max_lose = maxLose === 999999 ? 0 : maxLose * 100;
+
+                // 年化報酬率
+                // const diffYears = sumOfSellIntervalDays / 365.25; // 一年的平均天數，考慮閏年
+                // console.log(sumOfSellIntervalDays);
+                // console.log(diffYears);
+                // console.log(totalBuyCost);
+                // console.log(totalSellCost);
+                // foundStock.policy.stats.annual_rate_of_return =
+                //     numberOfSell > 0 ? (totalSellCost / totalBuyCost) ** (1 / diffYears) - 1 : 0;
+                // console.log(foundStock.policy.stats.annual_rate_of_return);
+                // 單位報酬率
+                foundStock.policy.stats.unit_rate_of_return =
+                    numberOfSell > 0 ? ((totalSellCost - totalBuyCost) / totalBuyCost) * 100 : 0;
+                // 累積報酬率
+                foundStock.policy.stats.acc_rate_of_return = numberOfSell > 0 ? accRateOfRuturn * 100 : 0;
+                // 賣出單位數
+                foundStock.policy.stats.sum_of_sell_number = sumOfSellNumber;
+                // 平均報酬率
+                foundStock.policy.stats.average_rate_of_return = numberOfSell > 0 ? (totalRateOfRuturn / numberOfSell) * 100 : 0;
+                // 計算期間
+                if (earliestBuyDate !== '' && lastSellDate !== '') {
+                    const duration = moment.duration(moment(lastSellDate).diff(moment(earliestBuyDate)));
+                    const years = duration.years();
+                    const months = duration.months();
+                    foundStock.policy.stats.duration = `${years}年${months}月`;
+                } else {
+                    foundStock.policy.stats.duration = '';
+                }
             } else if (_.has(foundStock, 'policy.stats')) {
                 delete foundStock.policy.stats;
             }

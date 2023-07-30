@@ -384,6 +384,10 @@ export default {
                                             showSignals.push(
                                                 '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">KD黃金</span>'
                                             );
+                                        if (foundPolicyResult.reason.includes('kd_w'))
+                                            showSignals.push(
+                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">KD W底</span>'
+                                            );
                                         if (foundPolicyResult.reason.includes('kd_dead'))
                                             showSignals.push(
                                                 '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">KD死亡</span>'

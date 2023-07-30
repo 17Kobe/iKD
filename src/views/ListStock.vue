@@ -157,7 +157,7 @@
                         <el-popover
                             placement="left-start"
                             title="實際買賣歷史"
-                            width="500"
+                            width="400"
                             trigger="hover"
                             :hide-after="0"
                             :ref="`popover-${scope.row.id}`"
@@ -178,14 +178,17 @@
                                     style="
                                         background-color: #82e725;
                                         font-size: 14px;
-                                        display: inline-block;
+                                        display: inline-flex;
+                                        justify-content: space-between;
                                         width: 30px;
                                         text-align: center;
                                         color: white;
                                         border-radius: 10px 100px / 120px;
                                         padding: 5px;
+                                        width: 90px;
+                                        text-align: left;
                                     "
-                                    >今</span
+                                    >今<span> ({{ getNumberSum(scope.row.cost.settings) }} 股) </span></span
                                 >
                                 &nbsp;&nbsp;
                                 <span
@@ -198,15 +201,6 @@
                                     "
                                     >{{ scope.row.last_price }}</span
                                 >
-                                &nbsp;&nbsp;<span
-                                    style="
-                                        background-color: #eeeeee;
-                                        font-size: 14px;
-                                        display: inline-block;
-                                        width: 60px;
-                                        text-align: center;
-                                    "
-                                ></span>
                                 &nbsp;&nbsp;<span
                                     :style="[
                                         scope.row.cost.rate_of_return < 0 ? { color: '#01aa00' } : { color: '#ee3333' },
@@ -231,25 +225,32 @@
                                                 display: 'inline-block',
                                                 width: '100px',
                                                 'text-align': 'center',
+                                                'margin-top': '6px',
                                             },
                                         ]"
                                         >{{ item.buy_date }}</span
                                     >&nbsp;&nbsp;
+
                                     <span
                                         :style="[
                                             item.buy_date ? { 'background-color': '#f28b82' } : { 'background-color': '#82d125' },
                                             {
                                                 'font-size': '14px',
-                                                display: 'inline-block',
-                                                width: '30px',
-                                                'text-align': 'center',
+                                                display: 'inline-flex' /* 使用 inline-flex 以允許靠右對齊 */,
+                                                width: '90px',
+                                                'text-align': 'left',
+                                                'justify-content': 'space-between' /* 將子元素靠右對齊 */,
                                                 color: 'white',
                                                 'border-radius': '10px 100px / 120px',
                                                 padding: '5px',
+                                                'vertical-align': 'top' /* 將文字靠最上方 */,
                                             },
                                         ]"
-                                        >買</span
                                     >
+                                        買
+                                        <span> ({{ item.number }} 股) </span>
+                                    </span>
+
                                     &nbsp;&nbsp;<span
                                         :style="[
                                             index % 2 === 1
@@ -260,23 +261,10 @@
                                                 display: 'inline-block',
                                                 width: '60px',
                                                 'text-align': 'center',
+                                                'margin-top': '6px',
                                             },
                                         ]"
                                         >{{ item.cost }}</span
-                                    >
-                                    &nbsp;&nbsp;<span
-                                        :style="[
-                                            index % 2 === 1
-                                                ? { 'background-color': '#eeeeee' }
-                                                : { 'background-color': '#ffffff' },
-                                            {
-                                                'font-size': '14px',
-                                                display: 'inline-block',
-                                                width: '60px',
-                                                'text-align': 'center',
-                                            },
-                                        ]"
-                                        >{{ item.number }}</span
                                     >
                                 </div>
                             </div>
@@ -396,7 +384,7 @@
                                             padding: 2px 4px;
                                             border-radius: 10px 100px / 120px;
                                         "
-                                        ><span v-if="item.label.includes('2+n倍')" style="font-size: 10px">x2</span>買</span
+                                        >買<span v-if="item.label.includes('2+n倍')" style="font-size: 10px">x2</span></span
                                     >
                                     <span>
                                         &nbsp;{{ item.label.replace('買', '').replace(' 底 (2+n倍)', '') }}&nbsp;<span
@@ -407,7 +395,10 @@
                                 </div>
                             </div>
                             <div v-for="(item, index) in scope.row.policy.settings.sell" :key="index">
-                                <div style="line-height: 18px">
+                                <div
+                                    style="line-height: 18px; width: 100%"
+                                    v-if="scope.row.policy.settings.buy.length + index < 5"
+                                >
                                     <span
                                         style="
                                             font-size: 14px;
@@ -419,7 +410,7 @@
                                         >{{
                                             scope.row.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought') &&
                                             (item.method === 'kd_dead' || item.method === 'kd_turn_down')
-                                                ? '½賣'
+                                                ? '賣½'
                                                 : '賣'
                                         }}</span
                                     >
@@ -433,6 +424,27 @@
                                             style="color: #4386f5; font-size: 14px"
                                             >{{ item.limit }}</span
                                         >&nbsp;{{ item.limit_desc }}
+                                        <span
+                                            style="float: right"
+                                            v-if="
+                                                scope.row.policy.settings.buy.length + scope.row.policy.settings.sell.length >
+                                                    5 && index === 5 - scope.row.policy.settings.buy.length - 1
+                                            "
+                                            ><button
+                                                style="
+                                                    width: 0;
+                                                    height: 0;
+                                                    border-left: 6px solid transparent;
+                                                    border-right: 6px solid transparent;
+                                                    border-top: 10px solid #8ad125;
+                                                    background-color: transparent;
+                                                    cursor: pointer;
+                                                    outline: none;
+                                                "
+                                            >
+                                                <!-- 您可以在這裡添加按鈕內容 -->
+                                            </button></span
+                                        >
                                     </span>
                                 </div>
                             </div>
@@ -472,42 +484,73 @@
                                 <span
                                     :style="[
                                         index % 2 === 0 ? { 'background-color': '#eeeeee' } : { 'background-color': '#ffffff' },
-                                        { 'font-size': '14px', display: 'inline-block', width: '100px', 'text-align': 'center' },
+                                        {
+                                            'font-size': '14px',
+                                            display: 'inline-block',
+                                            width: '100px',
+                                            'text-align': 'center',
+                                            'vertical-align': 'top' /* 將文字靠最上方 */,
+                                            'margin-top': '6px',
+                                        },
                                     ]"
                                     >{{ item.date }}</span
                                 >&nbsp;&nbsp;
                                 <span
-                                    :style="[
-                                        item.buy_or_sell === '買'
-                                            ? { 'background-color': '#f28b82' }
-                                            : item.buy_or_sell === '賣'
-                                            ? { 'background-color': '#82d125' }
-                                            : { 'background-color': '#82e725' },
-                                        {
-                                            'font-size': '14px',
-                                            display: 'inline-block',
-                                            width: '30px',
-                                            'text-align': 'center',
-                                            color: 'white',
-                                            'border-radius': '10px 100px / 120px',
-                                            padding: '5px',
-                                        },
-                                    ]"
-                                    >{{ item.buy_or_sell === '現在' ? '今' : item.buy_or_sell }}</span
+                                    :style="{
+                                        'font-size': '14px',
+                                        display: 'inline-flex' /* 使用 inline-flex 以允許靠右對齊 */,
+                                        width: '90px',
+                                        'text-align': 'left',
+                                        'justify-content': 'space-between' /* 將子元素靠右對齊 */,
+                                        color: 'white',
+                                        'border-radius': '10px 100px / 120px',
+                                        padding: '5px',
+                                        'vertical-align': 'top' /* 將文字靠最上方 */,
+                                        'background-color':
+                                            item.buy_or_sell === '買'
+                                                ? '#f28b82'
+                                                : item.buy_or_sell === '賣'
+                                                ? '#82d125'
+                                                : '#82e725',
+                                    }"
                                 >
+                                    {{ item.buy_or_sell === '現在' ? '今' : item.buy_or_sell
+                                    }}{{ item.unit && item.unit === 0.5 ? '½' : '' }}
+                                    <span>
+                                        ({{
+                                            item.buy_or_sell === '買'
+                                                ? Math.round(item.number_of_buy * 100) / 100
+                                                : Math.round(item.number_of_sell * 100) / 100
+                                        }})
+                                    </span>
+                                </span>
                                 &nbsp;&nbsp;<span
                                     :style="[
                                         index % 2 === 0 ? { 'background-color': '#eeeeee' } : { 'background-color': '#ffffff' },
-                                        { 'font-size': '14px', display: 'inline-block', width: '60px', 'text-align': 'center' },
+                                        {
+                                            'font-size': '14px',
+                                            display: 'inline-block',
+                                            width: '60px',
+                                            'text-align': 'center',
+                                            'vertical-align': 'top' /* 將文字靠最上方 */,
+                                            'margin-top': '6px',
+                                        },
                                     ]"
                                     >{{ item.price }}</span
                                 >
                                 &nbsp;&nbsp;<span
                                     :style="[
-                                        item.rate_of_return.includes('-') ? { color: '#01aa00' } : { color: '#ee3333' },
-                                        { 'font-size': '14px', display: 'inline-block', width: '50px', 'text-align': 'right' },
+                                        item.rate_of_return < 0 ? { color: '#01aa00' } : { color: '#ee3333' },
+                                        {
+                                            'font-size': '14px',
+                                            display: 'inline-block',
+                                            width: '50px',
+                                            'text-align': 'right',
+                                            'vertical-align': 'top' /* 將文字靠最上方 */,
+                                            'margin-top': '6px',
+                                        },
                                     ]"
-                                    >{{ item.rate_of_return }}</span
+                                    >{{ item.rate_of_return ? Number((item.rate_of_return * 100).toFixed(1)) + '%' : '' }}</span
                                 >
                                 &nbsp;&nbsp;<span
                                     :style="[
@@ -528,19 +571,20 @@
                                         },
                                     ]"
                                 >
-                                    <span v-if="item.reason.includes('kd_gold')">KD 黃金交叉</span>
-                                    <span v-if="item.reason.includes('kd_turn_up')">KD往 上轉折</span>
-                                    <span v-if="item.reason.includes('rsi_over_sold')">RSI 超賣</span>
-                                    <span v-if="item.reason.includes('rsi_turn_up')">RSI 往上轉折</span>
-                                    <span v-if="item.reason.includes('annual_fixed_date_buy')">每年固定日買</span>
+                                    <p v-if="item.reason.includes('kd_gold')">KD 黃金交叉</p>
+                                    <p v-if="item.reason.includes('kd_w')">KD W底</p>
+                                    <p v-if="item.reason.includes('kd_turn_up')">KD往 上轉折</p>
+                                    <p v-if="item.reason.includes('rsi_over_sold')">RSI 超賣</p>
+                                    <p v-if="item.reason.includes('rsi_turn_up')">RSI 往上轉折</p>
+                                    <p v-if="item.reason.includes('annual_fixed_date_buy')">每年固定日買</p>
 
-                                    <span v-if="item.reason.includes('kd_dead')">KD 死亡交叉</span>
-                                    <span v-if="item.reason.includes('kd_turn_down')">KD 往下轉折</span>
-                                    <span v-if="item.reason.includes('rsi_over_bought')">RSI 超買</span>
-                                    <span v-if="item.reason.includes('rsi_turn_down')">RSI 往下轉折</span>
-                                    <span v-if="item.reason.includes('annual_fixed_date_sell')">每年固定日賣</span>
+                                    <p v-if="item.reason.includes('kd_dead')">KD 死亡交叉</p>
+                                    <p v-if="item.reason.includes('kd_turn_down')">KD 往下轉折</p>
+                                    <p v-if="item.reason.includes('rsi_over_bought')">RSI 超買</p>
+                                    <p v-if="item.reason.includes('rsi_turn_down')">RSI 往下轉折</p>
+                                    <p v-if="item.reason.includes('annual_fixed_date_sell')">每年固定日賣</p>
 
-                                    <span v-if="item.reason.includes('latest')">現在</span>
+                                    <p v-if="item.reason.includes('latest')">現在</p>
                                 </span>
                             </div>
                         </div>
@@ -555,17 +599,26 @@
                                             ><el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
                                                     scope.row.policy.stats.number_of_sell
+                                                        ? scope.row.policy.stats.number_of_sell
+                                                        : ''
                                                 }}</span
-                                                >次</el-tag
+                                                >次<span style="font-size: 14px; font-weight: bold">{{
+                                                    scope.row.policy.stats.sum_of_sell_number
+                                                        ? scope.row.policy.stats.sum_of_sell_number
+                                                        : ''
+                                                }}</span
+                                                >單位</el-tag
                                             ></el-col
                                         >
                                         <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
-                                            ><span>&nbsp;年化報酬率</span></el-col
+                                            ><span>&nbsp;累積報酬率</span></el-col
                                         >
                                         <el-col :span="5" style="padding-right: 16px; text-align: right"
                                             ><el-tag class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
-                                                    Number((scope.row.policy.stats.internal_of_return * 100).toFixed(1))
+                                                    scope.row.policy.stats.acc_rate_of_return
+                                                        ? Number(scope.row.policy.stats.acc_rate_of_return.toFixed(1))
+                                                        : ''
                                                 }}</span
                                                 >%</el-tag
                                             >
@@ -578,19 +631,24 @@
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><el-tag type="warning" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
-                                                    scope.row.policy.stats.average_hold_days
+                                                    scope.row.policy.stats.average_sell_interval
+                                                        ? Math.round(scope.row.policy.stats.average_sell_interval)
+                                                        : ''
                                                 }}</span
                                                 >天</el-tag
                                             >
                                         </el-col>
 
                                         <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
-                                            ><span>&nbsp;每回報酬率</span></el-col
+                                            ><span>&nbsp;單位報酬率</span></el-col
                                         >
                                         <el-col :span="5" style="padding-right: 16px; text-align: right"
-                                            ><span style="color: #4386f5; font-size: 14px">{{
-                                                Number((scope.row.policy.stats.average_of_returns * 100).toFixed(1))
-                                            }}</span
+                                            ><span style="color: #4386f5; font-size: 14px">
+                                                {{
+                                                    scope.row.policy.stats.unit_rate_of_return
+                                                        ? Number(scope.row.policy.stats.unit_rate_of_return.toFixed(1))
+                                                        : ''
+                                                }} </span
                                             >%</el-col
                                         >
                                         <!-- <el-col :span="6" style="padding: 0"><span>年均報酬率</span></el-col>
@@ -602,35 +660,37 @@
                                         > -->
                                     </el-row>
                                     <el-row>
-                                        <el-col :span="7" style="padding: 0 0 0 30px; text-align: left"
-                                            ><span>最大賺幅</span></el-col
-                                        >
+                                        <el-col :span="7" style="padding: 0 0 0 30px; text-align: left"><span>最好</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><el-tag type="danger" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
-                                                    Number((scope.row.policy.stats.max_earn * 100).toFixed(1))
+                                                    scope.row.policy.stats.max_earn
+                                                        ? Number(scope.row.policy.stats.max_earn.toFixed(1))
+                                                        : ''
                                                 }}</span
                                                 >%</el-tag
                                             >
                                         </el-col>
                                         <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
-                                            ><span>&nbsp;累積報酬率</span></el-col
+                                            ><span>&nbsp;平均報酬率</span></el-col
                                         >
                                         <el-col :span="5" style="padding-right: 16px; text-align: right"
                                             ><span style="color: #4386f5; font-size: 14px; font-weight: bold">{{
-                                                Number((scope.row.policy.stats.sum_of_returns * 100).toFixed(1))
+                                                scope.row.policy.stats.average_rate_of_return
+                                                    ? Number(scope.row.policy.stats.average_rate_of_return.toFixed(1))
+                                                    : ''
                                             }}</span
                                             >%</el-col
                                         >
                                     </el-row>
                                     <el-row>
-                                        <el-col :span="7" style="padding: 0 0 0 30px; text-align: left"
-                                            ><span>最大賠幅</span></el-col
-                                        >
+                                        <el-col :span="7" style="padding: 0 0 0 30px; text-align: left"><span>最差</span></el-col>
                                         <el-col :span="5" style="padding: 0; text-align: right"
                                             ><el-tag type="success" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
-                                                    Number((scope.row.policy.stats.max_lose * 100).toFixed(1))
+                                                    scope.row.policy.stats.max_lose
+                                                        ? Number(scope.row.policy.stats.max_lose.toFixed(1))
+                                                        : ''
                                                 }}</span
                                                 >%</el-tag
                                             ></el-col
@@ -640,9 +700,8 @@
                                         >
                                         <el-col :span="5" style="padding-right: 16px; text-align: right"
                                             ><span style="color: #4386f5; font-size: 14px">{{
-                                                Number(scope.row.policy.stats.diff_years.toFixed(1))
-                                            }}</span
-                                            >年
+                                                scope.row.policy.stats.duration ? scope.row.policy.stats.duration : ''
+                                            }}</span>
                                         </el-col>
                                     </el-row>
                                 </div>
@@ -871,6 +930,9 @@ export default {
         },
         getReversedItems(array) {
             return array.slice().reverse();
+        },
+        getNumberSum(array) {
+            return _.sumBy(array, 'number');
         },
     },
 };
