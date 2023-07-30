@@ -463,7 +463,7 @@
                     <el-popover
                         placement="left-start"
                         title="策略回測歷史"
-                        width="500"
+                        width="480px"
                         trigger="hover"
                         :hide-after="0"
                         :ref="`popover-${scope.row.id}`"
