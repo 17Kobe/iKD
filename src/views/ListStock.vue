@@ -21,6 +21,7 @@
                 <template #default="scope">
                     <div style="width: 95px; display: inline-block">
                         <el-badge
+                            title="424"
                             :value="scope.row.badge"
                             class="item"
                             :class="[scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '', , 'item']"

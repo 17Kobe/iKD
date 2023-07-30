@@ -1359,6 +1359,7 @@ const stock = {
             let buyList = [];
             let preSellReason = [];
             foundStock.badge = null;
+            foundStock.badge_reason = [];
             foundStock.policy.result.forEach((obj) => {
                 // 必需有買才要在第一次賣時算報酬率
                 if (obj.is_buy && !obj.is_sell && !obj.is_buy_cancel) {
@@ -1701,14 +1702,19 @@ const stock = {
                 // 預測賣看KD死亡交叉跟死亡轉折，停利停損之後再看
                 if (_.has(foundStock, 'policy.settings.buy')) {
                     let foundKdGold = false;
+                    let foundKdW = false;
                     let foundKdTurnUp = false;
                     foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
+                    foundKdW = _.find(foundStock.policy.settings.buy, ['method', 'kd_w']);
                     foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
                     if (foundKdGold) {
                         const lastArray = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1];
                         const lastK = lastArray[1];
                         const lastD = lastArray[2];
-                        if (lastK <= foundKdGold.limit && lastK < lastD) foundStock.badge = '準買'; // K要小於D，才是訊號前的準備
+                        if (lastK <= foundKdGold.limit && lastK < lastD) {
+                            foundStock.badge = '準買'; // K要小於D，才是訊號前的準備
+                            foundStock.badge_reason.push('kd_gold'); // K要小於D，才是訊號前的準備
+                        }
                     }
                     if (foundKdTurnUp) {
                         const lastK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
