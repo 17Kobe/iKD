@@ -1677,7 +1677,9 @@ const stock = {
                     const duration = moment.duration(moment(lastSellDate).diff(moment(earliestBuyDate)));
                     const years = duration.years();
                     const months = duration.months();
-                    foundStock.policy.stats.duration = `${years}年${months}月`;
+                    if (years === 0 && months === 0) foundStock.policy.stats.duration = '';
+                    else if (years === 0) foundStock.policy.stats.duration = `${months}月`;
+                    else if (months === 0) foundStock.policy.stats.duration = `${years}年`;
                 } else {
                     foundStock.policy.stats.duration = '';
                 }
