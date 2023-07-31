@@ -1678,9 +1678,8 @@ const stock = {
                     const duration = moment.duration(moment(lastSellDate).diff(moment(earliestBuyDate)));
                     const years = duration.years();
                     const months = duration.months();
-                    if (years === 0 && months === 0) foundStock.policy.stats.duration = '';
-                    else if (years === 0) foundStock.policy.stats.duration = `${months}月`;
-                    else if (months === 0) foundStock.policy.stats.duration = `${years}年`;
+                    foundStock.policy.stats.duration = years ? `${years}年` : '';
+                    foundStock.policy.stats.duration += months ? `${months}月` : '';
                 } else {
                     foundStock.policy.stats.duration = '';
                 }
@@ -1713,13 +1712,16 @@ const stock = {
                         const lastD = lastArray[2];
                         if (lastK <= foundKdGold.limit && lastK < lastD) {
                             foundStock.badge = '準買'; // K要小於D，才是訊號前的準備
-                            foundStock.badge_reason.push('kd_gold'); // K要小於D，才是訊號前的準備
+                            foundStock.badge_reason.push('kd_gold');
                         }
                     }
                     if (foundKdTurnUp) {
                         const lastK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
                         const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
-                        if (lastK <= foundKdTurnUp.limit && lastK < lastSecondK) foundStock.badge = '準買';
+                        if (lastK <= foundKdTurnUp.limit && lastK < lastSecondK) {
+                            foundStock.badge = '準買';
+                            foundStock.badge_reason.push('kd_turn_up');
+                        }
                     }
                 }
 
@@ -1739,17 +1741,26 @@ const stock = {
                             const lastArray = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1];
                             const lastK = lastArray[1];
                             const lastD = lastArray[2];
-                            if (lastK >= foundKdDead.limit && lastK > lastD) foundStock.badge = '準賣'; // K要大於D，才是訊號前的準備
+                            if (lastK >= foundKdDead.limit && lastK > lastD) {
+                                foundStock.badge = '準賣'; // K要大於D，才是訊號前的準備
+                                foundStock.badge_reason.push('kd_dead');
+                            }
                         }
                         if (foundKdTurnDown) {
                             const lastestK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
                             const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
-                            if (lastestK >= foundKdTurnDown.limit && lastestK > lastSecondK) foundStock.badge = '準賣';
+                            if (lastestK >= foundKdTurnDown.limit && lastestK > lastSecondK) {
+                                foundStock.badge = '準賣';
+                                foundStock.badge_reason.push('kd_turn_down');
+                            }
                         }
                         if (foundRsiOverBought) {
                             const lastArray = foundTempStock.data.weekly_rsi[foundTempStock.data.weekly_rsi.length - 1];
                             const lastRsi = lastArray[1];
-                            if (lastRsi >= foundRsiOverBought.limit - 3) foundStock.badge = '準賣'; // K要大於D，才是訊號前的準備
+                            if (lastRsi >= foundRsiOverBought.limit - 3) {
+                                foundStock.badge = '準賣'; // K要大於D，才是訊號前的準備
+                                foundStock.badge_reason.push('rsi_over_bought');
+                            }
                         }
                     }
                 }
