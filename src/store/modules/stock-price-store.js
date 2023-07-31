@@ -1723,6 +1723,60 @@ const stock = {
                             foundStock.badge_reason.push('kd_turn_up');
                         }
                     }
+                    if (foundKdW) {
+                        let preK = 0;
+                        let kdWGoldTimes = 0;
+                        let kdWReady = false;
+                        let kdWReady2 = false;
+                        let preKdWGoldDate = '';
+                        foundTempStock.data.weekly_kdj
+                            .filter((entry) => {
+                                const entryDate = moment(entry[0]);
+                                const oneYearAgo = moment().subtract(2, 'year');
+                                return entryDate >= oneYearAgo;
+                            })
+                            .forEach((item, index, array) => {
+                                console.log(item);
+                                const k = item[1];
+                                const d = item[2];
+
+                                if (k < preK) {
+                                    kdWReady = true;
+                                }
+                                if (k > 30) {
+                                    // 30 以上，看起來比較合理，因為若30以下，那山峰看來太矮
+                                    kdWReady2 = true;
+                                }
+
+                                if (kdWReady2 && k <= 20 && k >= preK && kdWReady) {
+                                    kdWGoldTimes += 1;
+                                    if (
+                                        kdWGoldTimes >= foundKdW.limit &&
+                                        moment(item[0]).diff(moment(preKdWGoldDate), 'days') <= 365
+                                    ) {
+                                    } else if (
+                                        preKdWGoldDate !== '' &&
+                                        moment(item[0]).diff(moment(preKdWGoldDate), 'days') > 365
+                                    ) {
+                                        kdWGoldTimes = 1; // 大於365天則重新來了
+                                        console.log('reset W底');
+                                    }
+                                    preKdWGoldDate = item[0];
+
+                                    kdWReady = false;
+                                    kdWReady2 = false;
+                                }
+
+                                if (index === array.length - 1) {
+                                    if (kdWReady2 && k <= 20 && kdWReady) {
+                                        foundStock.badge = '準買x2';
+                                        foundStock.badge_reason.push('kd_w');
+                                    }
+                                }
+
+                                preK = k;
+                            });
+                    }
                 }
 
                 if (
@@ -1742,7 +1796,7 @@ const stock = {
                             const lastK = lastArray[1];
                             const lastD = lastArray[2];
                             if (lastK >= foundKdDead.limit && lastK > lastD) {
-                                foundStock.badge = '準賣'; // K要大於D，才是訊號前的準備
+                                foundStock.badge = foundRsiOverBought ? '準賣½' : '準賣'; // K要大於D，才是訊號前的準備
                                 foundStock.badge_reason.push('kd_dead');
                             }
                         }
@@ -1750,7 +1804,7 @@ const stock = {
                             const lastestK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
                             const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
                             if (lastestK >= foundKdTurnDown.limit && lastestK > lastSecondK) {
-                                foundStock.badge = '準賣';
+                                foundStock.badge = foundRsiOverBought ? '準賣½' : '準賣';
                                 foundStock.badge_reason.push('kd_turn_down');
                             }
                         }
