@@ -1768,7 +1768,7 @@ const stock = {
                                 }
 
                                 if (index === array.length - 1) {
-                                    if (kdWReady2 && k <= 20 && kdWReady) {
+                                    if (kdWReady2 && k <= 20 && kdWReady && kdWGoldTimes >= foundKdW.limit - 1) {
                                         foundStock.badge = '準買x2';
                                         foundStock.badge_reason.push('kd_w');
                                     }
