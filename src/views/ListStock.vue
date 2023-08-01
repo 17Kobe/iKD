@@ -108,7 +108,7 @@
                                     ]"
                                     >$ {{ Number(Math.round(scope.row.cost.return * 10) / 10).toLocaleString('en-US') }}</span
                                 >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #545454">{{
-                                    scope.row.cost.rate_of_return === 0
+                                        scope.row.cost.rate_of_return === 0
                                         ? '0'
                                         : scope.row.cost.rate_of_return === null
                                         ? 'N/A'
@@ -354,6 +354,8 @@
                         type="info"
                         plain
                         @click="doShowPolicy(scope.row.id)"
+                        @mouseenter="handleMouseEnter"
+                        @mouseleave="handleMouseLeave"
                         :style="[
                             scope.row.policy &&
                             scope.row.policy.settings &&
@@ -398,7 +400,7 @@
                             <div v-for="(item, index) in scope.row.policy.settings.sell" :key="index">
                                 <div
                                     style="line-height: 18px; width: 100%"
-                                    v-if="scope.row.policy.settings.buy.length + index < 5"
+                                    v-if="showMoreButton || scope.row.policy.settings.buy.length + index < 5"
                                 >
                                     <span
                                         style="
@@ -427,7 +429,7 @@
                                         >&nbsp;{{ item.limit_desc }}
                                         <span
                                             style="float: right"
-                                            v-if="
+                                            v-if="!showMoreButton &&
                                                 scope.row.policy.settings.buy.length + scope.row.policy.settings.sell.length >
                                                     5 && index === 5 - scope.row.policy.settings.buy.length - 1
                                             "
@@ -755,6 +757,8 @@ export default {
             showWeekRSI: true,
             showJLine: false,
             currentStockId: null,
+
+            showMoreButton: false
         };
     },
     computed: {
@@ -963,6 +967,12 @@ export default {
                 str = str ? str + ', 每年固定日賣' : '每年固定日賣';
             
             return str;
+        },
+        handleMouseEnter() {
+            this.showMoreButton = true;
+        },
+        handleMouseLeave() {
+            this.showMoreButton = false;
         }
     },
 };
