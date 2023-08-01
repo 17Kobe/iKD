@@ -354,8 +354,8 @@
                         type="info"
                         plain
                         @click="doShowPolicy(scope.row.id)"
-                        @mouseenter="handleMouseEnter"
-                        @mouseleave="handleMouseLeave"
+                        @mouseenter="handleMouseEnter(scope.row.id)"
+                        @mouseleave="handleMouseLeave(scope.row.id)"
                         :style="[
                             scope.row.policy &&
                             scope.row.policy.settings &&
@@ -400,7 +400,7 @@
                             <div v-for="(item, index) in scope.row.policy.settings.sell" :key="index">
                                 <div
                                     style="line-height: 18px; width: 100%"
-                                    v-if="showMoreButton || scope.row.policy.settings.buy.length + index < 5"
+                                    v-if="showMoreButton.includes(scope.row.id) || scope.row.policy.settings.buy.length + index < 5"
                                 >
                                     <span
                                         style="
@@ -429,7 +429,7 @@
                                         >&nbsp;{{ item.limit_desc }}
                                         <span
                                             style="float: right"
-                                            v-if="!showMoreButton &&
+                                            v-if="!showMoreButton.includes(scope.row.id) &&
                                                 scope.row.policy.settings.buy.length + scope.row.policy.settings.sell.length >
                                                     5 && index === 5 - scope.row.policy.settings.buy.length - 1
                                             "
@@ -758,7 +758,7 @@ export default {
             showJLine: false,
             currentStockId: null,
 
-            showMoreButton: false
+            showMoreButton: []
         };
     },
     computed: {
@@ -968,11 +968,11 @@ export default {
             
             return str;
         },
-        handleMouseEnter() {
-            this.showMoreButton = true;
+        handleMouseEnter(id) {
+            this.showMoreButton.push(id);
         },
-        handleMouseLeave() {
-            this.showMoreButton = false;
+        handleMouseLeave(id) {
+            _.pull(this.showMoreButton, id);
         }
     },
 };
