@@ -108,7 +108,7 @@
                                     ]"
                                     >$ {{ Number(Math.round(scope.row.cost.return * 10) / 10).toLocaleString('en-US') }}</span
                                 >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #545454">{{
-                                        scope.row.cost.rate_of_return === 0
+                                    scope.row.cost.rate_of_return === 0
                                         ? '0'
                                         : scope.row.cost.rate_of_return === null
                                         ? 'N/A'
@@ -387,7 +387,11 @@
                                             padding: 2px 4px;
                                             border-radius: 10px 100px / 120px;
                                         "
-                                        >買<span v-if="item.label.includes('2+n倍')" style="font-size: 10px">x2</span></span
+                                        >買<span
+                                            v-if="item.label.includes('W') || item.label.includes('固定日')"
+                                            style="font-size: 10px"
+                                            >x2</span
+                                        ></span
                                     >
                                     <span>
                                         &nbsp;{{ item.label.replace('買', '').replace(' 底 (2+n倍)', '') }}&nbsp;<span
@@ -400,7 +404,9 @@
                             <div v-for="(item, index) in scope.row.policy.settings.sell" :key="index">
                                 <div
                                     style="line-height: 18px; width: 100%"
-                                    v-if="showMoreButton.includes(scope.row.id) || scope.row.policy.settings.buy.length + index < 5"
+                                    v-if="
+                                        showMoreButton.includes(scope.row.id) || scope.row.policy.settings.buy.length + index < 5
+                                    "
                                 >
                                     <span
                                         style="
@@ -429,13 +435,14 @@
                                         >&nbsp;{{ item.limit_desc }}
                                         <span
                                             style="float: right"
-                                            v-if="!showMoreButton.includes(scope.row.id) &&
+                                            v-if="
+                                                !showMoreButton.includes(scope.row.id) &&
                                                 scope.row.policy.settings.buy.length + scope.row.policy.settings.sell.length >
-                                                    5 && index === 5 - scope.row.policy.settings.buy.length - 1
+                                                    5 &&
+                                                index === 5 - scope.row.policy.settings.buy.length - 1
                                             "
-                                            ><button
-  
-                                            ><i class="el-icon-more"></i>
+                                            ><button>
+                                                <i class="el-icon-more"></i>
                                                 <!-- 您可以在這裡添加按鈕內容 -->
                                             </button></span
                                         >
@@ -749,7 +756,7 @@ export default {
             showJLine: false,
             currentStockId: null,
 
-            showMoreButton: []
+            showMoreButton: [],
         };
     },
     computed: {
@@ -931,32 +938,20 @@ export default {
             return _.sumBy(array, 'number');
         },
         getBadgeTitle(array) {
-            let str='';
-            if (array.includes('kd_gold'))
-                str += 'KD 黃金交叉';
-            if (array.includes('kd_w'))
-                str = str ? str + ', KD W底' : 'KD W底';
-            if (array.includes('kd_turn_up'))
-                str = str ? str + ', KD往 上轉折' : 'KD往 上轉折';
-            if (array.includes('rsi_over_sold'))
-                str = str ? str + ', RSI 超賣' : 'RSI 超賣';
-            if (array.includes('rsi_turn_up'))
-                str = str ? str + ', RSI 往上轉折' : 'RSI 往上轉折';
-            if (array.includes('annual_fixed_date_buy'))
-                str = str ? str + ', 每年固定日買' : '每年固定日買';
-            if (array.includes('kd_dead'))
-                str = str ? str + ', KD 死亡交叉' : 'KD 死亡交叉';
-            if (array.includes('kd_turn_down'))
-                str = str ? str + ', KD 往下轉折' : 'KD 往下轉折';
-            if (array.includes('rsi_over_bought'))
-                str = str ? str + ', RSI 超買' : 'RSI 超買';
-            if (array.includes('rsi_turn_down'))
-                str = str ? str + ', RSI 往下轉折' : 'RSI 往下轉折';
-            if (array.includes('annual_fixed_date_sell'))
-                str = str ? str + ', 每年固定日賣' : '每年固定日賣';
-            if (array.includes('annual_fixed_date_sell'))
-                str = str ? str + ', 每年固定日賣' : '每年固定日賣';
-            
+            let str = '';
+            if (array.includes('kd_gold')) str += 'KD 黃金交叉';
+            if (array.includes('kd_w')) str = str ? str + ', KD W底' : 'KD W底';
+            if (array.includes('kd_turn_up')) str = str ? str + ', KD往 上轉折' : 'KD往 上轉折';
+            if (array.includes('rsi_over_sold')) str = str ? str + ', RSI 超賣' : 'RSI 超賣';
+            if (array.includes('rsi_turn_up')) str = str ? str + ', RSI 往上轉折' : 'RSI 往上轉折';
+            if (array.includes('annual_fixed_date_buy')) str = str ? str + ', 每年固定日買' : '每年固定日買';
+            if (array.includes('kd_dead')) str = str ? str + ', KD 死亡交叉' : 'KD 死亡交叉';
+            if (array.includes('kd_turn_down')) str = str ? str + ', KD 往下轉折' : 'KD 往下轉折';
+            if (array.includes('rsi_over_bought')) str = str ? str + ', RSI 超買' : 'RSI 超買';
+            if (array.includes('rsi_turn_down')) str = str ? str + ', RSI 往下轉折' : 'RSI 往下轉折';
+            if (array.includes('annual_fixed_date_sell')) str = str ? str + ', 每年固定日賣' : '每年固定日賣';
+            if (array.includes('annual_fixed_date_sell')) str = str ? str + ', 每年固定日賣' : '每年固定日賣';
+
             return str;
         },
         handleMouseEnter(id) {
@@ -964,7 +959,7 @@ export default {
         },
         handleMouseLeave(id) {
             _.pull(this.showMoreButton, id);
-        }
+        },
     },
 };
 </script>

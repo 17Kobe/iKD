@@ -1390,7 +1390,11 @@ const stock = {
                         // console.log('====================');
                         // console.log(numberOfBuy);
                         // console.log(limitRateOfReturn);
-                        if (rateOfReturn * 100 > -limitRateOfReturn && !obj.reason.includes('kd_w')) {
+                        if (
+                            rateOfReturn * 100 > -limitRateOfReturn &&
+                            !obj.reason.includes('kd_w') &&
+                            !obj.reason.includes('annual_fixed_date_buy')
+                        ) {
                             // 搭配成本價跌超過，W底不取消
                             // W不取消
                             // 比負10還大，就是沒超過，就不買了。foundCostDown都是正值，但實際人認知是負值
@@ -1403,7 +1407,11 @@ const stock = {
                     // console.log(obj);
                     // console.log(isCancelToBuy);
                     if (!isCancelToBuy) {
-                        buyList.push({ date: obj.date, numberOfBuy: obj.reason.includes('kd_w') ? 2 : 1, price: obj.price });
+                        buyList.push({
+                            date: obj.date,
+                            numberOfBuy: obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? 2 : 1,
+                            price: obj.price,
+                        });
 
                         const currBuyList2 = [...buyList];
                         const currSumNumberOfBuy2 = _.sumBy(currBuyList2, 'numberOfBuy');
@@ -1413,7 +1421,7 @@ const stock = {
                         // console.log(numberOfBuy);
                         if (currBuyList2.length === 1) dateOfFirstBuy = obj.date; // 賣出要記，之後可以知道該次賣出最早的買進時間，然後再算總期間累計報酬
                         // accPriceOfBuy += obj.price;
-                        obj.number_of_buy = obj.reason.includes('kd_w') ? 2 : 1;
+                        obj.number_of_buy = obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? 2 : 1;
                         obj.is_sure_buy = true;
                         isReadyToSell = true;
                         preSellReason = [];
@@ -1424,11 +1432,13 @@ const stock = {
                             obj.number_of_sell = currSumNumberOfBuy2;
                             obj.total_unit_cost = currAccPriceOfbuy2;
                             obj.unit = currSumNumberOfBuy2;
-                            foundStock.badge = obj.reason.includes('kd_w') ? '買x2' : '買'; // 必定買
+                            foundStock.badge =
+                                obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? '買x2' : '買'; // 必定買
                         }
                         // 最後一筆離今天是在5天內
-                        if (index === array.length - 1 && moment(obj.date).diff(moment(), 'days')<=5) {
-                            foundStock.badge = obj.reason.includes('kd_w') ? '買x2' : '買'; // 必定買
+                        if (index === array.length - 1 && moment(obj.date).diff(moment(), 'days') <= 5) {
+                            foundStock.badge =
+                                obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? '買x2' : '買'; // 必定買
                         }
                     }
                 } else if (
@@ -1542,7 +1552,11 @@ const stock = {
                         console.log('isReadyToSell=', isReadyToSell);
 
                         // 如果最後一天剛好也是賣; 是最後一筆且距今天差3天
-                        if (obj.is_sure_sell && (dataDailyLastDate.isSame(moment(obj.date)) || (index === array.length - 1 && moment(obj.date).diff(moment(), 'days')<=5))) {
+                        if (
+                            obj.is_sure_sell &&
+                            (dataDailyLastDate.isSame(moment(obj.date)) ||
+                                (index === array.length - 1 && moment(obj.date).diff(moment(), 'days') <= 5))
+                        ) {
                             foundStock.badge = unit === 0.5 ? '賣½' : '賣'; // 必定賣
                         }
 
@@ -1787,7 +1801,7 @@ const stock = {
                         const today = moment().startOf('day');
                         const limit = moment(foundAnnualFixedDateBuy.limit, 'MM/DD').year(today.year());
                         if (limit.diff(today, 'days') <= 3) {
-                            foundStock.badge = '準買';
+                            foundStock.badge = '準買x2';
                             foundStock.badge_reason.push('annual_fixed_date_buy');
                         }
                     }
