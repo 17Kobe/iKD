@@ -149,7 +149,7 @@ export default {
                 },
                 {
                     value: 'kd_w',
-                    label: '週 KD 形成 W 底 (2+n倍買)',
+                    label: '週 KD 形成 W 底',
                     default_limit: 2,
                     default_limit_desc: '個底以上',
                 },

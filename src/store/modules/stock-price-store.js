@@ -301,7 +301,8 @@ const stock = {
                 const low = _.min(rangeLowArray);
                 const high = _.max(rangeHighArray);
 
-                rsv = ((foundStock.data.weekly[k][4] - low) / (high - low)) * 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
+                rsv = high - low !== 0 ? ((foundStock.data.weekly[k][4] - low) / high - low) * 100 : 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
+
                 todayK = (2 / 3) * preK + (1 / 3) * rsv; // k=2/3 * 昨日的k值 + 1/3*今日的RSV
                 todayD = (2 / 3) * preD + (1 / 3) * todayK; // d=2/3 * 昨日的d值 + 1/3*今日的k值
                 todayJ = 3 * todayD - 2 * todayK;
@@ -1424,7 +1425,7 @@ const stock = {
                             obj.number_of_sell = currSumNumberOfBuy2;
                             obj.total_unit_cost = currAccPriceOfbuy2;
                             obj.unit = currSumNumberOfBuy2;
-                            foundStock.badge = '買'; // 必定買
+                            foundStock.badge = obj.reason.includes('kd_w') ? '買x2' : '買'; // 必定買
                         }
                     }
                 } else if (
@@ -1539,7 +1540,7 @@ const stock = {
 
                         // 如果最後一天剛好也是賣
                         if (obj.is_sure_sell && dataDailyLastDate.isSame(moment(obj.date))) {
-                            foundStock.badge = '賣'; // 必定賣
+                            foundStock.badge = unit === 0.5 ? '賣½' : '賣'; // 必定賣
                         }
 
                         // 如果是最後一個日期，且也不是賣，並且之前有買，這時要算一下最新狀態，有可能是要買入或賣出或都沒有，
