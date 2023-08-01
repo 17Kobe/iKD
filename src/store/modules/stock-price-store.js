@@ -1800,7 +1800,7 @@ const stock = {
                     if (foundAnnualFixedDateBuy) {
                         const today = moment().startOf('day');
                         const limit = moment(foundAnnualFixedDateBuy.limit, 'MM/DD').year(today.year());
-                        if (limit.diff(today, 'days') <= 3) {
+                        if (limit.diff(today, 'days') <= 3 && limit.diff(today, 'days') >= 0) {
                             foundStock.badge = '準買x2';
                             foundStock.badge_reason.push('annual_fixed_date_buy');
                         }
@@ -1849,7 +1849,7 @@ const stock = {
                         if (foundAnnualFixedDateSell) {
                             const today = moment().startOf('day');
                             const limit = moment(foundAnnualFixedDateSell.limit, 'MM/DD').year(today.year());
-                            if (limit.diff(today, 'days') <= 3) {
+                            if (limit.diff(today, 'days') <= 3 && limit.diff(today, 'days') >= 0) {
                                 foundStock.badge = '準賣';
                                 foundStock.badge_reason.push('annual_fixed_date_sell');
                             }
