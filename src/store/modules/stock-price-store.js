@@ -444,6 +444,7 @@ const stock = {
                 let foundKdTurnUp = false;
                 let foundKdDead = false;
                 let foundKdTurnDown = false;
+                let foundKdM = false;
                 let foundRsiOverSold = false;
                 let foundRsiTurnUp = false;
                 let foundRsiOverBought = false;
@@ -455,8 +456,8 @@ const stock = {
 
                 if (_.has(foundStock, 'policy.settings.buy')) {
                     foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
-                    foundKdW = _.find(foundStock.policy.settings.buy, ['method', 'kd_w']);
                     foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
+                    foundKdW = _.find(foundStock.policy.settings.buy, ['method', 'kd_w']);
                     foundRsiOverSold = _.find(foundStock.policy.settings.buy, ['method', 'rsi_over_sold']);
                     foundRsiTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'rsi_turn_up']);
                     foundMaBuy = _.find(foundStock.policy.settings.buy, ['method', 'ma_buy']);
@@ -465,6 +466,7 @@ const stock = {
                 if (_.has(foundStock, 'policy.settings.sell')) {
                     foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
                     foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
+                    foundKdM = _.find(foundStock.policy.settings.sell, ['method', 'kd_m']);
                     foundRsiOverBought = _.find(foundStock.policy.settings.sell, ['method', 'rsi_over_bought']);
                     foundRsiTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'rsi_turn_down']);
                     foundMaSell = _.find(foundStock.policy.settings.sell, ['method', 'ma_sell']);
@@ -473,10 +475,16 @@ const stock = {
 
                 // KD 相關訊號
                 let kdGoldReady = false;
+
                 let kdWReady = false;
                 let kdWReady2 = true;
-                let kdWGoldTimes = 0;
-                let preKdWGoldDate = '';
+                let kdWTurnUpTimes = 0;
+                let preKdWTurnUpDate = '';
+
+                let kdMReady = false;
+                let kdMReady2 = true;
+                let kdMTurnDownTimes = 0;
+                let preKdMTurnDownDate = '';
 
                 let kdDeadReady = false;
                 let preK = 0;
@@ -534,7 +542,7 @@ const stock = {
                             kdGoldReady = false;
                         }
                     }
-                    // 週 KD 形成 W 底 (2+n倍買)黃金交叉 買進訊號
+                    // 週 KD 形成 W 底  買進訊號
                     if (foundKdW) {
                         if (k < preK) {
                             kdWReady = true;
@@ -545,11 +553,14 @@ const stock = {
                         }
 
                         if (kdWReady2 && k <= 20 && k >= preK && kdWReady) {
-                            kdWGoldTimes += 1;
-                            console.log(kdWGoldTimes);
+                            kdWTurnUpTimes += 1;
+                            console.log(kdWTurnUpTimes);
                             console.log(item[0]);
-                            console.log(preKdWGoldDate);
-                            if (kdWGoldTimes >= foundKdW.limit && moment(item[0]).diff(moment(preKdWGoldDate), 'days') <= 365) {
+                            console.log(preKdWTurnUpDate);
+                            if (
+                                kdWTurnUpTimes >= foundKdW.limit &&
+                                moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') <= 365
+                            ) {
                                 // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                                 const index = _.findIndex(policyResult, ['date', item[0]]);
                                 const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
@@ -568,11 +579,11 @@ const stock = {
                                     // policyResult[index].number_of_buy = 2; 後面才加
                                     policyResult[index].reason.push('kd_w');
                                 }
-                            } else if (preKdWGoldDate !== '' && moment(item[0]).diff(moment(preKdWGoldDate), 'days') > 365) {
-                                kdWGoldTimes = 1; // 大於365天則重新來了
+                            } else if (preKdWTurnUpDate !== '' && moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') > 365) {
+                                kdWTurnUpTimes = 1; // 大於365天則重新來了
                                 console.log('reset W底');
                             }
-                            preKdWGoldDate = item[0];
+                            preKdWTurnUpDate = item[0];
 
                             kdWReady = false;
                             kdWReady2 = false;
@@ -652,6 +663,53 @@ const stock = {
                                 policyResult[index].reason.push('kd_turn_down');
                             }
                             kdTurnDownReady = false;
+                        }
+                    }
+                    // 週 KD 形成 M 頭  賣出訊號
+                    if (foundKdM) {
+                        if (k > preK) {
+                            kdMReady = true;
+                        }
+                        if (k < 70) {
+                            // 70 以下，看起來比較合理，因為若70以上，那山底看來太高
+                            kdMReady2 = true;
+                        }
+
+                        if (kdMReady2 && k >= 80 && k <= preK && kdMReady) {
+                            kdMTurnDownTimes += 1;
+                            if (
+                                kdMTurnDownTimes >= foundKdM.limit &&
+                                moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') <= 365
+                            ) {
+                                // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                                const index = _.findIndex(policyResult, ['date', item[0]]);
+                                const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
+                                if (index === -1)
+                                    policyResult.push({
+                                        date: item[0],
+                                        is_sell: true,
+                                        k,
+                                        // number_of_buy: 2, 後面才加
+                                        price: dataWeeklyPrice,
+                                        reason: ['kd_m'],
+                                    });
+                                else {
+                                    policyResult[index].is_sell = true;
+                                    policyResult[index].k = k;
+                                    // policyResult[index].number_of_buy = 2; 後面才加
+                                    policyResult[index].reason.push('kd_m');
+                                }
+                            } else if (
+                                preKdMTurnDownDate !== '' &&
+                                moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') > 365
+                            ) {
+                                kdMTurnDownTimes = 1; // 大於365天則重新來了
+                                console.log('reset W底');
+                            }
+                            preKdMTurnDownDate = item[0];
+
+                            kdMReady = false;
+                            kdMReady2 = false;
                         }
                     }
                     preK = k;
@@ -1444,7 +1502,8 @@ const stock = {
                 } else if (
                     isReadyToSell &&
                     ((!preSellReason.includes('kd_dead') && !preSellReason.includes('kd_turn_down')) ||
-                        obj.reason.includes('rsi_over_bought')) &&
+                        obj.reason.includes('rsi_over_bought') ||
+                        obj.reason.includes('kd_m')) &&
                     ((obj.is_sell && !obj.is_buy && !obj.is_sell_cancel) || obj.is_latest)
                 ) {
                     // 若有RSI，則KD賣的策略都要賣一半
@@ -1459,7 +1518,8 @@ const stock = {
                     if (
                         foundRsiOverBought &&
                         (obj.reason.includes('kd_dead') || obj.reason.includes('kd_turn_down')) &&
-                        !obj.reason.includes('rsi_over_bought')
+                        !obj.reason.includes('rsi_over_bought') &&
+                        !obj.reason.includes('kd_m')
                     ) {
                         thisNumberOfSell = totalNumberOfBuy / 2;
                         console.log('RSI，且有 KD');
@@ -1745,10 +1805,10 @@ const stock = {
                     }
                     if (foundKdW) {
                         let preK = 0;
-                        let kdWGoldTimes = 0;
+                        let kdWTurnUpTimes = 0;
                         let kdWReady = false;
                         let kdWReady2 = false;
-                        let preKdWGoldDate = '';
+                        let preKdWTurnUpDate = '';
                         foundTempStock.data.weekly_kdj
                             .filter((entry) => {
                                 const entryDate = moment(entry[0]);
@@ -1769,26 +1829,26 @@ const stock = {
                                 }
 
                                 if (kdWReady2 && k <= 20 && k >= preK && kdWReady) {
-                                    kdWGoldTimes += 1;
+                                    kdWTurnUpTimes += 1;
                                     if (
-                                        kdWGoldTimes >= foundKdW.limit &&
-                                        moment(item[0]).diff(moment(preKdWGoldDate), 'days') <= 365
+                                        kdWTurnUpTimes >= foundKdW.limit &&
+                                        moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') <= 365
                                     ) {
                                     } else if (
-                                        preKdWGoldDate !== '' &&
-                                        moment(item[0]).diff(moment(preKdWGoldDate), 'days') > 365
+                                        preKdWTurnUpDate !== '' &&
+                                        moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') > 365
                                     ) {
-                                        kdWGoldTimes = 1; // 大於365天則重新來了
+                                        kdWTurnUpTimes = 1; // 大於365天則重新來了
                                         console.log('reset W底');
                                     }
-                                    preKdWGoldDate = item[0];
+                                    preKdWTurnUpDate = item[0];
 
                                     kdWReady = false;
                                     kdWReady2 = false;
                                 }
 
                                 if (index === array.length - 1) {
-                                    if (kdWReady2 && k <= 20 && kdWReady && kdWGoldTimes >= foundKdW.limit - 1) {
+                                    if (kdWReady2 && k <= 20 && kdWReady && kdWTurnUpTimes >= foundKdW.limit - 1) {
                                         foundStock.badge = '準買x2';
                                         foundStock.badge_reason.push('kd_w');
                                     }
@@ -1815,10 +1875,12 @@ const stock = {
                     if (_.has(foundStock, 'policy.settings.sell')) {
                         let foundKdDead = false;
                         let foundKdTurnDown = false;
+                        let foundKdM = false;
                         let foundRsiOverBought = false;
                         let foundAnnualFixedDateSell = false;
                         foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
                         foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
+                        foundKdM = _.find(foundStock.policy.settings.sell, ['method', 'kd_m']);
                         foundRsiOverBought = _.find(foundStock.policy.settings.sell, ['method', 'rsi_over_bought']);
                         foundAnnualFixedDateSell = _.find(foundStock.policy.settings.sell, ['method', 'annual_fixed_date_sell']);
                         if (foundKdDead) {
@@ -1837,6 +1899,60 @@ const stock = {
                                 foundStock.badge = foundRsiOverBought ? '準賣½' : '準賣';
                                 foundStock.badge_reason.push('kd_turn_down');
                             }
+                        }
+                        if (foundKdM) {
+                            let preK = 0;
+                            let kdMTurnDownTimes = 0;
+                            let kdMReady = false;
+                            let kdMReady2 = false;
+                            let preKdMTurnDownDate = '';
+                            foundTempStock.data.weekly_kdj
+                                .filter((entry) => {
+                                    const entryDate = moment(entry[0]);
+                                    const oneYearAgo = moment().subtract(2, 'year');
+                                    return entryDate >= oneYearAgo;
+                                })
+                                .forEach((item, index, array) => {
+                                    console.log(item);
+                                    const k = item[1];
+                                    const d = item[2];
+
+                                    if (k > preK) {
+                                        kdMReady = true;
+                                    }
+                                    if (k < 70) {
+                                        // 30 以上，看起來比較合理，因為若30以下，那山峰看來太矮
+                                        kdMReady2 = true;
+                                    }
+
+                                    if (kdMReady2 && k >= 80 && k <= preK && kdMReady) {
+                                        kdMTurnDownTimes += 1;
+                                        if (
+                                            kdMTurnDownTimes >= foundKdM.limit &&
+                                            moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') <= 365
+                                        ) {
+                                        } else if (
+                                            preKdMTurnDownDate !== '' &&
+                                            moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') > 365
+                                        ) {
+                                            kdMTurnDownTimes = 1; // 大於365天則重新來了
+                                            console.log('reset M頭');
+                                        }
+                                        preKdMTurnDownDate = item[0];
+
+                                        kdMReady = false;
+                                        kdMReady2 = false;
+                                    }
+
+                                    if (index === array.length - 1) {
+                                        if (kdWReady2 && k <= 20 && kdWReady && kdWGoldTimes >= foundKdM.limit - 1) {
+                                            foundStock.badge = '準買x2';
+                                            foundStock.badge_reason.push('kd_w');
+                                        }
+                                    }
+
+                                    preK = k;
+                                });
                         }
                         if (foundRsiOverBought) {
                             const lastArray = foundTempStock.data.weekly_rsi[foundTempStock.data.weekly_rsi.length - 1];

@@ -204,6 +204,12 @@ export default {
                     default_limit_desc: '以上',
                 },
                 {
+                    value: 'kd_m',
+                    label: '週 KD 形成 M 頭',
+                    default_limit: 2,
+                    default_limit_desc: '個頭以上',
+                },
+                {
                     value: 'rsi_over_bought',
                     label: '週 RSI 超買 (全賣)',
                     default_limit: 95,
