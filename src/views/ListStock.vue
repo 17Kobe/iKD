@@ -21,7 +21,7 @@
                 <template #default="scope">
                     <div style="width: 95px; display: inline-block">
                         <el-badge
-                            title="424"
+                            :title="getBadgeTitle(scope.row.badge_reason)"
                             :value="scope.row.badge"
                             class="item"
                             :class="[scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '', , 'item']"
@@ -935,6 +935,35 @@ export default {
         getNumberSum(array) {
             return _.sumBy(array, 'number');
         },
+        getBadgeTitle(array) {
+            let str='';
+            if (array.includes('kd_gold'))
+                str += 'KD 黃金交叉';
+            if (array.includes('kd_w'))
+                str = str ? str + ', KD W底' : 'KD W底';
+            if (array.includes('kd_turn_up'))
+                str = str ? str + ', KD往 上轉折' : 'KD往 上轉折';
+            if (array.includes('rsi_over_sold'))
+                str = str ? str + ', RSI 超賣' : 'RSI 超賣';
+            if (array.includes('rsi_turn_up'))
+                str = str ? str + ', RSI 往上轉折' : 'RSI 往上轉折';
+            if (array.includes('annual_fixed_date_buy'))
+                str = str ? str + ', 每年固定日買' : '每年固定日買';
+            if (array.includes('kd_dead'))
+                str = str ? str + ', KD 死亡交叉' : 'KD 死亡交叉';
+            if (array.includes('kd_turn_down'))
+                str = str ? str + ', KD 往下轉折' : 'KD 往下轉折';
+            if (array.includes('rsi_over_bought'))
+                str = str ? str + ', RSI 超買' : 'RSI 超買';
+            if (array.includes('rsi_turn_down'))
+                str = str ? str + ', RSI 往下轉折' : 'RSI 往下轉折';
+            if (array.includes('annual_fixed_date_sell'))
+                str = str ? str + ', 每年固定日賣' : '每年固定日賣';
+            if (array.includes('annual_fixed_date_sell'))
+                str = str ? str + ', 每年固定日賣' : '每年固定日賣';
+            
+            return str;
+        }
     },
 };
 </script>

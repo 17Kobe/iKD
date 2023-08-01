@@ -301,8 +301,7 @@ const stock = {
                 const low = _.min(rangeLowArray);
                 const high = _.max(rangeHighArray);
 
-                rsv = high - low !== 0 ? ((foundStock.data.weekly[k][4] - low) / high - low) * 100 : 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
-
+                rsv = high - low !== 0 ? ((foundStock.data.weekly[k][4] - low) / (high - low)) * 100 : 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
                 todayK = (2 / 3) * preK + (1 / 3) * rsv; // k=2/3 * 昨日的k值 + 1/3*今日的RSV
                 todayD = (2 / 3) * preD + (1 / 3) * todayK; // d=2/3 * 昨日的d值 + 1/3*今日的k值
                 todayJ = 3 * todayD - 2 * todayK;
@@ -1361,7 +1360,7 @@ const stock = {
             let preSellReason = [];
             foundStock.badge = null;
             foundStock.badge_reason = [];
-            foundStock.policy.result.forEach((obj) => {
+            foundStock.policy.result.forEach((obj, index, array) => {
                 // 必需有買才要在第一次賣時算報酬率
                 if (obj.is_buy && !obj.is_sell && !obj.is_buy_cancel) {
                     // !isReadyToSell && 不需要這個判斷，因為隨時都可買
@@ -1425,6 +1424,10 @@ const stock = {
                             obj.number_of_sell = currSumNumberOfBuy2;
                             obj.total_unit_cost = currAccPriceOfbuy2;
                             obj.unit = currSumNumberOfBuy2;
+                            foundStock.badge = obj.reason.includes('kd_w') ? '買x2' : '買'; // 必定買
+                        }
+                        // 最後一筆離今天是在5天內
+                        if (index === array.length - 1 && moment(obj.date).diff(moment(), 'days')<=5) {
                             foundStock.badge = obj.reason.includes('kd_w') ? '買x2' : '買'; // 必定買
                         }
                     }
@@ -1538,8 +1541,8 @@ const stock = {
                         preSellReason = obj.reason; // 為了避免連續賣都是KD
                         console.log('isReadyToSell=', isReadyToSell);
 
-                        // 如果最後一天剛好也是賣
-                        if (obj.is_sure_sell && dataDailyLastDate.isSame(moment(obj.date))) {
+                        // 如果最後一天剛好也是賣; 是最後一筆且距今天差3天
+                        if (obj.is_sure_sell && (dataDailyLastDate.isSame(moment(obj.date)) || (index === array.length - 1 && moment(obj.date).diff(moment(), 'days')<=5))) {
                             foundStock.badge = unit === 0.5 ? '賣½' : '賣'; // 必定賣
                         }
 
@@ -1704,9 +1707,11 @@ const stock = {
                     let foundKdGold = false;
                     let foundKdW = false;
                     let foundKdTurnUp = false;
+                    let foundAnnualFixedDateBuy = false;
                     foundKdGold = _.find(foundStock.policy.settings.buy, ['method', 'kd_gold']);
                     foundKdW = _.find(foundStock.policy.settings.buy, ['method', 'kd_w']);
                     foundKdTurnUp = _.find(foundStock.policy.settings.buy, ['method', 'kd_turn_up']);
+                    foundAnnualFixedDateBuy = _.find(foundStock.policy.settings.buy, ['method', 'annual_fixed_date_buy']);
                     if (foundKdGold) {
                         const lastArray = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1];
                         const lastK = lastArray[1];
@@ -1778,6 +1783,14 @@ const stock = {
                                 preK = k;
                             });
                     }
+                    if (foundAnnualFixedDateBuy) {
+                        const today = moment().startOf('day');
+                        const limit = moment(foundAnnualFixedDateBuy.limit, 'MM/DD').year(today.year());
+                        if (limit.diff(today, 'days') <= 3) {
+                            foundStock.badge = '準買';
+                            foundStock.badge_reason.push('annual_fixed_date_buy');
+                        }
+                    }
                 }
 
                 if (
@@ -1789,9 +1802,11 @@ const stock = {
                         let foundKdDead = false;
                         let foundKdTurnDown = false;
                         let foundRsiOverBought = false;
+                        let foundAnnualFixedDateSell = false;
                         foundKdDead = _.find(foundStock.policy.settings.sell, ['method', 'kd_dead']);
                         foundKdTurnDown = _.find(foundStock.policy.settings.sell, ['method', 'kd_turn_down']);
                         foundRsiOverBought = _.find(foundStock.policy.settings.sell, ['method', 'rsi_over_bought']);
+                        foundAnnualFixedDateSell = _.find(foundStock.policy.settings.sell, ['method', 'annual_fixed_date_sell']);
                         if (foundKdDead) {
                             const lastArray = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1];
                             const lastK = lastArray[1];
@@ -1815,6 +1830,14 @@ const stock = {
                             if (lastRsi >= foundRsiOverBought.limit - 3) {
                                 foundStock.badge = '準賣'; // K要大於D，才是訊號前的準備
                                 foundStock.badge_reason.push('rsi_over_bought');
+                            }
+                        }
+                        if (foundAnnualFixedDateSell) {
+                            const today = moment().startOf('day');
+                            const limit = moment(foundAnnualFixedDateSell.limit, 'MM/DD').year(today.year());
+                            if (limit.diff(today, 'days') <= 3) {
+                                foundStock.badge = '準賣';
+                                foundStock.badge_reason.push('annual_fixed_date_sell');
                             }
                         }
                     }
