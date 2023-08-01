@@ -439,7 +439,7 @@
                                                     height: 0;
                                                     border-left: 6px solid transparent;
                                                     border-right: 6px solid transparent;
-                                                    border-top: 10px solid #8ad125;
+                                                    border-top: 10px solid #aaaaaa;
                                                     background-color: transparent;
                                                     cursor: pointer;
                                                     outline: none;
