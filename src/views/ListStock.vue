@@ -434,17 +434,8 @@
                                                     5 && index === 5 - scope.row.policy.settings.buy.length - 1
                                             "
                                             ><button
-                                                style="
-                                                    width: 0;
-                                                    height: 0;
-                                                    border-left: 6px solid transparent;
-                                                    border-right: 6px solid transparent;
-                                                    border-top: 10px solid #aaaaaa;
-                                                    background-color: transparent;
-                                                    cursor: pointer;
-                                                    outline: none;
-                                                "
-                                            >
+  
+                                            ><i class="el-icon-more"></i>
                                                 <!-- 您可以在這裡添加按鈕內容 -->
                                             </button></span
                                         >
