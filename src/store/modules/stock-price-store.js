@@ -1982,6 +1982,24 @@ const stock = {
             if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus = 'KD鈍化';
             foundStock.kd_status = kdStatus;
 
+            let kStatus = '';
+            const lastestValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 1];
+            const lastSecondValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 2];
+            const lastThirdValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 3];
+            if (kdStatus === 'KD鈍化') {
+                // date open high low close
+                // 紅棒最低點
+                let kOpenValue = 0;
+                if (lastestValueAarray[4] >= lastestValueAarray[1]) kOpenValue = lastestValueAarray[1];
+                if (lastSecondValueAarray[4] >= lastSecondValueAarray[1] && lastSecondValueAarray[1] > kOpenValue)
+                    kOpenValue = lastSecondValueAarray[1];
+                if (lastThirdValueAarray[4] >= lastThirdValueAarray[1] && lastThirdValueAarray[1] > kOpenValue)
+                    kOpenValue = lastThirdValueAarray[1];
+
+                if (kOpenValue !== 9999) kStatus = '停利 ' + kOpenValue;
+            }
+            foundStock.k_status = kStatus;
+
             foundStock.calc_policy_date = foundStock.last_price_date; // 設成一樣，之後判斷有無相同來知道是否當天真的計算完成
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE OK');

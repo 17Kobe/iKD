@@ -22,7 +22,7 @@
                     line-height: 1.5;
                 "
                 >{{ this.stockData.kd_status ? this.stockData.kd_status : '' }}</span
-            >&nbsp; <span style="display: inline-block" :style="{ 'min-width': showJLine ? '10px' : '51px' }"> </span
+            >&nbsp;<span style="display: inline-block" :style="{ 'min-width': showJLine ? '10px' : '51px' }"> </span
             ><span style="color: #4286f5">K</span>: {{ k[k.length - 1][1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
             {{ d[d.length - 1][1].toFixed(2) }}
             <span v-if="showJLine"><span style="color: #febd09">J</span>: {{ j[j.length - 1][1].toFixed(2) }}</span>

@@ -7,20 +7,34 @@
             style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 80px; right: 14px; font-size: 12px" v-if="ohlc && ohlc.length > 0">
+        <div style="position: absolute; top: 80px; font-size: 12px; left: 11px" v-if="ohlc && ohlc.length > 0">
             <!-- <span style="color: #834beb">P</span>: {{ Number(ohlc.at(-1)[3].toFixed(2)) }} -->
+            <span
+                style="
+                    display: inline-block;
+                    min-width: 48px;
+                    background-color: rgb(103, 194, 58);
+                    color: white;
+                    padding: 0px 3px;
+                    border-radius: 10px;
+                    font-size 12px;
+                    opacity: 0.83;
+                    line-height: 1.5;
+                "
+                >{{ this.stockData.k_status ? this.stockData.k_status : '' }}</span
+            >
+
             <span v-if="last_price"
                 ><span style="color: #000000" title="股價">&nbsp;&nbsp;{{ last_price }}</span></span
             >
             <span v-if="cost && cost.length > 0">
-                &nbsp;&nbsp;
                 <span
                     title="平均成本線"
                     :style="[
                         last_price > cost[cost.length - 1][1]
                             ? { 'background-color': '#ededed' }
                             : { 'background-color': 'none' },
-                        { color: '#4286f5' },
+                        { color: '#4286f5', 'margin-left': '4px' },
                     ]"
                     >{{
                         cost[cost.length - 1][1] >= 100
@@ -30,12 +44,11 @@
                 ></span
             >
             <span v-if="ma5 && ma5.length > 0">
-                &nbsp;&nbsp;
                 <span
                     title="MA(5)"
                     :style="[
                         last_price > ma5[ma5.length - 1][1] ? { 'background-color': '#ededed' } : { 'background-color': 'none' },
-                        { color: '#834beb' },
+                        { color: '#834beb', 'margin-left': '4px' },
                     ]"
                     >{{
                         ma5[ma5.length - 1][1] >= 100
@@ -45,13 +58,13 @@
                 ></span
             >
             <span v-if="ma10 && ma10.length > 0">
-                &nbsp;&nbsp;<span
+                <span
                     title="MA(10)"
                     :style="[
                         last_price > ma10[ma10.length - 1][1]
                             ? { 'background-color': '#ededed' }
                             : { 'background-color': 'none' },
-                        { color: '#febd09' },
+                        { color: '#febd09', 'margin-left': '4px' },
                     ]"
                     >{{
                         ma10[ma10.length - 1][1] >= 100
@@ -61,14 +74,13 @@
                 ></span
             >
             <span v-if="ma20 && ma20.length > 0">
-                &nbsp;&nbsp;
                 <span
                     title="MA(20)"
                     :style="[
                         last_price > ma20[ma20.length - 1][1]
                             ? { 'background-color': '#ededed' }
                             : { 'background-color': 'none' },
-                        { color: '#fc7742' },
+                        { color: '#fc7742', 'margin-left': '4px' },
                     ]"
                     >{{
                         ma20[ma20.length - 1][1] >= 100
@@ -93,6 +105,11 @@ export default {
         return {};
     },
     computed: {
+        stockData() {
+            console.log('stockData');
+            // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            return this.$store.getters.getStock(this.parentData);
+        },
         ohlc() {
             console.log('ohlc');
             return this.$store.getters.getStockDataWeekly(this.parentData);
