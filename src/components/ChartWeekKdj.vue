@@ -13,7 +13,7 @@
                 style="
                     display: inline-block;
                     min-width: 48px;
-                    background-color: rgb(120, 120, 120);
+                    background-color: rgb(170, 170, 170);
                     color: white;
                     padding: 0px 3px;
                     border-radius: 10px;
