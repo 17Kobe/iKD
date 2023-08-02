@@ -1973,6 +1973,15 @@ const stock = {
                     }
                 }
             }
+
+            let kdStatus = '';
+            const lastestK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
+            const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
+            const lastThirdK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 3][1];
+            if (lastestK >= 80 && lastSecondK >= 80 && lastThirdK >= 80) kdStatus = 'KD鈍化';
+            if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus = 'KD鈍化';
+            foundStock.kd_status = kdStatus;
+
             foundStock.calc_policy_date = foundStock.last_price_date; // 設成一樣，之後判斷有無相同來知道是否當天真的計算完成
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
             console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE OK');

@@ -7,12 +7,23 @@
             style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div
-            style="position: absolute; top: 80px; font-size: 12px"
-            :style="{ left: showJLine ? '75px' : '121px' }"
-            v-if="k && k.length > 0"
-        >
-            <span style="color: #4286f5">K</span>: {{ k[k.length - 1][1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
+        <div style="position: absolute; top: 80px; font-size: 12px; left: 11px" v-if="k && k.length > 0">
+            <!-- :style="{ left: showJLine ? '75px' : '41px' }" -->
+            <span
+                style="
+                    display: inline-block;
+                    min-width: 48px;
+                    background-color: rgb(120, 120, 120);
+                    color: white;
+                    padding: 0px 3px;
+                    border-radius: 10px;
+                    font-size 12px;
+                    opacity: 0.83;
+                    line-height: 1.5;
+                "
+                >{{ this.stockData.kd_status ? this.stockData.kd_status : '' }}</span
+            >&nbsp; <span style="display: inline-block" :style="{ 'min-width': showJLine ? '10px' : '51px' }"> </span
+            ><span style="color: #4286f5">K</span>: {{ k[k.length - 1][1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
             {{ d[d.length - 1][1].toFixed(2) }}
             <span v-if="showJLine"><span style="color: #febd09">J</span>: {{ j[j.length - 1][1].toFixed(2) }}</span>
         </div>
@@ -75,7 +86,6 @@ export default {
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             return this.$store.getters.getStock(this.parentData);
         },
-
         stockDataOfKdjPrice() {
             console.log('stockDataOfKdjPrice');
             // console.log(this.stockDataOfPolicy);
