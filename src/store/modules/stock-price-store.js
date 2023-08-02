@@ -1978,15 +1978,15 @@ const stock = {
             const lastestK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
             const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
             const lastThirdK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 3][1];
-            if (lastestK >= 80 && lastSecondK >= 80 && lastThirdK >= 80) kdStatus = 'KD鈍化';
-            if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus = 'KD鈍化';
+            if (lastestK >= 80 && lastSecondK >= 80 && lastThirdK >= 80) kdStatus = 'KD 鈍化';
+            if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus = 'KD 鈍化';
             foundStock.kd_status = kdStatus;
 
             let kStatus = '';
             const lastestValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 1];
             const lastSecondValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 2];
             const lastThirdValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 3];
-            if (kdStatus === 'KD鈍化') {
+            if (kdStatus === 'KD 鈍化') {
                 // date open high low close
                 // 紅棒最低點
                 let kOpenValue = 0;
