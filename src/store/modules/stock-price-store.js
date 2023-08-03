@@ -1945,7 +1945,7 @@ const stock = {
                                     }
 
                                     if (index === array.length - 1) {
-                                        if (kdWReady2 && k <= 20 && kdWReady && kdWGoldTimes >= foundKdM.limit - 1) {
+                                        if (kdMReady2 && k <= 20 && kdMReady && kdMGoldTimes >= foundKdM.limit - 1) {
                                             foundStock.badge = '準買x2';
                                             foundStock.badge_reason.push('kd_w');
                                         }
@@ -2002,58 +2002,87 @@ const stock = {
             }
             foundStock.k_status = kStatus;
 
-            // 算箱子 date open high low close
+            // // 算箱子 date open high low close
             // let boxStart = false;
             // let boxTop = 0;
             // let boxBottom = 0;
             // let boxStartDate = '';
             // let boxStartEnd = '';
+            // let box = [];
             // foundTempStock.data.weekly.forEach((item, index) => {
-            //     // 後面3個值不超過close值時則，箱子頂部確定(牛市)，箱子底部確定(熊市)
-            //     const currentItem = item;
-            //     const nextFirstItem = foundTempStock.data.weekly[index + 1];
-            //     const nextSecondItem = foundTempStock.data.weekly[index + 2];
-            //     const nextThirdItem = foundTempStock.data.weekly[index + 3];
-            //     if (
-            //         !boxStart &&
-            //         ((currentItem[4] >= nextFirstItem[4] &&
-            //             currentItem[4] >= nextSecondItem[4] &&
-            //             currentItem[4] >= nextThirdItem[4]) ||
-            //             (currentItem[2] <= nextFirstItem[2] &&
-            //                 currentItem[2] <= nextSecondItem[2] &&
-            //                 currentItem[2] <= nextThirdItem[2]))
-            //     ) {
-            //         boxTop = _.max([currentItem[4], nextFirstItem[4], nextSecondItem[4], nextThirdItem[4]]);
-            //         boxBottom = _.min([currentItem[2], nextFirstItem[2], nextSecondItem[2], nextThirdItem[2]]);
-            //         boxStartDate = currentItem[0];
-            //         boxStartEnd = currentItem[0];
-            //         boxStart = true;
-            //     } else if (boxStart) {
-            //         // 已確定箱子頂部 或 底部
-            //         // close 向上突破頂部，不行後面3個值的 open 在箱子頂部之下
+            //     if (index <= foundTempStock.data.weekly.length - 3 - 1) {
+            //         // 後面3個值不超過close值時則，箱子頂部確定(牛市)，箱子底部確定(熊市)
+            //         const currentItem = item;
+            //         const nextFirstItem = foundTempStock.data.weekly[index + 1];
+            //         const nextSecondItem = foundTempStock.data.weekly[index + 2];
+            //         const nextThirdItem = foundTempStock.data.weekly[index + 3];
+            //         const isCurrentRed = currentItem[4] >= currentItem[2];
+            //         const isNextFirstRed = nextFirstItem[4] >= nextFirstItem[2];
+            //         const isNextSecondRed = nextSecondItem[4] >= nextSecondItem[2];
+            //         const isNextThirdRed = nextThirdItem[4] >= nextThirdItem[2];
             //         if (
-            //             // 真的往上突破
-            //             currentItem[4] > boxTop &&
-            //             nextFirstItem[2] >= boxTop &&
-            //             nextSecondItem[2] >= boxTop &&
-            //             nextThirdItem[2] >= boxTop
+            //             !boxStart &&
+            //             ((currentItem[4] >= nextFirstItem[4] &&
+            //                 currentItem[4] >= nextSecondItem[4] &&
+            //                 currentItem[4] >= nextThirdItem[4]) ||
+            //                 (currentItem[2] <= nextFirstItem[2] &&
+            //                     currentItem[2] <= nextSecondItem[2] &&
+            //                     currentItem[2] <= nextThirdItem[2]))
             //         ) {
-            //             boxStart = false;
-            //         } else if (
-            //             // 真的往下突破
-            //             currentItem[2] < boxBottom &&
-            //             nextFirstItem[4] <= boxBottom &&
-            //             nextSecondItem[4] <= boxBottom &&
-            //             nextThirdItem[4] <= boxBottom
-            //         ) {
-            //             boxStart = false;
-            //         } else {
-            //             boxTop = _.max(boxTop, currentItem[4]);
-            //             boxBottom = _.min(boxBottom, currentItem[2]);
+            //             console.log('date=', item[0]);
+            //             boxTop = _.max([currentItem[4], nextFirstItem[4], nextSecondItem[4], nextThirdItem[4]]);
+            //             boxBottom = _.min([currentItem[2], nextFirstItem[2], nextSecondItem[2], nextThirdItem[2]]);
+            //             boxStartDate = currentItem[0];
             //             boxStartEnd = currentItem[0];
+            //             boxStart = true;
+            //         } else if (boxStart) {
+            //             // 已確定箱子頂部 或 底部
+            //             // close 向上突破頂部，不行後面3個值的 open 在箱子頂部之下
+            //             console.log('boxTop=', boxTop);
+            //             console.log('currentItem[isCurrentRed ? 2 : 4]=', currentItem[isCurrentRed ? 2 : 4]);
+            //             console.log('nextFirstItem[isNextFirstRed ? 2 : 4]=', nextFirstItem[isNextFirstRed ? 2 : 4]);
+            //             console.log('nextSecondItem[isNextSecondRed ? 2 : 4]=', nextSecondItem[isNextSecondRed ? 2 : 4]);
+            //             console.log('nextThirdItem[isNextThirdRed ? 2 : 4]=', nextThirdItem[isNextThirdRed ? 2 : 4]);
+            //             if (
+            //                 // 真的往上突破
+            //                 currentItem[isCurrentRed ? 4 : 2] > boxTop &&
+            //                 nextFirstItem[isNextFirstRed ? 2 : 4] >= boxTop &&
+            //                 nextSecondItem[isNextSecondRed ? 2 : 4] >= boxTop &&
+            //                 nextThirdItem[isNextThirdRed ? 2 : 4] >= boxTop
+            //             ) {
+            //                 console.log('box over1 date=', item[0]);
+            //                 const preItem = foundTempStock.data.weekly[index - 1];
+            //                 box.push([boxStartDate, boxTop]);
+            //                 box.push([boxStartDate, boxBottom]);
+            //                 box.push([preItem[0], boxTop]);
+            //                 box.push([preItem[0], boxBottom]);
+
+            //                 boxStart = false;
+            //             } else if (
+            //                 // 真的往下突破
+            //                 currentItem[2] < boxBottom &&
+            //                 nextFirstItem[4] <= boxBottom &&
+            //                 nextSecondItem[4] <= boxBottom &&
+            //                 nextThirdItem[4] <= boxBottom
+            //             ) {
+            //                 console.log('box over2 date=', item[0]);
+            //                 const preItem = foundTempStock.data.weekly[index - 1];
+            //                 box.push([boxStartDate, boxTop]);
+            //                 box.push([boxStartDate, boxBottom]);
+            //                 box.push([preItem[0], boxTop]);
+            //                 box.push([preItem[0], boxBottom]);
+
+            //                 boxStart = false;
+            //             } else {
+            //                 console.log('box continue date=', item[0]);
+            //                 boxTop = _.max([boxTop, currentItem[isCurrentRed ? 4 : 2]]);
+            //                 boxBottom = _.min([boxBottom, currentItem[isCurrentRed ? 2 : 4]]);
+            //                 boxStartEnd = currentItem[0];
+            //             }
             //         }
             //     }
             // });
+            // foundStock.data.weekly_box = box;
 
             foundStock.calc_policy_date = foundStock.last_price_date; // 設成一樣，之後判斷有無相同來知道是否當天真的計算完成
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
