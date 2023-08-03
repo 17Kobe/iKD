@@ -1974,6 +1974,7 @@ const stock = {
                 }
             }
 
+            // 算 kd圖的 badge
             let kdStatus = '';
             const lastestK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
             const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
@@ -1982,6 +1983,7 @@ const stock = {
             if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus = 'KD 鈍化';
             foundStock.kd_status = kdStatus;
 
+            // 算 k線圖的 badge
             let kStatus = '';
             const lastestValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 1];
             const lastSecondValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 2];
@@ -1996,9 +1998,62 @@ const stock = {
                 if (lastThirdValueAarray[4] >= lastThirdValueAarray[1] && lastThirdValueAarray[1] > kOpenValue)
                     kOpenValue = lastThirdValueAarray[1];
 
-                if (kOpenValue !== 9999) kStatus = '停利 ' + kOpenValue;
+                if (kOpenValue !== 0) kStatus = '停利 ' + kOpenValue;
             }
             foundStock.k_status = kStatus;
+
+            // 算箱子 date open high low close
+            // let boxStart = false;
+            // let boxTop = 0;
+            // let boxBottom = 0;
+            // let boxStartDate = '';
+            // let boxStartEnd = '';
+            // foundTempStock.data.weekly.forEach((item, index) => {
+            //     // 後面3個值不超過close值時則，箱子頂部確定(牛市)，箱子底部確定(熊市)
+            //     const currentItem = item;
+            //     const nextFirstItem = foundTempStock.data.weekly[index + 1];
+            //     const nextSecondItem = foundTempStock.data.weekly[index + 2];
+            //     const nextThirdItem = foundTempStock.data.weekly[index + 3];
+            //     if (
+            //         !boxStart &&
+            //         ((currentItem[4] >= nextFirstItem[4] &&
+            //             currentItem[4] >= nextSecondItem[4] &&
+            //             currentItem[4] >= nextThirdItem[4]) ||
+            //             (currentItem[2] <= nextFirstItem[2] &&
+            //                 currentItem[2] <= nextSecondItem[2] &&
+            //                 currentItem[2] <= nextThirdItem[2]))
+            //     ) {
+            //         boxTop = _.max([currentItem[4], nextFirstItem[4], nextSecondItem[4], nextThirdItem[4]]);
+            //         boxBottom = _.min([currentItem[2], nextFirstItem[2], nextSecondItem[2], nextThirdItem[2]]);
+            //         boxStartDate = currentItem[0];
+            //         boxStartEnd = currentItem[0];
+            //         boxStart = true;
+            //     } else if (boxStart) {
+            //         // 已確定箱子頂部 或 底部
+            //         // close 向上突破頂部，不行後面3個值的 open 在箱子頂部之下
+            //         if (
+            //             // 真的往上突破
+            //             currentItem[4] > boxTop &&
+            //             nextFirstItem[2] >= boxTop &&
+            //             nextSecondItem[2] >= boxTop &&
+            //             nextThirdItem[2] >= boxTop
+            //         ) {
+            //             boxStart = false;
+            //         } else if (
+            //             // 真的往下突破
+            //             currentItem[2] < boxBottom &&
+            //             nextFirstItem[4] <= boxBottom &&
+            //             nextSecondItem[4] <= boxBottom &&
+            //             nextThirdItem[4] <= boxBottom
+            //         ) {
+            //             boxStart = false;
+            //         } else {
+            //             boxTop = _.max(boxTop, currentItem[4]);
+            //             boxBottom = _.min(boxBottom, currentItem[2]);
+            //             boxStartEnd = currentItem[0];
+            //         }
+            //     }
+            // });
 
             foundStock.calc_policy_date = foundStock.last_price_date; // 設成一樣，之後判斷有無相同來知道是否當天真的計算完成
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
