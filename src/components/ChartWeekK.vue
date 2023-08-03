@@ -25,7 +25,7 @@
             >
 
             <span v-if="last_price"
-                ><span style="color: #000000" title="股價">&nbsp;&nbsp;{{ last_price }}</span></span
+                ><span style="color: #000000" title="股價">&nbsp;{{ last_price }}</span></span
             >
             <span v-if="cost && cost.length > 0">
                 <span
