@@ -2012,26 +2012,60 @@ const stock = {
             // foundTempStock.data.weekly.forEach((item, index) => {
             //     if (index <= foundTempStock.data.weekly.length - 3 - 1) {
             //         // 後面3個值不超過close值時則，箱子頂部確定(牛市)，箱子底部確定(熊市)
+            //         const lastIndex = foundTempStock.data.weekly.length - 1;
             //         const currentItem = item;
-            //         const nextFirstItem = foundTempStock.data.weekly[index + 1];
-            //         const nextSecondItem = foundTempStock.data.weekly[index + 2];
-            //         const nextThirdItem = foundTempStock.data.weekly[index + 3];
+
+            //         let nextFirstItem;
+            //         let nextSecondItem;
+            //         let nextThirdItem;
+            //         // 0, 1, "2", 3, 4
+            //         if (index === lastIndex - 2) {
+            //             nextFirstItem = foundTempStock.data.weekly[index + 1];
+            //             nextSecondItem = foundTempStock.data.weekly[index + 2];
+            //             nextThirdItem = foundTempStock.data.weekly[index + 2];
+            //         } else if (index === lastIndex - 1) {
+            //             // 0, 1, 2, "3", 4
+            //             nextFirstItem = foundTempStock.data.weekly[index + 1];
+            //             nextSecondItem = foundTempStock.data.weekly[index + 1];
+            //             nextThirdItem = foundTempStock.data.weekly[index + 1];
+            //         } else if (index === lastIndex) {
+            //             // 0, 1, 2, 3, "4"
+            //             nextFirstItem = foundTempStock.data.weekly[index];
+            //             nextSecondItem = foundTempStock.data.weekly[index];
+            //             nextThirdItem = foundTempStock.data.weekly[index];
+            //         } else {
+            //             nextFirstItem = foundTempStock.data.weekly[index + 1];
+            //             nextSecondItem = foundTempStock.data.weekly[index + 2];
+            //             nextThirdItem = foundTempStock.data.weekly[index + 3];
+            //         }
             //         const isCurrentRed = currentItem[4] >= currentItem[2];
             //         const isNextFirstRed = nextFirstItem[4] >= nextFirstItem[2];
             //         const isNextSecondRed = nextSecondItem[4] >= nextSecondItem[2];
             //         const isNextThirdRed = nextThirdItem[4] >= nextThirdItem[2];
             //         if (
             //             !boxStart &&
-            //             ((currentItem[4] >= nextFirstItem[4] &&
+            //             ((isCurrentRed &&
+            //                 currentItem[4] >= nextFirstItem[4] &&
             //                 currentItem[4] >= nextSecondItem[4] &&
             //                 currentItem[4] >= nextThirdItem[4]) ||
-            //                 (currentItem[2] <= nextFirstItem[2] &&
+            //                 (!isCurrentRed &&
+            //                     currentItem[2] <= nextFirstItem[2] &&
             //                     currentItem[2] <= nextSecondItem[2] &&
             //                     currentItem[2] <= nextThirdItem[2]))
             //         ) {
             //             console.log('date=', item[0]);
-            //             boxTop = _.max([currentItem[4], nextFirstItem[4], nextSecondItem[4], nextThirdItem[4]]);
-            //             boxBottom = _.min([currentItem[2], nextFirstItem[2], nextSecondItem[2], nextThirdItem[2]]);
+            //             boxTop = _.max([
+            //                 currentItem[isCurrentRed ? 4 : 2],
+            //                 nextFirstItem[isNextFirstRed ? 4 : 2],
+            //                 nextSecondItem[isNextSecondRed ? 4 : 2],
+            //                 nextThirdItem[isNextThirdRed ? 4 : 2],
+            //             ]);
+            //             boxBottom = _.min([
+            //                 currentItem[isCurrentRed ? 2 : 4],
+            //                 nextFirstItem[isNextFirstRed ? 2 : 4],
+            //                 nextSecondItem[isNextSecondRed ? 2 : 4],
+            //                 nextThirdItem[isNextThirdRed ? 2 : 4],
+            //             ]);
             //             boxStartDate = currentItem[0];
             //             boxStartEnd = currentItem[0];
             //             boxStart = true;
@@ -2060,10 +2094,10 @@ const stock = {
             //                 boxStart = false;
             //             } else if (
             //                 // 真的往下突破
-            //                 currentItem[2] < boxBottom &&
-            //                 nextFirstItem[4] <= boxBottom &&
-            //                 nextSecondItem[4] <= boxBottom &&
-            //                 nextThirdItem[4] <= boxBottom
+            //                 currentItem[isCurrentRed ? 2 : 4] < boxBottom &&
+            //                 nextFirstItem[isNextFirstRed ? 4 : 2] <= boxBottom &&
+            //                 nextSecondItem[isNextSecondRed ? 4 : 2] <= boxBottom &&
+            //                 nextThirdItem[isNextThirdRed ? 4 : 2] <= boxBottom
             //             ) {
             //                 console.log('box over2 date=', item[0]);
             //                 const preItem = foundTempStock.data.weekly[index - 1];
