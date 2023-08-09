@@ -20,6 +20,7 @@
                     opacity: 0.83;
                     line-height: 1.5;
                 "
+                :class="[rsi5Hint === 'RSI 最高' ? 'shake-base' : '', 'cell-chart']"
                 >{{ rsi5Hint }}</span
             >&nbsp;<span style="color: #4286f5">RSI(5)</span>:
             {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
@@ -494,3 +495,16 @@ export default {
     methods: {},
 };
 </script>
+
+<style lang="sass">
+.cell-chart.shake-base
+    animation-name: shake-base
+    animation-duration: 5s
+    animation-iteration-count: infinite
+    animation-timing-function: ease-in-out
+    animation-delay: 0s
+    animation-play-state: running
+    right: -20px
+    top: -9px
+    opacity: 0.83
+</style>
