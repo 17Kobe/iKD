@@ -21,6 +21,12 @@
                     opacity: 0.83;
                     line-height: 1.5;
                 "
+                :class="[
+                    this.stockData.k_status && parseFloat(this.stockData.k_status.split(' ')[1]) > this.stockData.last_price
+                        ? 'shake-base'
+                        : '',
+                    'cell-chart',
+                ]"
                 >{{ this.stockData.k_status ? this.stockData.k_status : '' }}</span
             >
 
