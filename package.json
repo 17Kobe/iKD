@@ -26,7 +26,8 @@
         "vue-currency-input": "^2.4.0",
         "vue-number-animation": "^1.1.1",
         "vue-router": "^4.0.12",
-        "vuex": "^4.0.2"
+        "vuex": "^4.0.2",
+        "well-cache": "^1.0.2"
     },
     "devDependencies": {
         "@vue/compiler-sfc": "^3.2.31",

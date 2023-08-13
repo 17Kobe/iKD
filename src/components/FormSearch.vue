@@ -402,8 +402,14 @@ export default {
         },
 
         onDel10YearsOld() {
-            this.$store.commit('DEL_10_YEARS_OLD');
-
+            // this.$store.commit('DEL_10_YEARS_OLD');
+            // this.$cache.save('aaa', { id: 123, data: '1231' });
+            // console.log('Value added to cache.');
+            // this.$cache.get('aaa', (result) => {
+            //     console.log(result);
+            //     //     sendData(`get: ${JSON.stringify(result)}`);
+            // });
+            // console.log(this.$cache.get('aaa', { id: 123, data: '1231' }));
             ElMessage({
                 type: 'success',
                 message: '完成刪除10年前舊資料!',

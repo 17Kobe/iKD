@@ -1,6 +1,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
+import { saveStockListToDb } from '@/shared/idbUtils.js';
 
 const defaultState = {
     usdExchange: 30,
@@ -972,6 +973,7 @@ const stock = {
             state.stockList.push(data);
             // console.log(state.currStockDayData);
             localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb(this.$cache);
             this.dispatch('GET_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
         SAVE_STOCK_DIVIDEND_LAST_DATE(state) {
