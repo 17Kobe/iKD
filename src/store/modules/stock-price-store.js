@@ -42,10 +42,10 @@ const stock = {
                     // 按照網站存在的日期才發出API需求
                     // https://stackoverflow.com/questions/36197031/how-to-use-moment-js-to-check-whether-the-current-time-is-between-2-times
                     const currentTime = moment(); // 目前時間
-                    const today = currentTime.format('YYYY-MM-DD');
+                    // const today = currentTime.format('YYYY-MM-DD');
                     const stockMarketCloseTime = moment('13:30:00', 'hh:mm:ss');
                     let siteExistsLatestDate = moment().format('YYYY-MM-DD');
-                    console.log(currentTime.day());
+                    // console.log(currentTime.day());
                     if (currentTime.day() === 6)
                         // 星期六，不算了，就減一天
                         siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
@@ -555,9 +555,9 @@ const stock = {
 
                         if (kdWReady2 && k <= 20 && k >= preK && kdWReady) {
                             kdWTurnUpTimes += 1;
-                            console.log(kdWTurnUpTimes);
-                            console.log(item[0]);
-                            console.log(preKdWTurnUpDate);
+                            // console.log(kdWTurnUpTimes);
+                            // console.log(item[0]);
+                            // console.log(preKdWTurnUpDate);
                             if (
                                 kdWTurnUpTimes >= foundKdW.limit &&
                                 moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') <= 365
@@ -955,14 +955,16 @@ const stock = {
         SAVE_STOCK_LIST_WITH_DIVIDEND_LAST_DATE(state, { stockId, lastDate }) {
             console.log('SAVE_STOCK_LIST_WITH_DIVIDEND_LAST_DATE');
             const foundStock = state.stockList.find((v) => v.id === stockId);
-            console.log(lastDate);
+            // console.log(lastDate);
             if (lastDate) {
                 foundStock.crawler_dividend_last_date = lastDate;
-                localStorage.setItem('stockList', JSON.stringify(state.stockList));
+                // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+                saveStockListToDb('stockList', state.stockList);
             } else if (_.has(foundStock, 'crawler_dividend_last_date')) {
                 // 有存在才去刪，避免初始還要去呼叫 setItem
                 delete foundStock.crawler_dividend_last_date;
-                localStorage.setItem('stockList', JSON.stringify(state.stockList));
+                // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+                saveStockListToDb('stockList', state.stockList);
             }
             // console.log(foundStock);
         },
@@ -972,8 +974,8 @@ const stock = {
             // console.log(data);
             state.stockList.push(data);
             // console.log(state.currStockDayData);
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb(this.$cache);
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb('stockList', state.stockList);
             this.dispatch('GET_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
         SAVE_STOCK_DIVIDEND_LAST_DATE(state) {
@@ -982,14 +984,16 @@ const stock = {
                 o.crawler_dividend_last_date = '2022-10-01';
             });
 
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb('stockList', state.stockList);
         },
         ADD_A_STOCK_KEY(state, { stockId, isDvidend }) {
             console.log('ADD_A_STOCK_KEY');
             const foundStock = state.stockList.find((v) => v.id === stockId);
             foundStock.is_dividend = isDvidend;
             // state.stockList.push(data);
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb('stockList', state.stockList);
         },
         MOVE_A_STOCK(state, { stockId, direction }) {
             // data 是 object {name: XXX, id: XXX}
@@ -1019,14 +1023,16 @@ const stock = {
                 foundStockMoveDst.order = foundStockMoveDst.order + 1;
             }
 
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb('stockList', state.stockList);
         },
         DEL_A_STOCK(state, data) {
             // data 是 object {name: XXX, id: XXX}
             console.log('DEL_A_STOCK');
             // 移除某個自選股
             _.remove(state.stockList, (obj) => obj.id === data);
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb('stockList', state.stockList);
         },
         DEL_10_YEARS_OLD(state, data) {
             // data 是 object {name: XXX, id: XXX}
@@ -1038,7 +1044,8 @@ const stock = {
                 });
             });
 
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb('stockList', state.stockList);
         },
 
         SAVE_STOCK_STAR(state, { stockId, star }) {
@@ -1048,7 +1055,8 @@ const stock = {
             found.star = star; // 複製數據複本
 
             // save to localstorage
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb('stockList', state.stockList);
         },
         SAVE_STOCK_BACKGROUND_COLOR(state, stockId) {
             // object of array 去 find 並 update
@@ -1060,7 +1068,8 @@ const stock = {
                 found.background = true;
             }
             // save to localstorage
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb('stockList', state.stockList);
         },
         async SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
             console.log('SAVE_STOCK_COST');
@@ -1068,10 +1077,10 @@ const stock = {
             const foundStock = state.stockList.find((v) => v.id === stockId);
 
             if (costList.length === 0) {
-                console.log('costList.length === 0');
+                // console.log('costList.length === 0');
                 if (_.has(foundStock, 'cost.settings')) delete foundStock.cost;
             } else {
-                console.log('costList.length> 0');
+                // console.log('costList.length> 0');
                 // console.log(costList);
                 foundStock.cost = {};
                 foundStock.cost.settings = [];
@@ -1093,7 +1102,8 @@ const stock = {
             foundStock.data.cost = _.slice(weekly_cost_line_data, -26);
 
             // save to localstorage
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb('stockList', state.stockList);
             // 因為有可能是刪除的
             if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId);
             this.dispatch('GET_DIVIDEND');
@@ -1109,8 +1119,8 @@ const stock = {
             if (_.has(foundStock, 'cost') && _.has(foundStock, 'data.daily') && foundStock.data.daily.length > 0) {
                 const closeValueIndex = foundStock.data.daily[0].length === 2 ? 1 : 4;
                 const close = foundStock.data.daily[foundStock.data.daily.length - 1][closeValueIndex];
-                console.log(close);
-                console.log(foundStock.cost.sum);
+                // console.log(close);
+                // console.log(foundStock.cost.sum);
 
                 // 若有 buy_exchange，則要取到最新匯率
                 const exchange = foundStock.buy_exchange ? state.usdExchange : 1;
@@ -1124,7 +1134,8 @@ const stock = {
                         : ((close * foundStock.cost.total * exchange - foundStock.cost.sum) * 100) / foundStock.cost.sum; // 只發股數，有可能股價輸入0，這時設為 null，顯示則為 N/A 無法計算，因為成本為0，報酬率為無限吧
 
                 // save to localstorage
-                localStorage.setItem('stockList', JSON.stringify(state.stockList));
+                // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+                saveStockListToDb('stockList', state.stockList);
             }
         },
         SAVE_STOCK_POLICY(state, { stockId, policyList }) {
@@ -1150,7 +1161,8 @@ const stock = {
             }
             // alert(JSON.stringify(state.stockList));
             try {
-                localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+                // localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+                saveStockListToDb('stockList', state.stockList);
             } catch (err) {
                 alert(err);
             }
@@ -1306,7 +1318,8 @@ const stock = {
                 // console.log(foundStock);
 
                 // ===================塞入localstorage===================
-                localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+                // localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+                saveStockListToDb('stockList', state.stockList);
 
                 if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId); // 有新值就要更新成本的報酬率
                 console.log('SAVE_STOCK_PRICE OK');
@@ -1513,9 +1526,9 @@ const stock = {
                     buyList = [];
                     const totalNumberOfBuy = _.sumBy(currBuyList, 'numberOfBuy');
                     let thisNumberOfSell = totalNumberOfBuy;
-                    console.log('=====================');
-                    console.log(foundRsiOverBought);
-                    console.log(obj.reason);
+                    // console.log('=====================');
+                    // console.log(foundRsiOverBought);
+                    // console.log(obj.reason);
                     var unit = 1; // 有可能絕對正報酬後才能確定賣的單位數要儲存進 obj
                     if (
                         foundRsiOverBought &&
@@ -1527,8 +1540,8 @@ const stock = {
                         console.log('RSI，且有 KD');
                         unit = 0.5;
                     }
-                    console.log('currBuyList=', currBuyList);
-                    console.log('thisNumberOfSell=', thisNumberOfSell);
+                    // console.log('currBuyList=', currBuyList);
+                    // console.log('thisNumberOfSell=', thisNumberOfSell);
                     let remainingNumberOfSell = thisNumberOfSell;
                     let totalPrice = 0;
                     const remainingBuyList = _.reduce(
@@ -1538,37 +1551,37 @@ const stock = {
                             let realNumberOfBuy = numberOfBuy;
                             let remainingNumberOfBuy = numberOfBuy;
                             if (remainingNumberOfSell > 0) {
-                                console.log('numberOfBuy=', numberOfBuy);
-                                console.log('remainingNumberOfSell=', remainingNumberOfSell);
+                                // console.log('numberOfBuy=', numberOfBuy);
+                                // console.log('remainingNumberOfSell=', remainingNumberOfSell);
                                 if (numberOfBuy > remainingNumberOfSell) {
                                     // 1，0.5     1，1    1，0.75
                                     realNumberOfBuy = remainingNumberOfSell;
                                     remainingNumberOfBuy = numberOfBuy - remainingNumberOfSell;
                                     remainingNumberOfSell = 0;
-                                    console.log('1');
+                                    // console.log('1');
                                 } else {
                                     // 2，6
                                     remainingNumberOfBuy = numberOfBuy - remainingNumberOfSell;
                                     remainingNumberOfSell -= numberOfBuy;
-                                    console.log('2');
+                                    // console.log('2');
                                 }
-                                console.log('remainingNumberOfSell=', remainingNumberOfSell);
-                                console.log('realNumberOfBuy=', realNumberOfBuy);
-                                console.log('price=', price);
-                                console.log('remainingNumberOfBuy=', remainingNumberOfBuy);
+                                // console.log('remainingNumberOfSell=', remainingNumberOfSell);
+                                // console.log('realNumberOfBuy=', realNumberOfBuy);
+                                // console.log('price=', price);
+                                // console.log('remainingNumberOfBuy=', remainingNumberOfBuy);
                                 totalPrice += realNumberOfBuy * price;
                             }
                             if (remainingNumberOfSell === 0 && remainingNumberOfBuy > 0) {
                                 // 這一圈已變 0 也要跑，所以用 if 而不用 else if
                                 result.push({ date, numberOfBuy: remainingNumberOfBuy, price });
                             }
-                            console.log(result);
+                            // console.log(result);
                             return result;
                         },
                         []
                     );
                     // console.log(buyList);
-                    console.log(remainingBuyList);
+                    // console.log(remainingBuyList);
 
                     // 不能同時當天有買也有賣，這樣也會取消
                     // 去累加買入訊號單位
@@ -1581,7 +1594,7 @@ const stock = {
                     // console.log(obj.is_sell);
                     // console.log(obj.is_latest);
                     // 搭配 絕對正報酬，應該是要該天要有賣，有遇到 is_lastest=true，但沒有is_sell，最終有earn
-                    console.log('rateOfReturn=', rateOfReturn);
+                    // console.log('rateOfReturn=', rateOfReturn);
                     let isCancelToSell = false;
                     if (foundEarn && obj.is_sell && rateOfReturn * 100 <= foundEarn.limit) {
                         // 絕對正報酬
@@ -1592,7 +1605,7 @@ const stock = {
                     }
                     if (!isCancelToSell || obj.is_latest) {
                         buyList = _.concat(remainingBuyList, buyList);
-                        console.log(buyList);
+                        // console.log(buyList);
 
                         // 就算是取消賣，最後一天也是要去算最新報酬喔
                         obj.rate_of_return = rateOfReturn;
@@ -1611,7 +1624,7 @@ const stock = {
                         isReadyToSell = remainingBuyList.length > 0;
 
                         preSellReason = obj.reason; // 為了避免連續賣都是KD
-                        console.log('isReadyToSell=', isReadyToSell);
+                        // console.log('isReadyToSell=', isReadyToSell);
 
                         // 如果最後一天剛好也是賣; 是最後一筆且距今天差3天
                         if (
@@ -2121,7 +2134,8 @@ const stock = {
             // foundStock.data.weekly_box = box;
 
             foundStock.calc_policy_date = foundStock.last_price_date; // 設成一樣，之後判斷有無相同來知道是否當天真的計算完成
-            localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb('stockList', state.stockList);
             console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE OK');
         },
     },

@@ -283,7 +283,9 @@
                 </template>
             </el-table-column>
             <el-table-column label="累積股數" width="70" align="right" header-align="right">
-                <template #default="scope"> {{ scope.row.number_of_shares.toLocaleString('en-US') }} 股 </template>
+                <template #default="scope">
+                    {{ scope.row.number_of_shares ? scope.row.number_of_shares.toLocaleString('en-US') : '' }} 股
+                </template>
             </el-table-column>
             <el-table-column label="股利所得&nbsp;&nbsp;" width="80" align="right" header-align="right">
                 <template #default="scope">

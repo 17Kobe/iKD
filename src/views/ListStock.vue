@@ -738,6 +738,7 @@ import FormPolicy from '@/components/FormPolicy.vue';
 import StockAnalysis from '@/components/StockAnalysis.vue';
 import DefaultStockList from '../store/data/default-stock-list.json';
 import GlobalSettings from '../store/data/global-settings.json';
+import { saveStockListToDb, loadStockListFromDb } from '@/shared/idbUtils.js';
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 
@@ -794,80 +795,85 @@ export default {
         //     this.renderStockCount += 1;
         // }, 400);
         // 取得 localstorage 自選股，最先開始是 null 時，會給予預設值空矩陣
-        let localStockList = JSON.parse(localStorage.getItem('stockList')) || [];
-        // console.log(localStockList);
-
-        // 將 stockList 預設的塞進到 localstorage
-        // console.log(this.stockList);
-        // const diffDefault = this.getDifference(this.stockList, localStockList); // 預設有，但本地沒有，則要新增
-        // const diffLocal = this.getDifference(localStockList, this.stockList); // 本地有，但預設沒有，則要砍掉
-
-        // 空時，或沒資料(有可能刪光)，就載入預設清單
-        if (_.isEmpty(localStockList)) {
-            // this.$store.commit('SAVE_STOCK_LIST', DefaultStockList);
-            localStockList.push(...DefaultStockList); // 新增 append 預設到 localStockList
-            localStorage.setItem('stockList', JSON.stringify(localStockList)); // 將 localStockList 從 object 轉 string 後塞到 localstorage
-            // console.log(diffLocal);
-            // console.log(diffDefault);
+        // let localStockList = JSON.parse(localStorage.getItem('stockList')) || [];
+        loadStockListFromDb('stockList', (dbData) => {
+            let localStockList = dbData;
             // console.log(localStockList);
+
+            // 將 stockList 預設的塞進到 localstorage
             // console.log(this.stockList);
+            // const diffDefault = this.getDifference(this.stockList, localStockList); // 預設有，但本地沒有，則要新增
+            // const diffLocal = this.getDifference(localStockList, this.stockList); // 本地有，但預設沒有，則要砍掉
 
-            // 將 localstorage 重塞回到 vuex 的 stockList
-        } else {
-            // 若已有資料時則先去除 data, policy(因為policy也會畫KD圖訊號)資料，用 setInterval來載入資料比較好
-            localStockList = _.orderBy(localStockList, ['order'], ['asc']).reduce((acc, obj) => {
-                acc.push(_.omit(obj, ['data']));
-                if (obj.data) {
-                    let tempStockObj = _.pick(obj, ['id', 'data']);
-                    // 若是基金時，在這裡是塞JSON的data.daily資料，因為是可能最新的。但不修改data.weekly資料喔，這部份還是由vuex去算
-                    if (obj.type === 'fund') {
-                        const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
-                        tempStockObj.data.daily = _.cloneDeep(foundStock.data.daily);
+            // 空時，或沒資料(有可能刪光)，就載入預設清單
+            if (_.isEmpty(localStockList)) {
+                // this.$store.commit('SAVE_STOCK_LIST', DefaultStockList);
+                localStockList.push(...DefaultStockList); // 新增 append 預設到 localStockList
+                // localStorage.setItem('stockList', JSON.stringify(localStockList)); // 將 localStockList 從 object 轉 string 後塞到 localstorage
+                saveStockListToDb('stockList', localStockList);
+                // console.log(diffLocal);
+                // console.log(diffDefault);
+                // console.log(localStockList);
+                // console.log(this.stockList);
+
+                // 將 localstorage 重塞回到 vuex 的 stockList
+            } else {
+                // 若已有資料時則先去除 data, policy(因為policy也會畫KD圖訊號)資料，用 setInterval來載入資料比較好
+                localStockList = _.orderBy(localStockList, ['order'], ['asc']).reduce((acc, obj) => {
+                    acc.push(_.omit(obj, ['data']));
+                    if (obj.data) {
+                        let tempStockObj = _.pick(obj, ['id', 'data']);
+                        // 若是基金時，在這裡是塞JSON的data.daily資料，因為是可能最新的。但不修改data.weekly資料喔，這部份還是由vuex去算
+                        if (obj.type === 'fund') {
+                            const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
+                            tempStockObj.data.daily = _.cloneDeep(foundStock.data.daily);
+                        }
+                        // console.log(tempStockObj);
+                        this.queueStockDataList.push(tempStockObj);
+                    } else if (obj.type === 'fund') {
+                        console.log('無資料');
+                        // 無資料，且是基金時，但無資料還是蠻怪，localstorage不可能無資料
+                        const foundStock = DefaultStockList.find((v) => v.id === obj.id);
+                        this.queueStockDataList.push(_.pick(foundStock, ['id', 'data']));
                     }
-                    // console.log(tempStockObj);
-                    this.queueStockDataList.push(tempStockObj);
-                } else if (obj.type === 'fund') {
-                    console.log('無資料');
-                    // 無資料，且是基金時，但無資料還是蠻怪，localstorage不可能無資料
-                    const foundStock = DefaultStockList.find((v) => v.id === obj.id);
-                    this.queueStockDataList.push(_.pick(foundStock, ['id', 'data']));
-                }
 
-                return acc;
-            }, []);
-            // console.log(tmpLocalStockList);
-            // localStockList = tmpLocalStockList;
-        }
-        // localStockList 有可能是本地資料，或是預設資料。然後再呼叫載入 this.stockList
-        // console.log(localStockList);
-        this.$store.commit('SAVE_STOCK_LIST', localStockList);
+                    return acc;
+                }, []);
+                // console.log(tmpLocalStockList);
+                // localStockList = tmpLocalStockList;
+            }
+            // localStockList 有可能是本地資料，或是預設資料。然後再呼叫載入 this.stockList
+            // console.log(localStockList);
+            this.$store.commit('SAVE_STOCK_LIST', localStockList);
+
+            // 看起來此timer會 commit裡面一個一個都跑完，才進行下一個，所以不用擔心 dispatch是還沒commit
+            var timerIdOfSetStockData = setInterval(() => {
+                // 判斷0在前面做可以下個100後，或是安全判斷會有
+                if (this.queueStockDataList.length === 0) {
+                    // console.log('GET_STOCK_PRICE');
+                    this.$store.dispatch('GET_STOCK_PRICE');
+                    clearInterval(timerIdOfSetStockData);
+                    // console.log('commit real over');
+                }
+                // console.log('timerIdOfSetStockData');
+                const stockDataAndPolicy = this.queueStockDataList.splice(0, 6); // 一次取6個
+                // console.log('commit begin');
+                // console.log(stockDataAndPolicy);
+                if (stockDataAndPolicy && !_.isEmpty(stockDataAndPolicy))
+                    // 最後1個沒有資料時 stockDataAndPolicy = undefined
+                    this.$store.commit('SAVE_STOCK_DATA_AND_POLICY', stockDataAndPolicy);
+                // console.log('commit over');
+
+                // console.log(this.queueStockDataList.length);
+
+                // console.log('commit 1 over');
+            }, 10);
+        });
     },
     mounted() {
         // 在 mounted() 事件時就可以發送，因為此時不須 data 及 computed 資料都準備好(因為沒有要data 參數，在create())
         this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-        // 看起來此timer會 commit裡面一個一個都跑完，才進行下一個，所以不用擔心 dispatch是還沒commit
-        var timerIdOfSetStockData = setInterval(() => {
-            // 判斷0在前面做可以下個100後，或是安全判斷會有
-            if (this.queueStockDataList.length === 0) {
-                // console.log('GET_STOCK_PRICE');
-                this.$store.dispatch('GET_STOCK_PRICE');
-                clearInterval(timerIdOfSetStockData);
-                // console.log('commit real over');
-            }
-            // console.log('timerIdOfSetStockData');
-            const stockDataAndPolicy = this.queueStockDataList.splice(0, 6); // 一次取6個
-            // console.log('commit begin');
-            // console.log(stockDataAndPolicy);
-            if (stockDataAndPolicy && !_.isEmpty(stockDataAndPolicy))
-                // 最後1個沒有資料時 stockDataAndPolicy = undefined
-                this.$store.commit('SAVE_STOCK_DATA_AND_POLICY', stockDataAndPolicy);
-            // console.log('commit over');
-
-            // console.log(this.queueStockDataList.length);
-
-            // console.log('commit 1 over');
-        }, 10);
         // setTimeout(() => {
         //     // 加這個確定是2秒後才會去 dispatch
         //     this.$store.dispatch('GET_STOCK_PRICE');
@@ -940,19 +946,22 @@ export default {
         },
         getBadgeTitle(array) {
             let str = '';
-            if (array.includes('kd_gold')) str += 'KD 黃金交叉';
-            if (array.includes('kd_turn_up')) str = str ? str + ', KD往 上轉折' : 'KD往 上轉折';
-            if (array.includes('kd_w')) str = str ? str + ', KD W底' : 'KD W底';
-            if (array.includes('rsi_over_sold')) str = str ? str + ', RSI 超賣' : 'RSI 超賣';
-            if (array.includes('rsi_turn_up')) str = str ? str + ', RSI 往上轉折' : 'RSI 往上轉折';
-            if (array.includes('annual_fixed_date_buy')) str = str ? str + ', 每年固定日買' : '每年固定日買';
-            if (array.includes('kd_dead')) str = str ? str + ', KD 死亡交叉' : 'KD 死亡交叉';
-            if (array.includes('kd_turn_down')) str = str ? str + ', KD 往下轉折' : 'KD 往下轉折';
-            if (array.includes('kd_m')) str = str ? str + ', KD M頭' : 'KD M頭';
-            if (array.includes('rsi_over_bought')) str = str ? str + ', RSI 超買' : 'RSI 超買';
-            if (array.includes('rsi_turn_down')) str = str ? str + ', RSI 往下轉折' : 'RSI 往下轉折';
-            if (array.includes('annual_fixed_date_sell')) str = str ? str + ', 每年固定日賣' : '每年固定日賣';
-            if (array.includes('annual_fixed_date_sell')) str = str ? str + ', 每年固定日賣' : '每年固定日賣';
+            if (array) {
+                // 一開始可能是 undefined
+                if (array.includes('kd_gold')) str += 'KD 黃金交叉';
+                if (array.includes('kd_turn_up')) str = str ? str + ', KD往 上轉折' : 'KD往 上轉折';
+                if (array.includes('kd_w')) str = str ? str + ', KD W底' : 'KD W底';
+                if (array.includes('rsi_over_sold')) str = str ? str + ', RSI 超賣' : 'RSI 超賣';
+                if (array.includes('rsi_turn_up')) str = str ? str + ', RSI 往上轉折' : 'RSI 往上轉折';
+                if (array.includes('annual_fixed_date_buy')) str = str ? str + ', 每年固定日買' : '每年固定日買';
+                if (array.includes('kd_dead')) str = str ? str + ', KD 死亡交叉' : 'KD 死亡交叉';
+                if (array.includes('kd_turn_down')) str = str ? str + ', KD 往下轉折' : 'KD 往下轉折';
+                if (array.includes('kd_m')) str = str ? str + ', KD M頭' : 'KD M頭';
+                if (array.includes('rsi_over_bought')) str = str ? str + ', RSI 超買' : 'RSI 超買';
+                if (array.includes('rsi_turn_down')) str = str ? str + ', RSI 往下轉折' : 'RSI 往下轉折';
+                if (array.includes('annual_fixed_date_sell')) str = str ? str + ', 每年固定日賣' : '每年固定日賣';
+                if (array.includes('annual_fixed_date_sell')) str = str ? str + ', 每年固定日賣' : '每年固定日賣';
+            }
 
             return str;
         },

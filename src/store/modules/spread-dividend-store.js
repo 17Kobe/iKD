@@ -158,7 +158,7 @@ const dividend = {
                         return acc + addNumber;
                     }, 0);
 
-                    console.log(accNumber);
+                    // console.log(accNumber);
 
                     if (accNumber > 0) {
                         state.historyDividendList.push({
@@ -191,7 +191,7 @@ const dividend = {
                         return acc + addNumber;
                     }, 0);
 
-                    console.log(accNumber);
+                    // console.log(accNumber);
 
                     thisYearLastCashDividendPaymentDate = moment(dividendObj.CashDividendPaymentDate);
                     if (accNumber > 0) {
@@ -218,9 +218,9 @@ const dividend = {
                 // console.log(today.format('YYYY-MM-DD'));
                 // 曾經出現預估報酬率，去年的2021出現2筆tradingDate相同，PaymentDate也相同，但 date是未來2027日期的(現在是2022)
                 const filterNotSureDividend = _.filter(data.data, (o) => {
-                    console.log(moment(o.CashDividendPaymentDate).format('YYYY-MM-DD'));
-                    console.log(moment(o.CashExDividendTradingDate).format('YYYY-MM-DD'));
-                    console.log(moment(o.date).format('YYYY-MM-DD'));
+                    // console.log(moment(o.CashDividendPaymentDate).format('YYYY-MM-DD'));
+                    // console.log(moment(o.CashExDividendTradingDate).format('YYYY-MM-DD'));
+                    // console.log(moment(o.date).format('YYYY-MM-DD'));
                     return (
                         moment(o.CashDividendPaymentDate).isSameOrAfter(thisDayLastYearAddOneMonth) &&
                         moment(o.CashExDividendTradingDate).isSameOrBefore(theLastDayOfLastYear) && // 像台積電會少算12月配息日，因為拿到錢是1月份
@@ -333,6 +333,8 @@ const dividend = {
             tempDividendList.forEach((obj, index) => {
                 const foundStock = _.find(rootState.price.stockList, ['id', obj.id]);
                 // 有可能清掉股票了，但 dividendlist 還保留著，所以要判斷
+                // 也有可能股票 cost 還沒載入的樣子
+                if (!tempDividendList[index].number_of_shares && !foundStock) return [];
                 if (!tempDividendList[index].number_of_shares) tempDividendList[index].number_of_shares = foundStock.cost.total;
             });
             if (mode === '歷史') return _.orderBy(tempDividendList, ['payment_date'], ['desc']);

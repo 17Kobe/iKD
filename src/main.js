@@ -4,7 +4,6 @@
 import { createApp } from 'vue';
 
 import ElementPlus from 'element-plus';
-import WellCachePlugin from '@/plugins/wellCache';
 
 import 'element-plus/lib/theme-chalk/index.css';
 import '@/index.css';
@@ -56,7 +55,6 @@ app.use(store);
 app.use(router);
 app.use(ElementPlus);
 app.use(VueNumber);
-app.use(WellCachePlugin);
 
 // 掛載 monut 至指定網頁(index.html) 中的 #app 節點上
 app.mount('#app');
