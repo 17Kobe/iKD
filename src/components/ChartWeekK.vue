@@ -113,6 +113,11 @@
         </div>
 
         <!-- :updateArgs="[true, true, true]" -->
+        <highcharts
+            :options="columnChartOptions"
+            v-if="false"
+            style="position: relative; top: -2px; height: 48px; background: transparent"
+        ></highcharts>
     </div>
 </template>
 
@@ -503,6 +508,46 @@ export default {
                     //         units: [['day', [1]]],
                     //     },
                     // },
+                ],
+            };
+        },
+        columnChartOptions() {
+            return {
+                chart: {
+                    type: 'column',
+                    height: 70, // 設置圖表高度為100px
+                },
+                title: {
+                    text: '',
+                },
+                legend: {
+                    // 該線是什麼線的說明，原本顯示在最下方，現在把它隱藏
+                    enabled: false,
+                },
+                xAxis: {
+                    type: 'datetime',
+                    labels: {
+                        enabled: false, // 沒有顯示 x 軸標纖
+                    },
+                },
+                yAxis: {
+                    title: {
+                        text: '',
+                    },
+                    labels: {
+                        enabled: false, // 沒有顯示 Y 軸標纖
+                    },
+                },
+                plotOptions: {
+                    column: {
+                        pointWidth: 8, // 調整每個直方圖的寬度
+                    },
+                },
+                series: [
+                    {
+                        name: '成交量',
+                        data: this.tradingVolume,
+                    },
                 ],
             };
         },
