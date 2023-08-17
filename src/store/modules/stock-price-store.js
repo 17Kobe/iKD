@@ -238,7 +238,7 @@ const stock = {
                     i -= 1;
                 }
             } else {
-                // [date, open high low close]
+                // [date, open high low close, Trading_Volume]
                 while (i >= 0) {
                     // console.log(i);
                     // console.log(moment(currStock[index].data.daily[i][0]).format('YYYY-MM-DD'));
@@ -254,6 +254,7 @@ const stock = {
                         const range2dArray = _.slice(foundStock.data.daily, startIndex, endIndex + 1);
                         const rangeHighArray = _.map(range2dArray, (v) => v[2]);
                         const rangeLowArray = _.map(range2dArray, (v) => v[3]);
+                        const rangeTradingVolumeArray = _.map(range2dArray, (v) => v.length >= 6 ? v[5] : 0);
                         // const rangeVolumeArray = _.map(range2dArray, (v) => v[5]);
 
                         const date = foundStock.data.daily[endIndex][0];
@@ -261,9 +262,10 @@ const stock = {
                         const close = foundStock.data.daily[endIndex][4]; // 之前的i，還沒i=n是下一個
                         const low = _.min(rangeLowArray);
                         const high = _.max(rangeHighArray);
+                        const tradingVolume = _.sum(rangeTradingVolumeArray);
                         // const volume = _.sum(rangeVolumeArray);
 
-                        resData.push([date, open, high, low, close]);
+                        resData.push([date, open, high, low, close, tradingVolume]);
                         j = startIndex - 1;
 
                         // 要採用下個i值的該週第一天，不能用firstDayOfWeek-7天，因為有可能該週都沒值
@@ -1207,7 +1209,7 @@ const stock = {
                             element.max,
                             element.min,
                             element.close,
-                            // element.Trading_Volume,
+                            element.Trading_Volume,
                         ]);
                     });
                 } else if (stcokObjType === 'exchange') {
@@ -1272,7 +1274,6 @@ const stock = {
 
                 foundStock.last_price = v1;
 
-                const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
                 currStockLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
                 foundStock.last_price_date = `${currStockLastDate.format('YYYY-MM-DD')}`;
 
