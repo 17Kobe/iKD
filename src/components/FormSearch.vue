@@ -381,7 +381,8 @@ export default {
 
                                 const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
                                 indexedDB.deleteDatabase("wc");
-                                location.reload();
+                                window.setTimeout( () => location.reload() , 1000);
+                                
 
                             } catch (e) {
                                 console.log('localStorage 儲存失敗：', e);
