@@ -7,10 +7,21 @@
             style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div v-if="ohlc && ohlc.length > 0" style="display: flex; justify-content: space-between; font-size: 12px; position: absolute; top: 80px; padding: 0px 10px 0px 6px; width: 100%">
-            <span style="order: 1;">
+        <div
+            v-if="ohlc && ohlc.length > 0"
+            style="
+                display: flex;
+                justify-content: space-between;
+                font-size: 12px;
+                position: absolute;
+                top: 80px;
+                padding: 0px 10px 0px 6px;
+                width: 100%;
+            "
+        >
+            <span style="order: 1">
                 <span
-                style="
+                    style="
                     display: inline-block;
                     min-width: 48px;
                     background-color: rgb(103, 194, 58);
@@ -21,85 +32,85 @@
                     opacity: 0.83;
                     line-height: 1.5;
                 "
-                :class="[
-                    this.stockData.k_status && parseFloat(this.stockData.k_status.split(' ')[1]) > this.stockData.last_price
-                        ? 'shake-base'
-                        : '',
-                    'cell-chart',
-                ]"
-                >{{ this.stockData.k_status ? this.stockData.k_status : '' }}</span
-            >
+                    :class="[
+                        this.stockData.k_status && parseFloat(this.stockData.k_status.split(' ')[1]) > this.stockData.last_price
+                            ? 'shake-base'
+                            : '',
+                        'cell-chart',
+                    ]"
+                    >{{ this.stockData.k_status ? this.stockData.k_status : '' }}</span
+                >
             </span>
-            <span style="order: 2;">
+            <span style="order: 2">
                 <span v-if="last_price"
-                ><span style="color: #000000" title="股價">&nbsp;{{ last_price }}</span></span
-            >
-            <span v-if="cost && cost.length > 0">
-                <span
-                    title="平均成本線"
-                    :style="[
-                        last_price > cost[cost.length - 1][1]
-                            ? { 'background-color': '#ededed' }
-                            : { 'background-color': 'none' },
-                        { color: '#4286f5', 'margin-left': '4px' },
-                    ]"
-                    >{{
-                        cost[cost.length - 1][1] >= 100
-                            ? Number(cost[cost.length - 1][1].toFixed(0))
-                            : Number(cost[cost.length - 1][1].toFixed(2))
-                    }}</span
-                ></span
-            >
-            <span v-if="ma5 && ma5.length > 0">
-                <span
-                    title="MA(5)"
-                    :style="[
-                        last_price > ma5[ma5.length - 1][1] ? { 'background-color': '#ededed' } : { 'background-color': 'none' },
-                        { color: '#834beb', 'margin-left': '4px' },
-                    ]"
-                    >{{
-                        ma5[ma5.length - 1][1] >= 100
-                            ? Number(ma5[ma5.length - 1][1].toFixed(0))
-                            : Number(ma5[ma5.length - 1][1].toFixed(2))
-                    }}</span
-                ></span
-            >
-            <span v-if="ma10 && ma10.length > 0">
-                <span
-                    title="MA(10)"
-                    :style="[
-                        last_price > ma10[ma10.length - 1][1]
-                            ? { 'background-color': '#ededed' }
-                            : { 'background-color': 'none' },
-                        { color: '#febd09', 'margin-left': '4px' },
-                    ]"
-                    >{{
-                        ma10[ma10.length - 1][1] >= 100
-                            ? Number(ma10[ma10.length - 1][1].toFixed(0))
-                            : Number(ma10[ma10.length - 1][1].toFixed(2))
-                    }}</span
-                ></span
-            >
-            <span v-if="ma20 && ma20.length > 0">
-                <span
-                    title="MA(20)"
-                    :style="[
-                        last_price > ma20[ma20.length - 1][1]
-                            ? { 'background-color': '#ededed' }
-                            : { 'background-color': 'none' },
-                        { color: '#fc7742', 'margin-left': '4px' },
-                    ]"
-                    >{{
-                        ma20[ma20.length - 1][1] >= 100
-                            ? Number(ma20[ma20.length - 1][1].toFixed(0))
-                            : Number(ma20[ma20.length - 1][1].toFixed(2))
-                    }}</span
-                ></span
-            >
+                    ><span style="color: #000000" title="股價">&nbsp;{{ last_price }}</span></span
+                >
+                <span v-if="cost && cost.length > 0">
+                    <span
+                        title="平均成本線"
+                        :style="[
+                            last_price > cost[cost.length - 1][1]
+                                ? { 'background-color': '#ededed' }
+                                : { 'background-color': 'none' },
+                            { color: '#4286f5', 'margin-left': '4px' },
+                        ]"
+                        >{{
+                            cost[cost.length - 1][1] >= 100
+                                ? Number(cost[cost.length - 1][1].toFixed(0))
+                                : Number(cost[cost.length - 1][1].toFixed(2))
+                        }}</span
+                    ></span
+                >
+                <span v-if="ma5 && ma5.length > 0">
+                    <span
+                        title="MA(5)"
+                        :style="[
+                            last_price > ma5[ma5.length - 1][1]
+                                ? { 'background-color': '#ededed' }
+                                : { 'background-color': 'none' },
+                            { color: '#834beb', 'margin-left': '4px' },
+                        ]"
+                        >{{
+                            ma5[ma5.length - 1][1] >= 100
+                                ? Number(ma5[ma5.length - 1][1].toFixed(0))
+                                : Number(ma5[ma5.length - 1][1].toFixed(2))
+                        }}</span
+                    ></span
+                >
+                <span v-if="ma10 && ma10.length > 0">
+                    <span
+                        title="MA(10)"
+                        :style="[
+                            last_price > ma10[ma10.length - 1][1]
+                                ? { 'background-color': '#ededed' }
+                                : { 'background-color': 'none' },
+                            { color: '#febd09', 'margin-left': '4px' },
+                        ]"
+                        >{{
+                            ma10[ma10.length - 1][1] >= 100
+                                ? Number(ma10[ma10.length - 1][1].toFixed(0))
+                                : Number(ma10[ma10.length - 1][1].toFixed(2))
+                        }}</span
+                    ></span
+                >
+                <span v-if="ma20 && ma20.length > 0">
+                    <span
+                        title="MA(20)"
+                        :style="[
+                            last_price > ma20[ma20.length - 1][1]
+                                ? { 'background-color': '#ededed' }
+                                : { 'background-color': 'none' },
+                            { color: '#fc7742', 'margin-left': '4px' },
+                        ]"
+                        >{{
+                            ma20[ma20.length - 1][1] >= 100
+                                ? Number(ma20[ma20.length - 1][1].toFixed(0))
+                                : Number(ma20[ma20.length - 1][1].toFixed(2))
+                        }}</span
+                    ></span
+                >
             </span>
         </div>
-
-
 
         <!-- :updateArgs="[true, true, true]" -->
     </div>
@@ -124,6 +135,10 @@ export default {
         ohlc() {
             console.log('ohlc');
             return this.$store.getters.getStockDataWeekly(this.parentData);
+        },
+        tradingVolume() {
+            console.log('tradingVolume');
+            return this.$store.getters.getStockDataWeeklyTradingVolume(this.parentData);
         },
         last_price() {
             console.log('last_price');
