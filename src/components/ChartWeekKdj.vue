@@ -7,9 +7,9 @@
             style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 80px; font-size: 12px; left: 11px" v-if="k && k.length > 0">
-            <!-- :style="{ left: showJLine ? '75px' : '41px' }" -->
-            <span
+        <div v-if="k && k.length > 0" style="display: flex; justify-content: space-between; font-size: 12px; position: absolute; top: 80px; padding: 0px 12px 0px 6px; width: 100%">
+            <span style="order: 1;">
+                <span
                 style="
                     display: inline-block;
                     min-width: 48px;
@@ -21,11 +21,15 @@
                     opacity: 0.83;
                     line-height: 1.5;
                 "
-                >{{ this.stockData.kd_status ? this.stockData.kd_status : '' }}</span
-            >&nbsp;<span style="display: inline-block" :style="{ 'min-width': showJLine ? '10px' : '51px' }"> </span
-            ><span style="color: #4286f5">K</span>: {{ k[k.length - 1][1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
-            {{ d[d.length - 1][1].toFixed(2) }}
-            <span v-if="showJLine"><span style="color: #febd09">J</span>: {{ j[j.length - 1][1].toFixed(2) }}</span>
+                v-if="stockData.kd_status"
+                >{{ this.stockData.kd_status }}</span
+            >
+            </span>
+            <span style="order: 2;">
+                <span style="color: #4286f5">K</span>: {{ k[k.length - 1][1].toFixed(2) }} 
+                <span style="color: #e75c9a">D</span>: {{ d[d.length - 1][1].toFixed(2) }}
+                <span v-if="showJLine"><span style="color: #febd09">J</span>: {{ j[j.length - 1][1].toFixed(2) }}</span>
+            </span>
         </div>
 
         <!-- :updateArgs="[true, true, true]" -->

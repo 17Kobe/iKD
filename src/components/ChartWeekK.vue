@@ -7,9 +7,9 @@
             style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div style="position: absolute; top: 80px; font-size: 12px; left: 11px" v-if="ohlc && ohlc.length > 0">
-            <!-- <span style="color: #834beb">P</span>: {{ Number(ohlc.at(-1)[3].toFixed(2)) }} -->
-            <span
+        <div v-if="ohlc && ohlc.length > 0" style="display: flex; justify-content: space-between; font-size: 12px; position: absolute; top: 80px; padding: 0px 10px 0px 6px; width: 100%">
+            <span style="order: 1;">
+                <span
                 style="
                     display: inline-block;
                     min-width: 48px;
@@ -29,8 +29,9 @@
                 ]"
                 >{{ this.stockData.k_status ? this.stockData.k_status : '' }}</span
             >
-
-            <span v-if="last_price"
+            </span>
+            <span style="order: 2;">
+                <span v-if="last_price"
                 ><span style="color: #000000" title="股價">&nbsp;{{ last_price }}</span></span
             >
             <span v-if="cost && cost.length > 0">
@@ -95,7 +96,11 @@
                     }}</span
                 ></span
             >
+            </span>
         </div>
+
+
+
         <!-- :updateArgs="[true, true, true]" -->
     </div>
 </template>
