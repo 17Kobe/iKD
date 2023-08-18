@@ -437,7 +437,11 @@
                                                 scope.row.policy.settings.buy.length + scope.row.policy.settings.sell.length >
                                                     5 && index === 5 - scope.row.policy.settings.buy.length - 1
                                             "
-                                            ><button @click.stop="showPolicyMore(scope.row.id)">
+                                            ><button
+                                                @click.stop="showPolicyMore(scope.row.id)"
+                                                @mouseenter="handleMouseEnter(scope.row.id)"
+                                                @mouseleave="handleMouseLeave(scope.row.id)"
+                                            >
                                                 <i
                                                     style="font-size: 24px"
                                                     :class="
@@ -971,6 +975,12 @@ export default {
         showPolicyMore(id) {
             if (this.showMoreButton.includes(id)) _.pull(this.showMoreButton, id);
             else this.showMoreButton.push(id);
+        },
+        handleMouseEnter(id) {
+            this.showMoreButton.push(id);
+        },
+        handleMouseLeave(id) {
+            _.pull(this.showMoreButton, id);
         },
     },
 };
