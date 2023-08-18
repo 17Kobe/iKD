@@ -113,6 +113,7 @@
         </div>
         <el-button
             type="primary"
+            class="custom-button"
             :plain="!stockData.show_trading_volume"
             size="mini"
             style="position: absolute; left: 17px; top: 6px; padding: 0px 8px"
@@ -606,3 +607,10 @@ export default {
     },
 };
 </script>
+
+<style lang="sass">
+.custom-button.el-button--primary.is-plain:focus
+    background-color: #ecf5ff
+    border-color: #b3d8ff
+    color: #409eff
+</style>
