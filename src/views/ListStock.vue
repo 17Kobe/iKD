@@ -450,7 +450,7 @@
                                                         showMoreButton.includes('always-' + scope.row.id)
                                                             ? 'el-icon-location'
                                                             : showMoreButton.includes(scope.row.id)
-                                                            ? 'el-icon-caret-top'
+                                                            ? ['el-icon-caret-top', 'hidden-icon']
                                                             : 'el-icon-caret-bottom'
                                                     "
                                                 ></i>
@@ -1073,4 +1073,6 @@ input::-webkit-inner-spin-button
 
 .el-table--striped .el-table__body tr.el-table__row--striped.color-row td
     background: #fffbec
+.hidden-icon
+    visibility: hidden
 </style>
