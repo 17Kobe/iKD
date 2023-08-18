@@ -403,7 +403,9 @@
                                 <div
                                     style="line-height: 18px; width: 100%"
                                     v-if="
-                                        showMoreButton.includes(scope.row.id) || scope.row.policy.settings.buy.length + index < 5
+                                        showMoreButton.includes('always-' + scope.row.id) ||
+                                        showMoreButton.includes(scope.row.id) ||
+                                        scope.row.policy.settings.buy.length + index < 5
                                     "
                                 >
                                     <span
@@ -432,7 +434,7 @@
                                             >{{ item.limit }}</span
                                         >&nbsp;{{ item.limit_desc }}
                                         <span
-                                            style="position: absolute; top: -2px; right: 1px"
+                                            style="position: absolute; top: -1px; right: 1px"
                                             v-if="
                                                 scope.row.policy.settings.buy.length + scope.row.policy.settings.sell.length >
                                                     5 && index === 5 - scope.row.policy.settings.buy.length - 1
@@ -445,7 +447,9 @@
                                                 <i
                                                     style="font-size: 24px"
                                                     :class="
-                                                        showMoreButton.includes(scope.row.id)
+                                                        showMoreButton.includes('always-' + scope.row.id)
+                                                            ? 'el-icon-location'
+                                                            : showMoreButton.includes(scope.row.id)
                                                             ? 'el-icon-caret-top'
                                                             : 'el-icon-caret-bottom'
                                                     "
@@ -973,8 +977,9 @@ export default {
             return str;
         },
         showPolicyMore(id) {
-            if (this.showMoreButton.includes(id)) _.pull(this.showMoreButton, id);
-            else this.showMoreButton.push(id);
+            const alwaysId = 'always-' + id;
+            if (this.showMoreButton.includes(alwaysId)) _.pull(this.showMoreButton, alwaysId);
+            else this.showMoreButton.push(alwaysId);
         },
         handleMouseEnter(id) {
             this.showMoreButton.push(id);
