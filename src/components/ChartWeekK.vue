@@ -111,8 +111,9 @@
                 >
             </span>
         </div>
-        <el-button size="mini" style="position: absolute; left: 17px; top: 6px; padding: 0px 8px; background: transparent;"   @mousedown="showTradingVolume = true"
-            @mouseup="showTradingVolume = false">量</el-button>
+        <el-button size="mini" style="position: absolute; left: 17px; top: 6px; padding: 0px 8px; background: transparent;"
+        v-if="stockData.type !== 'exchange' && stockData.type !== 'fund'"
+        @click="toggleTradingVolume">量</el-button>
         <!-- :updateArgs="[true, true, true]" -->
         <highcharts
             :options="columnChartOptions"
@@ -547,6 +548,31 @@ export default {
                         enabled: false, // 沒有顯示 Y 軸標纖
                     },
                     gridLineWidth: 0, // 隱藏 Y 軸橫向灰線
+                },
+                tooltip: {
+                    // backgroundColor: 'transparent',
+                    shadow: false,
+                    // borderWidth: 0,
+                    borderColor: '#999999',
+                    split: false,
+                    shared: true,
+                    useHTML: true,
+                    formatter() {
+                        let str = '<div>';
+                        const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+                        this.points.forEach((point, index) => {
+                            if (index === 0) {
+                                str += `<div style="text-align:center;">${moment(point.x).format(
+                                    'YYYY-MM-DD'
+                                )}(<span style="color: #3333ee; font-weight:bold;">${
+                                    dayOfWeek[moment(point.x).day()]
+                                }</span>)</div>`;
+                                str += `<div>成交量：<span style="color: ${point.color}">${point.y.toLocaleString('en-US')}</span></div>`;
+                            }
+                        });
+                        str += '</div>';
+                        return str;
+                    },
                 },
                 plotOptions: {
                     column: {
