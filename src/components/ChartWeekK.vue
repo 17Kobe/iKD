@@ -113,7 +113,7 @@
         </div>
         <el-button
             type="primary"
-            :plain="!showTradingVolume"
+            :plain="!stockData.show_trading_volume"
             size="mini"
             style="position: absolute; left: 17px; top: 6px; padding: 0px 8px"
             v-if="stockData.type !== 'exchange' && stockData.type !== 'fund'"
@@ -124,7 +124,7 @@
         <highcharts
             :options="columnChartOptions"
             style="position: relative; top: -2px; background: transparent"
-            v-if="showTradingVolume"
+            v-if="stockData.show_trading_volume"
         ></highcharts>
     </div>
 </template>
@@ -138,7 +138,7 @@ export default {
     props: ['parentData'],
     data() {
         return {
-            showTradingVolume: false,
+            // showTradingVolume: false,
         };
     },
     computed: {
@@ -600,7 +600,8 @@ export default {
     watch: {},
     methods: {
         toggleTradingVolume() {
-            this.showTradingVolume = !this.showTradingVolume;
+            this.$store.commit('SAVE_SHOW_TRADING_VOLUME', { stockId: this.parentData });
+            // this.showTradingVolume = !this.showTradingVolume;
         },
     },
 };

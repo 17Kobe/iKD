@@ -1060,6 +1060,13 @@ const stock = {
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             saveStockListToDb('stockList', state.stockList);
         },
+        SAVE_SHOW_TRADING_VOLUME(state, { stockId }) {
+            // object of array 去 find 並 update
+            const found = state.stockList.find((v) => v.id === stockId);
+            found.show_trading_volume = !found.show_trading_volume;
+
+            saveStockListToDb('stockList', state.stockList);
+        },
         SAVE_STOCK_BACKGROUND_COLOR(state, stockId) {
             // object of array 去 find 並 update
             const found = state.stockList.find((v) => v.id === stockId);
@@ -2189,7 +2196,11 @@ const stock = {
             const found = getters.getStock(id);
             // const found = getters.getStock(id);
             return found.data && found.data.weekly
-                ? _.slice(found.data.weekly, -26).map((value) => ({x: moment(value[0]).valueOf(), y: value[5], color: value[4]>=value[1]?'#d41c1c':'#65b206'}))
+                ? _.slice(found.data.weekly, -26).map((value) => ({
+                      x: moment(value[0]).valueOf(),
+                      y: value[5],
+                      color: value[4] >= value[1] ? '#d41c1c' : '#65b206',
+                  }))
                 : [];
             // kd 一定要去直取 policy，而非取 stock，才能Policy有改有連動
             // getStockPolicy: (state, getters) => (id) => _.has(getters.getStock(id), 'policy') ? getters.getStock(id).policy : null,
