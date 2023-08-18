@@ -111,9 +111,15 @@
                 >
             </span>
         </div>
-        <el-button size="mini" style="position: absolute; left: 17px; top: 6px; padding: 0px 8px; background: transparent;"
-        v-if="stockData.type !== 'exchange' && stockData.type !== 'fund'"
-        @click="toggleTradingVolume">量</el-button>
+        <el-button
+            type="primary"
+            :plain="!showTradingVolume"
+            size="mini"
+            style="position: absolute; left: 17px; top: 6px; padding: 0px 8px"
+            v-if="stockData.type !== 'exchange' && stockData.type !== 'fund'"
+            @click="toggleTradingVolume"
+            >量</el-button
+        >
         <!-- :updateArgs="[true, true, true]" -->
         <highcharts
             :options="columnChartOptions"
@@ -567,7 +573,9 @@ export default {
                                 )}(<span style="color: #3333ee; font-weight:bold;">${
                                     dayOfWeek[moment(point.x).day()]
                                 }</span>)</div>`;
-                                str += `<div>成交量：<span style="color: ${point.color}">${point.y.toLocaleString('en-US')}</span></div>`;
+                                str += `<div>成交量：<span style="color: ${point.color}">${point.y.toLocaleString(
+                                    'en-US'
+                                )}</span></div>`;
                             }
                         });
                         str += '</div>';
@@ -592,7 +600,7 @@ export default {
     watch: {},
     methods: {
         toggleTradingVolume() {
-            this.showTradingVolume = !this.showTradingVolume; 
+            this.showTradingVolume = !this.showTradingVolume;
         },
     },
 };
