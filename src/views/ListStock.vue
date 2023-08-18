@@ -434,7 +434,7 @@
                                             >{{ item.limit }}</span
                                         >&nbsp;{{ item.limit_desc }}
                                         <span
-                                            style="position: absolute; top: -1px; right: 1px"
+                                            style="position: absolute; top: 1px; right: 3px"
                                             v-if="
                                                 scope.row.policy.settings.buy.length + scope.row.policy.settings.sell.length >
                                                     5 && index === 5 - scope.row.policy.settings.buy.length - 1
@@ -445,13 +445,13 @@
                                                 @mouseleave="handleMouseLeave(scope.row.id)"
                                             >
                                                 <i
-                                                    style="font-size: 24px"
+                                                    style="font-size: 20px"
                                                     :class="
                                                         showMoreButton.includes('always-' + scope.row.id)
                                                             ? 'el-icon-location'
                                                             : showMoreButton.includes(scope.row.id)
                                                             ? ['el-icon-caret-top', 'hidden-icon']
-                                                            : 'el-icon-caret-bottom'
+                                                            : 'el-icon-more'
                                                     "
                                                 ></i>
                                                 <!-- 您可以在這裡添加按鈕內容 -->
