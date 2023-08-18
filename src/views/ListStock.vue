@@ -478,7 +478,7 @@
                     <el-popover
                         placement="left-start"
                         title="策略回測歷史"
-                        width="480px"
+                        width="500px"
                         trigger="hover"
                         :hide-after="0"
                         :ref="`popover-${scope.row.id}`"
@@ -514,7 +514,7 @@
                                     :style="{
                                         'font-size': '14px',
                                         display: 'inline-flex' /* 使用 inline-flex 以允許靠右對齊 */,
-                                        width: '90px',
+                                        width: '110px',
                                         'text-align': 'left',
                                         'justify-content': 'space-between' /* 將子元素靠右對齊 */,
                                         color: 'white',
@@ -536,7 +536,8 @@
                                             item.buy_or_sell === '買'
                                                 ? Math.round(item.number_of_buy * 100) / 100
                                                 : Math.round(item.number_of_sell * 100) / 100
-                                        }})
+                                        }}
+                                        單位)
                                     </span>
                                 </span>
                                 &nbsp;&nbsp;<span
