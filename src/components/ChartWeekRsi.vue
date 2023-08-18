@@ -40,9 +40,8 @@
                 <span style="color: #4286f5">RSI(5)</span>:
                 {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
                 <span style="color: #e75c9a">
-                    {{ rsi5[rsi5.length - 1][1] >= 50 ? '最高' : '最低' }}
-                </span>
-                {{
+                    {{ rsi5[rsi5.length - 1][1] >= 50 ? '最高' : '最低' }} </span
+                >{{
                     rsi5[rsi5.length - 1][1] >= 50
                         ? ': ' + Math.round(rsi5Max * 100) / 100
                         : ': ' + Math.round(rsi5Min * 100) / 100
