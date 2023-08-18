@@ -7,10 +7,21 @@
             style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
-        <div v-if="rsi5 && rsi5.length > 0" style="display: flex; justify-content: space-between; font-size: 12px; position: absolute; top: 80px; padding: 0px 10px 0px 6px; width: 100%">
-            <span style="order: 1;">
+        <div
+            v-if="rsi5 && rsi5.length > 0"
+            style="
+                display: flex;
+                justify-content: space-between;
+                font-size: 12px;
+                position: absolute;
+                top: 80px;
+                padding: 0px 10px 0px 6px;
+                width: 100%;
+            "
+        >
+            <span style="order: 1">
                 <span
-                style="
+                    style="
                     display: inline-block;
                     min-width: 48px;
                     background-color: rgb(103, 194, 58);
@@ -21,18 +32,21 @@
                     opacity: 0.83;
                     line-height: 1.5;
                 "
-                :class="[rsi5Hint === 'RSI 最高' ? 'shake-base' : '', 'cell-chart']"
-                >{{ rsi5Hint }}</span
-            >
+                    :class="[rsi5Hint === 'RSI 最高' ? 'shake-base' : '', 'cell-chart']"
+                    >{{ rsi5Hint }}</span
+                >
             </span>
-            <span style="order: 2;">
+            <span style="order: 2">
                 <span style="color: #4286f5">RSI(5)</span>:
-            {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
-            ({{
-                rsi5[rsi5.length - 1][1] >= 50
-                    ? '最高: ' + Math.round(rsi5Max * 100) / 100
-                    : '最低: ' + Math.round(rsi5Min * 100) / 100
-            }})
+                {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
+                <span style="color: #e75c9a">
+                    {{ rsi5[rsi5.length - 1][1] >= 50 ? '最高' : '最低' }}
+                </span>
+                {{
+                    rsi5[rsi5.length - 1][1] >= 50
+                        ? ': ' + Math.round(rsi5Max * 100) / 100
+                        : ': ' + Math.round(rsi5Min * 100) / 100
+                }}
             </span>
         </div>
 
