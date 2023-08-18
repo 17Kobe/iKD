@@ -8,9 +8,12 @@
             :data="stockList"
             :row-class-name="tableRowClassName"
             style="width: 100%"
-            empty-text="無資料"
+            empty-text=""
             id="stock-list"
         >
+            <template v-slot:empty>
+                <el-skeleton :rows="19" animated />
+            </template>
             <el-table-column
                 fixed
                 label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名稱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;股價"
@@ -730,6 +733,7 @@
                 <el-table-column prop="city" label="本益比" width="120" />
                 <el-table-column prop="city" label="EPS" width="120" /> -->
         </el-table>
+
         <br /><br />
         <br />
         <FormCost ref="childFormCost" />
@@ -768,7 +772,6 @@ export default {
             showWeekRSI: true,
             showJLine: false,
             currentStockId: null,
-
             showMoreButton: [],
         };
     },
