@@ -112,7 +112,7 @@
             </span>
         </div>
         <el-button
-            type="primary"
+            type="info"
             class="custom-button"
             :plain="!stockData.show_trading_volume"
             size="mini"
