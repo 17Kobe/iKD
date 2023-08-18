@@ -516,6 +516,10 @@ export default {
                 chart: {
                     type: 'column',
                     height: 70, // 設置圖表高度為100px
+                    backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
+                    zoomType: 'none',
+                    pinchType: 'none',
+                    panning: false,
                 },
                 title: {
                     text: '',
@@ -527,7 +531,7 @@ export default {
                 xAxis: {
                     type: 'datetime',
                     labels: {
-                        enabled: false, // 沒有顯示 x 軸標纖
+                        enabled: false, // 不顯示 x 軸的 Label
                     },
                 },
                 yAxis: {
