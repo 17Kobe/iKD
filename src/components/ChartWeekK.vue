@@ -111,12 +111,13 @@
                 >
             </span>
         </div>
-
+        <el-button size="mini" style="position: absolute; left: 17px; top: 6px; padding: 0px 8px; background: transparent;"   @mousedown="showTradingVolume = true"
+            @mouseup="showTradingVolume = false">量</el-button>
         <!-- :updateArgs="[true, true, true]" -->
         <highcharts
             :options="columnChartOptions"
-            v-if="false"
-            style="position: relative; top: -2px; height: 48px; background: transparent"
+            style="position: relative; top: -2px; background: transparent"
+            v-if="showTradingVolume"
         ></highcharts>
     </div>
 </template>
@@ -129,7 +130,9 @@ export default {
     components: { highcharts: Chart },
     props: ['parentData'],
     data() {
-        return {};
+        return {
+            showTradingVolume: false,
+        };
     },
     computed: {
         stockData() {
@@ -515,11 +518,13 @@ export default {
             return {
                 chart: {
                     type: 'column',
-                    height: 70, // 設置圖表高度為100px
+                    height: 40, // 設置圖表高度為100px
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
                     zoomType: 'none',
                     pinchType: 'none',
                     panning: false,
+                    marginTop: 0, // 調整圖表上邊距
+                    marginBottom: 0, // 調整圖表下邊距
                 },
                 title: {
                     text: '',
@@ -541,6 +546,7 @@ export default {
                     labels: {
                         enabled: false, // 沒有顯示 Y 軸標纖
                     },
+                    gridLineWidth: 0, // 隱藏 Y 軸橫向灰線
                 },
                 plotOptions: {
                     column: {
@@ -558,6 +564,10 @@ export default {
     },
     created() {},
     watch: {},
-    methods: {},
+    methods: {
+        toggleTradingVolume() {
+            this.showTradingVolume = !this.showTradingVolume; 
+        },
+    },
 };
 </script>
