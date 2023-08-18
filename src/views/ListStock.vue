@@ -354,8 +354,6 @@
                         type="info"
                         plain
                         @click="doShowPolicy(scope.row.id)"
-                        @mouseenter="handleMouseEnter(scope.row.id)"
-                        @mouseleave="handleMouseLeave(scope.row.id)"
                         :style="[
                             scope.row.policy &&
                             scope.row.policy.settings &&
@@ -364,7 +362,7 @@
                             (scope.row.policy.settings.buy.length >= 1 || scope.row.policy.settings.sell.length >= 1)
                                 ? { width: 'auto' }
                                 : {},
-                            { 'text-align': 'left', 'line-height': '18px', padding: '3px 9px' },
+                            { 'text-align': 'left', 'line-height': '18px', padding: '3px 9px', position: 'relative' },
                         ]"
                     >
                         <div
@@ -434,15 +432,20 @@
                                             >{{ item.limit }}</span
                                         >&nbsp;{{ item.limit_desc }}
                                         <span
-                                            style="float: right"
+                                            style="position: absolute; top: -2px; right: 1px"
                                             v-if="
-                                                !showMoreButton.includes(scope.row.id) &&
                                                 scope.row.policy.settings.buy.length + scope.row.policy.settings.sell.length >
-                                                    5 &&
-                                                index === 5 - scope.row.policy.settings.buy.length - 1
+                                                    5 && index === 5 - scope.row.policy.settings.buy.length - 1
                                             "
-                                            ><button>
-                                                <i class="el-icon-more"></i>
+                                            ><button @click.stop="showPolicyMore(scope.row.id)">
+                                                <i
+                                                    style="font-size: 24px"
+                                                    :class="
+                                                        showMoreButton.includes(scope.row.id)
+                                                            ? 'el-icon-caret-top'
+                                                            : 'el-icon-caret-bottom'
+                                                    "
+                                                ></i>
                                                 <!-- 您可以在這裡添加按鈕內容 -->
                                             </button></span
                                         >
@@ -965,11 +968,9 @@ export default {
 
             return str;
         },
-        handleMouseEnter(id) {
-            this.showMoreButton.push(id);
-        },
-        handleMouseLeave(id) {
-            _.pull(this.showMoreButton, id);
+        showPolicyMore(id) {
+            if (this.showMoreButton.includes(id)) _.pull(this.showMoreButton, id);
+            else this.showMoreButton.push(id);
         },
     },
 };
