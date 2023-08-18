@@ -12,7 +12,7 @@
             id="stock-list"
         >
             <template v-slot:empty>
-                <el-skeleton :rows="19" animated />
+                <el-skeleton :rows="19" animated style="text-align: left" />
             </template>
             <el-table-column
                 fixed
@@ -1078,4 +1078,7 @@ input::-webkit-inner-spin-button
     background: #fffbec
 .hidden-icon
     visibility: hidden
+#stock-list .el-table__empty-text
+    width: 100%
+    margin: 10px
 </style>
