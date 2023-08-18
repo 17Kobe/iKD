@@ -609,8 +609,8 @@ export default {
 </script>
 
 <style lang="sass">
-.custom-button.el-button--primary.is-plain:focus
-    background-color: #ecf5ff
-    border-color: #b3d8ff
-    color: #409eff
+.custom-button.el-button--info.is-plain:focus
+    background-color: #f4f4f5
+    border-color: #d3d4d6
+    color: #909399
 </style>
