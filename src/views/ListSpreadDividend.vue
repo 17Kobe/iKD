@@ -12,6 +12,7 @@
                     href="#"
                     style="margin-left: 3px; text-decoration: underline; color: #409eff"
                     @click="toggleShowSpreadData"
+                    v-if="spreadList.length > 5"
                 >
                     <span v-if="modeSpread === '歷史' && show5HistorySpreadData">更多</span>
                     <span v-else-if="modeSpread === '歷史'">5筆</span></el-link
@@ -220,6 +221,7 @@
                     href="#"
                     style="margin-left: 3px; text-decoration: underline; color: #409eff"
                     @click="toggleShowDividendData"
+                    v-if="dividendList.length > 5"
                 >
                     <span
                         v-if="
