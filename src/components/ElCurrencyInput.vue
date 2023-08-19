@@ -25,12 +25,13 @@ export default {
         options: Object,
     },
     setup(props) {
-        const { inputRef, formattedValue } = useCurrencyInput(props.options);
+        const { inputRef, formattedValue, setValue } = useCurrencyInput(props.options);
 
         watch(
             () => props.modelValue,
             (newValue) => {
-                formattedValue.value = newValue;
+                // formattedValue.value = newValue; 這個方法沒有貨幣符號
+                setValue(newValue);
             }
         );
 
