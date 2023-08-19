@@ -12,7 +12,7 @@
 
 <script>
 import { useCurrencyInput } from 'vue-currency-input';
-import { onMounted } from 'vue';
+import { watch } from 'vue';
 
 export default {
     name: 'ElCurrencyInput',
@@ -26,6 +26,13 @@ export default {
     },
     setup(props) {
         const { inputRef, formattedValue } = useCurrencyInput(props.options);
+
+        watch(
+            () => props.modelValue,
+            (newValue) => {
+                formattedValue.value = newValue;
+            }
+        );
 
         return { inputRef, formattedValue };
     },
