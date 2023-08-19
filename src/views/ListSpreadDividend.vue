@@ -13,8 +13,8 @@
                     style="margin-left: 3px; text-decoration: underline; color: #409eff"
                     @click="toggleShowSpreadData"
                 >
-                    <span v-if="modeSpread === '歷史' && show5HistorySpreadData">5筆</span>
-                    <span v-else-if="modeSpread === '歷史'">全部</span></el-link
+                    <span v-if="modeSpread === '歷史' && show5HistorySpreadData">更多</span>
+                    <span v-else-if="modeSpread === '歷史'">5筆</span></el-link
                 >
             </el-col>
             <el-col :span="13" style="margin-right: 4px">
@@ -226,9 +226,9 @@
                             (modeDividend === '未來' && show5FutureDividendData) ||
                             (modeDividend === '歷史' && show5HistoryDividendData)
                         "
-                        >5筆</span
+                        >更多</span
                     >
-                    <span v-else>全部</span></el-link
+                    <span v-else>5筆</span></el-link
                 >
             </el-col>
             <el-col :span="13" style="margin-right: 4px">
