@@ -452,6 +452,14 @@ export default {
         netAssets() {
             return this.assets - this.liabilities;
         },
+        usAssets() {
+            const tempAssets = this.assetList.reduce((acc, { account, amount, isPositive }) => {
+                if (isPositive && account.includes('美金')) return acc + amount;
+                return acc;
+            }, 0);
+
+            return tempAssets;
+        },
         leverageAssetsd() {
             return ((this.liabilities * 100) / this.assets).toFixed(1);
         },
@@ -607,7 +615,11 @@ export default {
                 plugins: {
                     title: {
                         display: true,
-                        text: '資產配置',
+                        // text: '資產配置',
+                        text: `美金: $ ${Number((this.usAssets / 10000).toFixed(1))} 萬; 占比: ${(
+                            (this.usAssets * 100) /
+                            this.assets
+                        ).toFixed(1)}%`,
                         // align: 'start',
                         padding: {
                             top: 5,
