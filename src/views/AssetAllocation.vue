@@ -499,6 +499,9 @@ export default {
                 return acc;
             }, 0);
         },
+        stockSumOfCostReturn() {
+            return _.sumBy(this.spreadList, 'cost.return');
+        },
         stockCostExistAndTop5List() {
             // 存在 cost 設定的股票名稱
             return _.orderBy(
@@ -762,7 +765,8 @@ export default {
                     },
                     title: {
                         display: true,
-                        text: '股票本金 Top 5 的損益',
+                        // text: '股票本金 Top 5 的損益',
+                        text: `股票前5損益; 總計: $ ${this.stockSumOfCostReturn.toLocaleString('en-US')} 元`,
                         // align: 'start',
                         padding: {
                             top: 5,
