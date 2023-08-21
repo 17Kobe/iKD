@@ -1526,7 +1526,7 @@ const stock = {
                                 obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? '買x2' : '買'; // 必定買
                         }
                         // 最後一筆離今天是在5天內
-                        if (index === array.length - 1 && moment(obj.date).diff(moment(), 'days') <= 5) {
+                        if (index === array.length - 1 || moment().diff(moment(obj.date), 'days') <= 4) {
                             foundStock.badge =
                                 obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? '買x2' : '買'; // 必定買
                         }
@@ -1644,10 +1644,14 @@ const stock = {
                         // console.log('isReadyToSell=', isReadyToSell);
 
                         // 如果最後一天剛好也是賣; 是最後一筆且距今天差3天
+                        console.log(obj.is_sure_sell);
+                        console.log(moment().diff(moment(obj.date), 'days'));
+                        console.log(index);
+                        console.log(array.length);
                         if (
                             obj.is_sure_sell &&
                             (dataDailyLastDate.isSame(moment(obj.date)) ||
-                                (index === array.length - 1 && moment(obj.date).diff(moment(), 'days') <= 5))
+                                moment().diff(moment(obj.date), 'days') <= 4)
                         ) {
                             foundStock.badge = unit === 0.5 ? '賣½' : '賣'; // 必定賣
                         }
