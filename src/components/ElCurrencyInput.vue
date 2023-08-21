@@ -4,6 +4,7 @@
         :class="{ 'i-currency': true, disabled: isStock }"
         :modelValue="formattedValue"
         :style="isStock ? { 'pointer-events': 'none' } : {}"
+        @focus="selectAllText"
     >
         <template #prepend>$</template>
         <template #suffix><span style="position: relative; top: 8px; font-size: 10px">元</span> </template>
@@ -12,7 +13,7 @@
 
 <script>
 import { useCurrencyInput } from 'vue-currency-input';
-import { watch } from 'vue';
+import { watch, nextTick } from 'vue';
 
 export default {
     name: 'ElCurrencyInput',
@@ -35,7 +36,15 @@ export default {
             }
         );
 
-        return { inputRef, formattedValue };
+        const selectAllText = () => {
+            nextTick(() => {
+                setTimeout(() => {
+                    inputRef.value.select();
+                }, 100);
+            });
+        };
+
+        return { inputRef, formattedValue, selectAllText };
     },
 };
 </script>
