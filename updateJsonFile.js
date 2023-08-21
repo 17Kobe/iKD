@@ -34,9 +34,13 @@ const urls = [
     'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F000001V09:FO;timeslot=2012-01-01T00:00:00Z-' +
         today +
         'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
+    'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04AR8:FO;timeslot=2012-01-01T00:00:00Z-' +
+        today +
+        'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
+    
 ];
 
-const fundName = ['富達全球科技基金', '安聯台灣智慧基金'];
+const fundName = ['富達全球科技基金', '安聯台灣智慧基金', '貝萊德世界黃金基金A2'];
 
 function getPromise(url) {
     return new Promise(function (resolve) {
@@ -71,9 +75,6 @@ Promise.all(urls.map(getPromise)).then(function (stats) {
     // console.log(typeof myLocalstorage.stockList);
     // console.log(myLocalstorage);
     // console.log(myLocalstorage);
-
-    _.remove(myLocalstorageStockList, (obj) => obj.id === 'F0GBR04K8F');
-    _.remove(myLocalstorageStockList, (obj) => obj.id === 'F0GBR04AR8');
 
     stats.forEach((price, index) => {
         const foundStock = myLocalstorageStockList.find((obj) => obj.name === fundName[index]);
