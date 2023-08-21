@@ -980,6 +980,15 @@ const stock = {
             saveStockListToDb('stockList', state.stockList);
             this.dispatch('GET_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
+        SAVE_ALL_STOCK(state, data) {
+            // data 是 object {name: XXX, id: XXX}
+            console.log('SAVE_ALL_STOCK');
+            // console.log(data);
+            // state.stockList.push(data);
+            // console.log(state.currStockDayData);
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb('stockList', data);
+        },
         SAVE_STOCK_DIVIDEND_LAST_DATE(state) {
             console.log('SAVE_STOCK_DIVIDEND_LAST_DATE');
             state.stockList.forEach((o) => {

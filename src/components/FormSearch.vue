@@ -151,6 +151,9 @@ export default {
             // return this.$store.state.price.stockList;
             return this.$store.getters.getStockSortedList();
         },
+        stockList() {
+            return this.$store.state.price.stockList;
+        },
     },
     mounted() {},
     methods: {
@@ -370,18 +373,37 @@ export default {
                         .then((data) => {
                             // 將 JSON 資料存儲到 localStorage
                             try {
+                                let downloadLocalSotrage = [];
                                 for (const key in data) {
                                     if (key === 'crawlerDividendLastDate') localStorage.setItem(key, data[key]);
+                                    else if (key === 'stockList') {
+                                        localStorage.setItem(key, JSON.stringify(data[key]));
+                                        downloadLocalSotrage = data[key];
+                                    }
                                     else localStorage.setItem(key, JSON.stringify(data[key]));
                                 }
+                                // console.log(downloadLocalSotrage);
+                                downloadLocalSotrage.forEach((obj) => {
+                                    obj.calc_policy_date = "";
+                                    const foundStock = this.stockList.find((v) => v.id === obj.id);
+                                    if (foundStock)
+                                        obj.data = JSON.parse(JSON.stringify(foundStock.data)); //{ ...foundStock.data }; // 這種改法只有第一層 // 取值而已，不然會是 proxy(object)
+
+                                });
+                                // console.log(downloadLocalSotrage);
+                                this.$store.commit('SAVE_ALL_STOCK', downloadLocalSotrage);
+
                                 ElMessage({
                                     type: 'success',
                                     message: '完成同步線上的所有資料!',
                                 });
 
-                                const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
-                                indexedDB.deleteDatabase("wc");
+                                // saveStockListToDb('stockList', state.stockList);
                                 window.setTimeout( () => location.reload() , 1000);
+
+                                // const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+                                // indexedDB.deleteDatabase("wc");
+
                                 
 
                             } catch (e) {
