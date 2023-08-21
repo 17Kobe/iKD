@@ -1083,6 +1083,6 @@ input::-webkit-inner-spin-button
     width: 100%
     margin: 10px
 .el-skeleton.is-animated .el-skeleton__item
-    height: 81px
+    height: 80px
     margin-top: 0px
 </style>
