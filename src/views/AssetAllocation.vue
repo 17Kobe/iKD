@@ -766,7 +766,7 @@ export default {
                     title: {
                         display: true,
                         // text: '股票本金 Top 5 的損益',
-                        text: `股票前5損益; 總計: $ ${this.stockSumOfCostReturn.toLocaleString('en-US')} 元`,
+                        text: `股票損益; 總計: $ ${this.stockSumOfCostReturn.toLocaleString('en-US')} 元`,
                         // align: 'start',
                         padding: {
                             top: 5,
