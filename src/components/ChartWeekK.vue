@@ -50,7 +50,7 @@
                         title="平均成本線"
                         :style="[
                             last_price > cost[cost.length - 1][1]
-                                ? { 'background-color': '#ededed' }
+                                ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
                                 : { 'background-color': 'none' },
                             { color: '#4286f5', 'margin-left': '4px' },
                         ]"
@@ -66,7 +66,7 @@
                         title="MA(5)"
                         :style="[
                             last_price > ma5[ma5.length - 1][1]
-                                ? { 'background-color': '#ededed' }
+                                ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
                                 : { 'background-color': 'none' },
                             { color: '#834beb', 'margin-left': '4px' },
                         ]"
@@ -82,7 +82,7 @@
                         title="MA(10)"
                         :style="[
                             last_price > ma10[ma10.length - 1][1]
-                                ? { 'background-color': '#ededed' }
+                                ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
                                 : { 'background-color': 'none' },
                             { color: '#febd09', 'margin-left': '4px' },
                         ]"
@@ -98,7 +98,7 @@
                         title="MA(20)"
                         :style="[
                             last_price > ma20[ma20.length - 1][1]
-                                ? { 'background-color': '#ededed' }
+                                ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
                                 : { 'background-color': 'none' },
                             { color: '#fc7742', 'margin-left': '4px' },
                         ]"
