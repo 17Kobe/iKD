@@ -97,7 +97,11 @@
                                 : '',
                             ['item', 'signal'],
                         ]"
-                        :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
+                        :type="
+                            scope.row.badge === '買' || scope.row.badge === '準買' || scope.row.badge === '準買x2'
+                                ? 'danger'
+                                : 'success'
+                        "
                     >
                         {{ scope.row.name.replace('基金', '').replace('A2', '') }}
                     </el-badge>

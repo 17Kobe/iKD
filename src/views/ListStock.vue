@@ -28,7 +28,11 @@
                             :value="scope.row.badge"
                             class="item"
                             :class="[scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '', 'item']"
-                            :type="scope.row.badge === '買' || scope.row.badge === '準買' ? 'danger' : 'success'"
+                            :type="
+                                scope.row.badge === '買' || scope.row.badge === '準買' || scope.row.badge === '準買x2'
+                                    ? 'danger'
+                                    : 'success'
+                            "
                         >
                             <span
                                 style="font-size: 16px; font-weight: bold; cursor: pointer"
