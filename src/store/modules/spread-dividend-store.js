@@ -346,9 +346,7 @@ const dividend = {
         },
         getStockDividendList: (state) => (stockId) => {
             console.log('getStockDividendList');
-            const allDividendList = _.concat(state.dividendList, state.historyDividendList);
-
-            return _.orderBy(_.filter(allDividendList, { id: stockId }), ['trading_date'], ['asc']);
+            return _.orderBy(_.concat(_.filter(state.dividendList, { id: stockId }), _.filter(state.historyDividendList, { id: stockId })), ['trading_date'], ['asc']);
         },
     },
 };
