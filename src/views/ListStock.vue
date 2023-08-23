@@ -875,7 +875,7 @@ export default {
                     // console.log('commit real over');
                 }
                 // console.log('timerIdOfSetStockData');
-                const stockDataAndPolicy = this.queueStockDataList.splice(0, 6); // 一次取6個
+                const stockDataAndPolicy = this.queueStockDataList.splice(0); // 一次取6個
                 // console.log('commit begin');
                 // console.log(stockDataAndPolicy);
                 if (stockDataAndPolicy && !_.isEmpty(stockDataAndPolicy))

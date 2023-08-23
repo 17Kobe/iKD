@@ -288,14 +288,18 @@ const dividend = {
                                 (obj) => {
                                     if (obj.badge === '買') {
                                         return 0;
+                                    } else if (obj.badge === '準買x2') {
+                                        return 1;
                                     } else if (obj.badge === '準買') {
                                         return 2;
                                     } else if (obj.badge === '賣') {
                                         return 3;
-                                    } else if (obj.badge === '準賣') {
+                                    } else if (obj.badge === '準賣½') {
                                         return 4;
-                                    } else {
+                                    } else if (obj.badge === '準賣') {
                                         return 5;
+                                    } else {
+                                        return 6;
                                     }
                                 },
                                 ,
