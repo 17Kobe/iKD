@@ -857,10 +857,10 @@ export default {
         },
     },
     created() {
-        console.log('created asset');
+        // console.log('created asset');
         // 取得 localstorage 自選股，最先開始是 null 時，會給予預設值空矩陣
         const localAssetList = JSON.parse(localStorage.getItem('assetList')) || [];
-        console.log(localAssetList);
+        // console.log(localAssetList);
         if (_.isEmpty(localAssetList)) {
             localAssetList.push(...this.storeAssetList); // 新增 append 預設到 localStockList
             localStorage.setItem('assetList', JSON.stringify(localAssetList)); // 將 localStockList 從 object 轉 string 後塞到 localstorage
@@ -873,7 +873,7 @@ export default {
             acc.push({ account: account, amount: Math.abs(amount), isPositive: amount >= 0 });
             return acc;
         }, []);
-        console.log('created asset over!');
+        // console.log('created asset over!');
 
         // 歷史存款
         const localHistoryAssettList = JSON.parse(localStorage.getItem('historyAssetList')) || [];
@@ -881,7 +881,7 @@ export default {
     },
     methods: {
         onAddDeposit() {
-            console.log('onAddAsset');
+            console.log('onAddDeposit');
 
             const index = this.assetList.push({
                 account: '',
@@ -894,7 +894,7 @@ export default {
             });
         },
         onAddDebt() {
-            console.log('onAddAsset');
+            console.log('onAddDebt');
 
             const index = this.assetList.push({
                 account: '',

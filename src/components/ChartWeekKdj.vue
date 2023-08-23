@@ -352,12 +352,12 @@ export default {
                     formatter() {
                         let str = '<div>';
                         const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
-                        console.log('point');
-                        console.log(this.points);
+                        // console.log('point');
+                        // console.log(this.points);
                         // 在畫買賣訊號有可能沒有 points，是 undefined
                         this.points.forEach((point, index) => {
-                            console.log(point);
-                            console.log(index);
+                            // console.log(point);
+                            // console.log(index);
                             // const fontColor = point.y > point.point.open ? '#ee3333' : '#01aa00';
                             if (index === 0) {
                                 str += `<div style="text-align:center;">${moment(point.x).format(

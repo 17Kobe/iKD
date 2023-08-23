@@ -67,11 +67,11 @@ const stock = {
 
                     // 因為我有將 stockStartDate + 1天，所以有 Same
                     if (moment(siteExistsLatestDate).isSameOrAfter(stockStartDate) || force) {
-                        console.log('GET_STOCK_PRICE 3');
+                        // console.log('GET_STOCK_PRICE 3');
 
                         // 股票
                         if (stcokObjType === 'stock') {
-                            console.log('GET_STOCK_PRICE 31');
+                            // console.log('GET_STOCK_PRICE 31');
                             // 因為 axios 是非同步，但我要確實等它執行完才 resolve
                             await axios
                                 .get('https://api.finmindtrade.com/api/v4/data', {
@@ -84,7 +84,7 @@ const stock = {
                                 })
                                 // 成功
                                 .then((res) => {
-                                    console.log('GET_STOCK_PRICE 4');
+                                    // console.log('GET_STOCK_PRICE 4');
                                     commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: res.data });
                                 })
                                 // 失敗
@@ -94,7 +94,7 @@ const stock = {
                                     console.log(err);
                                 });
                         } else if (stcokObjType === 'exchange') {
-                            console.log('GET_STOCK_PRICE 31');
+                            // console.log('GET_STOCK_PRICE 31');
                             // 因為 axios 是非同步，但我要確實等它執行完才 resolve
                             await axios
                                 .get('https://api.finmindtrade.com/api/v4/data', {
@@ -107,7 +107,7 @@ const stock = {
                                 })
                                 // 成功
                                 .then((res) => {
-                                    console.log('GET_STOCK_PRICE 4');
+                                    // console.log('GET_STOCK_PRICE 4');
                                     commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: res.data });
                                 })
                                 // 失敗
@@ -942,7 +942,7 @@ const stock = {
         SAVE_STOCK_LIST(state, data) {
             console.log('SAVE_STOCK_LIST');
             // console.log(data);
-            console.log(typeof data);
+            // console.log(typeof data);
             state.stockList = data;
             // console.log(state.currStockDayData);
         },
@@ -1644,10 +1644,10 @@ const stock = {
                         // console.log('isReadyToSell=', isReadyToSell);
 
                         // 如果最後一天剛好也是賣; 是最後一筆且距今天差3天
-                        console.log(obj.is_sure_sell);
-                        console.log(moment().diff(moment(obj.date), 'days'));
-                        console.log(index);
-                        console.log(array.length);
+                        // console.log(obj.is_sure_sell);
+                        // console.log(moment().diff(moment(obj.date), 'days'));
+                        // console.log(index);
+                        // console.log(array.length);
                         if (
                             obj.is_sure_sell &&
                             (dataDailyLastDate.isSame(moment(obj.date)) ||
@@ -1738,7 +1738,7 @@ const stock = {
                     if (['賣'].includes(obj.buy_or_sell)) {
                         // 回測不包括 '現在',
                         // 在這裡處理每個元素
-                        console.log(obj);
+                        // console.log(obj);
                         if (obj.rate_of_return > maxEarn) maxEarn = obj.rate_of_return;
                         if (obj.rate_of_return < maxLose) maxLose = obj.rate_of_return;
 
@@ -1852,9 +1852,8 @@ const stock = {
                                 return entryDate >= oneYearAgo;
                             })
                             .forEach((item, index, array) => {
-                                console.log(item);
+                                // console.log(item);
                                 const k = item[1];
-                                const d = item[2];
 
                                 if (k < preK) {
                                     kdWReady = true;
@@ -1949,9 +1948,7 @@ const stock = {
                                     return entryDate >= oneYearAgo;
                                 })
                                 .forEach((item, index, array) => {
-                                    console.log(item);
                                     const k = item[1];
-                                    const d = item[2];
 
                                     if (k > preK) {
                                         kdMReady = true;

@@ -311,7 +311,7 @@ export default {
                 limit: this.sellOptions[foundIndex].default_limit,
                 limit_desc: this.sellOptions[foundIndex].default_limit_desc,
             });
-            console.log(index);
+            // console.log(index);
             // nextTick()會在DOM已掛載、渲染完成後，執行nextTick()內的程式碼
             // https://stackoverflow.com/questions/59749325/vue-set-focus-to-dynamic-input-box
             // this.$nextTick(() => {

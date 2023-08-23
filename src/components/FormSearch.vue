@@ -111,7 +111,7 @@ export default {
     name: 'component-form-search',
     data() {
         const validateDuplcate = (rule, value, callback) => {
-            console.log(value);
+            // console.log(value);
 
             if (_.some(this.customStockList, { id: value })) {
                 const selected = _.find(this.stockOptions, ['value', this.form.stockId]);
@@ -171,7 +171,7 @@ export default {
                 this.loading = false;
                 const optionList = [];
                 found.forEach((item) => {
-                    console.log(item);
+                    // console.log(item);
                     if (item.type && item.type === 'exchange')
                         optionList.push({ label: item.stock_name, value: item.stock_id, type: 'exchange' });
                     else optionList.push({ label: item.stock_name, value: item.stock_id, type: 'stock' });
@@ -219,7 +219,7 @@ export default {
                 type: 'warning',
             })
                 .then(() => {
-                    console.log(stockId);
+                    // console.log(stockId);
                     this.$store.commit('DEL_A_STOCK', stockId);
                     this.$store.commit('DEL_A_STOCK_DIVIDENDLIST', stockId);
                     ElMessage({
@@ -307,7 +307,7 @@ export default {
                 }
                 const dataString = JSON.stringify(data);
 
-                console.log(dataString);
+                // console.log(dataString);
 
                 // 將資料轉換成 Blob 物件
                 const blob = new Blob([dataString], { type: 'application/json' });
@@ -326,7 +326,7 @@ export default {
                             ref: 'gh-pages', // 指定分支為 gh-pages
                         },
                     });
-                    console.log(response);
+                    // console.log(response);
                     const sha = response.data.sha;
 
                     // 在這裡上傳到 Github
@@ -345,7 +345,7 @@ export default {
                             },
                         }
                     );
-                    console.log(uploadResponse);
+                    // console.log(uploadResponse);
                     ElMessage({
                         type: 'success',
                         message: '完成上傳同步資料至線上!',

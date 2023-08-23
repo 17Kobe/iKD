@@ -401,7 +401,7 @@ export default {
                         return acc;
                     }, []);
 
-                    console.log(sellSrc);
+                    // console.log(sellSrc);
 
                     // 先塞入索引，然後再對 form 排序
                     let form = _.orderBy(
@@ -418,7 +418,7 @@ export default {
                         ['desc', 'asc']
                     );
 
-                    console.log(form);
+                    // console.log(form);
 
                     let removeIndex = [];
                     sellSrc.forEach((obj) => {
@@ -426,9 +426,9 @@ export default {
                         const found = _.find(form, function (o) {
                             return o.cost === obj.sellPrice;
                         });
-                        console.log('=======');
-                        console.log(found);
-                        console.log(obj.sellNumber);
+                        // console.log('=======');
+                        // console.log(found);
+                        // console.log(obj.sellNumber);
                         if (found.number === obj.sellNumber) {
                             // 數量一致，代表全賣
                             // this.form.splice(found.index, 1);
@@ -440,17 +440,17 @@ export default {
                         }
                         // 部份刪
                         else {
-                            console.log(found.index);
-                            console.log(this.form[found.index].number);
-                            console.log(obj.sellNumber);
+                            // console.log(found.index);
+                            // console.log(this.form[found.index].number);
+                            // console.log(obj.sellNumber);
                             this.form[found.index].number = this.form[found.index].number - obj.sellNumber;
-                            console.log(this.form[found.index].number);
+                            // console.log(this.form[found.index].number);
                         }
                     });
-                    console.log(removeIndex);
+                    // console.log(removeIndex);
                     // 由大到小，準備要刪的index
                     removeIndex = _.reverse(_.sortBy(removeIndex));
-                    console.log(this.form);
+                    // console.log(this.form);
                     // 真正從 the.form 去刪除
                     removeIndex.forEach((v) => {
                         this.form.splice(v, 1);
