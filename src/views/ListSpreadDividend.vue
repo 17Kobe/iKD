@@ -98,7 +98,7 @@
                             ['item', 'signal'],
                         ]"
                         :type="
-                            scope.row.badge === '買' || scope.row.badge === '準買' || scope.row.badge === '準買x2'
+                            ['買', '準買', '準買x2'].includes(scope.row.badge)
                                 ? 'danger'
                                 : 'success'
                         "
