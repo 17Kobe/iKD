@@ -155,7 +155,7 @@ const stock = {
                     return 'ok';
                 })
             );
-            console.log('all ok');
+            // console.log('all ok');
             // 為了股票值全部更新完去更新資產值
             // 並且該值要讀 localstorage 才是最新的，vuex若沒開啟資產配置是不會是最新值，只是預設值
             const localAssetList = JSON.parse(localStorage.getItem('assetList')) || [];
@@ -173,7 +173,7 @@ const stock = {
                         return acc;
                     }, 0);
 
-                console.log('=======assets');
+                // console.log('=======assets');
 
                 // 存到歷史存款去
                 // 歷史存款要先從 localstorage 讀到並且存到 vuex，因為這原本是 AssetAllocation才去做的。而ADD_OR_UPDATE_HISTORY_ASSET_LIST是判斷vuex內容去更新的
@@ -2223,10 +2223,10 @@ const stock = {
             console.log('getStockDataWeeklyKdj');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            console.log(id);
-            console.log(found.data);
+            // console.log(id);
+            // console.log(found.data);
             // console.log(found.data.weekly_kdj);
-            if (found.data && found.data.weekly_kdj) console.log(found.data.weekly_kdj);
+            // if (found.data && found.data.weekly_kdj) console.log(found.data.weekly_kdj);
 
             return found.data && found.data.weekly_kdj
                 ? _.slice(found.data.weekly_kdj, -26).map((value) => [moment(value[0]).valueOf(), value[1], value[2], value[3]])
