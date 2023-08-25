@@ -87,7 +87,7 @@
                         :value="scope.row.badge"
                         class="item"
                         :class="[
-                            scope.row.badge === '買' || scope.row.badge === '賣' ? 'shake-base' : '',
+                            ['買', '買x2', '賣', '賣½'].includes(scope.row.badge) ? 'shake-base' : '',
                             scope.row.name.length >= 6
                                 ? 'l6'
                                 : scope.row.name.length >= 5
@@ -97,11 +97,7 @@
                                 : '',
                             ['item', 'signal'],
                         ]"
-                        :type="
-                            ['買', '準買', '準買x2'].includes(scope.row.badge)
-                                ? 'danger'
-                                : 'success'
-                        "
+                        :type="['買', '買x2', '準買', '準買x2'].includes(scope.row.badge) ? 'danger' : 'success'"
                     >
                         {{ scope.row.name.replace('基金', '').replace('A2', '') }}
                     </el-badge>
