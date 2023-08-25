@@ -386,8 +386,13 @@ export default {
                                 downloadLocalSotrage.forEach((obj) => {
                                     obj.calc_policy_date = "";
                                     const foundStock = this.stockList.find((v) => v.id === obj.id);
-                                    if (foundStock)
+                                    if (foundStock) {
+                                        // 跟 data 有關(last_price、last_price_date、last_price_spread)的也有跟 data一起改，否則data可能無更新時，會顯示錯的last_price
+                                        obj.last_price = foundStock.last_price;
+                                        obj.last_price_date = foundStock.last_price_date;
+                                        obj.last_price_spread = foundStock.last_price_spread;
                                         obj.data = JSON.parse(JSON.stringify(foundStock.data)); //{ ...foundStock.data }; // 這種改法只有第一層 // 取值而已，不然會是 proxy(object)
+                                    }
 
                                 });
                                 // console.log(downloadLocalSotrage);
