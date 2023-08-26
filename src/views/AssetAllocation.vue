@@ -574,7 +574,7 @@ export default {
                     },
                     title: {
                         display: true,
-                        text: `淨資產: $ ${Number((this.netAssets / 10000).toFixed(1))} 萬; 桿杆率: ${this.leverageAssetsd}%`,
+                        text: `淨資產: $ ${Number((this.netAssets / 10000).toFixed(1))} 萬。桿杆率: ${this.leverageAssetsd}%`,
                         // align: 'start',
                         padding: {
                             top: 5,
@@ -619,7 +619,7 @@ export default {
                     title: {
                         display: true,
                         // text: '資產配置',
-                        text: `美金: $ ${Number((this.usAssets / 10000).toFixed(1))} 萬; 占比: ${(
+                        text: `美金: $ ${Number((this.usAssets / 10000).toFixed(1))} 萬。占比: ${(
                             (this.usAssets * 100) /
                             this.assets
                         ).toFixed(1)}%`,
@@ -766,7 +766,7 @@ export default {
                     title: {
                         display: true,
                         // text: '股票本金 Top 5 的損益',
-                        text: `股票損益; 總計: $ ${this.stockSumOfCostReturn.toLocaleString('en-US')} 元`,
+                        text: `股票損益。總計: $ ${this.stockSumOfCostReturn.toLocaleString('en-US')} 元`,
                         // align: 'start',
                         padding: {
                             top: 5,
