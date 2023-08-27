@@ -228,7 +228,7 @@
                         }"
                     />
                 </el-col>
-                <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                <el-col :xs="3" :sm="3" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
                     <el-button type="danger" size="small" @click="onDelAsset(index, item.account)" round plain
                         ><i class="el-icon-minus"></i
                     ></el-button>
