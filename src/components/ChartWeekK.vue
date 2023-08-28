@@ -228,6 +228,8 @@ export default {
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
                     zoomType: 'none',
                     pinchType: 'none',
+                    marginLeft: 2, // 調整左邊邊界的空白
+                    marginRight: 2, // 調整右邊邊界的空白
                     panning: false,
                     // pinchType: 'x',
                     height: 100,

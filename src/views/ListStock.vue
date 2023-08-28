@@ -1014,7 +1014,7 @@ export default {
     padding-right: 5px
 
 .el-table .el-table__body .el-table_1_column_3
-    padding: 0 0 0 5px
+    padding: 0 0 0 0
 .el-table .el-table__body td
     padding: 0px 0
 // 為了解決table內cell要/n換行的問題
