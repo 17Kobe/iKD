@@ -939,8 +939,9 @@ export default {
         // },
 
         goToStockAnalysis(id) {
-            this.showStockAnalysis = true;
-            this.currentStockId = id;
+            // this.showStockAnalysis = true;
+            // this.currentStockId = id;
+            window.open('https://www.wantgoo.com/stock/' + id + '/technical-chart', '_blank');
         },
         toggleWeekK() {
             // this.showWeekK = !this.showWeekK;
