@@ -187,7 +187,7 @@
 
             <el-table-column label="星等" width="66" align="center">
                 <template #default="scope">
-                    <el-rate v-model="scope.row.star" size="small" :max="3"> </el-rate>
+                    <el-rate v-model="scope.row.star" size="small" :max="3" disabled> </el-rate>
                 </template>
             </el-table-column>
 
