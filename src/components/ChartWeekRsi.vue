@@ -256,6 +256,8 @@ export default {
                     // zoomType: '', // x, y不能在放大縮小，避免手滑在移動時間又動到放大縮小
                     zoomType: 'none',
                     pinchType: 'none',
+                    marginLeft: 2, // 調整左邊邊界的空白
+                    marginRight: 2, // 調整右邊邊界的空白
                     panning: false,
                     height: 100,
                     events: {

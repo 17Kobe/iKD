@@ -1530,6 +1530,9 @@ const stock = {
                             foundStock.badge =
                                 obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? '買x2' : '買'; // 必定買
                         }
+                    } else if (index === array.length - 1 || moment().diff(moment(obj.date), 'days') <= 4) {
+                        foundStock.badge =
+                            obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? '買x2取消' : '買取消'; // 必定買
                     }
                 } else if (
                     isReadyToSell &&
@@ -1620,7 +1623,7 @@ const stock = {
                         obj.reason.push('earn');
                         buyList = _.concat(currBuyList, buyList);
                     }
-                    if (!isCancelToSell || obj.is_latest) {
+                    if (!isCancelToSell || obj.is_latest) { // 用 or 是因為 is_sell && !isCancelToSell 也是要進來
                         buyList = _.concat(remainingBuyList, buyList);
                         // console.log(buyList);
 
@@ -1634,7 +1637,7 @@ const stock = {
                         if (unit === 0.5) dateOfFirstBuy = obj.date;
                         else dateOfFirstBuy = '';
 
-                        if (obj.is_sell) obj.is_sure_sell = true; // 最後一個日期如果真的是賣才會有確定賣，
+                        if (obj.is_sell) obj.is_sure_sell = true; // 進來是 is_sell 或 is_lastest，所以 is_latest 不一定是 is_sell, 最後一個日期如果真的是賣才會有確定賣，
 
                         // numberOfBuy = finalNumberOfSell;
                         // accPriceOfBuy = 0;
@@ -1653,7 +1656,10 @@ const stock = {
                             (dataDailyLastDate.isSame(moment(obj.date)) ||
                                 moment().diff(moment(obj.date), 'days') <= 4)
                         ) {
-                            foundStock.badge = unit === 0.5 ? '賣½' : '賣'; // 必定賣
+                            if (!isCancelToSell)
+                                foundStock.badge = unit === 0.5 ? '賣½' : '賣'; // 必定賣
+                            else
+                                foundStock.badge = unit === 0.5 ? '賣½取消' : '賣取消'; // 取消
                         }
 
                         // 如果是最後一個日期，且也不是賣，並且之前有買，這時要算一下最新狀態，有可能是要買入或賣出或都沒有，
