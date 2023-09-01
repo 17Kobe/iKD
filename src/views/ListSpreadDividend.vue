@@ -79,7 +79,13 @@
             </el-col>
         </el-row>
 
-        <el-table :data="showSpreadList" style="width: 100%" empty-text="無資料" :row-class-name="tableRowClassName">
+        <el-table
+            :data="showSpreadList"
+            id="tableSpreadList"
+            style="width: 100%"
+            empty-text="無資料"
+            :row-class-name="tableRowClassName"
+        >
             <el-table-column label="名稱" width="107" align="center" fixed>
                 <template #default="scope">
                     <el-badge
@@ -176,6 +182,12 @@
                             $ {{ scope.row.cost.return === 0 ? 0 : scope.row.cost.return.toLocaleString('en-US') }}
                         </span></el-tag
                     >
+                </template>
+            </el-table-column>
+
+            <el-table-column label="星等" width="66" align="center">
+                <template #default="scope">
+                    <el-rate v-model="scope.row.star" size="small" :max="3"> </el-rate>
                 </template>
             </el-table-column>
 
@@ -475,4 +487,7 @@ export default {
 
 .table-custom-row
     height: 26px
+
+#tableSpreadList .el-rate__icon
+    margin-right: 0
 </style>
