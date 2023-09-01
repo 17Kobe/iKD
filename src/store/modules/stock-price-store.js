@@ -1656,7 +1656,10 @@ const stock = {
                             (dataDailyLastDate.isSame(moment(obj.date)) ||
                                 moment().diff(moment(obj.date), 'days') <= 4)
                         ) {
-                            foundStock.badge = unit === 0.5 ? '賣½' : '賣'; // 必定賣
+                            if (!isCancelToSell)
+                                foundStock.badge = unit === 0.5 ? '賣½' : '賣'; // 必定賣
+                            else
+                                foundStock.badge = unit === 0.5 ? '賣½取消' : '賣取消'; // 取消
                         }
 
                         // 如果是最後一個日期，且也不是賣，並且之前有買，這時要算一下最新狀態，有可能是要買入或賣出或都沒有，
