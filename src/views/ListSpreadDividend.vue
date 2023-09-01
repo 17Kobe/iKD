@@ -97,11 +97,17 @@
                                 : '',
                             ['item', 'signal'],
                         ]"
-                        :type="['買', '買x2', '準買', '準買x2'].includes(scope.row.badge) ? 'danger' : ['買取消', '買x2取消', '賣取消', '賣½取消'].includes(scope.row.badge) ? 'info' : 'success'"
+                        :type="
+                            ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge)
+                                ? 'danger'
+                                : ['買取消', '買x2取消', '賣取消', '賣½取消'].includes(scope.row.badge)
+                                ? 'info'
+                                : 'success'
+                        "
                     >
-                        {{ scope.row.name.replace('基金', '').replace('A2', '') }}
+                        {{ scope.row.name.replace('基金', '').replace('A2', '').replace('投資級', '') }}
                     </el-badge>
-                    <span v-else>{{ scope.row.name.replace('基金', '').replace('A2', '') }}</span>
+                    <span v-else>{{ scope.row.name.replace('基金', '').replace('A2', '').replace('投資級', '') }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="漲跌幅" width="70" align="right" header-align="right" v-if="modeSpread === '目前'">
