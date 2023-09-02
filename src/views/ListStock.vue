@@ -1047,12 +1047,7 @@ input::-webkit-inner-spin-button
 
 .shake-base > .el-badge__content
     text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00
-    animation-name: shake-base
-    animation-duration: 5s
-    animation-iteration-count: infinite
-    animation-timing-function: ease-in-out
-    animation-delay: 0s
-    animation-play-state: running
+    animation: shake-base 2s infinite ease-in-out
     right: -20px
     top: -9px
     opacity: 0.9
@@ -1067,17 +1062,14 @@ input::-webkit-inner-spin-button
 
 @keyframes shake-base
     0%, 100%
-        transform: translate3d(-2px, 0, 0)
-    10%, 90%
-        transform: translate3d(+4px, 0, 0)
-    20%, 80%
-        transform: translate3d(-4px, 0, 0)
-    30%, 70%
-        transform: translate3d(+4px, 0, 0)
-    40%, 60%
-        transform: translate3d(-4px, 0, 0)
+        transform: translateX(0)
+    25%
+        transform: translateX(-4px)
     50%
-        transform: translate3d(+4px, 0, 0)
+        transform: translateX(4px)
+    75%
+        transform: translateX(-4px)
+
 
 // 自訂想專注的顏色
 .el-table .color-row
