@@ -28,8 +28,12 @@
                         top: -index * 22 + 'px',
                         left: '0', // 左對齊
                         display: 'inline-block',
-                        minWidth: status.includes('KD 鈍化') ? '53px' : '77px',
-                        background: status.includes('KD 鈍化') ? 'rgb(170, 170, 170)' : 'rgb(242, 139, 130)',
+                        minWidth: ['KD 鈍化', 'KD 超買', 'KD 超賣'].includes(status) ? '53px' : '77px',
+                        background: status.includes('KD 鈍化')
+                            ? 'rgb(170, 170, 170)'
+                            : status.includes('KD 超買')
+                            ? 'rgb(103, 194, 58)'
+                            : 'rgb(242, 139, 130)',
                         color: 'white',
                         padding: '0px 3px',
                         borderRadius: '10px',

@@ -2024,6 +2024,10 @@ const stock = {
             const lastestK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
             const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
             const lastThirdK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 3][1];
+
+            if (lastestK >= 80) kdStatus.push('KD 超買');
+            if (lastestK <= 20) kdStatus.push('KD 超賣');
+
             if (lastestK >= 80 && lastSecondK >= 80 && lastThirdK >= 80) kdStatus.push('KD 鈍化');
             if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus.push('KD 鈍化');
             foundStock.kd_status = kdStatus;
