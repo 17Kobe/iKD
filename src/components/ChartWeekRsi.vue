@@ -19,22 +19,29 @@
                 width: 100%;
             "
         >
-            <span style="order: 1">
+            <span style="order: 1; position: relative">
                 <span
-                    style="
-                        display: inline-block;
-                        min-width: 48px;
-                        background-color: rgb(103, 194, 58);
-                        color: white;
-                        padding: 0px 3px;
-                        border-radius: 10px;
-                        font-size: 12px;
-                        opacity: 0.83;
-                        line-height: 1.5;
-                    "
-                    :class="[rsi5Hint === 'RSI 最高' ? 'shake-base' : '', 'cell-chart']"
-                    >{{ rsi5Hint }}</span
+                    v-for="(status, index) in stockData.rsi_status"
+                    :key="index"
+                    :style="{
+                        position: 'absolute',
+                        top: -index * 22 + 'px',
+                        left: '0', // 左對齊
+                        display: 'inline-block',
+                        minWidth: ['RSI 超買', 'RSI 超賣', 'RSI 最高'].includes(status) ? '58px' : '80px',
+                        background: ['RSI 超買', 'RSI 最高', 'RSI 接近最高'].includes(status)
+                            ? 'rgb(103, 194, 58)'
+                            : 'rgb(242, 139, 130)',
+                        color: 'white',
+                        padding: '0px 3px',
+                        borderRadius: '10px',
+                        fontSize: '12px',
+                        opacity: '0.83',
+                        lineHeight: '1.5',
+                    }"
                 >
+                    {{ status }}
+                </span>
             </span>
             <span style="order: 2">
                 <span style="color: #4286f5">RSI(5)</span>:
@@ -42,8 +49,8 @@
                 <span style="color: #e75c9a"> {{ rsi5[rsi5.length - 1][1] >= 50 ? '最高' : '最低' }} </span
                 >{{
                     rsi5[rsi5.length - 1][1] >= 50
-                        ? ': ' + Math.round(rsi5Max * 100) / 100
-                        : ': ' + Math.round(rsi5Min * 100) / 100
+                        ? ': ' + Math.round(stockData.data.weekly_rsi_max * 100) / 100
+                        : ': ' + Math.round(stockData.data.weekly_rsi_min * 100) / 100
                 }}
             </span>
         </div>
@@ -70,24 +77,6 @@ export default {
         // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
         rsi5() {
             return this.stockDataOfRsiPrice.map((value) => [value[0], value[1]]);
-        },
-        rsi5Max() {
-            return this.$store.getters.getStockDataWeeklyRsiMax(this.parentData);
-            // return this.stockData.data && this.stockData.data.weekly_rsi_max ? this.stockData.data.weekly_rsi_max.toFixed(2) : '';
-        },
-        rsi5Min() {
-            return this.$store.getters.getStockDataWeeklyRsiMin(this.parentData);
-        },
-        rsi5Hint() {
-            let str = '';
-            const lastRsi = _.last(this.rsi5)[1];
-            if (this.rsi5Max !== '') {
-                // console.log(this.rsi5Max);
-                // console.log(lastRsi);
-                if (lastRsi < this.rsi5Max && this.rsi5Max - lastRsi <= 3) str = 'RSI 接近最高';
-                else if (lastRsi >= this.rsi5Max) str = 'RSI 最高';
-            }
-            return str;
         },
         stockData() {
             console.log('stockData');

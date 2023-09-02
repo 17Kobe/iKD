@@ -2032,6 +2032,20 @@ const stock = {
             if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus.push('KD 鈍化');
             foundStock.kd_status = kdStatus;
 
+            // 算 rsi線圖的 badge
+            let rsiStatus = [];
+
+            const lastestRsi = foundTempStock.data.weekly_rsi[foundTempStock.data.weekly_rsi.length - 1][1];
+            const weeklyRsiMax = foundTempStock.data.weekly_rsi_max;
+            const weeklyRsiMin = foundTempStock.data.weekly_rsi_min;
+            if (weeklyRsiMax) {
+                if (lastestRsi < weeklyRsiMax && weeklyRsiMax - lastestRsi <= 3) rsiStatus.push('RSI 接近最高');
+                else if (lastestRsi >= weeklyRsiMax) rsiStatus.push('RSI 最高');
+            }
+            if (lastestRsi >= 70) rsiStatus.push('RSI 超買');
+            if (lastestRsi <= 30) rsiStatus.push('RSI 超賣');
+            foundStock.rsi_status = rsiStatus;
+
             // 算 k線圖的 badge
             let kStatus = [];
 
@@ -2049,8 +2063,6 @@ const stock = {
                     kOpenValue = lastThirdValueAarray[1];
 
                 if (kOpenValue !== 0) kStatus.push('停利 ' + kOpenValue);
-
-                // kStatus.push('多頭2');
             }
 
             const lastPrice = foundStock.last_price;
