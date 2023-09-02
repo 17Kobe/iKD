@@ -28,7 +28,13 @@
                             :value="scope.row.badge"
                             class="item"
                             :class="[['買', '買x2', '賣', '賣½'].includes(scope.row.badge) ? 'shake-base' : '', 'item']"
-                            :type="['買', '買x2', '準買', '準買x2'].includes(scope.row.badge) ? 'danger' : ['買取消', '買x2取消', '賣取消', '賣½取消'].includes(scope.row.badge) ? 'info' : 'success'"
+                            :type="
+                                ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge)
+                                    ? 'danger'
+                                    : ['買取消', '買x2取消', '賣取消', '賣½取消'].includes(scope.row.badge)
+                                    ? 'info'
+                                    : 'success'
+                            "
                         >
                             <span
                                 style="font-size: 16px; font-weight: bold; cursor: pointer"
@@ -1040,6 +1046,7 @@ input::-webkit-inner-spin-button
     padding: 0 10px
 
 .shake-base > .el-badge__content
+    text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00
     animation-name: shake-base
     animation-duration: 5s
     animation-iteration-count: infinite
@@ -1048,7 +1055,7 @@ input::-webkit-inner-spin-button
     animation-play-state: running
     right: -20px
     top: -9px
-    opacity: 0.83
+    opacity: 0.9
 
 // 全部 drawer title 變下面沒那麼多
 .el-drawer__header

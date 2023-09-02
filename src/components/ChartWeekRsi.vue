@@ -507,6 +507,7 @@ export default {
 
 <style lang="sass">
 .cell-chart.shake-base
+    text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00
     animation-name: shake-base
     animation-duration: 5s
     animation-iteration-count: infinite
@@ -515,5 +516,5 @@ export default {
     animation-play-state: running
     right: -20px
     top: -9px
-    opacity: 0.83
+    opacity: 0.9
 </style>
