@@ -1623,7 +1623,8 @@ const stock = {
                         obj.reason.push('earn');
                         buyList = _.concat(currBuyList, buyList);
                     }
-                    if (!isCancelToSell || obj.is_latest) { // 用 or 是因為 is_sell && !isCancelToSell 也是要進來
+                    if (!isCancelToSell || obj.is_latest) {
+                        // 用 or 是因為 is_sell && !isCancelToSell 也是要進來
                         buyList = _.concat(remainingBuyList, buyList);
                         // console.log(buyList);
 
@@ -1653,13 +1654,11 @@ const stock = {
                         // console.log(array.length);
                         if (
                             obj.is_sure_sell &&
-                            (dataDailyLastDate.isSame(moment(obj.date)) ||
-                                moment().diff(moment(obj.date), 'days') <= 4)
+                            (dataDailyLastDate.isSame(moment(obj.date)) || moment().diff(moment(obj.date), 'days') <= 4)
                         ) {
-                            if (!isCancelToSell)
-                                foundStock.badge = unit === 0.5 ? '賣½' : '賣'; // 必定賣
-                            else
-                                foundStock.badge = unit === 0.5 ? '賣½取消' : '賣取消'; // 取消
+                            if (!isCancelToSell) foundStock.badge = unit === 0.5 ? '賣½' : '賣';
+                            // 必定賣
+                            else foundStock.badge = unit === 0.5 ? '賣½取消' : '賣取消'; // 取消
                         }
 
                         // 如果是最後一個日期，且也不是賣，並且之前有買，這時要算一下最新狀態，有可能是要買入或賣出或都沒有，
@@ -2023,7 +2022,7 @@ const stock = {
             foundStock.kd_status = kdStatus;
 
             // 算 k線圖的 badge
-            let kStatus = '';
+            let kStatus = [];
             const lastestValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 1];
             const lastSecondValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 2];
             const lastThirdValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 3];
@@ -2037,7 +2036,36 @@ const stock = {
                 if (lastThirdValueAarray[4] >= lastThirdValueAarray[1] && lastThirdValueAarray[1] > kOpenValue)
                     kOpenValue = lastThirdValueAarray[1];
 
-                if (kOpenValue !== 0) kStatus = '停利 ' + kOpenValue;
+                if (kOpenValue !== 0) kStatus.push('停利 ' + kOpenValue);
+
+                // kStatus.push('多頭2');
+            }
+
+            const lastPrice = foundStock.last_price;
+            const lastestMa5 = foundTempStock.data.ma5[foundTempStock.data.ma5.length - 1][1];
+            const lastSecondMa5 = foundTempStock.data.ma5[foundTempStock.data.ma5.length - 2][1];
+            const lastestMa10 = foundTempStock.data.ma10[foundTempStock.data.ma10.length - 1][1];
+            const lastSecondMa10 = foundTempStock.data.ma10[foundTempStock.data.ma10.length - 2][1];
+            const lastestMa20 = foundTempStock.data.ma20[foundTempStock.data.ma20.length - 1][1];
+            const lastSecondMa20 = foundTempStock.data.ma20[foundTempStock.data.ma20.length - 2][1];
+
+            console.log(foundStock);
+            console.log(lastPrice);
+            console.log(lastestMa5);
+            console.log(lastestMa10);
+            console.log(lastestMa20);
+            if (lastPrice > lastestMa5 && lastPrice > lastestMa10 && lastPrice > lastestMa20) {
+                if (lastestMa5 > lastestMa10 && lastestMa5 > lastestMa20 && lastestMa10 > lastestMa20) kStatus.push('強多頭');
+                else kStatus.push('多頭');
+            } else if (lastestMa5 > lastestMa10 && lastSecondMa5 <= lastSecondMa10) {
+                if (lastestMa10 > lastestMa20 && lastSecondMa10 <= lastSecondMa20) kStatus.push('強多頭信號');
+                else kStatus.push('多頭信號');
+            } else if (lastPrice < lastestMa5 && lastPrice < lastestMa10 && lastPrice < lastestMa20) {
+                if (lastestMa5 < lastestMa10 && lastestMa5 < lastestMa20 && lastestMa10 < lastestMa20) kStatus.push('強空頭');
+                else kStatus.push('空頭');
+            } else if (lastestMa5 < lastestMa10 && lastSecondMa5 >= lastSecondMa10) {
+                if (lastestMa10 < lastestMa20 && lastSecondMa10 >= lastSecondMa20) kStatus.push('強空頭信號');
+                else kStatus.push('空頭信號');
             }
             foundStock.k_status = kStatus;
 

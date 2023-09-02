@@ -19,27 +19,29 @@
                 width: 100%;
             "
         >
-            <span style="order: 1">
+            <span style="order: 1; position: relative">
                 <span
-                    style="
-                        display: inline-block;
-                        min-width: 48px;
-                        background-color: rgb(103, 194, 58);
-                        color: white;
-                        padding: 0px 3px;
-                        border-radius: 10px;
-                        font-size: 12px;
-                        opacity: 0.83;
-                        line-height: 1.5;
-                    "
-                    :class="[
-                        this.stockData.k_status && parseFloat(this.stockData.k_status.split(' ')[1]) > this.stockData.last_price
-                            ? 'shake-base'
-                            : '',
-                        'cell-chart',
-                    ]"
-                    >{{ this.stockData.k_status ? this.stockData.k_status : '' }}</span
+                    v-for="(status, index) in stockData.k_status"
+                    :key="index"
+                    :style="{
+                        position: 'absolute',
+                        top: -index * 20 + 'px',
+                        left: '0',
+                        display: 'inline-block',
+                        minWidth: status.includes('停利') ? '68px' : 'auto',
+                        whiteSpace: status.includes('停利') ? 'normal' : 'nowrap',
+                        backgroundColor: ['停利', '空頭'].includes(status) ? 'rgb(103, 194, 58)' : 'rgb(242, 139, 130)',
+                        color: 'white',
+                        padding: '0px 5px',
+                        borderRadius: '10px',
+                        fontSize: '12px',
+                        opacity: '0.90',
+                        lineHeight: '1.5',
+                    }"
+                    :class="[stockData.last_price > parseFloat(status.split(' ')[1]) ? 'shake-base' : '', 'cell-chart']"
                 >
+                    {{ status }}
+                </span>
             </span>
             <span style="order: 2">
                 <span v-if="last_price"
