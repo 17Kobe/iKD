@@ -2,6 +2,7 @@ import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
 import { saveStockListToDb } from '@/shared/idbUtils.js';
+import GlobalSettings from '@/store/data/global-settings.json';
 
 const defaultState = {
     usdExchange: 30,
@@ -2013,16 +2014,23 @@ const stock = {
             }
 
             // 算 kd圖的 badge
-            let kdStatus = '';
+            let kdStatus = [];
+            const stockFairValueList = GlobalSettings.stock_fair_value;
+            const foundFairValueStock = stockFairValueList.find((v) => v.id === stockId);
+            if (foundFairValueStock) {
+                kdStatus.push('合理價 ' + foundFairValueStock.fair_value);
+            }
+
             const lastestK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
             const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
             const lastThirdK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 3][1];
-            if (lastestK >= 80 && lastSecondK >= 80 && lastThirdK >= 80) kdStatus = 'KD 鈍化';
-            if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus = 'KD 鈍化';
+            if (lastestK >= 80 && lastSecondK >= 80 && lastThirdK >= 80) kdStatus.push('KD 鈍化');
+            if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus.push('KD 鈍化');
             foundStock.kd_status = kdStatus;
 
             // 算 k線圖的 badge
             let kStatus = [];
+
             const lastestValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 1];
             const lastSecondValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 2];
             const lastThirdValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 3];
@@ -2049,11 +2057,6 @@ const stock = {
             const lastestMa20 = foundTempStock.data.ma20[foundTempStock.data.ma20.length - 1][1];
             const lastSecondMa20 = foundTempStock.data.ma20[foundTempStock.data.ma20.length - 2][1];
 
-            console.log(foundStock);
-            console.log(lastPrice);
-            console.log(lastestMa5);
-            console.log(lastestMa10);
-            console.log(lastestMa20);
             if (lastPrice > lastestMa5 && lastPrice > lastestMa10 && lastPrice > lastestMa20) {
                 if (lastestMa5 > lastestMa10 && lastestMa5 > lastestMa20 && lastestMa10 > lastestMa20) kStatus.push('強勢多頭');
                 else kStatus.push('多頭');

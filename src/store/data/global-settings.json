@@ -6,21 +6,21 @@
             "method": "殖利率法",
             "id": "0056",
             "multiples": 20,
-            "fair_value": 31.4
+            "fair_value": 31.42
         },
         {
             "name": "中信金",
             "id": "2891",
             "method": "殖利率法",
             "multiples": 20,
-            "fair_value": 21.1
+            "fair_value": 21.08
         },
         {
             "name": "國泰永續高股息",
             "id": "00878",
             "method": "殖利率法",
             "multiples": 20,
-            "fair_value": 20.7
+            "fair_value": 20.67
         },
         {
             "name": "中華電",

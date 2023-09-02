@@ -19,22 +19,28 @@
                 width: 100%;
             "
         >
-            <span style="order: 1">
+            <span style="order: 1; position: relative">
                 <span
-                    style="
-                        display: inline-block;
-                        min-width: 48px;
-                        background-color: rgb(170, 170, 170);
-                        color: white;
-                        padding: 0px 3px;
-                        border-radius: 10px;
-                        font-size: 12px;
-                        opacity: 0.83;
-                        line-height: 1.5;
-                    "
-                    v-if="stockData.kd_status"
-                    >{{ this.stockData.kd_status }}</span
+                    v-for="(status, index) in stockData.kd_status"
+                    :key="index"
+                    :style="{
+                        position: 'absolute',
+                        top: -index * 22 + 'px',
+                        left: '0', // 左對齊
+                        display: 'inline-block',
+                        minWidth: status.includes('KD 鈍化') ? '53px' : '77px',
+                        background: status.includes('KD 鈍化') ? 'rgb(170, 170, 170)' : 'rgb(242, 139, 130)',
+                        color: 'white',
+                        padding: '0px 3px',
+                        borderRadius: '10px',
+                        fontSize: '12px',
+                        opacity: '0.83',
+                        lineHeight: '1.5',
+                    }"
+                    :class="[stockData.last_price < parseFloat(status.split(' ')[1]) ? 'shake-base' : '']"
                 >
+                    {{ status }}
+                </span>
             </span>
             <span style="order: 2">
                 <span style="color: #4286f5">K</span>: {{ k[k.length - 1][1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
