@@ -59,14 +59,14 @@
                 </span>
             </span>
             <span style="order: 2">
-                <span v-if="last_price"
-                    ><span style="color: #000000" title="股價">&nbsp;{{ last_price }}</span></span
+                <span v-if="stockData.last_price"
+                    ><span style="color: #000000" title="股價">&nbsp;{{ stockData.last_price }}</span></span
                 >
                 <span v-if="cost && cost.length > 0">
                     <span
                         title="平均成本線"
                         :style="[
-                            last_price > cost[cost.length - 1][1]
+                            stockData.last_price > cost[cost.length - 1][1]
                                 ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
                                 : { 'background-color': 'none' },
                             { color: '#4286f5', 'margin-left': '4px' },
@@ -82,7 +82,7 @@
                     <span
                         title="MA(5)"
                         :style="[
-                            last_price > ma5[ma5.length - 1][1]
+                            stockData.last_price > ma5[ma5.length - 1][1]
                                 ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
                                 : { 'background-color': 'none' },
                             { color: '#834beb', 'margin-left': '4px' },
@@ -98,7 +98,7 @@
                     <span
                         title="MA(10)"
                         :style="[
-                            last_price > ma10[ma10.length - 1][1]
+                            stockData.last_price > ma10[ma10.length - 1][1]
                                 ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
                                 : { 'background-color': 'none' },
                             { color: '#febd09', 'margin-left': '4px' },
@@ -114,7 +114,7 @@
                     <span
                         title="MA(20)"
                         :style="[
-                            last_price > ma20[ma20.length - 1][1]
+                            stockData.last_price > ma20[ma20.length - 1][1]
                                 ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
                                 : { 'background-color': 'none' },
                             { color: '#fc7742', 'margin-left': '4px' },
@@ -172,10 +172,6 @@ export default {
         tradingVolume() {
             console.log('tradingVolume');
             return this.$store.getters.getStockDataWeeklyTradingVolume(this.parentData);
-        },
-        last_price() {
-            console.log('last_price');
-            return this.$store.getters.getStockLastPrice(this.parentData);
         },
         ma5() {
             console.log('ma5');

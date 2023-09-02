@@ -75,16 +75,13 @@ export default {
     },
     computed: {
         // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
-        rsi5() {
-            return this.stockDataOfRsiPrice.map((value) => [value[0], value[1]]);
-        },
         stockData() {
             console.log('stockData');
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             return this.$store.getters.getStock(this.parentData);
         },
 
-        stockDataOfRsiPrice() {
+        rsi5() {
             console.log('stockDataOfRsiPrice');
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
@@ -123,7 +120,7 @@ export default {
             );
         },
         stockDataOfPolicyResultSell() {
-            console.log('stockDataOfPolicyResultBuy');
+            console.log('stockDataOfPolicyResultSell');
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 需要小於365天，1年
@@ -142,7 +139,7 @@ export default {
             );
         },
         stockDataOfPolicyResultBuyOrSellCancel() {
-            console.log('stockDataOfPolicyResultBuy');
+            console.log('stockDataOfPolicyResultBuyOrSellCancel');
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 需要小於365天，1年
