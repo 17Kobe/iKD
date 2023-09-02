@@ -25,12 +25,15 @@
                     :key="index"
                     :style="{
                         position: 'absolute',
-                        top: -index * 20 + 'px',
+                        top: -index * 22 + 'px',
                         left: '0',
                         display: 'inline-block',
                         minWidth: status.includes('停利') ? '68px' : 'auto',
                         whiteSpace: status.includes('停利') ? 'normal' : 'nowrap',
-                        backgroundColor: ['停利', '空頭'].includes(status) ? 'rgb(103, 194, 58)' : 'rgb(242, 139, 130)',
+                        backgroundColor:
+                            status.includes('停利') || ['空頭', '強空頭', '空頭信號', '強空頭信號'].includes(status)
+                                ? 'rgb(103, 194, 58)'
+                                : 'rgb(242, 139, 130)',
                         color: 'white',
                         padding: '0px 5px',
                         borderRadius: '10px',
