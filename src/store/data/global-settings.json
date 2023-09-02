@@ -26,7 +26,8 @@
             "name": "中華電",
             "id": "2412",
             "method": "殖利率法",
-            "multiples": 112.2
+            "multiples": 25,
+            "fair_value": 112.2
         }
     ]
 }
