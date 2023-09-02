@@ -185,7 +185,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="星等" width="66" align="center">
+            <el-table-column label="星等" width="66" align="center" v-if="modeSpread === '目前'">
                 <template #default="scope">
                     <el-rate v-model="scope.row.star" size="small" :max="3" disabled> </el-rate>
                 </template>
@@ -203,6 +203,8 @@
                         }}
                     </span>
                 </template>
+            </el-table-column>
+            <el-table-column label="合理價" width="66" align="center" prop="fair_value" v-if="modeSpread === '目前'">
             </el-table-column>
             <el-table-column
                 :label="modeSpread === '目前' ? '累積股數&nbsp;&nbsp;' : '賣出股數&nbsp;&nbsp;'"

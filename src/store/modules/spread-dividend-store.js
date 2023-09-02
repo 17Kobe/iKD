@@ -1,6 +1,7 @@
 import axios from 'axios';
 import _ from 'lodash';
 import moment from 'moment';
+import GlobalSettings from '@/store/data/global-settings.json';
 
 const defaultState = {
     dividendList: [],
@@ -280,14 +281,18 @@ const dividend = {
                         ['desc']
                     );
                     if (!isCurrentAndOnlyBuy) {
-                        let noBuyList = 
-                            _.filter(rootState.price.stockList, function (obj) {
-                                return !obj.cost;
-                            });
-                        tempSpreadList = _.orderBy(_.concat(tempSpreadList, noBuyList),
-                            ['order'],
-                            ['asc']
-                        );
+                        let noBuyList = _.filter(rootState.price.stockList, function (obj) {
+                            return !obj.cost;
+                        });
+
+                        tempSpreadList = _.orderBy(_.concat(tempSpreadList, noBuyList), ['order'], ['asc']);
+                        const stockFairValueList = GlobalSettings.stock_fair_value;
+                        tempSpreadList.forEach((obj) => {
+                            const foundFairValueStock = stockFairValueList.find((v) => v.id === obj.id);
+                            if (foundFairValueStock) {
+                                obj.fair_value = foundFairValueStock.fair_value;
+                            }
+                        });
                     }
                 } else {
                     // 歷史
@@ -326,7 +331,11 @@ const dividend = {
         },
         getStockDividendList: (state) => (stockId) => {
             console.log('getStockDividendList');
-            return _.orderBy(_.concat(_.filter(state.dividendList, { id: stockId }), _.filter(state.historyDividendList, { id: stockId })), ['trading_date'], ['asc']);
+            return _.orderBy(
+                _.concat(_.filter(state.dividendList, { id: stockId }), _.filter(state.historyDividendList, { id: stockId })),
+                ['trading_date'],
+                ['asc']
+            );
         },
     },
 };
