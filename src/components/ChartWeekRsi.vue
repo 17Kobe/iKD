@@ -22,16 +22,16 @@
             <span style="order: 1">
                 <span
                     style="
-                    display: inline-block;
-                    min-width: 48px;
-                    background-color: rgb(103, 194, 58);
-                    color: white;
-                    padding: 0px 3px;
-                    border-radius: 10px;
-                    font-size 12px;
-                    opacity: 0.83;
-                    line-height: 1.5;
-                "
+                        display: inline-block;
+                        min-width: 48px;
+                        background-color: rgb(103, 194, 58);
+                        color: white;
+                        padding: 0px 3px;
+                        border-radius: 10px;
+                        font-size: 12px;
+                        opacity: 0.83;
+                        line-height: 1.5;
+                    "
                     :class="[rsi5Hint === 'RSI 最高' ? 'shake-base' : '', 'cell-chart']"
                     >{{ rsi5Hint }}</span
                 >
@@ -39,8 +39,7 @@
             <span style="order: 2">
                 <span style="color: #4286f5">RSI(5)</span>:
                 {{ rsi5[rsi5.length - 1][1].toFixed(2) }}
-                <span style="color: #e75c9a">
-                    {{ rsi5[rsi5.length - 1][1] >= 50 ? '最高' : '最低' }} </span
+                <span style="color: #e75c9a"> {{ rsi5[rsi5.length - 1][1] >= 50 ? '最高' : '最低' }} </span
                 >{{
                     rsi5[rsi5.length - 1][1] >= 50
                         ? ': ' + Math.round(rsi5Max * 100) / 100

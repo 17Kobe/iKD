@@ -22,16 +22,16 @@
             <span style="order: 1">
                 <span
                     style="
-                    display: inline-block;
-                    min-width: 48px;
-                    background-color: rgb(103, 194, 58);
-                    color: white;
-                    padding: 0px 3px;
-                    border-radius: 10px;
-                    font-size 12px;
-                    opacity: 0.83;
-                    line-height: 1.5;
-                "
+                        display: inline-block;
+                        min-width: 48px;
+                        background-color: rgb(103, 194, 58);
+                        color: white;
+                        padding: 0px 3px;
+                        border-radius: 10px;
+                        font-size: 12px;
+                        opacity: 0.83;
+                        line-height: 1.5;
+                    "
                     :class="[
                         this.stockData.k_status && parseFloat(this.stockData.k_status.split(' ')[1]) > this.stockData.last_price
                             ? 'shake-base'
