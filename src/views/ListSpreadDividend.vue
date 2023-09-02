@@ -216,10 +216,10 @@
                     </span></template
                 >
             </el-table-column>
-            <el-table-column label="市值&nbsp;" width="75" align="right" header-align="right">
+            <el-table-column label="市值&nbsp;&nbsp;" width="80" align="right" header-align="right">
                 <template #default="scope">
                     <span v-if="scope.row.cost"
-                        >$ {{ (scope.row.cost.sum + scope.row.cost.return).toLocaleString('en-US') }}</span
+                        >$ {{ (scope.row.cost.sum + scope.row.cost.return).toLocaleString('en-US') }}&nbsp;&nbsp;</span
                     >
                 </template>
             </el-table-column>

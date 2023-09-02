@@ -28,10 +28,16 @@
                         top: -index * 22 + 'px',
                         left: '0',
                         display: 'inline-block',
-                        minWidth: status.includes('停利') ? '68px' : 'auto',
+                        minWidth: status.includes('停利')
+                            ? '68px'
+                            : ['強多頭信號', '強空頭信號'].includes(status)
+                            ? '71px'
+                            : ['多頭信號', '空頭信號'].includes(status)
+                            ? '60px'
+                            : 'auto',
                         whiteSpace: status.includes('停利') ? 'normal' : 'nowrap',
                         backgroundColor:
-                            status.includes('停利') || ['空頭', '強空頭', '空頭信號', '強空頭信號'].includes(status)
+                            status.includes('停利') || ['空頭', '強勢空頭', '空頭信號', '強空頭信號'].includes(status)
                                 ? 'rgb(103, 194, 58)'
                                 : 'rgb(242, 139, 130)',
                         color: 'white',
@@ -41,7 +47,13 @@
                         opacity: '0.90',
                         lineHeight: '1.5',
                     }"
-                    :class="[stockData.last_price > parseFloat(status.split(' ')[1]) ? 'shake-base' : '', 'cell-chart']"
+                    :class="[
+                        stockData.last_price > parseFloat(status.split(' ')[1]) ||
+                        ['多頭信號', '強多頭信號', '空頭信號', '強空頭信號'].includes(status)
+                            ? 'shake-base'
+                            : '',
+                        'cell-chart',
+                    ]"
                 >
                     {{ status }}
                 </span>

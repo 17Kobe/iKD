@@ -2055,17 +2055,19 @@ const stock = {
             console.log(lastestMa10);
             console.log(lastestMa20);
             if (lastPrice > lastestMa5 && lastPrice > lastestMa10 && lastPrice > lastestMa20) {
-                if (lastestMa5 > lastestMa10 && lastestMa5 > lastestMa20 && lastestMa10 > lastestMa20) kStatus.push('強多頭');
+                if (lastestMa5 > lastestMa10 && lastestMa5 > lastestMa20 && lastestMa10 > lastestMa20) kStatus.push('強勢多頭');
                 else kStatus.push('多頭');
             } else if (lastestMa5 > lastestMa10 && lastSecondMa5 <= lastSecondMa10) {
                 if (lastestMa10 > lastestMa20 && lastSecondMa10 <= lastSecondMa20) kStatus.push('強多頭信號');
                 else kStatus.push('多頭信號');
+            } else if (lastestMa5 < lastestMa10 && lastestMa5 < lastestMa20 && lastestMa10 < lastestMa20) {
+                kStatus.push('強勢空頭');
             } else if (lastPrice < lastestMa5 && lastPrice < lastestMa10 && lastPrice < lastestMa20) {
-                if (lastestMa5 < lastestMa10 && lastestMa5 < lastestMa20 && lastestMa10 < lastestMa20) kStatus.push('強空頭');
-                else kStatus.push('空頭');
+                kStatus.push('空頭');
+            } else if (lastestMa10 < lastestMa20 && lastSecondMa10 >= lastSecondMa20) {
+                kStatus.push('強空頭信號');
             } else if (lastestMa5 < lastestMa10 && lastSecondMa5 >= lastSecondMa10) {
-                if (lastestMa10 < lastestMa20 && lastSecondMa10 >= lastSecondMa20) kStatus.push('強空頭信號');
-                else kStatus.push('空頭信號');
+                kStatus.push('空頭信號');
             }
             foundStock.k_status = kStatus;
 
