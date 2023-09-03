@@ -24,9 +24,9 @@
                     v-for="(status, index) in stockData.kd_status"
                     :key="index"
                     :title="
-                        status === 'KD 鈍化' && kdj[kdj.length - 1][1] >= 80
+                        status === 'KD 高檔鈍化'
                             ? '連續3根K值在80以上'
-                            : status === 'KD 鈍化' && kdj[kdj.length - 1][1] <= 20
+                            : status === 'KD 低檔鈍化'
                             ? '連續3根K值在20以下'
                             : status === 'KD ≥ 80超買'
                             ? 'K值>=80為超買'
@@ -41,7 +41,7 @@
                         top: -index * 22 + 'px',
                         left: '0', // 左對齊
                         display: 'inline-block',
-                        minWidth: ['KD 鈍化', 'KD W底', 'KD M頭'].includes(status)
+                        minWidth: ['KD W底', 'KD M頭'].includes(status)
                             ? '53px'
                             : ['KD ≥ 80超買', 'KD ≤ 20超賣'].includes(status)
                             ? '76px'
@@ -50,7 +50,7 @@
                             : ['每年固定日買', '每年固定日賣'].includes(status)
                             ? '81px'
                             : '77px',
-                        background: ['KD 鈍化', '成本價未跌過'].includes(status)
+                        background: ['KD 高檔鈍化', 'KD 低檔鈍化', '成本價未跌過'].includes(status)
                             ? 'rgb(170, 170, 170)'
                             : ['KD ≥ 80超買', 'KD 死亡交叉', 'KD 往下轉折', 'KD M頭', '每年固定日賣'].includes(status)
                             ? 'rgb(103, 194, 58)'

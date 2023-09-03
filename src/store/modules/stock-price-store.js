@@ -2040,8 +2040,8 @@ const stock = {
             if (lastestK >= 80) kdStatus.push('KD ≥ 80超買');
             if (lastestK <= 20) kdStatus.push('KD ≤ 20超賣');
 
-            if (lastestK >= 80 && lastSecondK >= 80 && lastThirdK >= 80) kdStatus.push('KD 鈍化');
-            if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus.push('KD 鈍化');
+            if (lastestK >= 80 && lastSecondK >= 80 && lastThirdK >= 80) kdStatus.push('KD 高檔鈍化');
+            if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus.push('KD 低檔鈍化');
             foundStock.kd_status = kdStatus;
 
             // 算 rsi線圖的 badge
@@ -2069,7 +2069,7 @@ const stock = {
             const lastestValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 1];
             const lastSecondValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 2];
             const lastThirdValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 3];
-            if (kdStatus.includes('KD 鈍化')) {
+            if (kdStatus.includes('KD 高檔鈍化')) {
                 // date open high low close
                 // 紅棒最低點
                 let kOpenValue = 0;
@@ -2080,6 +2080,17 @@ const stock = {
                     kOpenValue = lastThirdValueAarray[1];
 
                 if (kOpenValue !== 0) kStatus.push('停利 ' + kOpenValue);
+                // } else if (kdStatus.includes('KD 低檔鈍化')) {
+                //     // date open high low close
+                //     // 紅棒最低點
+                //     let kOpenValue = 0;
+                //     if (lastestValueAarray[4] >= lastestValueAarray[1]) kOpenValue = lastestValueAarray[1];
+                //     if (lastSecondValueAarray[4] >= lastSecondValueAarray[1] && lastSecondValueAarray[1] > kOpenValue)
+                //         kOpenValue = lastSecondValueAarray[1];
+                //     if (lastThirdValueAarray[4] >= lastThirdValueAarray[1] && lastThirdValueAarray[1] > kOpenValue)
+                //         kOpenValue = lastThirdValueAarray[1];
+
+                //     if (kOpenValue !== 0) kStatus.push('停損 ' + kOpenValue);
             }
 
             const lastPrice = foundStock.last_price;

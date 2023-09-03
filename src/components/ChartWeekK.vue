@@ -41,7 +41,7 @@
                             : status === '強空頭信號'
                             ? 'MA10下穿MA20視為強空頭信號'
                             : status.includes('停利')
-                            ? '當KD鈍化後，使用箱子戰法計算近3根且為紅燭的最高開盤價為停利價'
+                            ? '當KD高檔鈍化後，使用箱子戰法計算近3根且為紅燭的最高開盤價為停利價'
                             : ''
                     "
                     :style="{
@@ -69,7 +69,7 @@
                         lineHeight: '1.5',
                     }"
                     :class="[
-                        (status.includes('停利') && stockData.last_price > parseFloat(status.split(' ')[1])) ||
+                        (status.includes('停利') && stockData.last_price < parseFloat(status.split(' ')[1])) ||
                         ['多頭信號', '強多頭信號', '空頭信號', '強空頭信號'].includes(status)
                             ? 'shake-base'
                             : '',
