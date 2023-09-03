@@ -8,7 +8,7 @@
         >
         </highcharts>
         <div
-            v-if="k && k.length > 0"
+            v-if="kdj && kdj.length > 0"
             style="
                 display: flex;
                 justify-content: space-between;
@@ -47,9 +47,10 @@
                 </span>
             </span>
             <span style="order: 2">
-                <span style="color: #4286f5">K</span>: {{ k[k.length - 1][1].toFixed(2) }} <span style="color: #e75c9a">D</span>:
-                {{ d[d.length - 1][1].toFixed(2) }}
-                <span v-if="showJLine"><span style="color: #febd09">J</span>: {{ j[j.length - 1][1].toFixed(2) }}</span>
+                <span style="color: #4286f5">K</span>: {{ kdj[kdj.length - 1][1].toFixed(2) }}
+                <span style="color: #e75c9a">D</span>:
+                {{ kdj[kdj.length - 1][2].toFixed(2) }}
+                <span v-if="showJLine"><span style="color: #febd09">J</span>: {{ kdj[kdj.length - 1][3].toFixed(2) }}</span>
             </span>
         </div>
 
@@ -73,24 +74,14 @@ export default {
         };
     },
     computed: {
-        // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
-        k() {
-            return this.stockDataOfKdjPrice.map((value) => [value[0], value[1]]);
-        },
-        d() {
-            return this.stockDataOfKdjPrice.map((value) => [value[0], value[2]]);
-        },
-        j() {
-            return this.stockDataOfKdjPrice.map((value) => [value[0], value[3]]);
-        },
         // 如果您希望最大值和最小值使用天花板和地板的十進位值，而不使用偏移量，您可以將 chartMinMaxValues 函數修改如下：
         chartMinMaxValues() {
-            const kValues = this.k.map((value) => value[1]);
-            const dValues = this.d.map((value) => value[1]);
+            const kValues = this.kdj.map((value) => value[1]);
+            const dValues = this.kdj.map((value) => value[2]);
             let allValues;
 
             if (this.showJLine) {
-                const jValues = this.j.map((value) => value[1]);
+                const jValues = this.kdj.map((value) => value[3]);
 
                 allValues = [...kValues, ...dValues, ...jValues];
             } else {
@@ -112,8 +103,8 @@ export default {
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             return this.$store.getters.getStock(this.parentData);
         },
-        stockDataOfKdjPrice() {
-            console.log('stockDataOfKdjPrice');
+        kdj() {
+            console.log('kdj');
             // console.log(this.stockDataOfPolicy);
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             // 只取出最後52筆的週KD資料出來，約1年，因為1年52週
@@ -192,8 +183,8 @@ export default {
         allDividendList() {
             const dividendList = this.$store.getters.getStockDividendList(this.parentData);
             console.log(this.parentData);
-            return _.filter(this.k, (entry, index) => {
-                const startDate = index > 0 ? moment(this.k[index - 1][0]).add(1, 'day') : null;
+            return _.filter(this.kdj, (entry, index) => {
+                const startDate = index > 0 ? moment(this.kdj[index - 1][0]).add(1, 'day') : null;
                 const endDate = moment(entry[0]);
 
                 return Boolean(
@@ -567,17 +558,17 @@ export default {
                     {
                         name: 'K線',
                         color: '#4286f5',
-                        data: this.k,
+                        data: this.kdj.map((item) => [item[0], item[1]]),
                     },
                     {
                         name: 'D線',
                         color: '#e75c9a',
-                        data: this.d,
+                        data: this.kdj.map((item) => [item[0], item[2]]),
                     },
                     {
                         name: 'J線',
                         color: '#febd09',
-                        data: this.j,
+                        data: this.kdj.map((item) => [item[0], item[3]]),
                         visible: this.showJLine,
                     },
                     {
