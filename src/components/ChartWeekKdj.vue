@@ -61,6 +61,7 @@
                         fontSize: '12px',
                         opacity: '0.83',
                         lineHeight: '1.5',
+                        boxShadow: status.includes('合理價') ? '1px 1px 5px rgba(0, 0, 0, 0.3)' : 'none',
                     }"
                     :class="[
                         (status.includes('合理價') && stockData.last_price < parseFloat(status.split(' ')[1])) ||
