@@ -169,10 +169,10 @@ export default {
             console.log('ohlc');
             return this.$store.getters.getStockDataWeekly(this.parentData);
         },
-        tradingVolume() {
-            console.log('tradingVolume');
-            return this.$store.getters.getStockDataWeeklyTradingVolume(this.parentData);
-        },
+        // tradingVolume() {
+        //     console.log('tradingVolume');
+        //     return this.$store.getters.getStockDataWeeklyTradingVolume(this.parentData);
+        // },
         ma5() {
             console.log('ma5');
             return this.$store.getters.getStockDataWeeklyMa5(this.parentData);
@@ -606,7 +606,14 @@ export default {
                 series: [
                     {
                         name: '成交量',
-                        data: this.tradingVolume,
+                        data: this.ohlc.map((item) => {
+                            const color = item[4] >= item[1] ? '#d41c1c' : '#65b206';
+                            return {
+                                // x: item[0], // [0]可以不用
+                                y: item[5], // 長條圖的高度
+                                color: color, // 根據條件設置顏色
+                            };
+                        }),
                     },
                 ],
             };

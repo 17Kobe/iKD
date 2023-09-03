@@ -2243,24 +2243,8 @@ const stock = {
                       value[2],
                       value[3],
                       value[4],
+                      value[5],
                   ])
-                : [];
-            // kd 一定要去直取 policy，而非取 stock，才能Policy有改有連動
-            // getStockPolicy: (state, getters) => (id) => _.has(getters.getStock(id), 'policy') ? getters.getStock(id).policy : null,
-            // _.has(_.find(state.stockList, ['id', id]), 'policy') ? _.find(state.stockList, ['id', id]).policy : null,
-        },
-        getStockDataWeeklyTradingVolume: (state, getters) => (id) => {
-            console.log('getStockDataWeeklyTradingVolume');
-            // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
-            // const found = _.find(state.stockList, ['id', id]);
-            const found = getters.getStock(id);
-            // const found = getters.getStock(id);
-            return found.data && found.data.weekly
-                ? _.slice(found.data.weekly, -26).map((value) => ({
-                      x: moment(value[0]).valueOf(),
-                      y: value[5],
-                      color: value[4] >= value[1] ? '#d41c1c' : '#65b206',
-                  }))
                 : [];
             // kd 一定要去直取 policy，而非取 stock，才能Policy有改有連動
             // getStockPolicy: (state, getters) => (id) => _.has(getters.getStock(id), 'policy') ? getters.getStock(id).policy : null,
