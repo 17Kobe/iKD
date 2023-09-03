@@ -1522,15 +1522,18 @@ const stock = {
                             obj.unit = currSumNumberOfBuy2;
                             foundStock.badge =
                                 obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? '買x2' : '買'; // 必定買
+                            foundStock.badge_reason = obj.reason;
                         }
                         // 最後一筆離今天是在5天內
                         if (index === array.length - 1 || moment().diff(moment(obj.date), 'days') <= 4) {
                             foundStock.badge =
                                 obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? '買x2' : '買'; // 必定買
+                            foundStock.badge_reason = obj.reason;
                         }
                     } else if (index === array.length - 1 || moment().diff(moment(obj.date), 'days') <= 4) {
                         foundStock.badge =
                             obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? '買x2取消' : '買取消'; // 必定買
+                        foundStock.badge_reason = obj.reason;
                     }
                 } else if (
                     isReadyToSell &&
@@ -1657,6 +1660,7 @@ const stock = {
                             if (!isCancelToSell) foundStock.badge = unit === 0.5 ? '賣½' : '賣';
                             // 必定賣
                             else foundStock.badge = unit === 0.5 ? '賣½取消' : '賣取消'; // 取消
+                            foundStock.badge_reason = obj.reason;
                         }
 
                         // 如果是最後一個日期，且也不是賣，並且之前有買，這時要算一下最新狀態，有可能是要買入或賣出或都沒有，
