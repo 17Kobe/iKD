@@ -106,7 +106,7 @@
                         :type="
                             ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge)
                                 ? 'danger'
-                                : ['買取消', '買x2取消', '賣取消', '賣½取消'].includes(scope.row.badge)
+                                : ['取消買', '取消買x2', '取消賣', '取消賣½'].includes(scope.row.badge)
                                 ? 'info'
                                 : 'success'
                         "

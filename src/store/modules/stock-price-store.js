@@ -1532,7 +1532,7 @@ const stock = {
                         }
                     } else if (index === array.length - 1 || moment().diff(moment(obj.date), 'days') <= 4) {
                         foundStock.badge =
-                            obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? '買x2取消' : '買取消'; // 必定買
+                            obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? '取消買x2' : '取消買'; // 必定買
                         foundStock.badge_reason = obj.reason;
                     }
                 } else if (
@@ -1659,7 +1659,7 @@ const stock = {
                         ) {
                             if (!isCancelToSell) foundStock.badge = unit === 0.5 ? '賣½' : '賣';
                             // 必定賣
-                            else foundStock.badge = unit === 0.5 ? '賣½取消' : '賣取消'; // 取消
+                            else foundStock.badge = unit === 0.5 ? '取消賣½' : '取消賣'; // 取消
                             foundStock.badge_reason = obj.reason;
                         }
 
