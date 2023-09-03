@@ -78,51 +78,51 @@
                         }}</span
                     ></span
                 >
-                <span v-if="ma5 && ma5.length > 0">
+                <span v-if="ma && ma.length > 0">
                     <span
                         title="MA(5)"
                         :style="[
-                            stockData.last_price > ma5[ma5.length - 1][1]
+                            stockData.last_price > ma[ma.length - 1][1]
                                 ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
                                 : { 'background-color': 'none' },
                             { color: '#834beb', 'margin-left': '4px' },
                         ]"
                         >{{
-                            ma5[ma5.length - 1][1] >= 100
-                                ? Number(ma5[ma5.length - 1][1].toFixed(0))
-                                : Number(ma5[ma5.length - 1][1].toFixed(2))
+                            ma[ma.length - 1][1] >= 100
+                                ? Number(ma[ma.length - 1][1].toFixed(0))
+                                : Number(ma[ma.length - 1][1].toFixed(2))
                         }}</span
                     ></span
                 >
-                <span v-if="ma10 && ma10.length > 0">
+                <span v-if="ma && ma.length > 0">
                     <span
                         title="MA(10)"
                         :style="[
-                            stockData.last_price > ma10[ma10.length - 1][1]
+                            stockData.last_price > ma[ma.length - 1][2]
                                 ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
                                 : { 'background-color': 'none' },
                             { color: '#febd09', 'margin-left': '4px' },
                         ]"
                         >{{
-                            ma10[ma10.length - 1][1] >= 100
-                                ? Number(ma10[ma10.length - 1][1].toFixed(0))
-                                : Number(ma10[ma10.length - 1][1].toFixed(2))
+                            ma[ma.length - 1][1] >= 100
+                                ? Number(ma[ma.length - 1][2].toFixed(0))
+                                : Number(ma[ma.length - 1][2].toFixed(2))
                         }}</span
                     ></span
                 >
-                <span v-if="ma20 && ma20.length > 0">
+                <span v-if="ma && ma.length > 0">
                     <span
                         title="MA(20)"
                         :style="[
-                            stockData.last_price > ma20[ma20.length - 1][1]
+                            stockData.last_price > ma[ma.length - 1][3]
                                 ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
                                 : { 'background-color': 'none' },
                             { color: '#fc7742', 'margin-left': '4px' },
                         ]"
                         >{{
-                            ma20[ma20.length - 1][1] >= 100
-                                ? Number(ma20[ma20.length - 1][1].toFixed(0))
-                                : Number(ma20[ma20.length - 1][1].toFixed(2))
+                            ma[ma.length - 1][1] >= 100
+                                ? Number(ma[ma.length - 1][3].toFixed(0))
+                                : Number(ma[ma.length - 1][3].toFixed(2))
                         }}</span
                     ></span
                 >
@@ -173,17 +173,9 @@ export default {
         //     console.log('tradingVolume');
         //     return this.$store.getters.getStockDataWeeklyTradingVolume(this.parentData);
         // },
-        ma5() {
-            console.log('ma5');
-            return this.$store.getters.getStockDataWeeklyMa5(this.parentData);
-        },
-        ma10() {
-            console.log('ma10');
-            return this.$store.getters.getStockDataWeeklyMa10(this.parentData);
-        },
-        ma20() {
-            console.log('ma20');
-            return this.$store.getters.getStockDataWeeklyMa20(this.parentData);
+        ma() {
+            console.log('ma');
+            return this.$store.getters.getStockDataWeeklyMa(this.parentData);
         },
         cost() {
             console.log('cost');
@@ -205,9 +197,9 @@ export default {
             // 用 minValue及 maxValue 來判斷，若maxValue<100，則用小數2位數。minValue>=100則用小數0位數
             const ohlcHighValues = this.ohlc.map((value) => value[2]);
             const ohlcLowValues = this.ohlc.map((value) => value[3]);
-            const ma5Values = this.ma5.map((value) => value[1]);
-            const ma10Values = this.ma10.map((value) => value[1]);
-            const ma20Values = this.ma20.map((value) => value[1]);
+            const ma5Values = this.ma.map((value) => value[1]);
+            const ma10Values = this.ma.map((value) => value[2]);
+            const ma20Values = this.ma.map((value) => value[3]);
             const costValues = this.cost.map((value) => value[1]);
 
             const allHighValues = [...ohlcHighValues, ...ma5Values, ...ma10Values, ...ma20Values, ...costValues];
@@ -459,7 +451,7 @@ export default {
                         name: 'MA5線',
                         color: '#834beb',
                         lineWidth: 1,
-                        data: this.ma5,
+                        data: this.ma.map((item) => [item[0], item[1]]),
                         dataGrouping: {
                             // anchor: 'end',
                             // firstAnchor: 'end',
@@ -472,7 +464,7 @@ export default {
                         name: 'MA10線',
                         color: '#febd09',
                         lineWidth: 1,
-                        data: this.ma10,
+                        data: this.ma.map((item) => [item[0], item[2]]),
                         dataGrouping: {
                             // anchor: 'end',
                             // firstAnchor: 'end',
@@ -485,7 +477,7 @@ export default {
                         name: 'MA20線',
                         color: '#fc7742',
                         lineWidth: 1,
-                        data: this.ma20,
+                        data: this.ma.map((item) => [item[0], item[3]]),
                         dataGrouping: {
                             // anchor: 'end',
                             // firstAnchor: 'end',

@@ -359,25 +359,20 @@ const stock = {
         async CALC_STOCK_WEEKLY_MA({ state }, stockId) {
             console.log('CALC_STOCK_WEEKLY_MA');
 
-            // const index = _.findIndex(state.stockList, ['id', stockId]);
             const foundStock = state.tempStockList.find((v) => v.id === stockId);
 
-            let weeklyMaData = { ma5: [], ma10: [], ma20: [] };
-            [5, 10, 20].forEach((limit) => {
-                let maDataX = [];
-                for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
-                    const startIndex = k - limit - 1 < 0 ? 0 : k - limit - 1; // 如果減完小於0，就=0。正常寫法是-3+1，但我寫-2就好了
-                    const endIndex = k;
-                    const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
-                    const rangeCloseArray = _.map(range2dArray, (v) => v[4]);
-                    const average = _.mean(rangeCloseArray);
+            const weeklyMaData = [];
 
-                    const date = foundStock.data.weekly[endIndex][0];
+            for (let k = 0; k < foundStock.data.weekly.length; k++) {
+                const date = foundStock.data.weekly[k][0];
 
-                    maDataX.push([date, average]);
-                }
-                weeklyMaData['ma' + limit] = maDataX;
-            });
+                const ma5 = k >= 4 ? _.mean(_.map(foundStock.data.weekly.slice(k - 4, k + 1), (v) => v[4])) : null;
+                const ma10 = k >= 9 ? _.mean(_.map(foundStock.data.weekly.slice(k - 9, k + 1), (v) => v[4])) : null;
+                const ma20 = k >= 19 ? _.mean(_.map(foundStock.data.weekly.slice(k - 19, k + 1), (v) => v[4])) : null;
+
+                weeklyMaData.push([date, ma5, ma10, ma20]);
+            }
+
             return weeklyMaData;
         },
         async CALC_STOCK_WEEKLY_COST_LINE({ state }, stockId) {
@@ -1204,6 +1199,8 @@ const stock = {
                 foundStock.data.daily = foundStock.data.daily || []; // 有可能是 null 就變成 []
                 foundStock.data.weekly = foundStock.data.weekly || []; // 有可能是 null 就變成 []
                 foundStock.data.weekly_kdj = foundStock.data.weekly_kdj || []; // 有可能是 null 就變成 []
+                foundStock.data.weekly_rsi = foundStock.data.weekly_rsi || []; // 有可能是 null 就變成 []
+                foundStock.data.weekly_ma = foundStock.data.weekly_ma || []; // 有可能是 null 就變成 []
                 foundStock.data.ma_buy = foundStock.data.ma_buy || []; // 有可能是 null 就變成 [] 第一條MA線
                 foundStock.data.ma_sell = foundStock.data.ma_sell || []; // 有可能是 null 就變成 [] 第二條MA線
                 foundStock.data.cost = foundStock.data.cost || []; // 有可能是 null 就變成 [] 第二條MA線
@@ -1312,9 +1309,7 @@ const stock = {
                 tempStockListStockData = {};
                 tempStockListStockData.weekly_kdj = weekly_kdj_data;
                 tempStockListStockData.weekly_rsi = weekly_rsi_data;
-                tempStockListStockData.ma5 = weekly_ma_data.ma5;
-                tempStockListStockData.ma10 = weekly_ma_data.ma10;
-                tempStockListStockData.ma20 = weekly_ma_data.ma20;
+                tempStockListStockData.weekly_ma = weekly_ma_data;
                 tempStockListStockData.cost = weekly_cost_line_data;
                 const targetStock = _.find(state.tempStockList, { id: stockId });
                 if (targetStock) {
@@ -1328,9 +1323,7 @@ const stock = {
                 foundStock.data.weekly_rsi = _.slice(weekly_rsi_data, -26);
                 foundStock.data.weekly_rsi_max = weekly_rsi_max;
                 foundStock.data.weekly_rsi_min = weekly_rsi_min;
-                foundStock.data.ma5 = _.takeRight(weekly_ma_data.ma5, 26);
-                foundStock.data.ma10 = _.takeRight(weekly_ma_data.ma10, 26);
-                foundStock.data.ma20 = _.takeRight(weekly_ma_data.ma20, 26);
+                foundStock.data.weekly_ma = _.slice(weekly_ma_data, -26);
                 foundStock.data.cost = _.slice(weekly_cost_line_data, -26);
 
                 // console.log(foundStock);
@@ -1368,6 +1361,7 @@ const stock = {
                 tempStockListStockData = {};
                 tempStockListStockData.weekly_kdj = weekly_kdj_data;
                 tempStockListStockData.weekly_rsi = weekly_rsi_data;
+                tempStockListStockData.weekly_ma = weekly_ma_data;
 
                 let weekly_rsi_max = 0;
                 let weekly_rsi_min = 0;
@@ -1375,9 +1369,12 @@ const stock = {
                 weekly_rsi_min = _.minBy(weekly_rsi_data, (element) => element[1])[1];
                 foundStock.data.weekly_rsi_max = weekly_rsi_max;
                 foundStock.data.weekly_rsi_min = weekly_rsi_min;
+                // foundStock.data.weekly_ma = _.slice(weekly_ma_data, -26); // TODO: 暫時硬改
+                // delete foundStock.data.ma5;
+                // delete foundStock.data.ma10;
+                // delete foundStock.data.ma20;
                 // console.log('max');
                 // console.log(weekly_rsi_max);
-                _.merge(tempStockListStockData, weekly_ma_data);
                 tempStockListStockData.cost = weekly_cost_line_data;
                 const targetStock = _.find(state.tempStockList, { id: stockId });
                 if (targetStock) {
@@ -2066,12 +2063,12 @@ const stock = {
             }
 
             const lastPrice = foundStock.last_price;
-            const lastestMa5 = foundTempStock.data.ma5[foundTempStock.data.ma5.length - 1][1];
-            const lastSecondMa5 = foundTempStock.data.ma5[foundTempStock.data.ma5.length - 2][1];
-            const lastestMa10 = foundTempStock.data.ma10[foundTempStock.data.ma10.length - 1][1];
-            const lastSecondMa10 = foundTempStock.data.ma10[foundTempStock.data.ma10.length - 2][1];
-            const lastestMa20 = foundTempStock.data.ma20[foundTempStock.data.ma20.length - 1][1];
-            const lastSecondMa20 = foundTempStock.data.ma20[foundTempStock.data.ma20.length - 2][1];
+            const lastestMa5 = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 1][1];
+            const lastSecondMa5 = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 2][1];
+            const lastestMa10 = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 1][2];
+            const lastSecondMa10 = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 2][2];
+            const lastestMa20 = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 1][3];
+            const lastSecondMa20 = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 2][3];
 
             if (lastPrice > lastestMa5 && lastPrice > lastestMa10 && lastPrice > lastestMa20) {
                 if (lastestMa5 > lastestMa10 && lastestMa5 > lastestMa20 && lastestMa10 > lastestMa20) kStatus.push('強勢多頭');
@@ -2271,30 +2268,15 @@ const stock = {
                 ? _.slice(found.data.weekly_rsi, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
                 : [];
         },
-        getStockDataWeeklyMa5: (state, getters) => (id) => {
-            console.log('getStockDataWeeklyMa5');
+        getStockDataWeeklyMa: (state, getters) => (id) => {
+            console.log('getStockDataWeeklyMa');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.ma5
-                ? _.slice(found.data.ma5, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
+            return found.data && found.data.weekly_ma
+                ? _.slice(found.data.weekly_ma, -26).map((value) => [moment(value[0]).valueOf(), value[1], value[2], value[3]])
                 : [];
         },
-        getStockDataWeeklyMa10: (state, getters) => (id) => {
-            console.log('getStockDataWeeklyMa10');
-            // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
-            const found = getters.getStock(id);
-            return found.data && found.data.ma10
-                ? _.slice(found.data.ma10, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
-                : [];
-        },
-        getStockDataWeeklyMa20: (state, getters) => (id) => {
-            console.log('getStockDataWeeklyMa20');
-            // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
-            const found = getters.getStock(id);
-            return found.data && found.data.ma20
-                ? _.slice(found.data.ma20, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
-                : [];
-        },
+
         getStockDataWeeklyMaBuy: (state, getters) => (id) => {
             console.log('getStockDataWeeklyMaBuy');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
