@@ -1544,7 +1544,8 @@ const stock = {
                     isReadyToSell &&
                     ((!preSellReason.includes('kd_dead') && !preSellReason.includes('kd_turn_down')) ||
                         obj.reason.includes('rsi_over_bought') ||
-                        obj.reason.includes('kd_m')) &&
+                        obj.reason.includes('kd_m') ||
+                        obj.reason.includes('latest')) && // latest時，preSellReason為空，obj.reason只有 latest
                     ((obj.is_sell && !obj.is_buy && !obj.is_sell_cancel) || obj.is_latest)
                 ) {
                     // 若有RSI，則KD賣的策略都要賣一半
@@ -1629,6 +1630,7 @@ const stock = {
                         obj.reason.push('earn');
                         buyList = _.concat(currBuyList, buyList);
                     }
+
                     if (!isCancelToSell || obj.is_latest) {
                         // 用 or 是因為 is_sell && !isCancelToSell 也是要進來
                         buyList = _.concat(remainingBuyList, buyList);

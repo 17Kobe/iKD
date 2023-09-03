@@ -211,7 +211,7 @@ export default {
                 },
                 {
                     value: 'rsi_over_bought',
-                    label: '週 RSI 超買 (全賣)',
+                    label: '週 RSI 超買',
                     default_limit: 95,
                     default_limit_desc: '以上',
                 },

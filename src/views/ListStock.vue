@@ -628,7 +628,7 @@
                                                 }}</span
                                                 >次<span style="font-size: 14px; font-weight: bold">{{
                                                     scope.row.policy.stats.sum_of_sell_number
-                                                        ? scope.row.policy.stats.sum_of_sell_number
+                                                        ? Number(scope.row.policy.stats.sum_of_sell_number.toFixed(1))
                                                         : ''
                                                 }}</span
                                                 >單位</el-tag
