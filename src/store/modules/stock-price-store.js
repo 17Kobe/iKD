@@ -784,12 +784,17 @@ const stock = {
                 let rsiTurnDownReady = false;
                 foundTempStock.data.weekly_rsi.forEach((item, dataIndex) => {
                     const rsi = item[1];
+                    // a是array數量有514，b是array數量有518，目前取到a 的index503，正常a是0到513，所以503，代表倒數第11，我想用js算b的倒數第11個是哪個index
+                    // 因為 weekly_rsi數量與 weekly 數量是不一致，所以要用後面算回來的才正確
+                    const weeklyDataIndex =
+                        foundTempStock.data.weekly.length - (foundTempStock.data.weekly_rsi.length - dataIndex);
                     // 週 RSI 超賣 買進訊號
                     if (foundRsiOverSold) {
                         if (rsi <= foundRsiOverSold.limit) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
+
+                            const dataWeeklyPrice = foundTempStock.data.weekly[weeklyDataIndex][4];
                             const mappedToK = _.find(foundTempStock.data.weekly_kdj, (array) => array[0] === item[0])?.[1]; // 為了顯示在KDJ圖上
                             if (index === -1)
                                 policyResult.push({
@@ -816,7 +821,7 @@ const stock = {
                         if (preRsi <= foundRsiTurnUp.limit && rsi >= preRsi && rsiTurnUpReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
+                            const dataWeeklyPrice = foundTempStock.data.weekly[weeklyDataIndex][4];
                             const mappedToK = _.find(foundTempStock.data.weekly_kdj, (array) => array[0] === item[0])?.[1]; // 為了顯示在KDJ圖上
                             if (index === -1)
                                 policyResult.push({
@@ -842,7 +847,7 @@ const stock = {
                         if (rsi >= foundRsiOverBought.limit) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
+                            const dataWeeklyPrice = foundTempStock.data.weekly[weeklyDataIndex][4];
                             const mappedToK = _.find(foundTempStock.data.weekly_kdj, (array) => array[0] === item[0])?.[1]; // 為了顯示在KDJ圖上
                             if (index === -1)
                                 policyResult.push({
@@ -869,7 +874,7 @@ const stock = {
                         if (preRsi >= foundRsiTurnDown.limit && rsi <= preRsi && rsiTurnDownReady) {
                             // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                             const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
+                            const dataWeeklyPrice = foundTempStock.data.weekly[weeklyDataIndex][4];
                             const mappedToK = _.find(foundTempStock.data.weekly_kdj, (array) => array[0] === item[0])?.[1]; // 為了顯示在KDJ圖上
                             if (index === -1)
                                 policyResult.push({
