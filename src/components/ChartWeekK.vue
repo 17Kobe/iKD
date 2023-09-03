@@ -23,6 +23,27 @@
                 <span
                     v-for="(status, index) in stockData.k_status"
                     :key="index"
+                    :title="
+                        status === '多頭'
+                            ? '股價在MA5、MA10、MA20之上視為多頭'
+                            : status === '空頭'
+                            ? '股價在MA5、MA10、MA20之下視為空頭'
+                            : status === '強勢多頭'
+                            ? '除了股價在MA5、MA10、MA20之上，且MA5在MA10和MA20之上，而MA10也在MA20之上視為強勢多頭'
+                            : status === '強勢空頭'
+                            ? '除了股價在MA5、MA10、MA20之下，且MA5在MA10和MA20之下，而MA10也在MA20之下視為強勢空頭'
+                            : status === '多頭信號'
+                            ? 'MA5上穿MA10視為多頭信號'
+                            : status === '空頭信號'
+                            ? 'MA5下穿MA10視為空頭信號'
+                            : status === '強多頭信號'
+                            ? 'MA10上穿MA20視為強多頭信號'
+                            : status === '強空頭信號'
+                            ? 'MA10下穿MA20視為強空頭信號'
+                            : status.includes('停利')
+                            ? '當KD鈍化後，使用箱子戰法計算近3根且為紅燭的最高開盤價為停利價'
+                            : ''
+                    "
                     :style="{
                         position: 'absolute',
                         top: -index * 22 + 'px',

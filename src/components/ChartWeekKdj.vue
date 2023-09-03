@@ -23,6 +23,19 @@
                 <span
                     v-for="(status, index) in stockData.kd_status"
                     :key="index"
+                    :title="
+                        status === 'KD 鈍化' && kdj[kdj.length - 1][1] >= 80
+                            ? '連續3根K值在80以上'
+                            : status === 'KD 鈍化' && kdj[kdj.length - 1][1] <= 20
+                            ? '連續3根K值在20以下'
+                            : status === 'KD 超買'
+                            ? 'K值>=80為超買'
+                            : status === 'KD 超賣'
+                            ? 'K值<=20為超賣'
+                            : status.includes('合理價')
+                            ? '近7年平均殖利率的20倍作為估算(中華電使用25倍)'
+                            : ''
+                    "
                     :style="{
                         position: 'absolute',
                         top: -index * 22 + 'px',
