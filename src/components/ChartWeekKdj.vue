@@ -41,7 +41,7 @@
                         opacity: '0.83',
                         lineHeight: '1.5',
                     }"
-                    :class="[stockData.last_price < parseFloat(status.split(' ')[1]) ? 'shake-base' : '']"
+                    :class="[stockData.last_price < parseFloat(status.split(' ')[1]) ? 'shake-base' : '', 'cell-chart']"
                 >
                     {{ status }}
                 </span>

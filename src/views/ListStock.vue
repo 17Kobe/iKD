@@ -1048,6 +1048,19 @@ input::-webkit-inner-spin-button
 .shake-base > .el-badge__content
     text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00
     animation: shake-base 2s infinite ease-in-out
+    animation-delay: 0s
+    right: -20px
+    top: -9px
+    opacity: 0.9
+
+.cell-chart.shake-base
+    text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00
+    animation-name: shake-base
+    animation-duration: 5s
+    animation-iteration-count: infinite
+    animation-timing-function: ease-in-out
+    animation-delay: 0s
+    animation-play-state: running
     right: -20px
     top: -9px
     opacity: 0.9
