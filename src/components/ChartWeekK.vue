@@ -72,8 +72,10 @@
                             { color: '#4286f5', 'margin-left': '4px' },
                         ]"
                         >{{
-                            cost[cost.length - 1][1] >= 100
+                            cost[cost.length - 1][1] >= 1000
                                 ? Number(cost[cost.length - 1][1].toFixed(0))
+                                : cost[cost.length - 1][1] >= 100
+                                ? Number(cost[cost.length - 1][1].toFixed(1))
                                 : Number(cost[cost.length - 1][1].toFixed(2))
                         }}</span
                     ></span
@@ -88,13 +90,13 @@
                             { color: '#834beb', 'margin-left': '4px' },
                         ]"
                         >{{
-                            ma[ma.length - 1][1] >= 100
+                            ma[ma.length - 1][1] >= 1000
                                 ? Number(ma[ma.length - 1][1].toFixed(0))
+                                : ma[ma.length - 1][1] >= 100
+                                ? Number(ma[ma.length - 1][1].toFixed(1))
                                 : Number(ma[ma.length - 1][1].toFixed(2))
                         }}</span
-                    ></span
-                >
-                <span v-if="ma && ma.length > 0">
+                    >
                     <span
                         title="MA(10)"
                         :style="[
@@ -104,13 +106,13 @@
                             { color: '#febd09', 'margin-left': '4px' },
                         ]"
                         >{{
-                            ma[ma.length - 1][1] >= 100
+                            ma[ma.length - 1][1] >= 1000
                                 ? Number(ma[ma.length - 1][2].toFixed(0))
+                                : ma[ma.length - 1][2] >= 100
+                                ? Number(ma[ma.length - 1][2].toFixed(1))
                                 : Number(ma[ma.length - 1][2].toFixed(2))
                         }}</span
-                    ></span
-                >
-                <span v-if="ma && ma.length > 0">
+                    >
                     <span
                         title="MA(20)"
                         :style="[
@@ -120,8 +122,10 @@
                             { color: '#fc7742', 'margin-left': '4px' },
                         ]"
                         >{{
-                            ma[ma.length - 1][1] >= 100
+                            ma[ma.length - 1][3] >= 1000
                                 ? Number(ma[ma.length - 1][3].toFixed(0))
+                                : ma[ma.length - 1][3] >= 100
+                                ? Number(ma[ma.length - 1][3].toFixed(1))
                                 : Number(ma[ma.length - 1][3].toFixed(2))
                         }}</span
                     ></span

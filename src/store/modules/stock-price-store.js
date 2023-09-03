@@ -2063,26 +2063,31 @@ const stock = {
             }
 
             const lastPrice = foundStock.last_price;
-            const lastestMa5 = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 1][1];
-            const lastSecondMa5 = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 2][1];
-            const lastestMa10 = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 1][2];
-            const lastSecondMa10 = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 2][2];
-            const lastestMa20 = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 1][3];
-            const lastSecondMa20 = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 2][3];
+            const latestMa = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 1];
+            const lastSecondMa = foundTempStock.data.weekly_ma[foundTempStock.data.weekly_ma.length - 2];
 
-            if (lastPrice > lastestMa5 && lastPrice > lastestMa10 && lastPrice > lastestMa20) {
-                if (lastestMa5 > lastestMa10 && lastestMa5 > lastestMa20 && lastestMa10 > lastestMa20) kStatus.push('強勢多頭');
-                else kStatus.push('多頭');
-            } else if (lastPrice < lastestMa5 && lastPrice < lastestMa10 && lastPrice < lastestMa20) {
-                if (lastestMa5 < lastestMa10 && lastestMa5 < lastestMa20 && lastestMa10 < lastestMa20) kStatus.push('強勢空頭');
-                else kStatus.push('空頭');
-            } else if (lastestMa10 > lastestMa20 && lastSecondMa10 <= lastSecondMa20) {
+            const [ma5, ma10, ma20] = [latestMa[1], latestMa[2], latestMa[3]];
+            const [prevMa5, prevMa10, prevMa20] = [lastSecondMa[1], lastSecondMa[2], lastSecondMa[3]];
+
+            if (lastPrice > ma5 && lastPrice > ma10 && lastPrice > ma20) {
+                if (ma5 > ma10 && ma5 > ma20 && ma10 > ma20) {
+                    kStatus.push('強勢多頭');
+                } else {
+                    kStatus.push('多頭');
+                }
+            } else if (lastPrice < ma5 && lastPrice < ma10 && lastPrice < ma20) {
+                if (ma5 < ma10 && ma5 < ma20 && ma10 < ma20) {
+                    kStatus.push('強勢空頭');
+                } else {
+                    kStatus.push('空頭');
+                }
+            } else if (ma10 > ma20 && prevMa10 <= prevMa20) {
                 kStatus.push('強多頭信號');
-            } else if (lastestMa5 > lastestMa10 && lastSecondMa5 <= lastSecondMa10) {
+            } else if (ma5 > ma10 && prevMa5 <= prevMa10) {
                 kStatus.push('多頭信號');
-            } else if (lastestMa10 < lastestMa20 && lastSecondMa10 >= lastSecondMa20) {
+            } else if (ma10 < ma20 && prevMa10 >= prevMa20) {
                 kStatus.push('強空頭信號');
-            } else if (lastestMa5 < lastestMa10 && lastSecondMa5 >= lastSecondMa10) {
+            } else if (ma5 < ma10 && prevMa5 >= prevMa10) {
                 kStatus.push('空頭信號');
             }
             foundStock.k_status = kStatus;
