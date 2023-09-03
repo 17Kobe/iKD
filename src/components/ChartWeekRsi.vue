@@ -24,9 +24,9 @@
                     v-for="(status, index) in stockData.rsi_status"
                     :key="index"
                     :title="
-                        status === 'RSI 超買'
+                        status === 'RSI ≥ 70超買'
                             ? 'RSI(5)值>=70為超買'
-                            : status === 'RSI 超賣'
+                            : status === 'RSI ≤ 30超賣'
                             ? 'RSI(5)值<=30為超賣'
                             : status === 'RSI 接近最高'
                             ? 'RSI(5)值接近歷史最高(<=3以內)'
@@ -41,8 +41,14 @@
                         top: -index * 22 + 'px',
                         left: '0', // 左對齊
                         display: 'inline-block',
-                        minWidth: ['RSI 超買', 'RSI 超賣', 'RSI 最高'].includes(status) ? '58px' : '80px',
-                        background: ['RSI 超買', 'RSI 最高', 'RSI 接近最高'].includes(status)
+                        minWidth: ['RSI 超買', 'RSI 超賣', 'RSI 最高'].includes(status)
+                            ? '58px'
+                            : ['RSI ≥ 70超買', 'RSI ≤ 30超賣'].includes(status)
+                            ? '78px'
+                            : '80px',
+                        background: ['RSI ≥ 70超買', 'RSI 超買', 'RSI 往下轉折', 'RSI 超買', 'RSI 最高', 'RSI 接近最高'].includes(
+                            status
+                        )
                             ? 'rgb(103, 194, 58)'
                             : 'rgb(242, 139, 130)',
                         color: 'white',
@@ -52,6 +58,13 @@
                         opacity: '0.83',
                         lineHeight: '1.5',
                     }"
+                    :class="[
+                        ['RSI 超買', 'RSI 超賣', 'RSI 往下轉折', 'RSI 往上轉折'].includes(status) &&
+                        !['取消買', '取消買x2', '取消賣', '取消賣½'].includes(stockData.badge)
+                            ? 'shake-base'
+                            : '',
+                        'cell-chart',
+                    ]"
                 >
                     {{ status }}
                 </span>

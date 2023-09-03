@@ -28,9 +28,9 @@
                             ? '連續3根K值在80以上'
                             : status === 'KD 鈍化' && kdj[kdj.length - 1][1] <= 20
                             ? '連續3根K值在20以下'
-                            : status === 'KD 超買'
+                            : status === 'KD ≥ 80超買'
                             ? 'K值>=80為超買'
-                            : status === 'KD 超賣'
+                            : status === 'KD ≤ 20超賣'
                             ? 'K值<=20為超賣'
                             : status.includes('合理價')
                             ? '近7年平均殖利率的20倍作為估算(中華電使用25倍)'
@@ -41,10 +41,18 @@
                         top: -index * 22 + 'px',
                         left: '0', // 左對齊
                         display: 'inline-block',
-                        minWidth: ['KD 鈍化', 'KD 超買', 'KD 超賣'].includes(status) ? '53px' : '77px',
-                        background: status.includes('KD 鈍化')
+                        minWidth: ['KD 鈍化', 'KD W底', 'KD M頭'].includes(status)
+                            ? '53px'
+                            : ['KD ≥ 80超買', 'KD ≤ 20超賣'].includes(status)
+                            ? '76px'
+                            : ['成本價未跌過'].includes(status)
+                            ? '83px'
+                            : ['每年固定日買', '每年固定日賣'].includes(status)
+                            ? '81px'
+                            : '77px',
+                        background: ['KD 鈍化', '成本價未跌過'].includes(status)
                             ? 'rgb(170, 170, 170)'
-                            : status.includes('KD 超買')
+                            : ['KD ≥ 80超買', 'KD 死亡交叉', 'KD 往下轉折', 'KD M頭', '每年固定日賣'].includes(status)
                             ? 'rgb(103, 194, 58)'
                             : 'rgb(242, 139, 130)',
                         color: 'white',
@@ -54,7 +62,23 @@
                         opacity: '0.83',
                         lineHeight: '1.5',
                     }"
-                    :class="[stockData.last_price < parseFloat(status.split(' ')[1]) ? 'shake-base' : '', 'cell-chart']"
+                    :class="[
+                        (status.includes('合理價') && stockData.last_price < parseFloat(status.split(' ')[1])) ||
+                        ([
+                            'KD 黃金交叉',
+                            'KD 往上轉折',
+                            'KD W底',
+                            'KD 死亡交叉',
+                            'KD 往下轉折',
+                            'KD M頭',
+                            '每年固定日買',
+                            '每年固定日賣',
+                        ].includes(status) &&
+                            !['取消買', '取消買x2', '取消賣', '取消賣½'].includes(stockData.badge))
+                            ? 'shake-base'
+                            : '',
+                        'cell-chart',
+                    ]"
                 >
                     {{ status }}
                 </span>

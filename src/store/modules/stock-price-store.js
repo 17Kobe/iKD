@@ -2021,13 +2021,24 @@ const stock = {
             if (foundFairValueStock) {
                 kdStatus.push('合理價 ' + foundFairValueStock.fair_value);
             }
+            if (['買', '賣', '取消買', '取消買x2', '取消賣', '取消賣½'].includes(foundStock.badge)) {
+                if (foundStock.badge_reason.includes('kd_gold')) kdStatus.push('KD 黃金交叉');
+                if (foundStock.badge_reason.includes('kd_turn_up')) kdStatus.push('KD 往上轉折');
+                if (foundStock.badge_reason.includes('kd_w')) kdStatus.push('KD W底');
+                if (foundStock.badge_reason.includes('kd_dead')) kdStatus.push('KD 死亡交叉');
+                if (foundStock.badge_reason.includes('kd_turn_down')) kdStatus.push('KD 往下轉折');
+                if (foundStock.badge_reason.includes('kd_m')) kdStatus.push('KD M頭');
+                if (foundStock.badge_reason.includes('cost_down')) kdStatus.push('成本價未跌過');
+                if (foundStock.badge_reason.includes('annual_fixed_date_buy')) kdStatus.push('每年固定日買');
+                if (foundStock.badge_reason.includes('annual_fixed_date_sell')) kdStatus.push('每年固定日賣');
+            }
 
             const lastestK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
             const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
             const lastThirdK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 3][1];
 
-            if (lastestK >= 80) kdStatus.push('KD 超買');
-            if (lastestK <= 20) kdStatus.push('KD 超賣');
+            if (lastestK >= 80) kdStatus.push('KD ≥ 80超買');
+            if (lastestK <= 20) kdStatus.push('KD ≤ 20超賣');
 
             if (lastestK >= 80 && lastSecondK >= 80 && lastThirdK >= 80) kdStatus.push('KD 鈍化');
             if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus.push('KD 鈍化');
@@ -2035,7 +2046,12 @@ const stock = {
 
             // 算 rsi線圖的 badge
             let rsiStatus = [];
-
+            if (['買', '賣', '取消買', '取消買x2', '取消賣', '取消賣½'].includes(foundStock.badge)) {
+                if (foundStock.badge_reason.includes('rsi_over_bought')) rsiStatus.push('RSI 超買');
+                if (foundStock.badge_reason.includes('rsi_over_sold')) rsiStatus.push('RSI 超賣');
+                if (foundStock.badge_reason.includes('rsi_turn_down')) rsiStatus.push('RSI 往下轉折');
+                if (foundStock.badge_reason.includes('rsi_turn_up')) rsiStatus.push('RSI 往上轉折');
+            }
             const lastestRsi = foundTempStock.data.weekly_rsi[foundTempStock.data.weekly_rsi.length - 1][1];
             const weeklyRsiMax = foundTempStock.data.weekly_rsi_max;
             const weeklyRsiMin = foundTempStock.data.weekly_rsi_min;
@@ -2043,8 +2059,8 @@ const stock = {
                 if (lastestRsi < weeklyRsiMax && weeklyRsiMax - lastestRsi <= 3) rsiStatus.push('RSI 接近最高');
                 else if (lastestRsi >= weeklyRsiMax) rsiStatus.push('RSI 最高');
             }
-            if (lastestRsi >= 70) rsiStatus.push('RSI 超買');
-            if (lastestRsi <= 30) rsiStatus.push('RSI 超賣');
+            if (lastestRsi >= 70) rsiStatus.push('RSI ≥ 70超買');
+            if (lastestRsi <= 30) rsiStatus.push('RSI ≤ 30超賣');
             foundStock.rsi_status = rsiStatus;
 
             // 算 k線圖的 badge
@@ -2053,7 +2069,7 @@ const stock = {
             const lastestValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 1];
             const lastSecondValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 2];
             const lastThirdValueAarray = foundTempStock.data.weekly[foundTempStock.data.weekly.length - 3];
-            if (kdStatus === 'KD 鈍化') {
+            if (kdStatus.includes('KD 鈍化')) {
                 // date open high low close
                 // 紅棒最低點
                 let kOpenValue = 0;

@@ -69,7 +69,7 @@
                         lineHeight: '1.5',
                     }"
                     :class="[
-                        stockData.last_price > parseFloat(status.split(' ')[1]) ||
+                        (status.includes('停利') && stockData.last_price > parseFloat(status.split(' ')[1])) ||
                         ['多頭信號', '強多頭信號', '空頭信號', '強空頭信號'].includes(status)
                             ? 'shake-base'
                             : '',

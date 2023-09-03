@@ -594,12 +594,12 @@
                                     ]"
                                 >
                                     <p v-if="item.reason.includes('kd_gold')">KD 黃金交叉</p>
-                                    <p v-if="item.reason.includes('kd_turn_up')">KD往 上轉折</p>
+                                    <p v-if="item.reason.includes('kd_turn_up')">KD 往上轉折</p>
                                     <p v-if="item.reason.includes('kd_w')">KD W底</p>
                                     <p v-if="item.reason.includes('rsi_over_sold')">RSI 超賣</p>
                                     <p v-if="item.reason.includes('rsi_turn_up')">RSI 往上轉折</p>
                                     <p v-if="item.reason.includes('annual_fixed_date_buy')">每年固定日買</p>
-                                    <p v-if="item.reason.includes('cost_down')">成本價沒有跌超過</p>
+                                    <p v-if="item.reason.includes('cost_down')">成本價未跌過</p>
 
                                     <p v-if="item.reason.includes('kd_dead')">KD 死亡交叉</p>
                                     <p v-if="item.reason.includes('kd_turn_down')">KD 往下轉折</p>
@@ -972,18 +972,17 @@ export default {
             if (array) {
                 // 一開始可能是 undefined
                 if (array.includes('kd_gold')) str += 'KD 黃金交叉';
-                if (array.includes('kd_turn_up')) str = str ? str + ', KD往 上轉折' : 'KD往 上轉折';
+                if (array.includes('kd_turn_up')) str = str ? str + ', KD 往上轉折' : 'KD 往上轉折';
                 if (array.includes('kd_w')) str = str ? str + ', KD W底' : 'KD W底';
                 if (array.includes('rsi_over_sold')) str = str ? str + ', RSI 超賣' : 'RSI 超賣';
                 if (array.includes('rsi_turn_up')) str = str ? str + ', RSI 往上轉折' : 'RSI 往上轉折';
                 if (array.includes('annual_fixed_date_buy')) str = str ? str + ', 每年固定日買' : '每年固定日買';
-                if (array.includes('cost_down')) str = str ? str + ', 成本價沒有跌超過' : '成本價沒有跌超過';
+                if (array.includes('cost_down')) str = str ? str + ', 成本價未跌過' : '成本價未跌過';
                 if (array.includes('kd_dead')) str = str ? str + ', KD 死亡交叉' : 'KD 死亡交叉';
                 if (array.includes('kd_turn_down')) str = str ? str + ', KD 往下轉折' : 'KD 往下轉折';
                 if (array.includes('kd_m')) str = str ? str + ', KD M頭' : 'KD M頭';
                 if (array.includes('rsi_over_bought')) str = str ? str + ', RSI 超買' : 'RSI 超買';
                 if (array.includes('rsi_turn_down')) str = str ? str + ', RSI 往下轉折' : 'RSI 往下轉折';
-                if (array.includes('annual_fixed_date_sell')) str = str ? str + ', 每年固定日賣' : '每年固定日賣';
                 if (array.includes('annual_fixed_date_sell')) str = str ? str + ', 每年固定日賣' : '每年固定日賣';
             }
 
