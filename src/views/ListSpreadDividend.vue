@@ -91,6 +91,7 @@
                     <el-badge
                         v-if="modeSpread === '目前'"
                         :value="scope.row.badge"
+                        :title="getBadgeTitle(scope.row.badge_reason)"
                         class="item"
                         :class="[
                             ['買', '買x2', '賣', '賣½'].includes(scope.row.badge) ? 'shake-base' : '',
@@ -429,6 +430,35 @@ export default {
                 return 'table-custom-row color-row';
             }
             return 'table-custom-row';
+        },
+        getBadgeTitle(array) {
+            const options = {
+                kd_gold: 'KD 黃金交叉',
+                kd_turn_up: 'KD 往上轉折',
+                kd_w: 'KD W底',
+                rsi_over_sold: 'RSI 超賣',
+                rsi_turn_up: 'RSI 往上轉折',
+                annual_fixed_date_buy: '每年固定日買',
+                cost_down: '成本價未跌過',
+                kd_dead: 'KD 死亡交叉',
+                kd_turn_down: 'KD 往下轉折',
+                kd_m: 'KD M頭',
+                rsi_over_bought: 'RSI 超買',
+                rsi_turn_down: 'RSI 往下轉折',
+                annual_fixed_date_sell: '每年固定日賣',
+            };
+
+            const resultArray = [];
+
+            if (array) {
+                for (const option of array) {
+                    if (options[option]) {
+                        resultArray.push('[' + options[option] + ']');
+                    }
+                }
+            }
+
+            return '原因: ' + resultArray.join(', ');
         },
     },
 };
