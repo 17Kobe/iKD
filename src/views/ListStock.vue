@@ -1051,7 +1051,7 @@ input::-webkit-inner-spin-button
     animation-delay: 0s
     right: -20px
     top: -9px
-    opacity: 0.9
+    opacity: unset!important
 
 .cell-chart.shake-base
     text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00
@@ -1063,7 +1063,7 @@ input::-webkit-inner-spin-button
     animation-play-state: running
     right: -20px
     top: -9px
-    opacity: 0.9
+    opacity: unset!important
 
 // 全部 drawer title 變下面沒那麼多
 .el-drawer__header
