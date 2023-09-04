@@ -432,8 +432,8 @@ const stock = {
             // 黃金交叉、死亡交叉
             let policyResult = null;
             if (
-                (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell')) &&
-                !_.has(foundStock, 'policy.result') // 日期判斷是有可能上回有淨值(此回沒有)，上回卻沒有計算完policy
+                _.has(foundStock, 'policy.settings.buy') ||
+                _.has(foundStock, 'policy.settings.sell') // 日期判斷是有可能上回有淨值(此回沒有)，上回卻沒有計算完policy
                 //曾經發現有policy.settings，但都沒有算 policy.result
             ) {
                 policyResult = [];
