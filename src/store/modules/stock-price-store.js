@@ -947,7 +947,7 @@ const stock = {
             state.stockList = data;
             // console.log(state.currStockDayData);
         },
-        SAVE_STOCK_DATA_AND_POLICY(state, dataList) {
+        SAVE_STOCK_DATA(state, dataList) {
             dataList.forEach((obj) => {
                 const foundStock = state.stockList.find((v) => v.id === obj.id);
                 if (obj.data) foundStock.data = obj.data; // if是判斷有可能 undefined

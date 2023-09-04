@@ -878,12 +878,12 @@ export default {
                     // console.log('commit real over');
                 }
                 // console.log('timerIdOfSetStockData');
-                const stockDataAndPolicy = this.queueStockDataList.splice(0); // 一次取6個
+                const partialStockData = this.queueStockDataList.splice(0); // 一次取6個
                 // console.log('commit begin');
                 // console.log(stockDataAndPolicy);
-                if (stockDataAndPolicy && !_.isEmpty(stockDataAndPolicy))
-                    // 最後1個沒有資料時 stockDataAndPolicy = undefined
-                    this.$store.commit('SAVE_STOCK_DATA_AND_POLICY', stockDataAndPolicy);
+                if (partialStockData && !_.isEmpty(partialStockData))
+                    // 最後1個沒有資料時 partialStockData = undefined
+                    this.$store.commit('SAVE_STOCK_DATA', partialStockData);
                 // console.log('commit over');
 
                 // console.log(this.queueStockDataList.length);
