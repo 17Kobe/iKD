@@ -2147,12 +2147,12 @@ const stock = {
                 } else {
                     kStatus.push('空頭');
                 }
-            } else if (ma10 > ma20 && prevMa10 <= prevMa20) {
-                kStatus.push('強多頭信號');
+                // } else if (ma10 > ma20 && prevMa10 <= prevMa20) {
+                //     kStatus.push('強多頭信號');
             } else if (ma5 > ma10 && prevMa5 <= prevMa10) {
                 kStatus.push('多頭信號');
-            } else if (ma10 < ma20 && prevMa10 >= prevMa20) {
-                kStatus.push('強空頭信號');
+                // } else if (ma10 < ma20 && prevMa10 >= prevMa20) {
+                //     kStatus.push('強空頭信號');
             } else if (ma5 < ma10 && prevMa5 >= prevMa10) {
                 kStatus.push('空頭信號');
             }
