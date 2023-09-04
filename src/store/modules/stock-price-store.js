@@ -423,6 +423,7 @@ const stock = {
 
             return weeklyCostLineData;
         },
+
         // 訊號技術線報酬
         async CALC_STOCK_INDICATORS_RESULT({ state }, stockId) {
             const foundStock = state.stockList.find((v) => v.id === stockId);
@@ -432,7 +433,7 @@ const stock = {
             let policyResult = null;
             if (
                 (_.has(foundStock, 'policy.settings.buy') || _.has(foundStock, 'policy.settings.sell')) &&
-                (foundStock.calc_policy_date !== foundStock.last_price_date || !_.has(foundStock, 'policy.result')) // 日期判斷是有可能上回有淨值(此回沒有)，上回卻沒有計算完policy
+                !_.has(foundStock, 'policy.result') // 日期判斷是有可能上回有淨值(此回沒有)，上回卻沒有計算完policy
                 //曾經發現有policy.settings，但都沒有算 policy.result
             ) {
                 policyResult = [];
@@ -932,6 +933,29 @@ const stock = {
             }
             return policyResult;
         },
+        async CALC_HASH({ state }, stockId) {
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            const obj = {
+                last_price: !foundStock ? 'none' : !foundStock.data ? 'no data' : _.last(foundStock.data.daily)[0],
+                policy_settings: !foundStock
+                    ? 'none'
+                    : !foundStock.policy || !foundStock.policy.settings
+                    ? 'no policy'
+                    : foundStock.policy.settings,
+            };
+            // console.log(obj);
+            const jsonString = JSON.stringify(obj);
+            let hash = 0;
+
+            if (jsonString.length === 0) return hash;
+
+            for (let i = 0; i < jsonString.length; i++) {
+                const char = jsonString.charCodeAt(i);
+                hash = (hash << 5) - hash + char;
+            }
+
+            return Math.abs(hash);
+        },
     },
     mutations: {
         SAVE_GLOBAL_SETTINGS(state, data) {
@@ -1173,7 +1197,7 @@ const stock = {
                 delete foundStock.data.ma_buy;
                 delete foundStock.data.ma_sell;
             } else {
-                foundStock.policy = { settings: { buy: [], sell: [] } };
+                if (!foundStock.policy) foundStock.policy = { settings: { buy: [], sell: [] } };
                 foundStock.policy.settings = policyList; // 複製數據複本
 
                 // save to localstorage
@@ -1348,66 +1372,70 @@ const stock = {
 
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
-            // 像是從 UI改policy會沒有 tempStockList，需要重新計算
-            let foundTempStock = state.tempStockList.find((v) => v.id === stockId);
-            if (typeof foundTempStock === 'undefined') {
-                let tempStockListStockData = {};
-                const weekly_data = await this.dispatch('CALC_STOCK_WEEKLY', stockId);
-                tempStockListStockData.weekly = weekly_data;
-                state.tempStockList.push({ id: stockId, data: tempStockListStockData }); // 新增 state.tempStockList 資料
 
-                const [weekly_kdj_data, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
-                    this.dispatch('CALC_STOCK_WEEKLY_KDJ', stockId),
-                    this.dispatch('CALC_STOCK_WEEKLY_RSI', stockId),
-                    this.dispatch('CALC_STOCK_WEEKLY_MA', stockId),
-                    this.dispatch('CALC_STOCK_WEEKLY_COST_LINE', stockId),
-                ]);
+            const stockLastUpdateHash = await this.dispatch('CALC_HASH', stockId);
+            if (foundStock.last_update_hash !== stockLastUpdateHash) {
+                // 像是從 UI改policy會沒有 tempStockList，需要重新計算
+                let foundTempStock = state.tempStockList.find((v) => v.id === stockId);
+                if (typeof foundTempStock === 'undefined') {
+                    let tempStockListStockData = {};
+                    const weekly_data = await this.dispatch('CALC_STOCK_WEEKLY', stockId);
+                    tempStockListStockData.weekly = weekly_data;
+                    state.tempStockList.push({ id: stockId, data: tempStockListStockData }); // 新增 state.tempStockList 資料
 
-                tempStockListStockData = {};
-                tempStockListStockData.weekly_kdj = weekly_kdj_data;
-                tempStockListStockData.weekly_rsi = weekly_rsi_data;
-                tempStockListStockData.weekly_ma = weekly_ma_data;
+                    const [weekly_kdj_data, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
+                        this.dispatch('CALC_STOCK_WEEKLY_KDJ', stockId),
+                        this.dispatch('CALC_STOCK_WEEKLY_RSI', stockId),
+                        this.dispatch('CALC_STOCK_WEEKLY_MA', stockId),
+                        this.dispatch('CALC_STOCK_WEEKLY_COST_LINE', stockId),
+                    ]);
 
-                let weekly_rsi_max = 0;
-                let weekly_rsi_min = 0;
-                weekly_rsi_max = _.maxBy(weekly_rsi_data, (element) => element[1])[1];
-                weekly_rsi_min = _.minBy(weekly_rsi_data, (element) => element[1])[1];
-                foundStock.data.weekly_rsi_max = weekly_rsi_max;
-                foundStock.data.weekly_rsi_min = weekly_rsi_min;
-                // foundStock.data.weekly_ma = _.slice(weekly_ma_data, -26); // TODO: 暫時硬改
-                // delete foundStock.data.ma5;
-                // delete foundStock.data.ma10;
-                // delete foundStock.data.ma20;
-                // console.log('max');
-                // console.log(weekly_rsi_max);
-                tempStockListStockData.cost = weekly_cost_line_data;
-                const targetStock = _.find(state.tempStockList, { id: stockId });
-                if (targetStock) {
-                    _.assign(targetStock.data, tempStockListStockData); // 修改 state.tempStockList 資料
+                    tempStockListStockData = {};
+                    tempStockListStockData.weekly_kdj = weekly_kdj_data;
+                    tempStockListStockData.weekly_rsi = weekly_rsi_data;
+                    tempStockListStockData.weekly_ma = weekly_ma_data;
+
+                    let weekly_rsi_max = 0;
+                    let weekly_rsi_min = 0;
+                    weekly_rsi_max = _.maxBy(weekly_rsi_data, (element) => element[1])[1];
+                    weekly_rsi_min = _.minBy(weekly_rsi_data, (element) => element[1])[1];
+                    foundStock.data.weekly_rsi_max = weekly_rsi_max;
+                    foundStock.data.weekly_rsi_min = weekly_rsi_min;
+                    // foundStock.data.weekly_ma = _.slice(weekly_ma_data, -26); // TODO: 暫時硬改
+                    // delete foundStock.data.ma5;
+                    // delete foundStock.data.ma10;
+                    // delete foundStock.data.ma20;
+                    // console.log('max');
+                    // console.log(weekly_rsi_max);
+                    tempStockListStockData.cost = weekly_cost_line_data;
+                    const targetStock = _.find(state.tempStockList, { id: stockId });
+                    if (targetStock) {
+                        _.assign(targetStock.data, tempStockListStockData); // 修改 state.tempStockList 資料
+                    }
                 }
-            }
 
-            const policyResult = await this.dispatch('CALC_STOCK_INDICATORS_RESULT', stockId);
+                const policyResult = await this.dispatch('CALC_STOCK_INDICATORS_RESULT', stockId);
 
-            if (policyResult !== null) {
-                // policyResult 有可能因為是calc一樣所以沒計算，此時就不要去異動 result
-                foundStock.policy.result = [];
-                foundStock.policy.result.push(...policyResult);
-                // foundStock.policy.result.push(...policyResult);
-                // save to localstorage
+                if (policyResult !== null) {
+                    // policyResult 有可能因為是calc一樣所以沒計算，此時就不要去異動 result
+                    foundStock.policy.result = [];
+                    foundStock.policy.result.push(...policyResult);
+                    // foundStock.policy.result.push(...policyResult);
+                    // save to localstorage
+                    // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+                    if (Array.isArray(policyResult) && policyResult.length > 0) {
+                        this.commit('SAVE_STOCK_POLICY_RETURN_RESULT', stockId); // 計算policy且有關報酬率的結果
+                    }
+                }
+                // 算完就清除，如此不占用記憶體
+                _.remove(state.tempStockList, (obj) => obj.id === stockId);
+
+                // 刪除台達電
+                // _.remove(state.stockList, (obj) => obj.id === '2886');
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-                if (Array.isArray(policyResult) && policyResult.length > 0) {
-                    this.commit('SAVE_STOCK_POLICY_RETURN_RESULT', stockId); // 計算policy且有關報酬率的結果
-                }
+
+                console.log('SAVE_STOCK_POLICY_RESULT OK');
             }
-            // 算完就清除，如此不占用記憶體
-            _.remove(state.tempStockList, (obj) => obj.id === stockId);
-
-            // 刪除台達電
-            // _.remove(state.stockList, (obj) => obj.id === '2886');
-            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-
-            console.log('SAVE_STOCK_POLICY_RESULT OK');
         },
         SAVE_STOCK_POLICY_RETURN_RESULT(state, stockId) {
             console.log('SAVE_STOCK_POLICY_RETURN_RESULT');
@@ -1817,7 +1845,7 @@ const stock = {
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.commit('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE', stockId);
         },
-        SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE(state, stockId) {
+        async SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE(state, stockId) {
             console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE');
 
             const foundStock = state.stockList.find((v) => v.id === stockId);
@@ -2245,8 +2273,9 @@ const stock = {
             //     }
             // });
             // foundStock.data.weekly_box = box;
-
-            foundStock.calc_policy_date = foundStock.last_price_date; // 設成一樣，之後判斷有無相同來知道是否當天真的計算完成
+            const stockLastUpdateHash = await this.dispatch('CALC_HASH', stockId);
+            foundStock.last_update_hash = stockLastUpdateHash;
+            // foundStock.calc_policy_date = foundStock.last_price_date; // 設成一樣，之後判斷有無相同來知道是否當天真的計算完成
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             saveStockListToDb('stockList', state.stockList);
             console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE OK');
