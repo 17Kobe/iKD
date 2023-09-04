@@ -628,7 +628,7 @@
                                                 }}</span
                                                 >次<span style="font-size: 14px; font-weight: bold">{{
                                                     scope.row.policy.stats.sum_of_sell_number
-                                                        ? Number(scope.row.policy.stats.sum_of_sell_number.toFixed(1))
+                                                        ? Number(scope.row.policy.stats.sum_of_sell_number.toFixed(1)) // 因為沒有賣出 現在，所以有可能有小數點，如23.1單位，所以先取到小數第一位
                                                         : ''
                                                 }}</span
                                                 >單位</el-tag

@@ -1542,10 +1542,10 @@ const stock = {
                     }
                 } else if (
                     isReadyToSell &&
-                    ((!preSellReason.includes('kd_dead') && !preSellReason.includes('kd_turn_down')) ||
+                    ((!preSellReason.includes('kd_dead') && !preSellReason.includes('kd_turn_down')) || // 前次不得是黃金交叉 或 黃金轉折 賣(因為不想連續是以上)，除非這次是 RSI或KDM頭才要賣。但有買就都可以進入，一方面不影響基本，而且有買就又可以。"現在"則不考慮喔
                         obj.reason.includes('rsi_over_bought') ||
                         obj.reason.includes('kd_m') ||
-                        obj.reason.includes('latest')) && // latest時，preSellReason為空，obj.reason只有 latest
+                        obj.is_latest) && // latest時，preSellReason為空，obj.reason只有 latest
                     ((obj.is_sell && !obj.is_buy && !obj.is_sell_cancel) || obj.is_latest)
                 ) {
                     // 若有RSI，則KD賣的策略都要賣一半
