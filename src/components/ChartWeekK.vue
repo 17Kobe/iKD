@@ -563,6 +563,8 @@ export default {
                     zoomType: 'none',
                     pinchType: 'none',
                     panning: false,
+                    marginLeft: 8, // 調整左邊邊界的空白
+                    marginRight: 2, // 調整右邊邊界的空白
                     marginTop: 0, // 調整圖表上邊距
                     marginBottom: 0, // 調整圖表下邊距
                 },
