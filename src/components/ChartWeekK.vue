@@ -558,7 +558,7 @@ export default {
             return {
                 chart: {
                     type: 'column',
-                    height: 40, // 設置圖表高度為100px
+                    height: 55, // 設置圖表高度為100px
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
                     zoomType: 'none',
                     pinchType: 'none',
@@ -603,10 +603,10 @@ export default {
                         const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
                         this.points.forEach((point, index) => {
                             if (index === 0) {
-                                str += `<div style="text-align:center;">${moment(point.x).format(
+                                str += `<div style="text-align:center;">${moment(point.z).format(
                                     'YYYY-MM-DD'
                                 )}(<span style="color: #3333ee; font-weight:bold;">${
-                                    dayOfWeek[moment(point.x).day()]
+                                    dayOfWeek[moment(point.z).day()]
                                 }</span>)</div>`;
                                 str += `<div>成交量：<span style="color: ${point.color}">${point.y.toLocaleString(
                                     'en-US'
@@ -628,7 +628,7 @@ export default {
                         data: this.ohlc.map((item) => {
                             const color = item[4] >= item[1] ? '#d41c1c' : '#65b206';
                             return {
-                                // x: item[0], // [0]可以不用
+                                z: item[0], // x: [0]可以不用，這樣會常紅燭對齊，但tooltip要顯示日期，就用 point.z
                                 y: item[5], // 長條圖的高度
                                 color: color, // 根據條件設置顏色
                             };
