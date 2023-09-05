@@ -603,10 +603,10 @@ export default {
                         const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
                         this.points.forEach((point, index) => {
                             if (index === 0) {
-                                str += `<div style="text-align:center;">${moment(point.z).format(
+                                str += `<div style="text-align:center;">${moment(point.point.z).format(
                                     'YYYY-MM-DD'
                                 )}(<span style="color: #3333ee; font-weight:bold;">${
-                                    dayOfWeek[moment(point.z).day()]
+                                    dayOfWeek[moment(point.point.z).day()]
                                 }</span>)</div>`;
                                 str += `<div>成交量：<span style="color: ${point.color}">${point.y.toLocaleString(
                                     'en-US'
