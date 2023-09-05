@@ -192,6 +192,12 @@
                 </template>
             </el-table-column>
 
+            <el-table-column label="日期" width="66" align="center" v-if="modeSpread === '目前'">
+                <template #default="scope">
+                    {{ formatLastPriceDate(scope.row.last_price_date) }}
+                </template>
+            </el-table-column>
+
             <el-table-column :label="modeSpread === '目前' ? '現價' : '賣價'" prop="last_price" width="55" align="center">
             </el-table-column>
             <el-table-column label="成本價" width="55" align="center">
@@ -328,6 +334,7 @@
 </template>
 
 <script>
+import moment from 'moment';
 // import _ from 'lodash';
 //
 // This starter template is using Vue 3 experimental <script setup> SFCs
@@ -459,6 +466,10 @@ export default {
             }
 
             return '原因: ' + resultArray.join(', ');
+        },
+        formatLastPriceDate(date) {
+            const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+            return moment(date).format(`M/DD(${dayOfWeek[moment(date).day()]})`);
         },
     },
 };
