@@ -235,7 +235,7 @@ export default {
 
             let tickMin;
             let tickMax;
-            
+
             if (maxValue < 100) {
                 tickMin = Math.floor(minValue * 100) / 100;
                 tickMax = Math.ceil(maxValue * 100) / 100;
@@ -655,7 +655,7 @@ export default {
 
                 // 调用重新渲染图表的方法，具体方法根据您的项目和图表库来定
                 // 以下是一个示例，具体方法名请根据实际情况修改
-            // 使用 $refs.chartRef 访问组件引用
+                // 使用 $refs.chartRef 访问组件引用
                 const chartComponent = this.$refs.chartRef;
                 // console.log(chartComponent);
 
@@ -663,13 +663,13 @@ export default {
                 if (chartComponent) {
                     // 获取 Highcharts 图表实例
                     const chartInstance = chartComponent.chart;
-                    console.log("chartComponent");
+                    console.log('chartComponent');
 
                     const { tickMin, tickMax } = this.chartMinMaxValues;
 
-                    const positions = [];
+                    // const positions = [];
                     const tickCount = 4; // 刻度數量
-                    const tickInterval = (tickMax - tickMin) / (tickCount - 1); // 計算刻度間隔
+                    // const tickInterval = (tickMax - tickMin) / (tickCount - 1); // 計算刻度間隔
 
                     // 取得最大的小數位數
                     const decimalPlaces = Math.max(
@@ -677,30 +677,31 @@ export default {
                         tickMin.toString().split('.')[1]?.length || 0
                     );
 
-                    for (let i = 0; i < tickCount; i++) {
-                        let tickValue;
-                        if (i === 3) {
-                            tickValue = tickMax;
-                        } else {
-                            tickValue = tickMin + i * tickInterval;
-                        }
+                    // for (let i = 0; i < tickCount; i++) {
+                    //     let tickValue;
+                    //     if (i === 3) {
+                    //         tickValue = tickMax;
+                    //     } else {
+                    //         tickValue = tickMin + i * tickInterval;
+                    //     }
 
-                        tickValue = Number(tickValue.toFixed(decimalPlaces)); // 將刻度值限制小數位數
-                        positions.push(tickValue);
-                    }
+                    //     tickValue = Number(tickValue.toFixed(decimalPlaces)); // 將刻度值限制小數位數
+                    //     positions.push(tickValue);
+                    // }
 
                     // console.log(positions);
                     // console.log(tickMax);
                     // 调用图表的重新渲染方法
+                    const tickMiddle = Number(((tickMin + tickMax) / 2).toFixed(decimalPlaces));
 
                     chartInstance.update({
                         yAxis: [
                             {
                                 // tickPositions: [...positions], // 更新 y 轴的刻度值
-                                tickPositions: [tickMin, tickMax], // 更新 y 轴的刻度值
+                                tickPositions: [tickMin, tickMiddle, tickMax], // 更新 y 轴的刻度值
                             },
                         ],
-                    });  
+                    });
                 }
             },
             deep: true, // 深度监听 chartMinMaxValues 及其子属性的变化
