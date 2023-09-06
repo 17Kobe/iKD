@@ -5,6 +5,7 @@
             :constructorType="'stockChart'"
             :options="chartOptions"
             style="position: relative; top: 5px; background: transparent"
+            ref="chartRef"
         >
         </highcharts>
         <div
@@ -234,7 +235,7 @@ export default {
 
             let tickMin;
             let tickMax;
-
+            
             if (maxValue < 100) {
                 tickMin = Math.floor(minValue * 100) / 100;
                 tickMax = Math.ceil(maxValue * 100) / 100;
@@ -429,6 +430,9 @@ export default {
                         },
                         // 調整 y 軸 tick的間距，運用到高度最大化，不浪費
                         tickPositioner() {
+                            // console.log('觀察 tickMax = ', tickMax);
+                            // console.log('觀察 tickMax = ',tickMin);
+
                             const positions = [];
                             const tickCount = 4; // 刻度數量
                             const tickInterval = (tickMax - tickMin) / (tickCount - 1); // 計算刻度間隔
@@ -639,7 +643,69 @@ export default {
         },
     },
     created() {},
-    watch: {},
+    watch: {
+        chartMinMaxValues: {
+            handler() {
+                // chartMinMaxValues 发生变化时执行重新渲染图表的操作
+                // 这里可以添加调用重新渲染图表的代码，例如 chart.repaint() 或其他更新图表的方法
+                // 如果需要 chart 实例，请根据您的项目中如何获取 chart 实例来调用相应方法
+                // 如果使用的是 Highcharts-Vue 插件，通常可以通过 this.$refs.chart 来获取 chart 实例
+                // 例如：this.$refs.chart.redraw();
+                // console.log('chartOptions 變化了');
+
+                // 调用重新渲染图表的方法，具体方法根据您的项目和图表库来定
+                // 以下是一个示例，具体方法名请根据实际情况修改
+            // 使用 $refs.chartRef 访问组件引用
+                const chartComponent = this.$refs.chartRef;
+                // console.log(chartComponent);
+
+                // 检查组件是否存在
+                if (chartComponent) {
+                    // 获取 Highcharts 图表实例
+                    const chartInstance = chartComponent.chart;
+                    console.log("chartComponent");
+
+                    const { tickMin, tickMax } = this.chartMinMaxValues;
+
+                    const positions = [];
+                    const tickCount = 4; // 刻度數量
+                    const tickInterval = (tickMax - tickMin) / (tickCount - 1); // 計算刻度間隔
+
+                    // 取得最大的小數位數
+                    const decimalPlaces = Math.max(
+                        tickMax.toString().split('.')[1]?.length || 0,
+                        tickMin.toString().split('.')[1]?.length || 0
+                    );
+
+                    for (let i = 0; i < tickCount; i++) {
+                        let tickValue;
+                        if (i === 3) {
+                            tickValue = tickMax;
+                        } else {
+                            tickValue = tickMin + i * tickInterval;
+                        }
+
+                        tickValue = Number(tickValue.toFixed(decimalPlaces)); // 將刻度值限制小數位數
+                        positions.push(tickValue);
+                    }
+
+                    // console.log(positions);
+                    // console.log(tickMax);
+                    // 调用图表的重新渲染方法
+
+                    chartInstance.update({
+                        yAxis: [
+                            {
+                                // tickPositions: [...positions], // 更新 y 轴的刻度值
+                                tickPositions: [tickMin, tickMax], // 更新 y 轴的刻度值
+                            },
+                        ],
+                    });  
+                }
+            },
+            deep: true, // 深度监听 chartMinMaxValues 及其子属性的变化
+        },
+    },
     methods: {
         toggleTradingVolume() {
             this.$store.commit('SAVE_SHOW_TRADING_VOLUME', { stockId: this.parentData });
