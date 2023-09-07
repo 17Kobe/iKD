@@ -744,7 +744,15 @@
                             @click="doShowComment(scope.row.id)"
                             :style="[
                                 scope.row.comment && scope.row.comment !== '' ? { width: 'auto' } : {},
-                                { 'text-align': 'left', 'line-height': '18px', padding: '3px 9px', 'font-size': '14px' },
+                                {
+                                    'text-align': 'left',
+                                    'line-height': '18px',
+                                    padding: '3px 9px',
+                                    'font-size': '14px',
+                                    'max-width': '400px',
+                                    'word-wrap': 'break-word',
+                                    'white-space': 'pre-wrap',
+                                },
                             ]"
                         >
                             <div v-html="scope.row.comment.replace(/\n/g, '<br>')"></div>
