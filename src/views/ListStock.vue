@@ -734,6 +734,38 @@
                     </el-popover>
                 </template>
             </el-table-column>
+            <el-table-column label="備註" width="400" header-align="center" align="center">
+                <template #default="scope">
+                    <div v-if="scope.row.comment && scope.row.comment !== ''">
+                        <el-button
+                            size="small"
+                            type="info"
+                            plain
+                            @click="doShowComment(scope.row.id)"
+                            :style="[
+                                scope.row.comment && scope.row.comment !== '' ? { width: 'auto' } : {},
+                                { 'text-align': 'left', 'line-height': '18px', padding: '3px 9px', 'font-size': '14px' },
+                            ]"
+                        >
+                            <div v-html="scope.row.comment.replace(/\n/g, '<br>')"></div>
+                        </el-button>
+                    </div>
+                    <div v-else>
+                        <el-button
+                            size="small"
+                            type="info"
+                            plain
+                            @click="doShowComment(scope.row.id)"
+                            :style="[
+                                scope.row.comment && scope.row.comment !== '' ? { width: 'auto' } : {},
+                                { 'text-align': 'left', 'line-height': '18px', padding: '3px 9px' },
+                            ]"
+                        >
+                            <i class="el-icon-s-tools text-xl"></i>
+                        </el-button>
+                    </div>
+                </template>
+            </el-table-column>
             <!-- <el-table-column prop="city" label="功能" width="220" align="center">
                 <el-button type="danger" @click="onDel()"><i class="el-icon-minus"></i></el-button>
             </el-table-column> -->
@@ -747,6 +779,7 @@
         <FormCost ref="childFormCost" />
         <FormPolicy ref="childFormPolicy" />
         <FormExport ref="childFormExport" />
+        <FormComment ref="childFormComment" />
     </div>
 </template>
 
@@ -758,6 +791,7 @@ import ChartWeekRsi from '@/components/ChartWeekRsi.vue';
 import ChartWeekK from '@/components/ChartWeekK.vue';
 import FormCost from '@/components/FormCost.vue';
 import FormPolicy from '@/components/FormPolicy.vue';
+import FormComment from '@/components/FormComment.vue';
 import StockAnalysis from '@/components/StockAnalysis.vue';
 import DefaultStockList from '../store/data/default-stock-list.json';
 import GlobalSettings from '../store/data/global-settings.json';
@@ -767,7 +801,7 @@ import { saveStockListToDb, loadStockListFromDb } from '@/shared/idbUtils.js';
 
 export default {
     name: 'component-list',
-    components: { ChartWeekKdj, ChartWeekRsi, ChartWeekK, FormCost, FormPolicy, StockAnalysis },
+    components: { ChartWeekKdj, ChartWeekRsi, ChartWeekK, FormCost, FormPolicy, FormComment, StockAnalysis },
     data() {
         return {
             // rateOfReturn: 0,
@@ -937,6 +971,9 @@ export default {
             // 父傳一堆變數給子也不太好
             // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
             this.$refs.childFormPolicy.onInit(id);
+        },
+        doShowComment(id) {
+            this.$refs.childFormComment.onInit(id);
         },
         onChangeStar(selValue, index) {
             this.$store.commit('SAVE_STOCK_STAR', { stockId: index, star: selValue });

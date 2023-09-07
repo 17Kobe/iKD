@@ -1154,6 +1154,16 @@ const stock = {
             // 算完就清除，如此不占用記憶體
             _.remove(state.tempStockList, (obj) => obj.id === stockId);
         },
+        async SAVE_STOCK_COMMENT(state, { stockId, comment }) {
+            console.log('SAVE_STOCK_COMMENT');
+            // object of array 去 find 並 update
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            foundStock.comment = comment;
+
+            // save to localstorage
+            // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            saveStockListToDb('stockList', state.stockList);
+        },
         SAVE_STOCK_COST_RETURN(state, stockId) {
             console.log('SAVE_STOCK_COST_RETURN');
             // object of array 去 find 並 update
