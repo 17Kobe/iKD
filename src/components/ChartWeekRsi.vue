@@ -269,6 +269,8 @@ export default {
                     pinchType: 'none',
                     marginLeft: 8, // 調整左邊邊界的空白
                     marginRight: 2, // 調整右邊邊界的空白
+                    marginBottom: 27,
+                    marginTop: 1,
                     panning: false,
                     height: 100,
                     events: {
@@ -384,7 +386,7 @@ export default {
                 xAxis: {
                     type: 'datetime',
                     gridLineWidth: 1, // 顯示圖表X軸上的直色灰線
-
+                    tickWidth: 0,
                     endOnTick: false,
                     labels: {
                         enabled: false, // 不顯示 x 軸的 Label

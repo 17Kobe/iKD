@@ -260,6 +260,8 @@ export default {
                     pinchType: 'none',
                     marginLeft: 8, // 調整左邊邊界的空白
                     marginRight: 2, // 調整右邊邊界的空白
+                    marginBottom: 27,
+                    marginTop: 1,
                     panning: false,
                     // pinchType: 'x',
                     height: 100,
@@ -393,24 +395,24 @@ export default {
                 xAxis: {
                     type: 'datetime',
                     gridLineWidth: 0, // 顯示圖表X軸上的直色灰線
-
+                    tickWidth: 0,
                     endOnTick: false,
                     plotLines: [{
                         color: '#e6e6e6',     // 線的顏色
                         width: 1,          // 線的寬度
-                        value: this.ohlc && this.ohlc.length > 0 ? moment(_.nth(this.ohlc, -5)[0]).valueOf() : null, // ma5扣抵值，垂直線的位置（倒數第五個 x 值的位置）
+                        value: this.ohlc && this.ohlc.length >= 5 ? moment(_.nth(this.ohlc, -5)[0]).valueOf() : null, // ma5扣抵值，垂直線的位置（倒數第五個 x 值的位置）
                         zIndex: 1,         // 線的疊放順序，可自行調整
                     },
                     {
                         color: '#e6e6e6',     // 線的顏色
                         width: 1,          // 線的寬度
-                        value: this.ohlc && this.ohlc.length > 0 ? moment(_.nth(this.ohlc, -10)[0]).valueOf() : null, // ma10扣抵值，垂直線的位置（倒數第五個 x 值的位置）
+                        value: this.ohlc && this.ohlc.length >= 10 ? moment(_.nth(this.ohlc, -10)[0]).valueOf() : null, // ma10扣抵值，垂直線的位置（倒數第五個 x 值的位置）
                         zIndex: 1,         // 線的疊放順序，可自行調整
                     },
                     {
                         color: '#e6e6e6',     // 線的顏色
                         width: 1,          // 線的寬度
-                        value: this.ohlc && this.ohlc.length > 0 ? moment(_.nth(this.ohlc, -20)[0]).valueOf() : null, // ma20扣抵值，垂直線的位置（倒數第五個 x 值的位置）
+                        value: this.ohlc && this.ohlc.length>= 20 ? moment(_.nth(this.ohlc, -20)[0]).valueOf() : null, // ma20扣抵值，垂直線的位置（倒數第五個 x 值的位置）
                         zIndex: 1,         // 線的疊放順序，可自行調整
                     }],
                     labels: {
