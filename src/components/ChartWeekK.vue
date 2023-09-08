@@ -176,6 +176,7 @@
 <script>
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
+import _ from 'lodash';
 
 export default {
     components: { highcharts: Chart },
@@ -223,13 +224,11 @@ export default {
             // 用 minValue及 maxValue 來判斷，若maxValue<100，則用小數2位數。minValue>=100則用小數0位數
             const ohlcHighValues = this.ohlc.map((value) => value[2]);
             const ohlcLowValues = this.ohlc.map((value) => value[3]);
-            const ma5Values = this.ma.map((value) => value[1]);
-            const ma10Values = this.ma.map((value) => value[2]);
-            const ma20Values = this.ma.map((value) => value[3]);
+            const maValues = this.ma.map((value) => value.slice(1));
             const costValues = this.cost.map((value) => value[1]);
 
-            const allHighValues = [...ohlcHighValues, ...ma5Values, ...ma10Values, ...ma20Values, ...costValues];
-            const allLowValues = [...ohlcLowValues, ...ma5Values, ...ma10Values, ...ma20Values, ...costValues];
+            const allHighValues = [...ohlcHighValues, ...maValues.flat(), ...costValues];
+            const allLowValues = [...ohlcLowValues, ...maValues.flat(), ...costValues];
             const minValue = Math.min(...allLowValues);
             const maxValue = Math.max(...allHighValues);
 
@@ -393,22 +392,26 @@ export default {
                 },
                 xAxis: {
                     type: 'datetime',
-                    gridLineWidth: 1, // 顯示圖表X軸上的直色灰線
+                    gridLineWidth: 0, // 顯示圖表X軸上的直色灰線
 
                     endOnTick: false,
                     plotLines: [{
-                        color: 'gray',     // 線的顏色
-                        width: 2,          // 線的寬度
-                        value: 4.5,        // 垂直線的位置（倒數第五個 x 值的位置）
-                        zIndex: 5,         // 線的疊放順序，可自行調整
-                        label: {
-                            text: '中心',  // 線的標籤
-                            align: 'right',
-                            x: -10,         // 標籤相對於線的水平偏移量
-                            style: {
-                                color: 'gray'
-                            }
-                        }
+                        color: '#e6e6e6',     // 線的顏色
+                        width: 1,          // 線的寬度
+                        value: this.ohlc && this.ohlc.length > 0 ? moment(_.nth(this.ohlc, -5)[0]).valueOf() : null, // ma5扣抵值，垂直線的位置（倒數第五個 x 值的位置）
+                        zIndex: 1,         // 線的疊放順序，可自行調整
+                    },
+                    {
+                        color: '#e6e6e6',     // 線的顏色
+                        width: 1,          // 線的寬度
+                        value: this.ohlc && this.ohlc.length > 0 ? moment(_.nth(this.ohlc, -10)[0]).valueOf() : null, // ma10扣抵值，垂直線的位置（倒數第五個 x 值的位置）
+                        zIndex: 1,         // 線的疊放順序，可自行調整
+                    },
+                    {
+                        color: '#e6e6e6',     // 線的顏色
+                        width: 1,          // 線的寬度
+                        value: this.ohlc && this.ohlc.length > 0 ? moment(_.nth(this.ohlc, -20)[0]).valueOf() : null, // ma20扣抵值，垂直線的位置（倒數第五個 x 值的位置）
+                        zIndex: 1,         // 線的疊放順序，可自行調整
                     }],
                     labels: {
                         enabled: false, // 不顯示 x 軸的 Label
