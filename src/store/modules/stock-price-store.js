@@ -905,7 +905,7 @@ const stock = {
                 policyResult.forEach((item) => {
                     // 買進時，找出該天的日均線
                     if (item.is_buy && foundMaBuy) {
-                        const foundDataMaBuy = _.find(foundStock.data.ma_buy, (array) => array[0] === item.date);
+                        const foundDataMaBuy = _.find(foundTempStock.data.ma_buy, (array) => array[0] === item.date);
                         const maBuyValue = foundDataMaBuy[1];
                         // const foundDataWeekly = _.find(foundStock.data.weekly, (array) => array[0] === item.date);
                         // const priceValueForBuy = foundDataWeekly[4];
@@ -918,7 +918,7 @@ const stock = {
                     }
                     // 賣出時，找出該天的日均線
                     if (item.is_sell && foundMaSell) {
-                        const foundDataMaSell = _.find(foundStock.data.ma_sell, (array) => array[0] === item.date);
+                        const foundDataMaSell = _.find(foundTempStock.data.ma_sell, (array) => array[0] === item.date);
                         const maSellValue = foundDataMaSell[1];
                         // const foundDataWeekly = _.find(foundStock.data.weekly, (array) => array[0] === item.date);
                         // const priceValueForSell = foundDataWeekly[4];
@@ -1935,7 +1935,13 @@ const stock = {
                                 }
 
                                 if (index === array.length - 1) {
-                                    if (kdWReady2 && k <= 20 && kdWReady && kdWTurnUpTimes >= foundKdW.limit - 1) {
+                                    if (
+                                        kdWReady2 &&
+                                        k <= 20 &&
+                                        kdWReady &&
+                                        kdWTurnUpTimes >= foundKdW.limit - 1 &&
+                                        moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') <= 270
+                                    ) {
                                         foundStock.badge = '準買x2';
                                         foundStock.badge_reason.push('kd_w');
                                     }
