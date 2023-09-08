@@ -2036,7 +2036,13 @@ const stock = {
                                     }
 
                                     if (index === array.length - 1) {
-                                        if (kdMReady2 && k <= 20 && kdMReady && kdMGoldTimes >= foundKdM.limit - 1) {
+                                        if (
+                                            kdMReady2 &&
+                                            k <= 20 &&
+                                            kdMReady &&
+                                            kdMGoldTimes >= foundKdM.limit - 1 &&
+                                            moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') <= 270
+                                        ) {
                                             foundStock.badge = '準賣x2';
                                             foundStock.badge_reason.push('kd_w');
                                         }
