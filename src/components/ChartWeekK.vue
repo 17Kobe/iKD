@@ -396,6 +396,20 @@ export default {
                     gridLineWidth: 1, // 顯示圖表X軸上的直色灰線
 
                     endOnTick: false,
+                    plotLines: [{
+                        color: 'gray',     // 線的顏色
+                        width: 2,          // 線的寬度
+                        value: 4.5,        // 垂直線的位置（倒數第五個 x 值的位置）
+                        zIndex: 5,         // 線的疊放順序，可自行調整
+                        label: {
+                            text: '中心',  // 線的標籤
+                            align: 'right',
+                            x: -10,         // 標籤相對於線的水平偏移量
+                            style: {
+                                color: 'gray'
+                            }
+                        }
+                    }],
                     labels: {
                         enabled: false, // 不顯示 x 軸的 Label
                         staggerLines: 1,

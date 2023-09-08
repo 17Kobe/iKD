@@ -734,7 +734,7 @@
                     </el-popover>
                 </template>
             </el-table-column>
-            <el-table-column label="備註" width="400" header-align="center" align="center">
+            <el-table-column label="備註" width="260" header-align="center" align="center">
                 <template #default="scope">
                     <div v-if="scope.row.comment && scope.row.comment !== ''">
                         <el-button
@@ -749,7 +749,8 @@
                                     'line-height': '18px',
                                     padding: '3px 9px',
                                     'font-size': '14px',
-                                    'max-width': '400px',
+                                    'max-width': '260px',
+                                    'width': '260px',
                                     'word-wrap': 'break-word',
                                     'white-space': 'pre-wrap',
                                 },
