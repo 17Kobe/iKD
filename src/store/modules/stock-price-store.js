@@ -559,7 +559,7 @@ const stock = {
                             // console.log(preKdWTurnUpDate);
                             if (
                                 kdWTurnUpTimes >= foundKdW.limit &&
-                                moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') <= 365
+                                moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') <= 270
                             ) {
                                 // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                                 const index = _.findIndex(policyResult, ['date', item[0]]);
@@ -579,8 +579,8 @@ const stock = {
                                     // policyResult[index].number_of_buy = 2; 後面才加
                                     policyResult[index].reason.push('kd_w');
                                 }
-                            } else if (preKdWTurnUpDate !== '' && moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') > 365) {
-                                kdWTurnUpTimes = 1; // 大於365天則重新來了
+                            } else if (preKdWTurnUpDate !== '' && moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') > 270) {
+                                kdWTurnUpTimes = 1; // 大於270天則重新來了
                                 console.log('reset W底');
                             }
                             preKdWTurnUpDate = item[0];
@@ -679,7 +679,7 @@ const stock = {
                             kdMTurnDownTimes += 1;
                             if (
                                 kdMTurnDownTimes >= foundKdM.limit &&
-                                moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') <= 365
+                                moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') <= 270
                             ) {
                                 // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
                                 const index = _.findIndex(policyResult, ['date', item[0]]);
@@ -701,9 +701,9 @@ const stock = {
                                 }
                             } else if (
                                 preKdMTurnDownDate !== '' &&
-                                moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') > 365
+                                moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') > 270
                             ) {
-                                kdMTurnDownTimes = 1; // 大於365天則重新來了
+                                kdMTurnDownTimes = 1; // 大於270天則重新來了
                                 console.log('reset W底');
                             }
                             preKdMTurnDownDate = item[0];
@@ -1919,13 +1919,13 @@ const stock = {
                                     kdWTurnUpTimes += 1;
                                     if (
                                         kdWTurnUpTimes >= foundKdW.limit &&
-                                        moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') <= 365
+                                        moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') <= 270
                                     ) {
                                     } else if (
                                         preKdWTurnUpDate !== '' &&
-                                        moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') > 365
+                                        moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') > 270
                                     ) {
-                                        kdWTurnUpTimes = 1; // 大於365天則重新來了
+                                        kdWTurnUpTimes = 1; // 大於270天則重新來了
                                         console.log('reset W底');
                                     }
                                     preKdWTurnUpDate = item[0];
@@ -2014,13 +2014,13 @@ const stock = {
                                         kdMTurnDownTimes += 1;
                                         if (
                                             kdMTurnDownTimes >= foundKdM.limit &&
-                                            moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') <= 365
+                                            moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') <= 270
                                         ) {
                                         } else if (
                                             preKdMTurnDownDate !== '' &&
-                                            moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') > 365
+                                            moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') > 270
                                         ) {
-                                            kdMTurnDownTimes = 1; // 大於365天則重新來了
+                                            kdMTurnDownTimes = 1; // 大於270天則重新來了
                                             console.log('reset M頭');
                                         }
                                         preKdMTurnDownDate = item[0];
