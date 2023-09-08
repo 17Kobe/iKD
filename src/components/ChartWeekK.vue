@@ -397,24 +397,26 @@ export default {
                     gridLineWidth: 0, // 顯示圖表X軸上的直色灰線
                     tickWidth: 0,
                     endOnTick: false,
-                    plotLines: [{
-                        color: '#e6e6e6',     // 線的顏色
-                        width: 1,          // 線的寬度
-                        value: this.ohlc && this.ohlc.length >= 5 ? moment(_.nth(this.ohlc, -5)[0]).valueOf() : null, // ma5扣抵值，垂直線的位置（倒數第五個 x 值的位置）
-                        zIndex: 1,         // 線的疊放順序，可自行調整
-                    },
-                    {
-                        color: '#e6e6e6',     // 線的顏色
-                        width: 1,          // 線的寬度
-                        value: this.ohlc && this.ohlc.length >= 10 ? moment(_.nth(this.ohlc, -10)[0]).valueOf() : null, // ma10扣抵值，垂直線的位置（倒數第五個 x 值的位置）
-                        zIndex: 1,         // 線的疊放順序，可自行調整
-                    },
-                    {
-                        color: '#e6e6e6',     // 線的顏色
-                        width: 1,          // 線的寬度
-                        value: this.ohlc && this.ohlc.length>= 20 ? moment(_.nth(this.ohlc, -20)[0]).valueOf() : null, // ma20扣抵值，垂直線的位置（倒數第五個 x 值的位置）
-                        zIndex: 1,         // 線的疊放順序，可自行調整
-                    }],
+                    plotLines: [
+                        {
+                            color: '#e6e6e6', // 線的顏色
+                            width: 1, // 線的寬度
+                            value: this.ohlc && this.ohlc.length >= 5 ? moment(_.nth(this.ohlc, -5)[0]).valueOf() : null, // ma5扣抵值，垂直線的位置（倒數第五個 x 值的位置）
+                            zIndex: 1, // 線的疊放順序，可自行調整
+                        },
+                        {
+                            color: '#e6e6e6', // 線的顏色
+                            width: 1, // 線的寬度
+                            value: this.ohlc && this.ohlc.length >= 10 ? moment(_.nth(this.ohlc, -10)[0]).valueOf() : null, // ma10扣抵值，垂直線的位置（倒數第五個 x 值的位置）
+                            zIndex: 1, // 線的疊放順序，可自行調整
+                        },
+                        {
+                            color: '#e6e6e6', // 線的顏色
+                            width: 1, // 線的寬度
+                            value: this.ohlc && this.ohlc.length >= 20 ? moment(_.nth(this.ohlc, -20)[0]).valueOf() : null, // ma20扣抵值，垂直線的位置（倒數第五個 x 值的位置）
+                            zIndex: 1, // 線的疊放順序，可自行調整
+                        },
+                    ],
                     labels: {
                         enabled: false, // 不顯示 x 軸的 Label
                         staggerLines: 1,
@@ -686,9 +688,9 @@ export default {
 
                     const { tickMin, tickMax } = this.chartMinMaxValues;
 
-                    // const positions = [];
+                    const positions = [];
                     const tickCount = 4; // 刻度數量
-                    // const tickInterval = (tickMax - tickMin) / (tickCount - 1); // 計算刻度間隔
+                    const tickInterval = (tickMax - tickMin) / (tickCount - 1); // 計算刻度間隔
 
                     // 取得最大的小數位數
                     const decimalPlaces = Math.max(
@@ -696,28 +698,28 @@ export default {
                         tickMin.toString().split('.')[1]?.length || 0
                     );
 
-                    // for (let i = 0; i < tickCount; i++) {
-                    //     let tickValue;
-                    //     if (i === 3) {
-                    //         tickValue = tickMax;
-                    //     } else {
-                    //         tickValue = tickMin + i * tickInterval;
-                    //     }
+                    for (let i = 0; i < tickCount; i++) {
+                        let tickValue;
+                        if (i === 3) {
+                            tickValue = tickMax;
+                        } else {
+                            tickValue = tickMin + i * tickInterval;
+                        }
 
-                    //     tickValue = Number(tickValue.toFixed(decimalPlaces)); // 將刻度值限制小數位數
-                    //     positions.push(tickValue);
-                    // }
+                        tickValue = Number(tickValue.toFixed(decimalPlaces)); // 將刻度值限制小數位數
+                        positions.push(tickValue);
+                    }
 
                     // console.log(positions);
                     // console.log(tickMax);
                     // 调用图表的重新渲染方法
-                    const tickMiddle = Number(((tickMin + tickMax) / 2).toFixed(decimalPlaces));
+                    // const tickMiddle = Number(((tickMin + tickMax) / 2).toFixed(decimalPlaces));
 
                     chartInstance.update({
                         yAxis: [
                             {
-                                // tickPositions: [...positions], // 更新 y 轴的刻度值
-                                tickPositions: [tickMin, tickMiddle, tickMax], // 更新 y 轴的刻度值
+                                tickPositions: positions, // 更新 y 轴的刻度值
+                                // tickPositions: [tickMin, tickMiddle, tickMax], // 更新 y 轴的刻度值
                             },
                         ],
                     });
