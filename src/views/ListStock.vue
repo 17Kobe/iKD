@@ -536,7 +536,7 @@
                                     }"
                                 >
                                     {{ item.buy_or_sell === '現在' ? '今' : item.buy_or_sell
-                                    }}{{ item.unit && item.unit === 0.5 ? '½' : '' }}
+                                    }}{{ item.unit && item.unit === 0.5 ? '½' : item.unit && item.unit === 0.35 ? '⅓' : '' }}
                                     <span>
                                         ({{
                                             item.buy_or_sell === '買'
@@ -750,7 +750,7 @@
                                     padding: '3px 9px',
                                     'font-size': '14px',
                                     'max-width': '260px',
-                                    'width': '260px',
+                                    width: '260px',
                                     'word-wrap': 'break-word',
                                     'white-space': 'pre-wrap',
                                 },

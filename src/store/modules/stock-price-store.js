@@ -1453,6 +1453,8 @@ const stock = {
             const foundStock = state.stockList.find((v) => v.id === stockId);
             // 一定有 policy.settings.buy 及 sell 因為前面SAVE_STOCK_POLICYRESULT 已經判斷過了
 
+            const star = foundStock.star;
+
             let foundCostDown = false;
             let foundEarn = false;
             let foundRsiOverBought = false;
@@ -1488,7 +1490,8 @@ const stock = {
             // let accPriceOfBuy = 0;
             let dateOfFirstBuy = '';
             let buyList = [];
-            let preSellReason = [];
+            let preSellObj = { reason: [] };
+            let continuouSalesCount = 0; // 已經連續賣的次數，為了算5星的存股，第二次用單一K棒賣
             foundStock.badge = null;
             foundStock.badge_reason = [];
             foundStock.policy.result.forEach((obj, index, array) => {
@@ -1555,7 +1558,8 @@ const stock = {
                         obj.number_of_buy = obj.reason.includes('kd_w') || obj.reason.includes('annual_fixed_date_buy') ? 2 : 1;
                         obj.is_sure_buy = true;
                         isReadyToSell = true;
-                        preSellReason = [];
+                        preSellObj = { reason: [] };
+                        continuouSalesCount = 0;
                         // 如果最後一天剛好也是買，那也需要算報酬率, 但算完可能也是0(也許不用算直接給0)
                         if (dataDailyLastDate.isSame(moment(obj.date))) {
                             obj.date_of_first_buy = dateOfFirstBuy;
@@ -1580,10 +1584,10 @@ const stock = {
                     }
                 } else if (
                     isReadyToSell &&
-                    ((!preSellReason.includes('kd_dead') && !preSellReason.includes('kd_turn_down')) || // 前次不得是黃金交叉 或 黃金轉折 賣(因為不想連續是以上)，除非這次是 RSI或KDM頭才要賣。但有買就都可以進入，一方面不影響基本，而且有買就又可以。"現在"則不考慮喔
+                    ((!preSellObj.reason.includes('kd_dead') && !preSellObj.reason.includes('kd_turn_down')) || // 前次不得是黃金交叉 或 黃金轉折 賣(因為不想連續是以上)，除非這次是 RSI或KDM頭才要賣。但有買就都可以進入，一方面不影響基本，而且有買就又可以。"現在"則不考慮喔
                         obj.reason.includes('rsi_over_bought') ||
                         obj.reason.includes('kd_m') ||
-                        obj.is_latest) && // latest時，preSellReason為空，obj.reason只有 latest
+                        obj.is_latest) && // latest時，preSellObj.reason 為空，obj.reason只有 latest
                     ((obj.is_sell && !obj.is_buy && !obj.is_sell_cancel) || obj.is_latest)
                 ) {
                     // 若有RSI，則KD賣的策略都要賣一半
@@ -1595,14 +1599,36 @@ const stock = {
                     // console.log(foundRsiOverBought);
                     // console.log(obj.reason);
                     var unit = 1; // 有可能絕對正報酬後才能確定賣的單位數要儲存進 obj
-                    if (
+                    if (obj.is_latest && obj.reason.length === 1) {
+                        // 現在的話都是全賣，記得理由只有今天一個
+                    } else if (
                         foundRsiOverBought &&
                         (obj.reason.includes('kd_dead') || obj.reason.includes('kd_turn_down')) &&
                         !obj.reason.includes('rsi_over_bought') &&
                         !obj.reason.includes('kd_m')
                     ) {
+                        // KD 死亡、KD 下折、沒有RSI、也沒有KD M頭
+                        if (star === 3 && continuouSalesCount >= 1) {
+                            // 3顆星時要存股
+                            thisNumberOfSell = totalNumberOfBuy * 0.35;
+                            unit = 0.5;
+                        } else if (star === 3) {
+                            // 3顆星時要存股
+                            thisNumberOfSell = totalNumberOfBuy * 0.35;
+                            console.log('RSI，且有 KD');
+                            unit = 0.35;
+                        } else {
+                            thisNumberOfSell = totalNumberOfBuy / 2;
+                            console.log('RSI，且有 KD');
+                            unit = 0.5;
+                        }
+                    } else if (star === 3 && continuouSalesCount === 0) {
+                        // 其它若是3星，若是第1次賣
+                        thisNumberOfSell = totalNumberOfBuy * 0.35;
+                        unit = 0.35;
+                    } else if (star === 3) {
+                        // 其它若是3星，則賣一半，如 RSI、KD M頭
                         thisNumberOfSell = totalNumberOfBuy / 2;
-                        console.log('RSI，且有 KD');
                         unit = 0.5;
                     }
                     // console.log('currBuyList=', currBuyList);
@@ -1660,13 +1686,28 @@ const stock = {
                     // console.log(obj.is_latest);
                     // 搭配 絕對正報酬，應該是要該天要有賣，有遇到 is_lastest=true，但沒有is_sell，最終有earn
                     // console.log('rateOfReturn=', rateOfReturn);
+
                     let isCancelToSell = false;
+
                     if (foundEarn && obj.is_sell && rateOfReturn * 100 <= foundEarn.limit) {
                         // 絕對正報酬
                         isCancelToSell = true;
                         obj.is_sell_cancel = true;
                         obj.reason.push('earn');
                         buyList = _.concat(currBuyList, buyList);
+                    } else if (
+                        star === 3 &&
+                        continuouSalesCount >= 1 &&
+                        rateOfReturn < preSellObj.rate_of_return + 0.03 &&
+                        (obj.price - preSellObj.price) / preSellObj.price < 0.03
+                    ) {
+                        // 沒有取消賣時；且為3顆星；進入第三次賣以上時
+                        isCancelToSell = true;
+                        obj.is_sell_cancel = true;
+                        obj.reason.push('star3');
+                        buyList = _.concat(currBuyList, buyList);
+                        // } else if (star === 3 && continuouSalesCount === 0) {
+                        //     // 沒有取消賣時；且為3顆星；進入第一次賣時，這裡用K賣來算未來
                     }
 
                     if (!isCancelToSell || obj.is_latest) {
@@ -1681,16 +1722,17 @@ const stock = {
                         obj.total_unit_cost = totalPrice;
                         obj.unit = unit;
                         // 這裡故意不是真正first buy date，是為了避免重覆算時間
-                        if (unit === 0.5) dateOfFirstBuy = obj.date;
+                        if (unit !== 1) dateOfFirstBuy = obj.date;
                         else dateOfFirstBuy = '';
 
                         if (obj.is_sell) obj.is_sure_sell = true; // 進來是 is_sell 或 is_lastest，所以 is_latest 不一定是 is_sell, 最後一個日期如果真的是賣才會有確定賣，
 
+                        continuouSalesCount += 1;
                         // numberOfBuy = finalNumberOfSell;
                         // accPriceOfBuy = 0;
                         isReadyToSell = remainingBuyList.length > 0;
 
-                        preSellReason = obj.reason; // 為了避免連續賣都是KD
+                        preSellObj = obj; // 為了避免連續賣都是KD
                         // console.log('isReadyToSell=', isReadyToSell);
 
                         // 如果最後一天剛好也是賣; 是最後一筆且距今天差3天
@@ -1702,9 +1744,9 @@ const stock = {
                             obj.is_sure_sell &&
                             (dataDailyLastDate.isSame(moment(obj.date)) || moment().diff(moment(obj.date), 'days') <= 4)
                         ) {
-                            if (!isCancelToSell) foundStock.badge = unit === 0.5 ? '賣½' : '賣';
+                            if (!isCancelToSell) foundStock.badge = unit === 0.5 ? '賣½' : unit === 0.35 ? '賣⅓' : '賣';
                             // 必定賣
-                            else foundStock.badge = unit === 0.5 ? '取消賣½' : '取消賣'; // 取消
+                            else foundStock.badge = unit === 0.5 ? '取消賣½' : unit === 0.35 ? '取消賣⅓' : '取消賣'; // 取消
                             foundStock.badge_reason = obj.reason;
                         }
 
