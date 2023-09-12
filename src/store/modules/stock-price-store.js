@@ -2178,7 +2178,14 @@ const stock = {
                 if (lastThirdValueAarray[4] >= lastThirdValueAarray[1] && lastThirdValueAarray[1] > kOpenValue)
                     kOpenValue = lastThirdValueAarray[1];
 
-                if (kOpenValue !== 0) kStatus.push('停利 ' + kOpenValue);
+                if (kOpenValue !== 0) {
+                    kOpenValue = kOpenValue >= 1000
+                    ? Number(kOpenValue.toFixed(0))
+                    : kOpenValue >= 100
+                    ? Number(kOpenValue.toFixed(1))
+                    : Number(kOpenValue.toFixed(2));
+                    kStatus.push('停利 ' + kOpenValue);
+                }
                 // } else if (kdStatus.includes('KD 低檔鈍化')) {
                 //     // date open high low close
                 //     // 紅棒最低點

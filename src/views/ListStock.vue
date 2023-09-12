@@ -616,10 +616,10 @@
                             <div>
                                 <div v-if="scope.row.policy && scope.row.policy.stats" style="font-size: 13px">
                                     <el-row>
-                                        <el-col :span="7" style="padding: 0 0 0 30px; text-align: left"
+                                        <el-col :span="6" style="padding: 0 0 0 15px; text-align: left"
                                             ><span>賣出次數</span></el-col
                                         >
-                                        <el-col :span="5" style="padding: 0; text-align: right"
+                                        <el-col :span="6" style="padding: 0; text-align: right"
                                             ><el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
                                                     scope.row.policy.stats.number_of_sell
@@ -649,10 +649,10 @@
                                         </el-col>
                                     </el-row>
                                     <el-row>
-                                        <el-col :span="7" style="padding: 0 0 0 30px; text-align: left"
+                                        <el-col :span="6" style="padding: 0 0 0 15px; text-align: left"
                                             ><span>每回天數</span></el-col
                                         >
-                                        <el-col :span="5" style="padding: 0; text-align: right"
+                                        <el-col :span="6" style="padding: 0; text-align: right"
                                             ><el-tag type="warning" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
                                                     scope.row.policy.stats.average_sell_interval
@@ -684,8 +684,8 @@
                                         > -->
                                     </el-row>
                                     <el-row>
-                                        <el-col :span="7" style="padding: 0 0 0 30px; text-align: left"><span>最好</span></el-col>
-                                        <el-col :span="5" style="padding: 0; text-align: right"
+                                        <el-col :span="6" style="padding: 0 0 0 15px; text-align: left"><span>最好</span></el-col>
+                                        <el-col :span="6" style="padding: 0; text-align: right"
                                             ><el-tag type="danger" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
                                                     scope.row.policy.stats.max_earn
@@ -708,8 +708,8 @@
                                         >
                                     </el-row>
                                     <el-row>
-                                        <el-col :span="7" style="padding: 0 0 0 30px; text-align: left"><span>最差</span></el-col>
-                                        <el-col :span="5" style="padding: 0; text-align: right"
+                                        <el-col :span="6" style="padding: 0 0 0 15px; text-align: left"><span>最差</span></el-col>
+                                        <el-col :span="6" style="padding: 0; text-align: right"
                                             ><el-tag type="success" class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
                                                     scope.row.policy.stats.max_lose
