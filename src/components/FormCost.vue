@@ -143,7 +143,6 @@ export default {
             stockData: {},
             costList: [],
             defaultCost: 0, // 預設的股價，用代入的
-            defaultExchange: 1,
             // totalNumber: 0,
             form: [
                 // {
@@ -182,19 +181,24 @@ export default {
             console.log('averageCost');
             // 有可能cost 為 null，所以要變更為0
             return Math.round(
-                this.form.reduce((acc, { cost, number }) => acc + (cost || 0) * parseFloat(number, 10), 0) * this.defaultExchange
+                this.form.reduce((acc, { cost, number, buy_exchange }) => {
+                    return acc + (cost || 0) * parseFloat(number, 10) * buy_exchange;
+                }, 0)
             );
         },
         averageCost() {
             // parseFloat 是為了去除小數點後面的0
             // div 0 結果會 NaN, 所以把它變 /1
-            return Number((this.sumCost / (this.totalOfShares === 0 ? 1 : this.totalOfShares) / this.defaultExchange).toFixed(2));
+            const numberExchange = this.form.reduce((acc, { number, buy_exchange }) => {
+                return acc + parseFloat(number, 10) * buy_exchange;
+            }, 0);
+            return numberExchange === 0 ? 0 : Number((this.sumCost / numberExchange).toFixed(2));
         },
         sellSrcOptions() {
             let sellNumber = this.sellNumber; // 總共賣出的股數
             this.checkedSellSrc = [];
             // buy_date 是因為價格若一樣，則先買的日期要先賣
-            return _.orderBy(this.form, ['buy_date', 'cost'], ['asc','desc']).reduce((acc, { cost, number }, index) => {
+            return _.orderBy(this.form, ['buy_date', 'cost'], ['asc', 'desc']).reduce((acc, { cost, number }, index) => {
                 // 該價格總共有的股數
                 // 計算可以賣的股數
                 // console.log('sellNumber =' + sellNumber);
@@ -218,7 +222,11 @@ export default {
             }, []);
         },
         sellSumPrice() {
-            return Math.round(this.sellPrice * this.sellNumber * this.defaultExchange);
+            return Math.round(
+                this.sellPrice * this.sellNumber * this.stockData.currency === 'USD'
+                    ? this.$store.getters.getDatetoExchange(moment().format('YYYY-MM-DD')) - 0.075
+                    : 1
+            );
         },
         sellOriginSpend() {
             console.log('sellOriginSpend');
@@ -232,7 +240,11 @@ export default {
                     // console.log(match[1]);
                     // console.log(match[2]);
                     return acc + (sellPrice || 0) * parseFloat(sellNumber, 10);
-                }, 0) * this.defaultExchange
+                }, 0) *
+                    this.stockData.currency ===
+                    'USD'
+                    ? this.$store.getters.getDatetoExchange(moment().format('YYYY-MM-DD')) - 0.075
+                    : 1
             );
         },
         sellSpread() {
@@ -243,7 +255,10 @@ export default {
         },
         sellAverageCost() {
             return Number(
-                (this.sellOriginSpend / (this.sellNumber === 0 ? 1 : this.sellNumber) / this.defaultExchange).toFixed(2)
+                (this.sellOriginSpend / (this.sellNumber === 0 ? 1 : this.sellNumber) / this.stockData.currency === 'USD'
+                    ? this.$store.getters.getDatetoExchange(moment().format('YYYY-MM-DD')) - 0.075
+                    : 1
+                ).toFixed(2)
             );
         },
     },
@@ -251,11 +266,16 @@ export default {
     methods: {
         onAdd() {
             console.log('onAdd');
+
             const index = this.form.push({
                 cost: this.defaultCost,
                 number: 1000,
                 // buy_date: '2021-01-01',
                 buy_date: moment().format('YYYY-MM-DD'),
+                buy_exchange:
+                    this.stockData.currency === 'USD'
+                        ? this.$store.getters.getDatetoExchange(moment().format('YYYY-MM-DD')) + 0.075
+                        : 1,
             });
             // nextTick()會在DOM已掛載、渲染完成後，執行nextTick()內的程式碼
             // https://stackoverflow.com/questions/59749325/vue-set-focus-to-dynamic-input-box
@@ -322,9 +342,6 @@ export default {
             this.defaultCost = this.stockData.last_price;
             this.sellPrice = this.defaultCost;
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定成本`;
-            // 一定要用 else，不然可能用到上個開的股票了
-            if (this.stockData.buy_exchange) this.defaultExchange = this.stockData.buy_exchange;
-            else this.defaultExchange = 1;
 
             if (_.has(this.stockData, 'cost.settings')) {
                 let tempForm = _.cloneDeep(this.stockData.cost.settings);

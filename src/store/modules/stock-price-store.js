@@ -1168,6 +1168,7 @@ const stock = {
             console.log('SAVE_STOCK_COST_RETURN');
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
+            const foundExchange = state.stockList.find((v) => v.name === '美金匯率');
 
             if (_.has(foundStock, 'cost') && _.has(foundStock, 'data.daily') && foundStock.data.daily.length > 0) {
                 const closeValueIndex = foundStock.data.daily[0].length === 2 ? 1 : 4;
@@ -1176,15 +1177,20 @@ const stock = {
                 // console.log(foundStock.cost.sum);
 
                 // 若有 buy_exchange，則要取到最新匯率
-                const exchange = foundStock.buy_exchange ? state.usdExchange : 1;
+                const sellExchange =
+                    foundStock.currency === 'USD' && foundExchange && foundExchange.data.daily.length > 0
+                        ? foundExchange.data.daily[foundExchange.data.daily.length - 1][1] - 0.075
+                        : 1;
+
+                // 代表有匯率，美金中值+-0.075
                 foundStock.cost.return = 0;
                 foundStock.cost.rate_of_return = 0;
-                foundStock.cost.return = Math.round(close * foundStock.cost.total * exchange - foundStock.cost.sum);
+                foundStock.cost.return = Math.round(close * foundStock.cost.total * sellExchange - foundStock.cost.sum);
                 foundStock.cost.market_value = foundStock.cost.sum + foundStock.cost.return;
                 foundStock.cost.rate_of_return =
                     foundStock.cost.sum === 0
                         ? null
-                        : ((close * foundStock.cost.total * exchange - foundStock.cost.sum) * 100) / foundStock.cost.sum; // 只發股數，有可能股價輸入0，這時設為 null，顯示則為 N/A 無法計算，因為成本為0，報酬率為無限吧
+                        : ((close * foundStock.cost.total * sellExchange - foundStock.cost.sum) * 100) / foundStock.cost.sum; // 只發股數，有可能股價輸入0，這時設為 null，顯示則為 N/A 無法計算，因為成本為0，報酬率為無限吧
 
                 // save to localstorage
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList));
@@ -2179,11 +2185,12 @@ const stock = {
                     kOpenValue = lastThirdValueAarray[1];
 
                 if (kOpenValue !== 0) {
-                    kOpenValue = kOpenValue >= 1000
-                    ? Number(kOpenValue.toFixed(0))
-                    : kOpenValue >= 100
-                    ? Number(kOpenValue.toFixed(1))
-                    : Number(kOpenValue.toFixed(2));
+                    kOpenValue =
+                        kOpenValue >= 1000
+                            ? Number(kOpenValue.toFixed(0))
+                            : kOpenValue >= 100
+                            ? Number(kOpenValue.toFixed(1))
+                            : Number(kOpenValue.toFixed(2));
                     kStatus.push('停利 ' + kOpenValue);
                 }
                 // } else if (kdStatus.includes('KD 低檔鈍化')) {
@@ -2363,6 +2370,17 @@ const stock = {
                 });
             }
             return _.orderBy(filteredList, ['order'], ['asc']);
+        },
+        getDatetoExchange: (state, getters) => (date) => {
+            console.log('getDatetoExchange');
+
+            const foundExchange = state.stockList.find((v) => v.name === '美金匯率');
+            const matchingExchange = foundExchange.data.daily.find(function (exchangeObj) {
+                const exchangeDate = moment(exchangeObj[0]); // 轉換成日期物件
+                return exchangeDate.isSameOrBefore(date);
+            });
+            console.log(matchingExchange);
+            return matchingExchange ? matchingExchange[1] : 1;
         },
         // object of array to filter
         getStock: (state) => (id) => {
