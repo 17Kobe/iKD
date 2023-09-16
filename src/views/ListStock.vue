@@ -161,7 +161,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="實際買賣" width="190" header-align="center" align="center">
+            <el-table-column label="實際買賣" width="230" header-align="center" align="center">
                 <template #default="scope">
                     <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1">
                         <el-popover
@@ -190,12 +190,11 @@
                                         font-size: 14px;
                                         display: inline-flex;
                                         justify-content: space-between;
-                                        width: 30px;
+                                        width: 110px;
                                         text-align: center;
                                         color: white;
                                         border-radius: 10px 100px / 120px;
                                         padding: 5px;
-                                        width: 90px;
                                         text-align: left;
                                     "
                                     >今<span> ({{ getNumberSum(scope.row.cost.settings) }} 股) </span></span
@@ -247,7 +246,7 @@
                                             {
                                                 'font-size': '14px',
                                                 display: 'inline-flex' /* 使用 inline-flex 以允許靠右對齊 */,
-                                                width: '90px',
+                                                width: '110px',
                                                 'text-align': 'left',
                                                 'justify-content': 'space-between' /* 將子元素靠右對齊 */,
                                                 color: 'white',
