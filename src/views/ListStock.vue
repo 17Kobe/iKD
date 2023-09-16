@@ -38,7 +38,7 @@
                         >
                             <span
                                 style="font-size: 16px; font-weight: bold; cursor: pointer"
-                                @click="goToStockAnalysis(scope.row.id)"
+                                @click="goToStockAnalysis(scope.row.id, scope.row.url)"
                             >
                                 {{ scope.row.name }}
                             </span>
@@ -48,7 +48,7 @@
                         <span
                             style="color: #cccccc; cursor: pointer"
                             v-if="scope.row.type !== 'fund'"
-                            @click="goToStockAnalysis(scope.row.id)"
+                            @click="goToStockAnalysis(scope.row.id, scope.row.url)"
                             >{{ scope.row.id }}</span
                         >
                         <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
@@ -990,10 +990,10 @@ export default {
         //     return '<b>buy</b>';
         // },
 
-        goToStockAnalysis(id) {
+        goToStockAnalysis(id, url) {
             // this.showStockAnalysis = true;
             // this.currentStockId = id;
-            window.open('https://www.wantgoo.com/stock/' + id + '/technical-chart', '_blank');
+            url ? window.open(url, '_blank') : window.open('https://www.wantgoo.com/stock/' + id + '/technical-chart', '_blank');
         },
         toggleWeekK() {
             // this.showWeekK = !this.showWeekK;

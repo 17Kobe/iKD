@@ -180,7 +180,12 @@
                         style="margin: 1px 0px"
                         :type="scope.row.cost.return >= 0 ? 'primary' : 'danger'"
                         ><span style="font-size: 14px; font-weight: bold">
-                            $ {{ scope.row.cost.return === 0 ? 0 : scope.row.cost.return.toLocaleString('en-US') }}
+                            $
+                            {{
+                                scope.row.cost && scope.row.cost.return !== undefined && scope.row.cost.return !== 0
+                                    ? scope.row.cost.return.toLocaleString('en-US')
+                                    : 0
+                            }}
                         </span></el-tag
                     >
                 </template>

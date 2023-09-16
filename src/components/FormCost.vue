@@ -182,7 +182,8 @@ export default {
             // 有可能cost 為 null，所以要變更為0
             return Math.round(
                 this.form.reduce((acc, { cost, number, buy_exchange }) => {
-                    return acc + (cost || 0) * parseFloat(number, 10) * buy_exchange;
+                    const exchangeRate = buy_exchange !== undefined ? buy_exchange : 1;
+                    return acc + (cost || 0) * parseFloat(number, 10) * exchangeRate;
                 }, 0)
             );
         },
@@ -190,7 +191,8 @@ export default {
             // parseFloat 是為了去除小數點後面的0
             // div 0 結果會 NaN, 所以把它變 /1
             const numberExchange = this.form.reduce((acc, { number, buy_exchange }) => {
-                return acc + parseFloat(number, 10) * buy_exchange;
+                const exchangeRate = buy_exchange !== undefined ? buy_exchange : 1;
+                return acc + parseFloat(number, 10) * exchangeRate;
             }, 0);
             return numberExchange === 0 ? 0 : Number((this.sumCost / numberExchange).toFixed(2));
         },
@@ -223,9 +225,11 @@ export default {
         },
         sellSumPrice() {
             return Math.round(
-                this.sellPrice * this.sellNumber * this.stockData.currency === 'USD'
-                    ? this.$store.getters.getDatetoExchange(moment().format('YYYY-MM-DD')) - 0.075
-                    : 1
+                this.sellPrice *
+                    this.sellNumber *
+                    (this.stockData.currency === 'USD'
+                        ? this.$store.getters.getDatetoExchange(moment().format('YYYY-MM-DD')) - 0.075
+                        : 1)
             );
         },
         sellOriginSpend() {
@@ -241,10 +245,9 @@ export default {
                     // console.log(match[2]);
                     return acc + (sellPrice || 0) * parseFloat(sellNumber, 10);
                 }, 0) *
-                    this.stockData.currency ===
-                    'USD'
-                    ? this.$store.getters.getDatetoExchange(moment().format('YYYY-MM-DD')) - 0.075
-                    : 1
+                    (this.stockData.currency === 'USD'
+                        ? this.$store.getters.getDatetoExchange(moment().format('YYYY-MM-DD')) - 0.075
+                        : 1)
             );
         },
         sellSpread() {
@@ -255,9 +258,12 @@ export default {
         },
         sellAverageCost() {
             return Number(
-                (this.sellOriginSpend / (this.sellNumber === 0 ? 1 : this.sellNumber) / this.stockData.currency === 'USD'
-                    ? this.$store.getters.getDatetoExchange(moment().format('YYYY-MM-DD')) - 0.075
-                    : 1
+                (
+                    this.sellOriginSpend /
+                    (this.sellNumber === 0 ? 1 : this.sellNumber) /
+                    (this.stockData.currency === 'USD'
+                        ? this.$store.getters.getDatetoExchange(moment().format('YYYY-MM-DD')) - 0.075
+                        : 1)
                 ).toFixed(2)
             );
         },
