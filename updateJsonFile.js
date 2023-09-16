@@ -88,7 +88,7 @@ Promise.all(urls.map(getPromise)).then(function (stats) {
             return item;
         } else {
             // 非基金，刪除 data, cost, calc_policy_date, crawler_dividend_last_date
-            return _.omit(item, ['data', 'cost', 'calc_policy_date', 'crawler_dividend_last_date']);
+            return _.omit(item, ['data', 'cost', 'crawler_dividend_last_date']);
         }
     });
 

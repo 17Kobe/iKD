@@ -1209,9 +1209,9 @@ const stock = {
                 (!_.has(policyList, 'sell') || (_.has(policyList, 'sell') && policyList.sell.length === 0))
             ) {
                 if (_.has(foundStock, 'policy')) delete foundStock.policy;
-                delete foundStock.calc_policy_date;
-                delete foundStock.data.ma_buy;
-                delete foundStock.data.ma_sell;
+                // delete foundStock.calc_policy_date;
+                // delete foundStock.data.ma_buy;
+                // delete foundStock.data.ma_sell;
             } else {
                 if (!foundStock.policy) foundStock.policy = { settings: { buy: [], sell: [] } };
                 foundStock.policy.settings = policyList; // 複製數據複本

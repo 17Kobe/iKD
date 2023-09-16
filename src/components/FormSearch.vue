@@ -379,12 +379,10 @@ export default {
                                     else if (key === 'stockList') {
                                         localStorage.setItem(key, JSON.stringify(data[key]));
                                         downloadLocalSotrage = data[key];
-                                    }
-                                    else localStorage.setItem(key, JSON.stringify(data[key]));
+                                    } else localStorage.setItem(key, JSON.stringify(data[key]));
                                 }
                                 // console.log(downloadLocalSotrage);
                                 downloadLocalSotrage.forEach((obj) => {
-                                    obj.calc_policy_date = "";
                                     const foundStock = this.stockList.find((v) => v.id === obj.id);
                                     if (foundStock) {
                                         // 跟 data 有關(last_price、last_price_date、last_price_spread)的也有跟 data一起改，否則data可能無更新時，會顯示錯的last_price
@@ -393,7 +391,6 @@ export default {
                                         obj.last_price_spread = foundStock.last_price_spread;
                                         obj.data = JSON.parse(JSON.stringify(foundStock.data)); //{ ...foundStock.data }; // 這種改法只有第一層 // 取值而已，不然會是 proxy(object)
                                     }
-
                                 });
                                 // console.log(downloadLocalSotrage);
                                 this.$store.commit('SAVE_ALL_STOCK', downloadLocalSotrage);
@@ -404,13 +401,10 @@ export default {
                                 });
 
                                 // saveStockListToDb('stockList', state.stockList);
-                                window.setTimeout( () => location.reload() , 1000);
+                                window.setTimeout(() => location.reload(), 1000);
 
                                 // const indexedDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
                                 // indexedDB.deleteDatabase("wc");
-
-                                
-
                             } catch (e) {
                                 console.log('localStorage 儲存失敗：', e);
                             }
