@@ -5,7 +5,7 @@ import { saveStockListToDb } from '@/shared/idbUtils.js';
 import GlobalSettings from '@/store/data/global-settings.json';
 
 const defaultState = {
-    usdExchange: 30,
+    // usdExchange: 30,
     stockList: [], // 目前知道 ios 在 19支股票，>=19會不能儲存localstorage
     tempStockList: [], // 暫存股票data變一年以內
 };
@@ -961,7 +961,7 @@ const stock = {
         SAVE_GLOBAL_SETTINGS(state, data) {
             console.log('SAVE_GLOBAL_SETTINGS');
             // console.log(data);
-            state.usdExchange = data.usd_exchange;
+            // state.usdExchange = data.usd_exchange;
         },
         // 將該股票的淨值儲存到 state 上
         SAVE_STOCK_LIST(state, data) {
