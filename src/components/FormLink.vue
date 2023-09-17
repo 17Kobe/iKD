@@ -39,6 +39,11 @@ export default {
             title: '參考連結',
             links: [
                 {
+                    text: 'VIX 恐慌指數',
+                    url: 'https://www.macromicro.me/charts/17598/kong-huang-zhi-shu-yu-S-P-500',
+                    icon: 'el-icon-apple',
+                },
+                {
                     text: '美股 散戶投資人情緒指數',
                     url: 'https://www.macromicro.me/charts/20828/us-aaii-sentimentsurvey',
                     icon: 'el-icon-apple',
