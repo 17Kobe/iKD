@@ -5,7 +5,11 @@
                 <el-row>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" style="padding-left: 3px">
                         <div v-for="(link, index) in links" :key="index" style="line-height: 30px">
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i :class="link.icon" style="font-size: 16px"></i>&nbsp;<el-link
+                            &nbsp;&nbsp;&nbsp;&nbsp;<i
+                                :class="link.icon"
+                                style="font-size: 16px; position: relative; top: 2px"
+                            ></i
+                            >&nbsp;&nbsp;<el-link
                                 :href="link.url"
                                 type="primary"
                                 target="_blank"
