@@ -59,6 +59,11 @@ export default {
                     icon: 'el-icon-money',
                 },
                 {
+                    text: '美債 20年期公債殖利率',
+                    url: 'https://www.macromicro.me/charts/60802/mei-guo-20-nian-qi-gong-zhai-zhi-li-lyu-TLT',
+                    icon: 'el-icon-knife-fork',
+                },
+                {
                     text: '美債 基本面指數',
                     url: 'https://www.macromicro.me/collections/51/us-treasury-bond/763/mm-us-bond-index',
                     icon: 'el-icon-knife-fork',
@@ -80,7 +85,7 @@ export default {
                 },
                 {
                     text: '台灣 景氣對策信號',
-                    url: 'https://www.macromicro.me/charts/90/tw-light-stock',
+                    url: 'https://www.macromicro.me/collections/10/tw-monitoring-indicators-relative/90/tw-light-stock',
                     icon: 'el-icon-food',
                 },
                 {
