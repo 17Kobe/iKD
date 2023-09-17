@@ -112,9 +112,9 @@
                                 : 'success'
                         "
                     >
-                        {{ scope.row.name.replace(/(基金|台灣|A2|投資級)/g, '') }}
+                        {{ scope.row.name.replace(/(基金|精選|A2|投資級)/g, '') }}
                     </el-badge>
-                    <span v-else>{{ scope.row.name.replace(/(基金|台灣|A2|投資級)/g, '') }}</span>
+                    <span v-else>{{ scope.row.name.replace(/(基金|精選|A2|投資級)/g, '') }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="漲跌幅" width="70" align="right" header-align="right" v-if="modeSpread === '目前'">
