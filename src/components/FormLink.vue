@@ -89,6 +89,16 @@ export default {
                     icon: 'el-icon-food',
                 },
                 {
+                    text: '台灣 信義房價指數',
+                    url: 'https://www.macromicro.me/collections/15/tw-housing-relative/124/tw-housing-price-sinyi',
+                    icon: 'el-icon-food',
+                },
+                {
+                    text: '台積電(TSM) ADR',
+                    url: 'https://www.wantgoo.com/global/tsm',
+                    icon: 'el-icon-baseball',
+                },
+                {
                     text: '台積電(2330)',
                     url: 'https://www.macromicro.me/collections/1736/tsmc/14500/tw-tsmc-2330-monthly-revenue',
                     icon: 'el-icon-baseball',
