@@ -10,31 +10,36 @@
         </main>
         <footer class="footer">
             <el-menu default-active="default" :router="false" mode="horizontal" active-text-color="#409EFF">
-                <el-menu-item index="default" @click="onMenuItemClick('default')" style="padding: 0 12px">
+                <el-menu-item index="default" @click="onMenuItemClick('default')" style="padding: 0 6px">
                     <i class="el-icon-star-off" style="position: relative; top: -2px"></i>自選股　
                 </el-menu-item>
-                <el-menu-item index="dividend" @click="onMenuItemClick('dividend')" style="padding: 0 12px">
+                <el-menu-item index="dividend" @click="onMenuItemClick('dividend')" style="padding: 0 6px">
                     <i class="el-icon-sugar" style="position: relative; top: -2px"></i>價差股利
                 </el-menu-item>
-                <el-menu-item index="asset" @click="onMenuItemClick('asset')" style="padding: 0 12px">
+                <el-menu-item index="asset" @click="onMenuItemClick('asset')" style="padding: 0 6px">
                     <i class="el-icon-pie-chart" style="position: relative; top: -2px"></i>資產表　
                 </el-menu-item>
-                <el-menu-item index="add" @click="doShowSearch()" style="padding: 0 12px">
+                <el-menu-item index="add" @click="doShowSearch()" style="padding: 0 6px">
                     <i class="el-icon-circle-plus-outline" style="position: relative; top: -2px"></i>
+                </el-menu-item>
+                <el-menu-item index="link" @click="doShowLink()" style="padding: 0 6px">
+                    <i class="el-icon-link" style="position: relative; top: -2px"></i>
                 </el-menu-item>
             </el-menu>
         </footer>
         <el-backtop :right="10" :bottom="68" :visibility-height="30" />
         <FormSearch ref="childFormSearch" />
+        <FormLink ref="childFormLink" />
     </div>
 </template>
 
 <script>
 // import menuWav from '@/assets/menu.wav';
 import FormSearch from '@/components/FormSearch.vue';
+import FormLink from '@/components/FormLink.vue';
 
 export default {
-    components: { FormSearch },
+    components: { FormSearch, FormLink },
     data() {
         return {
             routerName: 'default',
@@ -57,6 +62,9 @@ export default {
             // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
             this.$store.dispatch('GET_TAIWAN_STOCK');
             this.$refs.childFormSearch.onInit();
+        },
+        doShowLink() {
+            this.$refs.childFormLink.onInit();
         },
     },
 };
