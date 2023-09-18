@@ -2394,7 +2394,7 @@ const stock = {
             // const found = _.find(state.stockList, ['id', id]);
             const found = getters.getStock(id);
             // const found = getters.getStock(id);
-            return found.data && found.data.weekly
+            return found && found.data && found.data.weekly
                 ? _.slice(found.data.weekly, -26).map((value) => [
                       moment(value[0]).valueOf(),
                       value[1],
@@ -2417,7 +2417,7 @@ const stock = {
             // console.log(found.data.weekly_kdj);
             // if (found.data && found.data.weekly_kdj) console.log(found.data.weekly_kdj);
 
-            return found.data && found.data.weekly_kdj
+            return found && found.data && found.data.weekly_kdj
                 ? _.slice(found.data.weekly_kdj, -26).map((value) => [moment(value[0]).valueOf(), value[1], value[2], value[3]])
                 : [];
         },
@@ -2425,7 +2425,7 @@ const stock = {
             console.log('getStockDataWeeklyRsi');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.weekly_rsi
+            return found && found.data && found.data.weekly_rsi
                 ? _.slice(found.data.weekly_rsi, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
                 : [];
         },
@@ -2433,7 +2433,7 @@ const stock = {
             console.log('getStockDataWeeklyMa');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.weekly_ma
+            return found && found.data && found.data.weekly_ma
                 ? _.slice(found.data.weekly_ma, -26).map((value) => [moment(value[0]).valueOf(), value[1], value[2], value[3]])
                 : [];
         },
@@ -2442,7 +2442,7 @@ const stock = {
             console.log('getStockDataWeeklyMaBuy');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.ma_buy
+            return found && found.data && found.data.ma_buy
                 ? _.slice(found.data.ma_buy, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
                 : [];
         },
@@ -2458,7 +2458,7 @@ const stock = {
             console.log('getStockDataWeeklyCost');
             // if (_.has(getters.getStock(id), 'data.weekly')) console.log(getters.getStock(id).data.weekly.length);
             const found = getters.getStock(id);
-            return found.data && found.data.cost
+            return found && found.data && found.data.cost
                 ? _.slice(found.data.cost, -26).map((value) => [moment(value[0]).valueOf(), value[1]])
                 : [];
         },
