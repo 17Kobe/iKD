@@ -349,7 +349,7 @@ export default {
                 reader.readAsDataURL(blob);
                 reader.onloadend = async () => {
                     // 取得現有檔案的 SHA 值
-                    const url = 'https://api.github.com/repos/17Kobe/iKD/contents/assets/data/my_localstorage.json';
+                    const url = `https://api.github.com/repos/17Kobe/iKD/contents/assets/data/my_localstorage${this.recordSelected}.json`;
                     const response = await axios.get(url, {
                         headers: {
                             Authorization: `Bearer ${GITHUB_ACCESS_TOKEN}`,
@@ -364,7 +364,7 @@ export default {
                     // 在這裡上傳到 Github
                     const contentBase64 = reader.result.split(',')[1];
                     const uploadResponse = await axios.put(
-                        'https://api.github.com/repos/17Kobe/iKD/contents/assets/data/my_localstorage.json',
+                        `https://api.github.com/repos/17Kobe/iKD/contents/assets/data/my_localstorage${this.recordSelected}.json`,
                         {
                             message: 'Upload iKD localstorage data',
                             content: contentBase64,
@@ -399,7 +399,9 @@ export default {
                     localStorage.clear();
 
                     // 載入 JSON 資料，後面加日期是為了避免手機用快取下載，而非真正抓最新的資料
-                    const url = 'https://17kobe.github.io/iKD/assets/data/my_localstorage.json?' + new Date().getTime();
+                    const url =
+                        `https://17kobe.github.io/iKD/assets/data/my_localstorage${this.recordSelected}.json?` +
+                        new Date().getTime();
                     fetch(url)
                         .then((response) => response.json())
                         .then((data) => {
