@@ -70,17 +70,23 @@
         <br />
         <br />
         <br />
-        <el-collapse>
-            <el-collapse-item title="&nbsp;&nbsp;&nbsp;&nbsp;進階設定">
-                &nbsp;&nbsp;<el-button type="warning" @click="onUploadSync"
-                    ><i class="el-icon-upload2"></i> 上傳同步資料</el-button
-                >
-                <br />
-                <br />
-                &nbsp;&nbsp;<el-button type="warning" @click="onDownloadSync"
-                    ><i class="el-icon-download"></i> 下載同步資料</el-button
-                >
-                <br />
+        <el-collapse v-model="activeNames">
+            <el-collapse-item name="1" title="&nbsp;&nbsp;&nbsp;&nbsp;進階設定">
+                <el-row align="middle">
+                    <el-col :xs="10" :sm="10" :md="10" :lg="3" :xl="2">
+                        <el-select v-model="recordSelected" class="m-2" placeholder="選擇記錄">
+                            <el-option v-for="item in recordOptions" :key="item.value" :label="item.label" :value="item.value" />
+                        </el-select>
+                    </el-col>
+
+                    <el-col :xs="14" :sm="14" :md="14" :lg="4" :xl="2">
+                        <div style="display: flex; align-items: center; justify-content: space-around">
+                            <el-button type="warning" @click="onUploadSync"><i class="el-icon-upload2"></i> 上傳</el-button>
+                            <el-button type="primary" @click="onDownloadSync"><i class="el-icon-download"></i> 下載</el-button>
+                        </div>
+                    </el-col>
+                </el-row>
+
                 <br />
                 &nbsp;
                 <el-tooltip class="box-item" effect="dark" content="使用在星期六也要補班的時候" placement="top">
@@ -124,8 +130,34 @@ export default {
             isShow: false,
             title: '新增股票',
 
+            activeNames: ['1'],
+
             loading: false,
             stockOptions: [],
+
+            recordSelected: '1',
+            recordOptions: [
+                {
+                    value: '1',
+                    label: '記錄1',
+                },
+                {
+                    value: '2',
+                    label: '記錄2',
+                },
+                {
+                    value: '3',
+                    label: '記錄3',
+                },
+                {
+                    value: '4',
+                    label: '記錄4',
+                },
+                {
+                    value: '5',
+                    label: '記錄5',
+                },
+            ],
 
             stockData: {},
             form: {
