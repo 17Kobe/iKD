@@ -39,6 +39,11 @@ export default {
             title: '參考連結',
             links: [
                 {
+                    text: 'StockQ',
+                    url: 'http://www.stockq.org/',
+                    icon: 'el-icon-coin',
+                },
+                {
                     text: 'VIX 恐慌指數',
                     url: 'https://www.macromicro.me/charts/17598/kong-huang-zhi-shu-yu-S-P-500',
                     icon: 'el-icon-lightning',
@@ -46,7 +51,7 @@ export default {
                 {
                     text: '美股 散戶投資人情緒指數',
                     url: 'https://www.macromicro.me/charts/20828/us-aaii-sentimentsurvey',
-                    icon: 'el-icon-apple',
+                    icon: 'el-icon-moon',
                 },
                 {
                     text: '美國 S&P500 科技類股',
@@ -81,17 +86,17 @@ export default {
                 {
                     text: '台灣 領先指標',
                     url: 'https://www.macromicro.me/collections/46/tw-stock-relative/696/tw-lagging-twse',
-                    icon: 'el-icon-food',
+                    icon: 'el-icon-guide',
                 },
                 {
                     text: '台灣 景氣對策信號',
                     url: 'https://www.macromicro.me/collections/10/tw-monitoring-indicators-relative/90/tw-light-stock',
-                    icon: 'el-icon-food',
+                    icon: 'el-icon-bicycle',
                 },
                 {
                     text: '台灣 信義房價指數',
                     url: 'https://www.macromicro.me/collections/15/tw-housing-relative/124/tw-housing-price-sinyi',
-                    icon: 'el-icon-food',
+                    icon: 'el-icon-house',
                 },
                 {
                     text: '台積電(TSM) ADR',
