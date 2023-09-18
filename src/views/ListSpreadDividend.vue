@@ -239,6 +239,9 @@
             </el-table-column>
             <el-table-column label="賣出日期" prop="sell_date" width="90" align="center" v-if="modeSpread === '歷史'">
             </el-table-column>
+            <el-table-column label="代號&nbsp;&nbsp;" width="98" align="right" v-if="modeSpread === '目前'">
+                <template #default="scope"> {{ scope.row.id }}&nbsp;&nbsp; </template>
+            </el-table-column>
         </el-table>
 
         <!-- ================================ 股利 -->
