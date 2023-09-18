@@ -340,6 +340,7 @@ export default {
                 const dataString = JSON.stringify(data);
 
                 // console.log(dataString);
+                //
 
                 // 將資料轉換成 Blob 物件
                 const blob = new Blob([dataString], { type: 'application/json' });
