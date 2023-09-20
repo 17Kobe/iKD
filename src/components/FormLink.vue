@@ -15,7 +15,6 @@
                                 target="_blank"
                                 :underline="true"
                                 style="color: #409eff; font-size: 16px"
-                                @click="handleLinkClick(index)"
                                 >{{ link.text }}</el-link
                             >
                         </div>
@@ -115,14 +114,10 @@ export default {
                     icon: 'el-icon-baseball',
                 },
             ],
-            linkClickCounts: {},
-            isInIncognitoMode: false,
         };
     },
     computed: {},
     mounted() {
-        const isInIncognitoMode = localStorage.getItem('isInIncognitoMode') === 'true';
-        this.isInIncognitoMode = isInIncognitoMode;
     },
     methods: {
         onInit() {
@@ -138,36 +133,6 @@ export default {
             // this.$refs.cost0[0].focus();
             // });
         },
-        handleLinkClick(index) {
-        // 增加點擊次數
-        if (!this.linkClickCounts[index]) {
-            this.linkClickCounts[index] = 1;
-        } else {
-            this.linkClickCounts[index]++;
-        }
-
-        // 判斷是否需要進入無痕模式
-        if (Object.values(this.linkClickCounts).reduce((a, b) => a + b, 0) > 3) {
-            this.isInIncognitoMode = true;
-            localStorage.setItem('isInIncognitoMode', 'true');
-        }
-
-        // 使用無痕瀏覽器打開
-        if (this.isInIncognitoMode) {
-            // const newWindow = window.open('', '_blank', 'incognito=yes');
-            // newWindow.location.href = this.links[index].url;
-            var a = document.createElement('a');
-            a.setAttribute('rel', 'noreferrer');
-            a.setAttribute('id', 'm_noreferrer');
-            a.setAttribute('href', this.links[index].url);
-            document.body.appendChild(a);
-            document.getElementById('m_noreferrer').click();
-            document.body.removeChild(a);
-        } else {
-            // 普通瀏覽器打開
-            window.open(this.links[index].url, '_blank');
-        }
-    },
     },
 };
 // 父傳子參考 https://its201.com/article/weixin_49035434/119852222 方法1，的emit似乎 vue 3有改語法而不行了。但方法2沒用 emit仍正常
