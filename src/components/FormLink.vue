@@ -15,6 +15,7 @@
                                 target="_blank"
                                 :underline="true"
                                 style="color: #409eff; font-size: 16px"
+                                @click="copyToClipboard(link.url)"
                                 >{{ link.text }}</el-link
                             >
                         </div>
@@ -132,6 +133,18 @@ export default {
             // this.$nextTick(() => {
             // this.$refs.cost0[0].focus();
             // });
+        },
+        copyToClipboard(url) {
+            // 使用 Clipboard API 複製網址到剪貼簿
+            const textField = document.createElement('textarea');
+            textField.innerText = url;
+            document.body.appendChild(textField);
+            textField.select();
+            document.execCommand('copy');
+            textField.remove();
+
+            // 這裡可以添加一個提示或反饋給用戶
+            // alert('網址已複製到剪貼簿');
         },
     },
 };
