@@ -1173,6 +1173,7 @@ const stock = {
             if (_.has(foundStock, 'cost') && _.has(foundStock, 'data.daily') && foundStock.data.daily.length > 0) {
                 const closeValueIndex = foundStock.data.daily[0].length === 2 ? 1 : 4;
                 const close = foundStock.data.daily[foundStock.data.daily.length - 1][closeValueIndex];
+                const closeNextToLast = foundStock.data.daily[foundStock.data.daily.length - 2][closeValueIndex];
                 // console.log(close);
                 // console.log(foundStock.cost.sum);
 
@@ -1181,11 +1182,16 @@ const stock = {
                     foundStock.currency === 'USD' && foundExchange && foundExchange.data.daily.length > 0
                         ? foundExchange.data.daily[foundExchange.data.daily.length - 1][1] - 0.075
                         : 1;
+                const sellExchangeNextToLast =
+                    foundStock.currency === 'USD' && foundExchange && foundExchange.data.daily.length > 0
+                        ? foundExchange.data.daily[foundExchange.data.daily.length - 2][1] - 0.075
+                        : 1;
 
                 // 代表有匯率，美金中值+-0.075
                 foundStock.cost.return = 0;
                 foundStock.cost.rate_of_return = 0;
                 foundStock.cost.return = Math.round(close * foundStock.cost.total * sellExchange - foundStock.cost.sum);
+                foundStock.cost.today_return = Math.round((close * foundStock.cost.total * sellExchange - foundStock.cost.sum) - (closeNextToLast * foundStock.cost.total * sellExchangeNextToLast - foundStock.cost.sum));
                 foundStock.cost.market_value = foundStock.cost.sum + foundStock.cost.return;
                 foundStock.cost.rate_of_return =
                     foundStock.cost.sum === 0

@@ -207,7 +207,12 @@
             </el-table-column>
             <el-table-column label="成本價" width="55" align="center">
                 <template #default="scope">
-                    <span v-if="scope.row.cost">
+                    <span v-if="scope.row.cost" :style="[
+                            modeSpread === '目前'  && scope.row.cost && scope.row.last_price < scope.row.cost.avg
+                                ? { color: '#f56c6c' }
+                                : modeSpread === '目前' ?
+                                { color: '#409eff' } : {}
+                        ]">
                         {{
                             scope.row.cost.avg >= 100
                                 ? Number(scope.row.cost.avg.toFixed(1))
@@ -232,8 +237,28 @@
             </el-table-column>
             <el-table-column label="市值&nbsp;&nbsp;" width="80" align="right" header-align="right">
                 <template #default="scope">
-                    <span v-if="scope.row.cost"
+                    <span v-if="scope.row.cost" :style="[
+                            modeSpread === '目前' && scope.row.cost && scope.row.last_price < scope.row.cost.avg
+                                ? { color: '#f56c6c' }
+                                : modeSpread === '目前' ?
+                                { color: '#409eff' } : {}
+                        ]"
                         >$ {{ (scope.row.cost.sum + scope.row.cost.return).toLocaleString('en-US') }}&nbsp;&nbsp;</span
+                    >
+                </template>
+            </el-table-column>
+            <el-table-column label="今日增減" width="60" align="right" header-align="right" v-if="modeSpread === '目前'">
+                <template #default="scope">
+                    <span v-if="scope.row.cost" :style="[
+                            scope.row.cost && scope.row.cost.today_return !== undefined && scope.row.cost.today_return < 0
+                                ? { color: '#f56c6c' }
+                                : { color: '#409eff' }
+                        ]"
+                        >$ {{
+                                scope.row.cost && scope.row.cost.today_return !== undefined && scope.row.cost.today_return !== 0
+                                    ? scope.row.cost.today_return.toLocaleString('en-US')
+                                    : 0
+                            }}</span
                     >
                 </template>
             </el-table-column>
