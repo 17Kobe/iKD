@@ -39,8 +39,23 @@
                             <span
                                 style="font-size: 16px; font-weight: bold; cursor: pointer"
                                 @click="goToStockAnalysis(scope.row.id, scope.row.url)"
+                                v-html="
+                                    [
+                                        '元大美債20年',
+                                        '群益台灣精選高息',
+                                        '國泰永續高股息',
+                                        '安聯台灣智慧基金',
+                                        '富達全球科技基金',
+                                    ].includes(scope.row.name)
+                                        ? scope.row.name
+                                              .replace('20年', '<br />20年')
+                                              .replace('精選高息', '<br />精選高息')
+                                              .replace('高股息', '<br />高股息')
+                                              .replace('智慧基金', '<br />智慧基金')
+                                              .replace('科技基金', '<br />科技基金')
+                                        : scope.row.name
+                                "
                             >
-                                {{ scope.row.name }}
                             </span>
                         </el-badge>
                         <br />
