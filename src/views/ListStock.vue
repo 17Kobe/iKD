@@ -46,6 +46,7 @@
                                         '國泰永續高股息',
                                         '安聯台灣智慧基金',
                                         '富達全球科技基金',
+                                        '元大S&P500',
                                     ].includes(scope.row.name)
                                         ? scope.row.name
                                               .replace('20年', '<br />20年')
@@ -53,6 +54,7 @@
                                               .replace('高股息', '<br />高股息')
                                               .replace('智慧基金', '<br />智慧基金')
                                               .replace('科技基金', '<br />科技基金')
+                                              .replace('500', '<br />500')
                                         : scope.row.name
                                 "
                             >
