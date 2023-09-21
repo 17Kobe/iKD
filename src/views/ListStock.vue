@@ -46,15 +46,19 @@
                                         '國泰永續高股息',
                                         '安聯台灣智慧基金',
                                         '富達全球科技基金',
+                                        '期元大S&P黃金',
+                                        '期元大S&P石油',
                                         '元大S&P500',
                                     ].includes(scope.row.name)
                                         ? scope.row.name
-                                              .replace('20年', '<br />20年')
+                                              .replace('美債20年', '<br />美債20年')
                                               .replace('精選高息', '<br />精選高息')
                                               .replace('高股息', '<br />高股息')
                                               .replace('智慧基金', '<br />智慧基金')
                                               .replace('科技基金', '<br />科技基金')
-                                              .replace('500', '<br />500')
+                                              .replace('S&P黃金', '<br />S&P黃金')
+                                              .replace('S&P石油', '<br />S&P石油')
+                                              .replace('S&P500', '<br />S&P500')
                                         : scope.row.name
                                 "
                             >
