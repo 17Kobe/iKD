@@ -35,6 +35,7 @@
                                     ? 'info'
                                     : 'success'
                             "
+                            style="background: #909399; border-radius: 8px; padding: 3px; color: white"
                         >
                             <span
                                 style="font-size: 16px; font-weight: bold; cursor: pointer"
