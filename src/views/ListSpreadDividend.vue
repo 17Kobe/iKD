@@ -112,9 +112,9 @@
                                 : 'success'
                         "
                     >
-                        {{ scope.row.name.replace(/(基金|精選|A2|投資級)/g, '') }}
+                        <span style="cursor: pointer" @click="goToStockAnalysis(scope.row.id, scope.row.url)">{{ scope.row.name.replace(/(基金|A2|投資級)/g, '').replace('群益台灣精選高息', '群益精選高息').replace('元大台灣高息低波', '元大高息低波') }}</span>
                     </el-badge>
-                    <span v-else>{{ scope.row.name.replace(/(基金|精選|A2|投資級)/g, '') }}</span>
+                    <span v-else>{{ scope.row.name.replace(/(基金|A2|投資級)/g, '').replace('群益台灣精選高息', '群益精選高息').replace('元大台灣高息低波', '元大高息低波') }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="漲跌幅" width="70" align="right" header-align="right" v-if="modeSpread === '目前'">
@@ -503,6 +503,11 @@ export default {
         formatLastPriceDate(date) {
             const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
             return moment(date).format(`M/DD(${dayOfWeek[moment(date).day()]})`);
+        },
+        goToStockAnalysis(id, url) {
+            // this.showStockAnalysis = true;
+            // this.currentStockId = id;
+            url ? window.open(url, '_blank') : window.open('https://www.wantgoo.com/stock/' + id + '/technical-chart', '_blank');
         },
     },
 };

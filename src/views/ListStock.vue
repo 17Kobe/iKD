@@ -49,6 +49,8 @@
                                         '期元大S&P黃金',
                                         '期元大S&P石油',
                                         '元大S&P500',
+                                        '國泰20年美債',
+                                        '元大台灣高息低波',
                                     ].includes(scope.row.name)
                                         ? scope.row.name
                                               .replace('美債20年', '<br />美債20年')
@@ -59,6 +61,8 @@
                                               .replace('S&P黃金', '<br />S&P黃金')
                                               .replace('S&P石油', '<br />S&P石油')
                                               .replace('S&P500', '<br />S&P500')
+                                              .replace('20年美債', '<br />20年美債')
+                                              .replace('高息低波', '<br />高息低波')
                                         : scope.row.name
                                 "
                             >
