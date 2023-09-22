@@ -385,7 +385,7 @@ export default {
                 },
                 xAxis: {
                     type: 'datetime',
-                    gridLineWidth: 1, // 顯示圖表X軸上的直色灰線
+                    gridLineWidth: 0, // 顯示圖表X軸上的直色灰線
                     tickWidth: 0,
                     endOnTick: false,
                     labels: {
@@ -400,17 +400,17 @@ export default {
                     // 有參考這個，但是根據資料去畫的 https://jsfiddle.net/BlackLabel/9yxmw7zv/ 應該要固定顯示月份
                     // 改參考這個 http://jsfiddle.net/kka8eyg5/3/
 
-                    tickPositioner() {
-                        const positions = [];
-                        let tick = Math.floor(this.dataMin);
-                        const increment = 1000 * 3600 * 24 * 91.5; // 3 months
+                    // tickPositioner() {
+                    //     const positions = [];
+                    //     let tick = Math.floor(this.dataMin);
+                    //     const increment = 1000 * 3600 * 24 * 91.5; // 3 months
 
-                        for (tick; tick <= this.dataMax; tick += increment) {
-                            positions.push(tick);
-                        }
-                        if (positions.indexOf(this.dataMax) === -1) positions.push(this.dataMax);
-                        return positions;
-                    },
+                    //     for (tick; tick <= this.dataMax; tick += increment) {
+                    //         positions.push(tick);
+                    //     }
+                    //     if (positions.indexOf(this.dataMax) === -1) positions.push(this.dataMax);
+                    //     return positions;
+                    // },
                 },
                 yAxis: [
                     {
