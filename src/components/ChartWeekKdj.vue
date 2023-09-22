@@ -284,14 +284,14 @@ export default {
             if (this.kdTurnDownLmit !== -999) {
                 plotBands.push({
                     from: this.kdTurnDownLmit,
-                    to: 100,
+                    to: this.showJLine ? 115 : 100,
                     color: 'rgba(75, 192, 192, 0.5)', // 設定填充顏色為紅色
                 });
             }
             if (this.kdDeadLimit !== -999) {
                 plotBands.push({
                     from: this.kdDeadLimit,
-                    to: this.kdTurnDownLmit !== -999 ? this.kdTurnDownLmit : 100,
+                    to: this.kdTurnDownLmit !== -999 ? this.kdTurnDownLmit : this.showJLine ? 115 : 100,
                     color: 'rgba(75, 192, 192, 0.05)', // 設定填充顏色為紅色
                 });
             }
@@ -562,8 +562,9 @@ export default {
                 yAxis: [
                     {
                         min: 0, // 設定 y 軸的最小值
-                        max: 100, // 設定 y 軸的最大值
+                        max: this.showJLine ? 115 : 100, // 設定 y 軸的最大值
                         plotBands: plotBands,
+                        tickInterval: 20,
                         showLastLabel: true,
                         // endOnTick: false,
                         resize: {
