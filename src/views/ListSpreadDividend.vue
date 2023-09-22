@@ -88,33 +88,49 @@
         >
             <el-table-column label="名稱" width="107" align="center" fixed>
                 <template #default="scope">
-                    <el-badge
+                    <el-tooltip
+                        class="box-item"
+                        effect="dark"
+                        :content="`${scope.row.name} ${getBadgeTitle(scope.row.badge_reason)}`"
+                        placement="top"
                         v-if="modeSpread === '目前'"
-                        :value="scope.row.badge"
-                        :title="getBadgeTitle(scope.row.badge_reason)"
-                        class="item"
-                        :class="[
-                            ['買', '買x2', '賣', '賣½'].includes(scope.row.badge) ? 'shake-base' : '',
-                            scope.row.name.length >= 6
-                                ? 'l6'
-                                : scope.row.name.length >= 5
-                                ? 'l5'
-                                : scope.row.name.length >= 4
-                                ? 'l4'
-                                : '',
-                            ['item', 'signal'],
-                        ]"
-                        :type="
-                            ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge)
-                                ? 'danger'
-                                : ['取消買', '取消買x2', '取消賣', '取消賣½'].includes(scope.row.badge)
-                                ? 'info'
-                                : 'success'
-                        "
                     >
-                        <span style="cursor: pointer" @click="goToStockAnalysis(scope.row.id, scope.row.url)">{{ scope.row.name.replace(/(基金|A2|投資級)/g, '').replace('群益台灣精選高息', '群益精選高息').replace('元大台灣高息低波', '元大高息低波') }}</span>
-                    </el-badge>
-                    <span v-else>{{ scope.row.name.replace(/(基金|A2|投資級)/g, '').replace('群益台灣精選高息', '群益精選高息').replace('元大台灣高息低波', '元大高息低波') }}</span>
+                        <el-badge
+                            :value="scope.row.badge"
+                            class="item"
+                            :class="[
+                                ['買', '買x2', '賣', '賣½'].includes(scope.row.badge) ? 'shake-base' : '',
+                                scope.row.name.length >= 6
+                                    ? 'l6'
+                                    : scope.row.name.length >= 5
+                                    ? 'l5'
+                                    : scope.row.name.length >= 4
+                                    ? 'l4'
+                                    : '',
+                                ['item', 'signal'],
+                            ]"
+                            :type="
+                                ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge)
+                                    ? 'danger'
+                                    : ['取消買', '取消買x2', '取消賣', '取消賣½'].includes(scope.row.badge)
+                                    ? 'info'
+                                    : 'success'
+                            "
+                        >
+                            <span style="cursor: pointer" @click="goToStockAnalysis(scope.row.id, scope.row.url)">{{
+                                scope.row.name
+                                    .replace(/(基金|A2|投資級)/g, '')
+                                    .replace('群益台灣精選高息', '群益精選高息')
+                                    .replace('元大台灣高息低波', '元大高息低波')
+                            }}</span>
+                        </el-badge>
+                    </el-tooltip>
+                    <span v-else>{{
+                        scope.row.name
+                            .replace(/(基金|A2|投資級)/g, '')
+                            .replace('群益台灣精選高息', '群益精選高息')
+                            .replace('元大台灣高息低波', '元大高息低波')
+                    }}</span>
                 </template>
             </el-table-column>
             <el-table-column label="漲跌幅" width="70" align="right" header-align="right" v-if="modeSpread === '目前'">
@@ -207,12 +223,16 @@
             </el-table-column>
             <el-table-column label="成本價" width="55" align="center">
                 <template #default="scope">
-                    <span v-if="scope.row.cost" :style="[
-                            modeSpread === '目前'  && scope.row.cost && scope.row.last_price < scope.row.cost.avg
+                    <span
+                        v-if="scope.row.cost"
+                        :style="[
+                            modeSpread === '目前' && scope.row.cost && scope.row.last_price < scope.row.cost.avg
                                 ? { color: '#f56c6c' }
-                                : modeSpread === '目前' ?
-                                { color: '#409eff' } : {}
-                        ]">
+                                : modeSpread === '目前'
+                                ? { color: '#409eff' }
+                                : {},
+                        ]"
+                    >
                         {{
                             scope.row.cost.avg >= 100
                                 ? Number(scope.row.cost.avg.toFixed(1))
@@ -237,11 +257,14 @@
             </el-table-column>
             <el-table-column label="市值&nbsp;&nbsp;" width="80" align="right" header-align="right">
                 <template #default="scope">
-                    <span v-if="scope.row.cost" :style="[
+                    <span
+                        v-if="scope.row.cost"
+                        :style="[
                             modeSpread === '目前' && scope.row.cost && scope.row.last_price < scope.row.cost.avg
                                 ? { color: '#f56c6c' }
-                                : modeSpread === '目前' ?
-                                { color: '#409eff' } : {}
+                                : modeSpread === '目前'
+                                ? { color: '#409eff' }
+                                : {},
                         ]"
                         >$ {{ (scope.row.cost.sum + scope.row.cost.return).toLocaleString('en-US') }}&nbsp;&nbsp;</span
                     >
@@ -249,16 +272,19 @@
             </el-table-column>
             <el-table-column label="今日增減" width="60" align="right" header-align="right" v-if="modeSpread === '目前'">
                 <template #default="scope">
-                    <span v-if="scope.row.cost" :style="[
+                    <span
+                        v-if="scope.row.cost"
+                        :style="[
                             scope.row.cost && scope.row.cost.today_return !== undefined && scope.row.cost.today_return < 0
                                 ? { color: '#f56c6c' }
-                                : { color: '#409eff' }
+                                : { color: '#409eff' },
                         ]"
-                        >$ {{
-                                scope.row.cost && scope.row.cost.today_return !== undefined && scope.row.cost.today_return !== 0
-                                    ? scope.row.cost.today_return.toLocaleString('en-US')
-                                    : 0
-                            }}</span
+                        >$
+                        {{
+                            scope.row.cost && scope.row.cost.today_return !== undefined && scope.row.cost.today_return !== 0
+                                ? scope.row.cost.today_return.toLocaleString('en-US')
+                                : 0
+                        }}</span
                     >
                 </template>
             </el-table-column>
@@ -498,7 +524,7 @@ export default {
                 }
             }
 
-            return '原因: ' + resultArray.join(', ');
+            return resultArray.length > 0 ? ' --- 理由: ' + resultArray.join(', ') : '';
         },
         formatLastPriceDate(date) {
             const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
