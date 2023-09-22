@@ -561,37 +561,78 @@ export default {
                 },
                 yAxis: [
                     {
-                        min: tickMin, // 設定 y 軸的最小值
-                        max: tickMax, // 設定 y 軸的最大值
+                        min: 0, // 設定 y 軸的最小值
+                        max: 100, // 設定 y 軸的最大值
                         plotBands: plotBands,
                         showLastLabel: true,
                         // endOnTick: false,
                         resize: {
                             enabled: true,
                         },
-                        // 調整 y 軸 tick的間距，運用到高度最大化，不浪費
-                        tickPositioner() {
-                            const positions = [];
-                            const tickCount = 4; // 刻度數量
-
-                            const tickInterval = Math.ceil((tickMax - tickMin) / (tickCount - 1)); // 計算刻度間隔
-
-                            for (let i = 0; i < tickCount; i++) {
-                                let tickValue;
-
-                                if (i === 1 || i === 2) {
-                                    tickValue = Math.round(tickMin + i * tickInterval); // 四捨五入到下一個個位數是0十位數是上述的值
-                                    tickValue = Math.ceil(tickValue / 10) * 10; // 取十位數
-                                } else if (i === 3) {
-                                    tickValue = tickMax;
-                                } else {
-                                    tickValue = tickMin + i * tickInterval;
-                                }
-
-                                positions.push(tickValue);
-                            }
-                            return positions;
+                        labels: {
+                            enabled: false, // 不显示刻度标签
                         },
+                        plotLines: [
+                            {
+                                value: 20, // 20 的位置
+                                color: '#e6e6e6', // 线的颜色
+                                width: 1, // 线的宽度
+                                zIndex: 1, // 线的层级
+                                label: {
+                                    text: '20', // 刻度值
+                                    align: 'right', // 刻度值的对齐方式
+                                    x: -1, // 刻度值的水平偏移
+                                    y: 3,
+                                },
+                            },
+                            {
+                                value: 50, // 50 的位置
+                                color: '#e6e6e6', // 线的颜色
+                                width: 1, // 线的宽度
+                                zIndex: 1, // 线的层级
+                                label: {
+                                    text: '50', // 刻度值
+                                    align: 'right', // 刻度值的对齐方式
+                                    x: -1, // 刻度值的水平偏移
+                                    y: 3,
+                                },
+                            },
+                            {
+                                value: 80, // 80 的位置
+                                color: '#e6e6e6', // 线的颜色
+                                width: 1, // 线的宽度
+                                zIndex: 1, // 线的层级
+                                label: {
+                                    text: '80', // 刻度值
+                                    align: 'right', // 刻度值的对齐方式
+                                    x: -1, // 刻度值的水平偏移
+                                    y: 3,
+                                },
+                            },
+                        ],
+                        // 調整 y 軸 tick的間距，運用到高度最大化，不浪費
+                        // tickPositioner() {
+                        //     const positions = [];
+                        //     const tickCount = 4; // 刻度數量
+
+                        //     const tickInterval = Math.ceil((tickMax - tickMin) / (tickCount - 1)); // 計算刻度間隔
+
+                        //     for (let i = 0; i < tickCount; i++) {
+                        //         let tickValue;
+
+                        //         if (i === 1 || i === 2) {
+                        //             tickValue = Math.round(tickMin + i * tickInterval); // 四捨五入到下一個個位數是0十位數是上述的值
+                        //             tickValue = Math.ceil(tickValue / 10) * 10; // 取十位數
+                        //         } else if (i === 3) {
+                        //             tickValue = tickMax;
+                        //         } else {
+                        //             tickValue = tickMin + i * tickInterval;
+                        //         }
+
+                        //         positions.push(tickValue);
+                        //     }
+                        //     return positions;
+                        // },
                     },
                 ],
                 series: [

@@ -423,13 +423,43 @@ export default {
                         resize: {
                             enabled: true,
                         },
-                        tickPositioner() {
-                            const positions = [0, 50, 100];
-                            if (this.dataMin && this.dataMax) {
-                                // ... 你原本的 tickPositioner 設定
-                            }
-                            return positions;
+                        labels: {
+                            enabled: false, // 不显示刻度标签
                         },
+                        plotLines: [
+                            {
+                                value: 30, // 20 的位置
+                                color: '#e6e6e6', // 线的颜色
+                                width: 1, // 线的宽度
+                                zIndex: 1, // 线的层级
+                                label: {
+                                    text: '30', // 刻度值
+                                    align: 'right', // 刻度值的对齐方式
+                                    x: -1, // 刻度值的水平偏移
+                                    y: 3,
+                                },
+                            },
+                            {
+                                value: 70, // 80 的位置
+                                color: '#e6e6e6', // 线的颜色
+                                width: 1, // 线的宽度
+                                zIndex: 1, // 线的层级
+                                label: {
+                                    text: '70', // 刻度值
+                                    align: 'right', // 刻度值的对齐方式
+                                    x: -1, // 刻度值的水平偏移
+                                    y: 3,
+                                },
+                            },
+                        ],
+                        // tickPositioner() {
+                        //     const positions = [0, 20, 50, 80, 100];
+                        //     if (this.dataMin && this.dataMax) {
+                        //         // ... 你原本的 tickPositioner 設定
+                        //     }
+                        //     return positions;
+                        // },
+
                         // 調整 y 軸 tick的間距，運用到高度最大化，不浪費
                         // tickPositioner() {
                         //     const positions = [];
