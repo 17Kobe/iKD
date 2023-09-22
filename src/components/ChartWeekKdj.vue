@@ -565,6 +565,7 @@ export default {
                         max: this.showJLine ? 115 : 100, // 設定 y 軸的最大值
                         plotBands: plotBands,
                         tickInterval: 20,
+                        gridLineWidth: 0,
                         showLastLabel: true,
                         // endOnTick: false,
                         resize: {
@@ -608,6 +609,15 @@ export default {
                                     align: 'right', // 刻度值的对齐方式
                                     x: -1, // 刻度值的水平偏移
                                     y: 3,
+                                },
+                            },
+                            {
+                                value: this.showJLine ? 115 : 100, // 100 的位置
+                                color: '#e6e6e6', // 线的颜色
+                                width: 1, // 线的宽度
+                                zIndex: 1, // 线的层级
+                                label: {
+                                    text: '', // 刻度值
                                 },
                             },
                         ],
