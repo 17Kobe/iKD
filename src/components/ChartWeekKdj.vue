@@ -113,29 +113,29 @@ export default {
     },
     computed: {
         // 如果您希望最大值和最小值使用天花板和地板的十進位值，而不使用偏移量，您可以將 chartMinMaxValues 函數修改如下：
-        chartMinMaxValues() {
-            const kValues = this.kdj.map((value) => value[1]);
-            const dValues = this.kdj.map((value) => value[2]);
-            let allValues;
+        // chartMinMaxValues() {
+        //     const kValues = this.kdj.map((value) => value[1]);
+        //     const dValues = this.kdj.map((value) => value[2]);
+        //     let allValues;
 
-            if (this.showJLine) {
-                const jValues = this.kdj.map((value) => value[3]);
+        //     if (this.showJLine) {
+        //         const jValues = this.kdj.map((value) => value[3]);
 
-                allValues = [...kValues, ...dValues, ...jValues];
-            } else {
-                allValues = [...kValues, ...dValues];
-            }
-            const minValue = Math.min(...allValues);
-            const maxValue = Math.max(...allValues);
+        //         allValues = [...kValues, ...dValues, ...jValues];
+        //     } else {
+        //         allValues = [...kValues, ...dValues];
+        //     }
+        //     const minValue = Math.min(...allValues);
+        //     const maxValue = Math.max(...allValues);
 
-            // 最小值使用地板的十進位值
-            const tickMin = Math.floor(minValue / 10) * 10;
+        //     // 最小值使用地板的十進位值
+        //     const tickMin = Math.floor(minValue / 10) * 10;
 
-            // 最大值使用天花板的十進位值
-            const tickMax = Math.ceil(maxValue / 10) * 10;
+        //     // 最大值使用天花板的十進位值
+        //     const tickMax = Math.ceil(maxValue / 10) * 10;
 
-            return { tickMin, tickMax };
-        },
+        //     return { tickMin, tickMax };
+        // },
         stockData() {
             console.log('stockData');
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
@@ -278,7 +278,7 @@ export default {
         chartOptions() {
             // component 參考 https://stackoverflow.com/questions/68381856/how-to-access-highcharts-stock-tooltip-data-in-vue
             const component = this;
-            const { tickMin, tickMax } = this.chartMinMaxValues;
+            // const { tickMin, tickMax } = this.chartMinMaxValues;
 
             let plotBands = [];
             if (this.kdTurnDownLmit !== -999) {
