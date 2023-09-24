@@ -40,7 +40,7 @@
                                 padding: '3px',
                                 color: 'white',
                                 background:
-                                    scope.row.type === 'fund' ? '#e6a23c' : scope.row.type === 'exchange' ? '#f56c6c' : '#909399',
+                                    scope.row.type === 'fund' ? '#e6a23c' : scope.row.type === 'exchange' ? '#f56c6c' : '#409eff',
                             }"
                         >
                             <span
