@@ -122,6 +122,7 @@
                                     .replace(/(基金|A2|投資級)/g, '')
                                     .replace('群益台灣精選高息', '群益精選高息')
                                     .replace('元大台灣高息低波', '元大高息低波')
+                                    .replace('復華台灣科技優息', '復華科技優息')
                             }}</span>
                         </el-badge>
                     </el-tooltip>
@@ -130,6 +131,7 @@
                             .replace(/(基金|A2|投資級)/g, '')
                             .replace('群益台灣精選高息', '群益精選高息')
                             .replace('元大台灣高息低波', '元大高息低波')
+                            .replace('復華台灣科技優息', '復華科技優息')
                     }}</span>
                 </template>
             </el-table-column>
