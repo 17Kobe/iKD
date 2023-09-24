@@ -105,6 +105,7 @@
                 <span v-if="ma && ma.length > 0">
                     <span
                         title="MA(5)"
+                        v-if="ma[ma.length - 1][1]"
                         :style="[
                             stockData.last_price > ma[ma.length - 1][1]
                                 ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
@@ -121,6 +122,7 @@
                     >
                     <span
                         title="MA(10)"
+                        v-if="ma[ma.length - 1][2]"
                         :style="[
                             stockData.last_price > ma[ma.length - 1][2]
                                 ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
@@ -137,6 +139,7 @@
                     >
                     <span
                         title="MA(20)"
+                        v-if="ma[ma.length - 1][3]"
                         :style="[
                             stockData.last_price > ma[ma.length - 1][3]
                                 ? { 'background-color': '#ededed', 'text-decoration': 'underline' }
