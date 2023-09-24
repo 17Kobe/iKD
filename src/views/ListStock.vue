@@ -35,7 +35,13 @@
                                     ? 'info'
                                     : 'success'
                             "
-                            style="background: #909399; border-radius: 8px; padding: 3px; color: white"
+                            :style="{
+                                'border-radius': '8px',
+                                padding: '3px',
+                                color: 'white',
+                                background:
+                                    scope.row.type === 'fund' ? '#e6a23c' : scope.row.type === 'exchange' ? '#f56c6c' : '#909399',
+                            }"
                         >
                             <span
                                 style="font-size: 16px; font-weight: bold; cursor: pointer"
