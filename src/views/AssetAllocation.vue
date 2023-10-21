@@ -1,12 +1,12 @@
 <template>
     <div>
         <el-row style="display: flex; flex-wrap: wrap">
-            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="display: flex; padding: 4px 2px 0 4px">
+            <el-col :xs="12" :sm="10" :md="7" :lg="7" :xl="5" style="display: flex; padding: 4px 2px 0 4px">
                 <el-card shadow="hover" ref="leftCard" style="flex: 1">
                     <BarChart :chartData="barData" :options="barOptions" />
                 </el-card>
             </el-col>
-            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="display: flex; padding: 4px 4px 0 2px">
+            <el-col :xs="12" :sm="10" :md="7" :lg="7" :xl="5" style="display: flex; padding: 4px 4px 0 2px">
                 <el-card shadow="hover" style="flex: 1" id="line-chart-card">
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
                         資產走勢 (今日: $
@@ -73,12 +73,12 @@
             </el-col>
         </el-row>
         <el-row style="margin-bottom: 4px">
-            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 2px 0 4px">
+            <el-col :xs="12" :sm="10" :md="7" :lg="7" :xl="5" style="padding: 4px 2px 0 4px">
                 <el-card shadow="hover" class="horizontal-bar">
                     <PieChart :chartData="pieData" :options="pieOptions" />
                 </el-card>
             </el-col>
-            <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 4px 4px 0 2px">
+            <el-col :xs="12" :sm="10" :md="7" :lg="7" :xl="5" style="padding: 4px 4px 0 2px">
                 <el-card shadow="hover" class="horizontal-bar">
                     <BarChart :chartData="horizontalBarData" :options="horizontalBarOptions" />
                 </el-card>
@@ -87,7 +87,7 @@
         <!-- <chart v-if="loaded" :chartdata="chartdata" :options="options"> </chart> -->
         <template v-for="(item, index) in spreadList" :key="index">
             <el-row style="margin-bottom: 1px">
-                <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                <el-col :xs="12" :sm="10" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
                     <el-input
                         size="small"
                         placeholder=""
@@ -99,7 +99,7 @@
                         <template #prepend><span>股票</span></template>
                     </el-input>
                 </el-col>
-                <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                <el-col :xs="9" :sm="10" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
                     <ElCurrencyInput
                         size="small"
                         placeholder=""
@@ -120,12 +120,12 @@
                         }"
                     />
                 </el-col>
-                <el-col :xs="3" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px"> </el-col>
+                <el-col :xs="3" :sm="10" :md="7" :lg="7" :xl="5" style="padding-left: 4px"> </el-col>
             </el-row>
         </template>
         <template v-for="(item, index) in assetList" :key="index">
             <el-row v-if="item.isPositive">
-                <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                <el-col :xs="12" :sm="10" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
                     <el-input
                         size="small"
                         placeholder=""
@@ -145,7 +145,7 @@
                         <template #prepend><span>帳戶</span></template>
                     </el-input>
                 </el-col>
-                <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                <el-col :xs="9" :sm="10" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
                     <ElCurrencyInput
                         size="small"
                         placeholder=""
@@ -175,7 +175,7 @@
                         }"
                     />
                 </el-col>
-                <el-col :xs="3" :sm="3" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                <el-col :xs="3" :sm="3" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
                     <el-button type="danger" size="small" @click="onDelAsset(index, item.account)" round plain
                         ><i class="el-icon-minus"></i
                     ></el-button>
@@ -183,19 +183,19 @@
             </el-row>
         </template>
         <el-row>
-            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 2px 4px 5px 4px">
+            <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="5" style="padding: 2px 4px 5px 4px">
                 <el-button type="primary" size="small" @click="onAddDeposit" round plain
                     ><i class="el-icon-plus"></i> 新增資產</el-button
                 >
             </el-col>
-            <!-- <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
+            <!-- <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="3" style="padding-left: 4px; padding-top: 4px">
                 <el-button type="primary" size="small" @click="onResetAsset" round><i class="el-icon-minus"></i></el-button>
             </el-col> -->
         </el-row>
 
         <template v-for="(item, index) in assetList" :key="index">
             <el-row v-if="!item.isPositive">
-                <el-col :xs="12" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                <el-col :xs="12" :sm="10" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
                     <el-input
                         size="small"
                         placeholder=""
@@ -207,7 +207,7 @@
                         <template #prepend>帳戶</template>
                     </el-input>
                 </el-col>
-                <el-col :xs="9" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                <el-col :xs="9" :sm="10" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
                     <ElCurrencyInput
                         size="small"
                         placeholder=""
@@ -228,7 +228,7 @@
                         }"
                     />
                 </el-col>
-                <el-col :xs="3" :sm="3" :md="7" :lg="4" :xl="3" style="padding-left: 4px">
+                <el-col :xs="3" :sm="3" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
                     <el-button type="danger" size="small" @click="onDelAsset(index, item.account)" round plain
                         ><i class="el-icon-minus"></i
                     ></el-button>
@@ -236,12 +236,12 @@
             </el-row>
         </template>
         <el-row>
-            <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding: 2px 4px 5px 4px">
+            <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="5" style="padding: 2px 4px 5px 4px">
                 <el-button type="primary" size="small" @click="onAddDebt" round plain
                     ><i class="el-icon-plus"></i> 新增負債</el-button
                 >
             </el-col>
-            <!-- <el-col :xs="24" :sm="10" :md="7" :lg="4" :xl="3" style="padding-left: 4px; padding-top: 4px">
+            <!-- <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="3" style="padding-left: 4px; padding-top: 4px">
                 <el-button type="primary" size="small" @click="onResetAsset" round><i class="el-icon-minus"></i></el-button>
             </el-col> -->
         </el-row>
