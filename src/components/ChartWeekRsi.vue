@@ -80,7 +80,16 @@
                 }}
             </span>
         </div>
-
+        <el-button
+            type="info"
+            class="custom-button"
+            :plain="true"
+            size="mini"
+            style="position: absolute; left: 17px; top: 6px; padding: 0px 8px"
+            v-if="stockData.type !== 'exchange' && stockData.type !== 'fund'"
+            @click="toggleDividend"
+            >息</el-button
+        >
         <!-- :updateArgs="[true, true, true]" -->
     </div>
 </template>
@@ -556,6 +565,12 @@ export default {
     },
     created() {},
     watch: {},
-    methods: {},
+    methods: {
+        toggleDividend() {
+            this.$store.dispatch('GET_STOCK_DIVIDEND');
+            // this.$store.commit('SAVE_SHOW_TRADING_VOLUME', { stockId: this.parentData });
+            // this.showTradingVolume = !this.showTradingVolume;
+        },
+    },
 };
 </script>

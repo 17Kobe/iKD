@@ -739,10 +739,3 @@ export default {
     },
 };
 </script>
-
-<style lang="sass">
-.custom-button.el-button--info.is-plain:focus
-    background-color: #f4f4f5
-    border-color: #d3d4d6
-    color: #909399
-</style>

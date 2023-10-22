@@ -1186,4 +1186,9 @@ input::-webkit-inner-spin-button
 .el-skeleton.is-animated .el-skeleton__item
     height: 80px
     margin-top: 0px
+
+.custom-button.el-button--info.is-plain:focus
+    background-color: #f4f4f5
+    border-color: #d3d4d6
+    color: #909399
 </style>
