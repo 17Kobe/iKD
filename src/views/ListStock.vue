@@ -233,7 +233,7 @@
                                     "
                                     >今<span> ({{ getNumberSum(scope.row.cost.settings) }} 股) </span></span
                                 >
-                                &nbsp;&nbsp;
+                                &nbsp;
                                 <span
                                     style="
                                         background-color: #eeeeee;
@@ -257,7 +257,7 @@
                                     >{{ Number(Math.round(scope.row.cost.rate_of_return * 10) / 10) }}%</span
                                 >
 
-                                <div v-for="(item, index) in getReversedItems(scope.row.cost.settings)" :key="index">
+                                <div v-for="(item, index) in [...scope.row.cost.settings].reverse()" :key="index">
                                     <span
                                         :style="[
                                             index % 2 === 1
@@ -1039,9 +1039,6 @@ export default {
         },
         toggleChildJLine() {
             this.showJLine = !this.showJLine;
-        },
-        getReversedItems(array) {
-            return array.slice().reverse();
         },
         getNumberSum(array) {
             return _.sumBy(array, 'number');

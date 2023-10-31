@@ -44,7 +44,7 @@ const stock = {
                     // https://stackoverflow.com/questions/36197031/how-to-use-moment-js-to-check-whether-the-current-time-is-between-2-times
                     const currentTime = moment(); // 目前時間
                     // const today = currentTime.format('YYYY-MM-DD');
-                    const stockMarketCloseTime = moment('13:30:00', 'hh:mm:ss');
+                    const stockMarketCloseTime = moment('13:50:00', 'hh:mm:ss');
                     let siteExistsLatestDate = moment().format('YYYY-MM-DD');
                     // console.log(currentTime.day());
                     if (currentTime.day() === 6)
@@ -185,6 +185,83 @@ const stock = {
                     tempAssets, // 總存款
                 ]);
             }
+        },
+        GET_STOCK_DIVIDEND({ state, commit }, stockId = null) {
+            console.log('GET_STOCK_DIVIDEND');
+            // console.log(context);
+            // console.log(context.rootState.price.stockList);
+
+            commit('SAVE_STOCK_DIVIDEND_CRAWLER_DATETIME', {
+                stockId: stockId,
+            });
+
+            // 用字串比日期就好了
+            const currentTime = moment(); // 目前時間
+            // const today = currentTime.format('YYYY-MM-DD');
+            const stockMarketCloseTime = moment('13:50:00', 'hh:mm:ss');
+            let siteExistsLatestDate = moment().format('YYYY-MM-DD');
+            // console.log(currentTime.day());
+            if (currentTime.day() === 6)
+                // 星期六，不算了，就減一天
+                siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
+            else if (currentTime.day() === 0)
+                // 星期日，不算了，就減二天
+                siteExistsLatestDate = moment().subtract(2, 'days').format('YYYY-MM-DD');
+            else if (currentTime.day() === 1 && currentTime.isBefore(stockMarketCloseTime))
+                // 星期一且還沒交易結束時間，不算了，就減三天
+                siteExistsLatestDate = moment().subtract(3, 'days').format('YYYY-MM-DD');
+            else if (currentTime.isBefore(stockMarketCloseTime))
+                // 如果目前時間少於交易結束時間，則要減一天
+                siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
+
+            state.stockList.forEach((stcokObj) => {
+                const stockDataDividend = _.has(stcokObj, 'data.dividend') ? stcokObj.data.dividend : [];
+                const localcrawlerDividendLastDate = moment(
+                    stockDataDividend.length === 0
+                        ? moment().subtract(10, 'years').format('YYYY-MM-DD')
+                        : moment(stockDataDividend[stockDataDividend.length - 1].date).add(1, 'days')
+                ).format('YYYY-MM-DD');
+                console.log(localcrawlerDividendLastDate);
+                // const localcrawlerDividendLastDate =
+                //     moment(stcokObj.crawler_dividend_last_date).add(1, 'days') || moment().subtract(10, 'years');
+                // const localcrawlerDividendLastDate = moment(stcokObj.crawler_dividend_last_date).add(1, 'days') || moment().subtract(10, 'years');
+                // 必須是有買的才要去抓未來配息
+                if (
+                    (stockId === null || stockId === stcokObj.id) &&
+                    stcokObj.type !== 'fund' &&
+                    stcokObj.type !== 'exchange' &&
+                    // 因為我有將 localcrawlerDividendLastDate + 1天，所以有 Same
+                    moment(siteExistsLatestDate).isSameOrAfter(localcrawlerDividendLastDate)
+                ) {
+                    // 為了只下一次API，但還要抓二年的資料回來算平均
+                    axios
+                        .get('https://api.finmindtrade.com/api/v4/data', {
+                            params: {
+                                dataset: 'TaiwanStockDividend',
+                                data_id: stcokObj.id,
+                                start_date: localcrawlerDividendLastDate,
+                                token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
+                            },
+                        })
+                        // 成功
+                        .then((res) => {
+                            console.log('GET_DIVIDEND PROCESS');
+                            console.log(res.data);
+                            // 要傳那麼多主要是因為 stockList是rootState
+                            commit('SAVE_STOCK_DIVIDEND', {
+                                stockId: stcokObj.id,
+                                data: res.data,
+                            });
+
+                            // 因為同一公司，可能屬不同產業，但同一個代碼，所以要過濾掉
+                            console.log('GET_STOCK_DIVIDEND OVER');
+                        })
+                        // 失敗
+                        .catch((err) => {
+                            console.log(err);
+                        });
+                }
+            });
         },
         async CALC_STOCK_WEEKLY({ state }, stockId) {
             console.log('CALC_STOCK_WEEKLY');
@@ -1191,7 +1268,11 @@ const stock = {
                 foundStock.cost.return = 0;
                 foundStock.cost.rate_of_return = 0;
                 foundStock.cost.return = Math.round(close * foundStock.cost.total * sellExchange - foundStock.cost.sum);
-                foundStock.cost.today_return = Math.round((close * foundStock.cost.total * sellExchange - foundStock.cost.sum) - (closeNextToLast * foundStock.cost.total * sellExchangeNextToLast - foundStock.cost.sum));
+                foundStock.cost.today_return = Math.round(
+                    close * foundStock.cost.total * sellExchange -
+                        foundStock.cost.sum -
+                        (closeNextToLast * foundStock.cost.total * sellExchangeNextToLast - foundStock.cost.sum)
+                );
                 foundStock.cost.market_value = foundStock.cost.sum + foundStock.cost.return;
                 foundStock.cost.rate_of_return =
                     foundStock.cost.sum === 0
@@ -1264,7 +1345,7 @@ const stock = {
                 let stcokObjType = 'stock';
                 if (foundStock.type) stcokObjType = foundStock.type; // 'fund' or 'exchange';
 
-                const values = [];
+                let values = [];
                 // 股票
                 if (stcokObjType === 'stock') {
                     data.data.forEach((element) => {
@@ -1388,6 +1469,78 @@ const stock = {
             }
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
             // 有可能有policy設定，有/無淨值，上回沒算完就關了，需要於 SAVE_STOCK_POLICY_RESULT 內部去確認有無算完
+        },
+        async SAVE_STOCK_DIVIDEND_CRAWLER_DATETIME(state, { stockId }) {
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            foundStock.crawler_dividend_last_date = moment().format('YYYY-MM-DD HH:mm:ss');
+        },
+        async SAVE_STOCK_DIVIDEND(state, { stockId, data }) {
+            console.log('SAVE_STOCK_DIVIDEND');
+
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            // 現金股利
+            // "CashEarningsDistribution": 1.8,
+            // "CashStatutorySurplus": 0.0,
+            // "CashExDividendTradingDate": "2021-10-22",
+            // "CashDividendPaymentDate": "2021-11-25",
+            // 股票股利
+            // "StockEarningsDistribution": 0.15,
+            // "StockExDividendTradingDate": "2023-08-11",
+            // "AnnouncementDate": "2023-07-27",
+            foundStock.data = foundStock.data || {};
+            foundStock.data.dividend = foundStock.data.dividend || []; // 有可能是 null 就變成 []
+
+            let values = [];
+            data.data.forEach((element) => {
+                // 取得最後一個
+                const lastDividendDate =
+                    foundStock.data.dividend && foundStock.data.dividend.length > 0
+                        ? foundStock.data.dividend[foundStock.data.dividend.length - 1].date
+                        : '2000-01-01';
+
+                // 日期小於等於時就跳過不做
+                if (moment(element.date).isSameOrBefore(lastDividendDate)) {
+                    return; // continue
+                }
+
+                let lastStockPrice = null;
+                const targetMoment = moment(
+                    element.CashExDividendTradingDate ? element.CashExDividendTradingDate : element.StockExDividendTradingDate,
+                    'YYYY-MM-DD'
+                );
+
+                // 取得對應的股價
+                foundStock.data.daily.forEach((item) => {
+                    const itemDate = moment(item[0], 'YYYY-MM-DD');
+                    if (itemDate.isBefore(targetMoment)) {
+                        lastStockPrice = item[4];
+                    } else if (itemDate.isSameOrAfter(targetMoment)) {
+                        // 日期大於等於目標日期時中斷 forEach
+                        return false;
+                    }
+                });
+
+                let dividendYield = null;
+                if (lastStockPrice) {
+                    if (element.CashExDividendTradingDate)
+                        dividendYield =
+                            ((element.CashEarningsDistribution + element.CashStatutorySurplus) * 100) / lastStockPrice;
+                    else if (element.StockExDividendTradingDate)
+                        dividendYield = (element.StockEarningsDistribution * 100) / lastStockPrice;
+                }
+
+                values.push({
+                    date: element.date,
+                    CashEarningsDistribution: element.CashEarningsDistribution + element.CashStatutorySurplus,
+                    CashExDividendTradingDate: element.CashExDividendTradingDate,
+                    CashDividendPaymentDate: element.CashDividendPaymentDate,
+                    StockEarningsDistribution: element.StockEarningsDistribution,
+                    StockExDividendTradingDate: element.StockExDividendTradingDate,
+                    dividendYield: dividendYield,
+                });
+            });
+            foundStock.data.dividend.push(...values);
+            saveStockListToDb('stockList', state.stockList);
         },
         async SAVE_STOCK_POLICY_RESULT(state, stockId) {
             console.log('SAVE_STOCK_POLICY_RESULT');
@@ -2393,6 +2546,11 @@ const stock = {
             // console.log('getStock');
             // return _.find(state.stockList, ['id', id]);
             return state.stockList.find((stock) => stock.id === id);
+        },
+        getStockDataDividend: (state, getters) => (id) => {
+            console.log('getStockDataDividend');
+            const found = getters.getStock(id);
+            return found && found.data && found.data.dividend ? [...found.data.dividend].reverse() : [];
         },
         getStockDataWeekly: (state, getters) => (id) => {
             console.log('getStockDataWeekly');

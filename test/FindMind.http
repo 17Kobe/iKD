@@ -15,7 +15,7 @@ GET https://api.finmindtrade.com/api/v4/data
 ###
 GET https://api.finmindtrade.com/api/v4/data
     ?dataset=TaiwanStockDividend
-    &data_id=0056
+    &data_id=2885
     &start_date=2021-01-13
     &token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE
 

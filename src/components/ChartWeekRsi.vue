@@ -80,16 +80,95 @@
                 }}
             </span>
         </div>
-        <el-button
-            type="info"
-            class="custom-button"
-            :plain="true"
-            size="mini"
-            style="position: absolute; left: 17px; top: 6px; padding: 0px 8px"
-            v-if="stockData.type !== 'exchange' && stockData.type !== 'fund'"
-            @click="toggleDividend"
-            >息</el-button
-        >
+        <el-popover placement="bottom-end" title="歷年股利" :offset="-65" :width="433" :trigger="popoverTrigger" :hide-after="0">
+            <div v-if="dividend && dividend.length >= 1">
+                <div v-for="(item, index) in dividend" :key="index">
+                    <span
+                        :style="[
+                            (item.CashExDividendTradingDate
+                                ? parseInt(item.CashExDividendTradingDate.substring(0, 4))
+                                : parseInt(item.StockExDividendTradingDate.substring(0, 4))) %
+                                2 ===
+                            1
+                                ? { 'background-color': '#eeeeee' }
+                                : { 'background-color': '#ffffff' },
+                            {
+                                'font-size': '14px',
+                                display: 'inline-block',
+                                width: '100px',
+                                'text-align': 'center',
+                                'margin-top': '6px',
+                            },
+                        ]"
+                        >{{
+                            item.CashExDividendTradingDate ? item.CashExDividendTradingDate : item.StockExDividendTradingDate
+                        }}</span
+                    >&nbsp;&nbsp;
+
+                    <span
+                        :style="[
+                            item.CashEarningsDistribution ? { 'background-color': '#e6a23c' } : { 'background-color': '#909399' },
+                            {
+                                'font-size': '14px',
+                                display: 'inline-flex' /* 使用 inline-flex 以允許靠右對齊 */,
+                                width: '130px',
+                                'text-align': 'left',
+                                'justify-content': 'space-between' /* 將子元素靠右對齊 */,
+                                color: 'white',
+                                'border-radius': '10px 100px / 120px',
+                                padding: '5px',
+                                'vertical-align': 'top' /* 將文字靠最上方 */,
+                            },
+                        ]"
+                    >
+                        {{ item.CashEarningsDistribution ? '現金股利' : '股票股利' }}
+                        <span>
+                            ({{
+                                item.CashEarningsDistribution
+                                    ? item.CashEarningsDistribution.toFixed(2) + '元'
+                                    : item.StockEarningsDistribution.toFixed(2) + '股'
+                            }}
+                            )
+                        </span>
+                    </span>
+
+                    &nbsp;&nbsp;<span
+                        :style="[
+                            parseInt(item.CashDividendPaymentDate.substring(0, 4)) % 2 === 1
+                                ? { 'background-color': '#eeeeee' }
+                                : { 'background-color': '#ffffff' },
+                            {
+                                'font-size': '14px',
+                                display: 'inline-block',
+                                width: '90px',
+                                'text-align': 'center',
+                                'margin-top': '6px',
+                            },
+                        ]"
+                        >{{ item.CashDividendPaymentDate }}</span
+                    >
+                    &nbsp;&nbsp;<span
+                        style="color: #ee3333; font-size: 14px; display: inline-block; width: 50px; text-align: right"
+                        >{{ item.dividendYield ? item.dividendYield.toFixed(2) + ' %' : '' }}</span
+                    >
+                </div>
+            </div>
+            <template #reference>
+                <div>
+                    <el-button
+                        type="info"
+                        class="custom-button"
+                        :plain="true"
+                        size="mini"
+                        style="position: absolute; left: 17px; top: 6px; padding: 0px 8px"
+                        v-if="stockData.type !== 'exchange' && stockData.type !== 'fund'"
+                        @click="getDividend"
+                        >息</el-button
+                    >
+                </div>
+            </template>
+        </el-popover>
+
         <!-- :updateArgs="[true, true, true]" -->
     </div>
 </template>
@@ -98,15 +177,23 @@
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
 import _ from 'lodash';
+import { ElMessage } from 'element-plus';
 
 export default {
     components: { highcharts: Chart },
     props: ['parentData'],
     data() {
         return {
+            popoverTrigger: 'hover',
             // chartOptions: {
             // },
         };
+    },
+    mounted() {
+        // 在 mounted() 事件時就可以發送，因為此時不須 data 及 computed 資料都準備好(因為沒有要data 參數，在create())
+        this.popoverTrigger = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+            ? 'click'
+            : 'hover';
     },
     computed: {
         // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
@@ -114,6 +201,11 @@ export default {
             console.log('stockData');
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             return this.$store.getters.getStock(this.parentData);
+        },
+
+        dividend() {
+            console.log('stockDataOfDividend');
+            return this.$store.getters.getStockDataDividend(this.parentData);
         },
 
         rsi5() {
@@ -566,8 +658,24 @@ export default {
     created() {},
     watch: {},
     methods: {
-        toggleDividend() {
-            this.$store.dispatch('GET_STOCK_DIVIDEND');
+        getDividend() {
+            const crawlerDividendLastDate = this.stockData.crawler_dividend_last_date ? moment(this.stockData.crawler_dividend_last_date) : '2023-11-06';
+            const duration = moment.duration(moment().diff(crawlerDividendLastDate));
+            const minutesDiff = duration.minutes();
+            const secondsDiff = duration.seconds();
+
+            if (minutesDiff <= 4 && secondsDiff <= 59) {
+                ElMessage({
+                    type: 'warning',
+                    message: `禁止在5分鐘內多次發送配息資料的請求，前次發送請求距今時間 ${minutesDiff}分 ${secondsDiff}秒!`,
+                });
+            } else {
+                this.$store.dispatch('GET_STOCK_DIVIDEND', this.parentData);
+                ElMessage({
+                    type: 'success',
+                    message: '送出配息資料的請求!',
+                });
+            }
             // this.$store.commit('SAVE_SHOW_TRADING_VOLUME', { stockId: this.parentData });
             // this.showTradingVolume = !this.showTradingVolume;
         },
