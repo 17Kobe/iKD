@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-row class="row-bg" justify="space-between" style="align-items: center; max-width: 650px">
+        <el-row class="row-bg" justify="space-between" style="align-items: center; max-width: 1024px">
             <el-col :span="10" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">價差&nbsp;&nbsp;</span>
                 <el-radio-group v-model="modeSpread" size="small" fill="#dedede" text-color="#373737">
@@ -311,7 +311,7 @@
         </el-table>
 
         <!-- ================================ 股利 -->
-        <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center; max-width: 650px">
+        <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center; max-width: 1024px">
             <el-col :span="10" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">股利&nbsp;&nbsp;</span>
                 <el-radio-group v-model="modeDividend" size="small" fill="#dedede" text-color="#373737">

@@ -26,7 +26,6 @@ const proxyPort = 8080;
 const proxy = addresses.includes('10.144.169.121') ? 'http://10.160.3.88:8080' : null;
 const agent = addresses.includes('10.144.169.121') ? new HttpsProxyAgent('http://10.160.3.88:8080') : null;
 
-
 console.log('proxy=' + proxy);
 
 const today = moment().format('YYYY-MM-DD');
@@ -71,25 +70,27 @@ function getPromise(url) {
                 else if (url.includes('F0GBR04AR8')) url2 = 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=SHZ18';
                 else if (url.includes('F0GBR04K8F')) url2 = 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=shza6';
                 if (url2 !== '') {
-                    if (addresses.includes('10.144.169.121')) { // proxy
+                    if (addresses.includes('10.144.169.121')) {
+                        // proxy
                         // 如果IP地址存在於列表中，則設定代理
                         const axiosInstance = axios.create({
-                          proxy: false, // 關閉內建代理
-                          httpsAgent: new HttpsProxyAgent(`http://${proxyHost}:${proxyPort}`),
+                            proxy: false, // 關閉內建代理
+                            httpsAgent: new HttpsProxyAgent(`http://${proxyHost}:${proxyPort}`),
                         });
 
                         // 使用 Axios 實例進行請求
-                        axiosInstance.get(url2)
+                        axiosInstance
+                            .get(url2)
                             .then((res) => {
                                 if (res.status === 200) {
                                     const html = res.data;
                                     const $ = cheerio.load(html);
-    
+
                                     // 使用屬性選擇器選擇特定表格
                                     const targetTable = $('table[width="99%"]');
                                     let data = [];
                                     const today = moment();
-    
+
                                     // 遍歷所選表格
                                     targetTable.find('tr').each((i, row) => {
                                         const td = $(row).find(
@@ -97,7 +98,7 @@ function getPromise(url) {
                                         );
                                         const date = $(td[0]).text().trim();
                                         const value = $(td[1]).text().trim();
-    
+
                                         // 如果日期和淨值都存在，則添加到array
                                         if (date && value) {
                                             // const extractDate = moment(today.format('YYYY') + '/' + date, 'YYYY/MM/DD');
@@ -105,19 +106,19 @@ function getPromise(url) {
                                             if (extractDate.isAfter(today) || !extractDate.isValid()) {
                                                 extractDate.subtract(1, 'years');
                                             }
-    
+
                                             data.push([extractDate.format('YYYY-MM-DD'), parseFloat(value)]);
                                         }
                                     });
-    
+
                                     // console.log(data.reverse());
-    
+
                                     //
                                     const lastValueDate = moment(_.last(values)[0], 'YYYY-MM-DD');
                                     data = data.reverse();
                                     for (let i = 0; i < data.length; i++) {
                                         const currentDate = moment(data[i][0], 'YYYY-MM-DD');
-    
+
                                         if (currentDate.isAfter(lastValueDate)) {
                                             // 如果日期大于 values 数组的最后一个日期，追加到 values 数组
                                             values.push(data[i]);
@@ -127,22 +128,22 @@ function getPromise(url) {
                                 }
                             })
                             .catch((err) => {
-                            console.error('錯誤：', err);
+                                console.error('錯誤：', err);
                             });
-                    } 
-                    else { // non-proxy
+                    } else {
+                        // non-proxy
                         axios
-                            .get(url2, proxyConfig)
+                            .get(url2)
                             .then((res) => {
                                 if (res.status === 200) {
                                     const html = res.data;
                                     const $ = cheerio.load(html);
-    
+
                                     // 使用屬性選擇器選擇特定表格
                                     const targetTable = $('table[width="99%"]');
                                     let data = [];
                                     const today = moment();
-    
+
                                     // 遍歷所選表格
                                     targetTable.find('tr').each((i, row) => {
                                         const td = $(row).find(
@@ -150,7 +151,7 @@ function getPromise(url) {
                                         );
                                         const date = $(td[0]).text().trim();
                                         const value = $(td[1]).text().trim();
-    
+
                                         // 如果日期和淨值都存在，則添加到array
                                         if (date && value) {
                                             // const extractDate = moment(today.format('YYYY') + '/' + date, 'YYYY/MM/DD');
@@ -158,19 +159,19 @@ function getPromise(url) {
                                             if (extractDate.isAfter(today) || !extractDate.isValid()) {
                                                 extractDate.subtract(1, 'years');
                                             }
-    
+
                                             data.push([extractDate.format('YYYY-MM-DD'), parseFloat(value)]);
                                         }
                                     });
-    
+
                                     // console.log(data.reverse());
-    
+
                                     //
                                     const lastValueDate = moment(_.last(values)[0], 'YYYY-MM-DD');
                                     data = data.reverse();
                                     for (let i = 0; i < data.length; i++) {
                                         const currentDate = moment(data[i][0], 'YYYY-MM-DD');
-    
+
                                         if (currentDate.isAfter(lastValueDate)) {
                                             // 如果日期大于 values 数组的最后一个日期，追加到 values 数组
                                             values.push(data[i]);
