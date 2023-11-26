@@ -80,7 +80,7 @@
                 }}
             </span>
         </div>
-        <el-popover placement="bottom-end" title="歷年股利" :offset="-65" :width="431" :trigger="popoverTrigger" :hide-after="0">
+        <el-popover placement="bottom-end" title="歷年股利" :offset="-65" :width="433" :trigger="popoverTrigger" :hide-after="0">
             <div v-if="dividend && dividend.length >= 1">
                 <div v-for="(item, index) in dividend" :key="index">
                     <span
@@ -659,7 +659,10 @@ export default {
     watch: {},
     methods: {
         getDividend() {
-            const duration = moment.duration(moment().diff(moment(this.stockData.crawler_dividend_last_date)));
+            const crawlerDividendLastDate = this.stockData.crawler_dividend_last_date
+                ? moment(this.stockData.crawler_dividend_last_date)
+                : '2023-11-06';
+            const duration = moment.duration(moment().diff(crawlerDividendLastDate));
             const minutesDiff = duration.minutes();
             const secondsDiff = duration.seconds();
 
