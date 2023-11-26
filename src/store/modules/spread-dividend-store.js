@@ -329,14 +329,14 @@ const dividend = {
             if (mode === '歷史') return _.orderBy(tempDividendList, ['payment_date'], ['desc']);
             else return _.orderBy(tempDividendList, ['trading_date'], ['asc']);
         },
-        getStockDividendList: (state) => (stockId) => {
-            console.log('getStockDividendList');
-            return _.orderBy(
-                _.concat(_.filter(state.dividendList, { id: stockId }), _.filter(state.historyDividendList, { id: stockId })),
-                ['trading_date'],
-                ['asc']
-            );
-        },
+        // getStockDividendList: (state) => (stockId) => {
+        //     console.log('getStockDividendList');
+        //     return _.orderBy(
+        //         _.concat(_.filter(state.dividendList, { id: stockId }), _.filter(state.historyDividendList, { id: stockId })),
+        //         ['trading_date'],
+        //         ['asc']
+        //     );
+        // },
     },
 };
 

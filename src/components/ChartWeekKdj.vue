@@ -218,16 +218,43 @@ export default {
             );
         },
 
-        allDividendList() {
-            const dividendList = this.$store.getters.getStockDividendList(this.parentData);
-            console.log(this.parentData);
-            return _.filter(this.kdj, (entry, index) => {
-                const startDate = index > 0 ? moment(this.kdj[index - 1][0]).add(1, 'day') : null;
-                const endDate = moment(entry[0]);
+        stockDataDividend() {
+            return this.$store.getters.getStockDataDividend(this.parentData);
+        },
 
+        stockDataDividendToKdjList() {
+            // const dividendList = this.$store.getters.getStockDataDividend(this.parentData);
+            // console.log(this.parentData);
+            // console.log(dividendList);
+            return _.filter(this.kdj, (entry, index) => {
+                // console.log(entry);
+                const startDate =
+                    index > 0
+                        ? moment(this.kdj[index - 1][0])
+                              .clone()
+                              .add(1, 'day')
+                        : null;
+                const endDate = moment(entry[0]).set({ hour: 23, minute: 59, second: 59 });
+                // if (startDate) console.log(startDate.format('YYYY-MM-DD HH:mm:ss'));
+                // if (endDate) console.log(endDate.format('YYYY-MM-DD HH:mm:ss'));
+                // CashExDividendTradingDate
                 return Boolean(
-                    _.find(dividendList, function (o) {
-                        return moment(o.trading_date).isBetween(startDate, endDate);
+                    _.find(this.stockDataDividend, function (o) {
+                        const cashExDividendDateCheck =
+                            startDate && o.CashExDividendTradingDate
+                                ? moment(o.CashExDividendTradingDate).isBetween(startDate, endDate, null, '[]')
+                                : false;
+                        const stockExDividendDateCheck =
+                            startDate && o.StockExDividendTradingDate
+                                ? moment(o.StockExDividendTradingDate).isBetween(startDate, endDate, null, '[]')
+                                : false;
+
+                        // console.log(moment(o.CashExDividendTradingDate).format('YYYY-MM-DD HH:mm:ss'));
+                        // console.log(moment(o.StockExDividendTradingDate).format('YYYY-MM-DD HH:mm:ss'));
+                        // console.log(cashExDividendDateCheck);
+                        // console.log(stockExDividendDateCheck);
+
+                        return cashExDividendDateCheck || stockExDividendDateCheck;
                     })
                 );
             });
@@ -509,18 +536,49 @@ export default {
                                     }
                                 }
 
-                                if (component.allDividendList && component.allDividendList.length > 0) {
+                                if (component.stockDataDividend && component.stockDataDividend.length > 0) {
                                     const point_index = this.points[0].point.index;
                                     if (point_index > 0) {
-                                        const startDate = moment(this.points[0].series.xData[point_index - 1]).add(1, 'days');
-                                        const endDate = moment(point.x);
-                                        var foundDate = _.find(component.allDividendList, function (o) {
-                                            return moment(o[0]).isBetween(startDate, endDate, undefined, '[]');
+                                        const startDate = moment(this.points[0].series.xData[point_index - 1])
+                                            .clone()
+                                            .add(1, 'days');
+                                        const endDate = moment(point.x).set({ hour: 23, minute: 59, second: 59 });
+                                        // console.log(startDate.format('YYYY-MM-DD HH:mm:ss'));
+                                        // console.log(endDate.format('YYYY-MM-DD HH:mm:ss'));
+                                        var foundObj = _.find(component.stockDataDividend, function (o) {
+                                            var cashExDividendDateCheck =
+                                                startDate && o.CashExDividendTradingDate
+                                                    ? moment(o.CashExDividendTradingDate).isBetween(
+                                                          startDate,
+                                                          endDate,
+                                                          undefined,
+                                                          '[]'
+                                                      )
+                                                    : false;
+                                            var stockExDividendDateCheck =
+                                                startDate && o.StockExDividendTradingDate
+                                                    ? moment(o.StockExDividendTradingDate).isBetween(
+                                                          startDate,
+                                                          endDate,
+                                                          undefined,
+                                                          '[]'
+                                                      )
+                                                    : false;
+
+                                            return cashExDividendDateCheck || stockExDividendDateCheck;
                                         });
-                                        if (foundDate)
+                                        // console.log(component.stockDataDividend);
+                                        // console.log(foundObj);
+                                        if (foundObj) {
+                                            // console.log(foundObj);
+                                            const foundDate = foundObj.CashExDividendTradingDate
+                                                ? foundObj.CashExDividendTradingDate
+                                                : foundObj.StockExDividendTradingDate;
+                                            // console.log(moment(foundDate).format('YYYY-MM-DD HH:mm:ss'));
                                             str += `<br>除息日: <span style="background-color: #999999; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">${moment(
-                                                foundDate[0]
-                                            ).format('M/DD')}(${dayOfWeek[moment(foundDate[0]).day()]})</span>`;
+                                                foundDate
+                                            ).format('M/DD')}(${dayOfWeek[moment(foundDate).day()]})</span>`;
+                                        }
                                     }
                                 }
                             }
@@ -709,7 +767,7 @@ export default {
                         },
                         // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
-                        data: this.allDividendList,
+                        data: this.stockDataDividendToKdjList,
                     },
                 ],
             };
