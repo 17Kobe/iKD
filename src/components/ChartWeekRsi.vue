@@ -80,7 +80,7 @@
                 }}
             </span>
         </div>
-        <el-popover placement="bottom-end" title="歷年股利" :offset="-65" :width="431" :trigger="popoverTrigger" :hide-after="0">
+        <el-popover placement="bottom-end" title="歷年股利" :offset="-65" :width="441" :trigger="popoverTrigger" :hide-after="0">
             <div v-if="dividend && dividend.length >= 1">
                 <div v-for="(item, index) in dividend" :key="index">
                     <span
@@ -111,7 +111,7 @@
                             {
                                 'font-size': '14px',
                                 display: 'inline-flex' /* 使用 inline-flex 以允許靠右對齊 */,
-                                width: '130px',
+                                width: '138px',
                                 'text-align': 'left',
                                 'justify-content': 'space-between' /* 將子元素靠右對齊 */,
                                 color: 'white',
@@ -659,7 +659,10 @@ export default {
     watch: {},
     methods: {
         getDividend() {
-            const duration = moment.duration(moment().diff(moment(this.stockData.crawler_dividend_last_date)));
+            const crawlerDividendLastDate = this.stockData.crawler_dividend_last_date
+                ? moment(this.stockData.crawler_dividend_last_date)
+                : '2023-11-06';
+            const duration = moment.duration(moment().diff(crawlerDividendLastDate));
             const minutesDiff = duration.minutes();
             const secondsDiff = duration.seconds();
 
