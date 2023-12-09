@@ -191,10 +191,6 @@ const stock = {
             // console.log(context);
             // console.log(context.rootState.price.stockList);
 
-            commit('SAVE_STOCK_DIVIDEND_CRAWLER_DATETIME', {
-                stockId: stockId,
-            });
-
             // 用字串比日期就好了
             const currentTime = moment(); // 目前時間
             // const today = currentTime.format('YYYY-MM-DD');
@@ -227,12 +223,15 @@ const stock = {
                 // const localcrawlerDividendLastDate = moment(stcokObj.crawler_dividend_last_date).add(1, 'days') || moment().subtract(10, 'years');
                 // 必須是有買的才要去抓未來配息
                 if (
-                    (stockId === null || stockId === stcokObj.id) &&
+                    ((stockId === null && stcokObj.cost) || stockId === stcokObj.id) &&
                     stcokObj.type !== 'fund' &&
                     stcokObj.type !== 'exchange' &&
                     // 因為我有將 localcrawlerDividendLastDate + 1天，所以有 Same
                     moment(siteExistsLatestDate).isSameOrAfter(localcrawlerDividendLastDate)
                 ) {
+                    commit('SAVE_STOCK_DIVIDEND_CRAWLER_DATETIME', {
+                        stockId: stcokObj.id,
+                    });
                     // 為了只下一次API，但還要抓二年的資料回來算平均
                     axios
                         .get('https://api.finmindtrade.com/api/v4/data', {
@@ -1226,7 +1225,7 @@ const stock = {
             saveStockListToDb('stockList', state.stockList);
             // 因為有可能是刪除的
             if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId);
-            // this.dispatch('GET_DIVIDEND');
+            this.dispatch('GET_STOCK_DIVIDEND', stockId);
 
             // 算完就清除，如此不占用記憶體
             _.remove(state.tempStockList, (obj) => obj.id === stockId);

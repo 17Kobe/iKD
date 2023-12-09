@@ -491,6 +491,7 @@ export default {
     },
     mounted() {
         // this.$store.dispatch('GET_DIVIDEND');
+        this.$store.dispatch('GET_STOCK_DIVIDEND');
     },
     methods: {
         currencyFormat(number) {
