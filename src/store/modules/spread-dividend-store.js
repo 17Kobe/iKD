@@ -313,19 +313,62 @@ const dividend = {
         // 該股票的股數，是另外再去撈的，如此才能當股數改變時又能即時反應
         getDividendList: (state, getters, rootState) => (mode) => {
             console.log('getDividendList');
+            console.log(mode);
             // const { dividendList } = state;
-            let tempDividendList = undefined;
-            if (mode === '未來') tempDividendList = state.dividendList;
-            else tempDividendList = state.historyDividendList; // 歷史
+            let tempDividendList = [];
 
-            // 若沒有股數，則加上股數
-            tempDividendList.forEach((obj, index) => {
-                const foundStock = _.find(rootState.price.stockList, ['id', obj.id]);
-                // 有可能清掉股票了，但 dividendlist 還保留著，所以要判斷
-                // 也有可能股票 cost 還沒載入的樣子
-                if (!tempDividendList[index].number_of_shares && !foundStock) return [];
-                if (!tempDividendList[index].number_of_shares) tempDividendList[index].number_of_shares = foundStock.cost.total;
-            });
+            if (mode === '未來') {
+                const todayDate = moment();
+                rootState.price.stockList.forEach((stcokObj) => {
+                    // 過濾出CashDividendPaymentDate大於今天的元素
+                    // 必需有買 cost，且有配息資料
+                    if (stcokObj.cost && stcokObj.data && stcokObj.data.dividend) {
+                        stcokObj.data.dividend.forEach((dividendObj) => {
+                            if ('CashDividendPaymentDate' in dividendObj) {
+                                const dividendPaymentDate = moment(dividendObj.CashDividendPaymentDate, 'YYYY-MM-DD');
+                                if (dividendPaymentDate.isAfter(todayDate)) {
+                                    // 將符合條件的元素加入結果陣列
+                                    // filteredFutureDividendData.push(item);
+                                    tempDividendList.push({
+                                        id: stcokObj.id,
+                                        name: stcokObj.name,
+                                        payment_date: dividendObj.CashDividendPaymentDate,
+                                        trading_date: dividendObj.CashExDividendTradingDate,
+                                        earnings_distribution: dividendObj.CashEarningsDistribution,
+                                        number_of_shares: stcokObj.cost.total,
+                                        isSure: true,
+                                    });
+                                }
+                            }
+                        });
+                    }
+
+                    // const filteredFutureDividendData = stcokObj.data.dividend.filter((item) => {
+                    //     if ('CashDividendPaymentDate' in item) {
+                    //         const dividendPaymentDate = moment(item.CashDividendPaymentDate, 'YYYY-MM-DD');
+                    //         return dividendPaymentDate.isValid() && dividendPaymentDate.isAfter(todayDate);
+                    //     }
+                    //     return false;
+                    // });
+                    // console.log(filteredFutureDividendData);
+                });
+            } else {
+                // 歷史
+                tempDividendList = state.historyDividendList;
+            }
+
+            // if (mode === '未來') tempDividendList = state.dividendList;
+            // else tempDividendList = state.historyDividendList; // 歷史
+
+            // // 若沒有股數，則加上股數
+            // tempDividendList.forEach((obj, index) => {
+            //     const foundStock = _.find(rootState.price.stockList, ['id', obj.id]);
+            //     // 有可能清掉股票了，但 dividendlist 還保留著，所以要判斷
+            //     // 也有可能股票 cost 還沒載入的樣子
+            //     if (!tempDividendList[index].number_of_shares && !foundStock) return [];
+            //     if (!tempDividendList[index].number_of_shares) tempDividendList[index].number_of_shares = foundStock.cost.total;
+            // });
+
             if (mode === '歷史') return _.orderBy(tempDividendList, ['payment_date'], ['desc']);
             else return _.orderBy(tempDividendList, ['trading_date'], ['asc']);
         },

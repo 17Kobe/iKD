@@ -490,7 +490,7 @@ export default {
         console.log('created dividend over');
     },
     mounted() {
-        this.$store.dispatch('GET_DIVIDEND');
+        // this.$store.dispatch('GET_DIVIDEND');
     },
     methods: {
         currencyFormat(number) {

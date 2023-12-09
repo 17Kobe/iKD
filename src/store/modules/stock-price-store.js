@@ -1226,7 +1226,7 @@ const stock = {
             saveStockListToDb('stockList', state.stockList);
             // 因為有可能是刪除的
             if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId);
-            this.dispatch('GET_DIVIDEND');
+            // this.dispatch('GET_DIVIDEND');
 
             // 算完就清除，如此不占用記憶體
             _.remove(state.tempStockList, (obj) => obj.id === stockId);
