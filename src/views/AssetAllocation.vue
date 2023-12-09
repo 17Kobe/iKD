@@ -253,6 +253,14 @@
             </div>
             <div>【$】請輸入帳戶目前金額。</div>
         </div>
+
+        <el-row style="display: flex; flex-wrap: wrap">
+            <el-col :xs="24" :sm="20" :md="14" :lg="14" :xl="20" style="display: flex; padding: 4px 2px 0 4px">
+                <el-card shadow="hover" ref="leftCard" style="flex: 1">
+                    <BarChart :chartData="bar2Data" :options="bar2Options" />
+                </el-card>
+            </el-col>
+        </el-row>
         <br /><br />
         <br /><br />
     </div>
@@ -855,6 +863,122 @@ export default {
                         fill: true /* this option hide background-color */,
                     },
                 ],
+            };
+        },
+
+        annualPassiveIncome() {
+            const currentYear = moment().year();
+            // 過濾最近的五年
+            const spreadData = this.$store.state.dividend.historySpreadList.filter(
+                (item) => moment(item.sell_date).year() >= currentYear - 4
+            );
+            const spreadResult = _(spreadData)
+                .groupBy((item) => moment(item.sell_date).format('YYYY'))
+                .map((group, year) => ({ year, sumSpread: _.sumBy(group, 'sell_return') }))
+                .value();
+
+            // 過濾最近的五年
+            const dividendData = this.$store.state.dividend.historyDividendList.filter(
+                (item) => moment(item.payment_date).year() >= currentYear - 4
+            );
+            const dividendResult = _(dividendData)
+                .groupBy((item) => moment(item.payment_date).format('YYYY'))
+                .map((group, year) => ({
+                    year,
+                    sumDividend: _.sumBy(group, (item) => Math.round(item.number_of_shares * item.earnings_distribution)),
+                }))
+                .value();
+            // console.log(spreadResult);
+            // console.log(dividendResult);
+            // 整合 spreadData 和 dividendData，但這是價差年去找配息也許會有可能找不到，不過應該每年都有賣吧
+            const integratedData = spreadResult.map((spreadItem) => {
+                const matchingDividendItem = dividendResult.find((dividendItem) => dividendItem.year === spreadItem.year);
+
+                return {
+                    year: spreadItem.year,
+                    sumSpread: spreadItem.sumSpread || 0,
+                    sumDividend: matchingDividendItem ? matchingDividendItem.sumDividend || 0 : 0,
+                    total: (spreadItem.sumSpread || 0) + (matchingDividendItem ? matchingDividendItem.sumDividend || 0 : 0),
+                };
+            });
+            return integratedData;
+        },
+        bar2Data() {
+            const years = _.map(this.annualPassiveIncome, (item) => `${item.year} 年`);
+            const totals = _.map(this.annualPassiveIncome, 'total');
+            return {
+                labels: years,
+                datasets: [
+                    {
+                        data: totals,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        borderWidth: 2, // 外框寬度
+                        options: {
+                            legend: {
+                                display: false,
+                            },
+                        },
+                    },
+                ],
+            };
+        },
+        bar2Options() {
+            return {
+                scales: {
+                    y: {
+                        ticks: {
+                            callback(value, index, ticks) {
+                                if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                else return `$ ${value}`;
+                            },
+                        },
+                    },
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    title: {
+                        display: true,
+                        text: `歷年被動收入`,
+                        // align: 'start',
+                        padding: {
+                            top: 5,
+                            bottom: 20,
+                        },
+                        // color: 'blue',
+                    },
+                    datalabels: {
+                        anchor: 'end', // remove this line to get label in middle of the bar
+                        align: 'end',
+                        formatter: (val) => {
+                            if (!val || val === 0) return '';
+                            else if (val > 100000) return `$ ${Number((val / 10000).toFixed(1))} 萬`;
+                            else return `$ ${Number(val.toFixed(1)).toLocaleString('en-US')} 元`;
+                        },
+                        labels: {
+                            // value: {
+                            //     color: 'blue',
+                            // },
+                        },
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label(context) {
+                                let label = context.dataset.label || '';
+
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += `$ ${context.parsed.y.toLocaleString('en-US')}`;
+                                }
+                                return label;
+                            },
+                        },
+                    },
+                },
             };
         },
     },
