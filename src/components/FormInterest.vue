@@ -10,7 +10,6 @@
                             type="date"
                             :clearable="false"
                             size="small"
-                            style="width: 120px"
                         />
                     </el-form-item>
                 </el-col>
@@ -140,4 +139,8 @@ export default {
     line-height: 28px
 .el-drawer.rtl
     overflow: scroll
+
+@media only screen and (max-width: 767px)
+    .el-input.el-date-editor--date
+        width: 120px
 </style>

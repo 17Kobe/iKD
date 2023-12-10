@@ -255,7 +255,7 @@
         </div>
 
         <el-row style="display: flex; flex-wrap: wrap">
-            <el-col :xs="24" :sm="20" :md="14" :lg="14" :xl="20" style="display: flex; padding: 4px 2px 0 4px">
+            <el-col :xs="24" :sm="20" :md="14" :lg="14" :xl="10" style="display: flex; padding: 4px 2px 0 4px">
                 <el-card shadow="hover" ref="leftCard" style="flex: 1">
                     <BarChart :chartData="bar2Data" :options="bar2Options" />
                 </el-card>
