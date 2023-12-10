@@ -1259,7 +1259,8 @@ const stock = {
             const foundStock = state.stockList.find((v) => v.id === stockId);
             const foundExchange = state.stockList.find((v) => v.name === '美金匯率');
 
-            if (_.has(foundStock, 'cost') && _.has(foundStock, 'data.daily') && foundStock.data.daily.length > 0) {
+            if (foundStock.cost && foundStock.data.daily && foundStock.data.daily.length >= 2) {
+                // 因為下面有-2，所以至少要2筆
                 const closeValueIndex = foundStock.data.daily[0].length === 2 ? 1 : 4;
                 const close = foundStock.data.daily[foundStock.data.daily.length - 1][closeValueIndex];
                 const closeNextToLast = foundStock.data.daily[foundStock.data.daily.length - 2][closeValueIndex];

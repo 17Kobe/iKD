@@ -20,6 +20,7 @@
                             v-model="item.interest"
                             placeholder="ex: 1200"
                             size="small"
+                            :ref="`interest${index}`"
                             @keyup="onChangeInterest($event, index)"
                             type="number"
                             inputmode="decimal"
@@ -82,7 +83,7 @@ export default {
             // nextTick()會在DOM已掛載、渲染完成後，執行nextTick()內的程式碼
             // https://stackoverflow.com/questions/59749325/vue-set-focus-to-dynamic-input-box
             this.$nextTick(() => {
-                this.$refs[`cost${index - 1}`][0].focus();
+                this.$refs[`interest${index - 1}`][0].focus();
             });
         },
         onDel(index) {
