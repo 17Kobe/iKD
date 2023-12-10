@@ -261,8 +261,16 @@
                 </el-card>
             </el-col>
         </el-row>
+        <el-row>
+            <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="5" style="padding: 2px 4px 5px 4px">
+                <el-button type="primary" size="small" @click="onAddInterest" round plain
+                    ><i class="el-icon-plus"></i> 新增利息</el-button
+                >
+            </el-col>
+        </el-row>
         <br /><br />
         <br /><br />
+        <FormInterest ref="childFormInterest" />
     </div>
 </template>
 
@@ -275,6 +283,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { BarChart, PieChart, LineChart } from 'vue-chart-3';
 import { ElMessageBox, ElMessage } from 'element-plus';
 import ElCurrencyInput from '@/components/ElCurrencyInput.vue';
+import FormInterest from '@/components/FormInterest.vue';
 
 Chart.register(...registerables);
 // Register the plugin to all charts:
@@ -283,7 +292,7 @@ Chart.register(ChartDataLabels);
 export default {
     name: 'component-asset',
     // components: { highcharts: Chart },
-    components: { ElCurrencyInput, BarChart, PieChart, LineChart },
+    components: { ElCurrencyInput, BarChart, PieChart, LineChart, FormInterest },
 
     data() {
         return {
@@ -888,17 +897,35 @@ export default {
                     sumDividend: _.sumBy(group, (item) => Math.round(item.number_of_shares * item.earnings_distribution)),
                 }))
                 .value();
+
+            // 過濾最近的五年
+            const interestData = this.$store.state.asset.interestList.filter(
+                (item) => moment(item.date).year() >= currentYear - 4
+            );
+            const interestResult = _(interestData)
+                .groupBy((item) => moment(item.date).format('YYYY'))
+                .map((group, year) => ({
+                    year,
+                    sumInterest: _.sumBy(group, 'interest'),
+                }))
+                .value();
             // console.log(spreadResult);
             // console.log(dividendResult);
+            // console.log(interestResult);
             // 整合 spreadData 和 dividendData，但這是價差年去找配息也許會有可能找不到，不過應該每年都有賣吧
             const integratedData = spreadResult.map((spreadItem) => {
                 const matchingDividendItem = dividendResult.find((dividendItem) => dividendItem.year === spreadItem.year);
+                const matchingInterestItem = interestResult.find((interestItem) => interestItem.year === spreadItem.year);
 
                 return {
                     year: spreadItem.year,
                     sumSpread: spreadItem.sumSpread || 0,
                     sumDividend: matchingDividendItem ? matchingDividendItem.sumDividend || 0 : 0,
-                    total: (spreadItem.sumSpread || 0) + (matchingDividendItem ? matchingDividendItem.sumDividend || 0 : 0),
+                    sumInterest: matchingInterestItem ? matchingInterestItem.sumInterest || 0 : 0,
+                    total:
+                        (spreadItem.sumSpread || 0) +
+                        (matchingDividendItem ? matchingDividendItem.sumDividend || 0 : 0) +
+                        (matchingInterestItem ? matchingInterestItem.sumInterest || 0 : 0),
                 };
             });
             return integratedData;
@@ -976,6 +1003,7 @@ export default {
                                 label += ' ( ';
                                 if (foundObj.sumSpread) label += `價差 $ ${foundObj.sumSpread.toLocaleString('en-US')}`;
                                 if (foundObj.sumDividend) label += `; 股利 $ ${foundObj.sumDividend.toLocaleString('en-US')}`;
+                                if (foundObj.sumInterest) label += `; 利息 $ ${foundObj.sumInterest.toLocaleString('en-US')}`;
                                 label += ' )';
                                 return label;
                             },
@@ -1005,8 +1033,12 @@ export default {
         // console.log('created asset over!');
 
         // 歷史存款
-        const localHistoryAssettList = JSON.parse(localStorage.getItem('historyAssetList')) || [];
-        this.$store.commit('SAVE_HISTORY_ASSET_LIST', localHistoryAssettList);
+        const localHistoryAssetList = JSON.parse(localStorage.getItem('historyAssetList')) || [];
+        this.$store.commit('SAVE_HISTORY_ASSET_LIST', localHistoryAssetList);
+
+        // 利息清單，這也有點算歷史，因為每年都有
+        const localInterestList = JSON.parse(localStorage.getItem('interestList')) || [];
+        this.$store.commit('SAVE_INTEREST', localInterestList);
     },
     methods: {
         onAddDeposit() {
@@ -1062,6 +1094,9 @@ export default {
                 this.assetList.splice(index, 1);
                 this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
             }
+        },
+        onAddInterest() {
+            this.$refs.childFormInterest.onInit();
         },
         onResetAsset() {
             localStorage.removeItem('assetList');

@@ -24,6 +24,7 @@ const defaultState = {
         },
     ],
     historyAssetList: [],
+    interestList: [],
 };
 
 const asset = {
@@ -56,6 +57,13 @@ const asset = {
             if (foundHistoryAsset) foundHistoryAsset[1] = data[1];
             else state.historyAssetList.push(data);
             localStorage.setItem('historyAssetList', JSON.stringify(state.historyAssetList));
+        },
+        SAVE_INTEREST(state, interestList) {
+            console.log('SAVE_INTEREST');
+            // console.log(interestList);
+            state.interestList = interestList;
+            localStorage.setItem('interestList', JSON.stringify(state.interestList));
+            console.log('SAVE_INTEREST OVER');
         },
     },
     getters: {
