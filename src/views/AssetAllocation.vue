@@ -924,6 +924,7 @@ export default {
             };
         },
         bar2Options() {
+            const { annualPassiveIncome } = this;
             return {
                 scales: {
                     y: {
@@ -966,14 +967,16 @@ export default {
                     tooltip: {
                         callbacks: {
                             label(context) {
-                                let label = context.dataset.label || '';
-
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    label += `$ ${context.parsed.y.toLocaleString('en-US')}`;
-                                }
+                                const xLabel = context.label; // 取出 '2023 年'
+                                const year = xLabel.split(' ')[0]; // 取出 '2023'
+                                var foundObj = _.find(annualPassiveIncome, { year: year });
+                                // console.log(foundObj);
+                                let label = '';
+                                if (foundObj.total) label += `總計 $ ${foundObj.total.toLocaleString('en-US')}`;
+                                label += ' ( ';
+                                if (foundObj.sumSpread) label += `價差 $ ${foundObj.sumSpread.toLocaleString('en-US')}`;
+                                if (foundObj.sumDividend) label += `; 股利 $ ${foundObj.sumDividend.toLocaleString('en-US')}`;
+                                label += ' )';
                                 return label;
                             },
                         },
