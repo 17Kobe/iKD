@@ -225,40 +225,53 @@ const stock = {
                 if (
                     ((stockId === null && stcokObj.cost) || stockId === stcokObj.id) &&
                     stcokObj.type !== 'fund' &&
-                    stcokObj.type !== 'exchange' &&
-                    // 因為我有將 localcrawlerDividendLastDate + 1天，所以有 Same
-                    moment(siteExistsLatestDate).isSameOrAfter(localcrawlerDividendLastDate)
+                    stcokObj.type !== 'exchange'
                 ) {
-                    commit('SAVE_STOCK_DIVIDEND_CRAWLER_DATETIME', {
-                        stockId: stcokObj.id,
-                    });
-                    // 為了只下一次API，但還要抓二年的資料回來算平均
-                    axios
-                        .get('https://api.finmindtrade.com/api/v4/data', {
-                            params: {
-                                dataset: 'TaiwanStockDividend',
-                                data_id: stcokObj.id,
-                                start_date: localcrawlerDividendLastDate,
-                                token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
-                            },
-                        })
-                        // 成功
-                        .then((res) => {
-                            console.log('GET_DIVIDEND PROCESS');
-                            console.log(res.data);
-                            // 要傳那麼多主要是因為 stockList是rootState
-                            commit('SAVE_STOCK_DIVIDEND', {
-                                stockId: stcokObj.id,
-                                data: res.data,
-                            });
-
-                            // 因為同一公司，可能屬不同產業，但同一個代碼，所以要過濾掉
-                            console.log('GET_STOCK_DIVIDEND OVER');
-                        })
-                        // 失敗
-                        .catch((err) => {
-                            console.log(err);
+                    if (
+                        // 因為我有將 localcrawlerDividendLastDate + 1天，所以有 Same
+                        moment(siteExistsLatestDate).isSameOrAfter(localcrawlerDividendLastDate)
+                    ) {
+                        commit('SAVE_STOCK_DIVIDEND_CRAWLER_DATETIME', {
+                            stockId: stcokObj.id,
                         });
+                        // 為了只下一次API，但還要抓二年的資料回來算平均
+                        axios
+                            .get('https://api.finmindtrade.com/api/v4/data', {
+                                params: {
+                                    dataset: 'TaiwanStockDividend',
+                                    data_id: stcokObj.id,
+                                    start_date: localcrawlerDividendLastDate,
+                                    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
+                                },
+                            })
+                            // 成功
+                            .then((res) => {
+                                console.log('GET_DIVIDEND PROCESS');
+                                console.log(res.data);
+                                // 要傳那麼多主要是因為 stockList是rootState
+                                commit('SAVE_STOCK_DIVIDEND', {
+                                    stockId: stcokObj.id,
+                                    data: res.data,
+                                });
+                                commit('SAVE_STOCK_HISTORY_DIVIDEND_LIST', {
+                                    stockId: stcokObj.id,
+                                    stcokObj: stcokObj,
+                                });
+
+                                // 因為同一公司，可能屬不同產業，但同一個代碼，所以要過濾掉
+                                console.log('GET_STOCK_DIVIDEND OVER');
+                            })
+                            // 失敗
+                            .catch((err) => {
+                                console.log(err);
+                            });
+                    } else if (stcokObj.cost) {
+                        //在 || stockId === stcokObj.id情況，要有 cost 才要結算
+                        commit('SAVE_STOCK_HISTORY_DIVIDEND_LIST', {
+                            stockId: stcokObj.id,
+                            stcokObj: stcokObj,
+                        });
+                    }
                 }
             });
         },

@@ -665,7 +665,9 @@ export default {
             const duration = moment.duration(moment().diff(crawlerDividendLastDate));
             const minutesDiff = duration.minutes();
             const secondsDiff = duration.seconds();
-
+            console.log(crawlerDividendLastDate);
+            console.log(minutesDiff);
+            console.log(secondsDiff);
             if (minutesDiff <= 4 && secondsDiff <= 59) {
                 ElMessage({
                     type: 'warning',

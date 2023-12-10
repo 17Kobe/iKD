@@ -85,6 +85,74 @@ const dividend = {
             state.dividendList = data;
             // console.log(state.currStockDayData);
         },
+        SAVE_STOCK_HISTORY_DIVIDEND_LIST(state, { stockId, stcokObj }) {
+            //  在抓完配息後，會去結算歷史配息(需要大於買的時間，還有最後一次結算歷史配息時間，都沒有則取有買且三個月內有配息)
+            console.log('SAVE_STOCK_HISTORY_DIVIDEND_LIST');
+            // console.log(stockId);
+            // console.log(stcokObj);
+
+            // 取得最後一次結算歷史配息時間，使用 _.maxBy 找到最晚的日期，預設值是十三個月前
+            let latestPaymentDate = moment().subtract(13, 'months').format('YYYY-MM-DD');
+            const filteredStockHistoryDividendData = _.filter(state.historyDividendList, { id: stockId });
+            // console.log(filteredStockHistoryDividendData);
+            if (filteredStockHistoryDividendData.length > 0) {
+                latestPaymentDate = _.maxBy(filteredStockHistoryDividendData, 'payment_date').payment_date;
+            }
+            // console.log('latestPaymentDate=', latestPaymentDate);
+
+            // 取得最早買的日期時間，這個一定要有
+            let earliestBuyDate = stcokObj.cost.settings[0].buy_date;
+            // console.log('earliestBuyDate=', earliestBuyDate);
+
+            // 找到最後結算日期
+            // 使用 Moment.js 進行日期比較
+            const latestPaymentDateMoment = moment(latestPaymentDate);
+            const earliestBuyDateMoment = moment(earliestBuyDate);
+
+            const lastSettlementDate = moment.max(latestPaymentDateMoment, earliestBuyDateMoment);
+
+            // console.log('lastSettlementDate=', lastSettlementDate.format('YYYY-MM-DD'));
+
+            // 取出大於最後結算日期的所有配息，並且付款配息要小於等於今天日期
+            const filteredStockDividendData = stcokObj.data.dividend.filter(
+                (item) =>
+                    item.CashDividendPaymentDate !== '' &&
+                    moment(item.CashDividendPaymentDate).isAfter(lastSettlementDate) &&
+                    moment(item.CashDividendPaymentDate).isSameOrBefore(moment(), 'day')
+            );
+            // console.log('filteredStockDividendData=', filteredStockDividendData);
+
+            // 塞入至 state.historyDividendList
+            let isSaveHistoryToLocalStorage = false;
+            filteredStockDividendData.forEach((dividendObj) => {
+                // 尋找小於等於除息日前的股票數目
+                const accNumber = stcokObj.cost.settings.reduce((acc, { number, buy_date }) => {
+                    let addNumber = 0;
+                    if (!buy_date || moment(buy_date).isSameOrBefore(dividendObj.CashExDividendTradingDate)) {
+                        addNumber = number;
+                    }
+                    return acc + addNumber;
+                }, 0);
+
+                // console.log(accNumber);
+
+                if (accNumber > 0) {
+                    state.historyDividendList.push({
+                        id: stockId,
+                        name: stcokObj.name,
+                        payment_date: dividendObj.CashDividendPaymentDate,
+                        trading_date: dividendObj.CashExDividendTradingDate,
+                        earnings_distribution: dividendObj.CashEarningsDistribution,
+                        number_of_shares: accNumber,
+                        isSure: true,
+                    });
+                    isSaveHistoryToLocalStorage = true;
+                }
+            });
+            if (isSaveHistoryToLocalStorage) {
+                localStorage.setItem('historyDividendList', JSON.stringify(state.historyDividendList));
+            }
+        },
         // 一開始載入用，不用再存 localstorage
         SAVE_HISTORY_SPREAD_LIST(state, data) {
             console.log('SAVE_HISTORY_SPREAD_LIST');
