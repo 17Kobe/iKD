@@ -1,56 +1,62 @@
 <template>
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="85%">
-        <el-form ref="formInterestRef">
-            <el-row v-for="(item, index) in form" :key="index">
-                <el-col :xs="10" :sm="12" :md="7" :lg="4" :xl="3" style="padding-left: 3px">
-                    <el-form-item label="日期">
-                        <el-date-picker
-                            @change="onChangeDate($event, index)"
-                            v-model="item.date"
-                            type="date"
-                            :clearable="false"
-                            size="small"
-                        />
-                    </el-form-item>
-                </el-col>
-                <el-col :xs="9" :sm="7" :md="7" :lg="5" :xl="4" style="padding-left: 16px">
-                    <el-form-item label="利息">
-                        <el-input
-                            v-model="item.interest"
-                            placeholder="ex: 1200"
-                            size="small"
-                            :ref="`interest${index}`"
-                            @keyup="onChangeInterest($event, index)"
-                            type="number"
-                            inputmode="decimal"
-                            style="margin-left: 2px"
-                            @focus="$event.target.select()"
-                        >
-                            <template #suffix>元</template>
-                        </el-input>
-                    </el-form-item>
-                </el-col>
-                <el-col :xs="5" :sm="5" :md="3" :lg="3" :xl="2" style="display: flex; align-items: center">
-                    &nbsp;&nbsp;<el-button type="danger" size="small" @click="onDel(index)"
-                        ><i class="el-icon-minus"></i></el-button
-                ></el-col>
-            </el-row>
-            <el-form-item>
-                <el-button type="primary" size="small" @click="onAdd" style="margin-left: 5px"
-                    ><i class="el-icon-plus"></i>&nbsp;新增利息</el-button
-                >
-            </el-form-item>
-        </el-form>
+        <el-config-provider :locale="locale">
+            <el-form ref="formInterestRef">
+                <el-row v-for="(item, index) in form" :key="index">
+                    <el-col :xs="10" :sm="12" :md="7" :lg="4" :xl="3" style="padding-left: 3px">
+                        <el-form-item label="日期">
+                            <el-date-picker
+                                @change="onChangeDate($event, index)"
+                                v-model="item.date"
+                                type="date"
+                                :clearable="false"
+                                size="small"
+                            />
+                        </el-form-item>
+                    </el-col>
+                    <el-col :xs="9" :sm="7" :md="7" :lg="5" :xl="4" style="padding-left: 16px">
+                        <el-form-item label="利息">
+                            <el-input
+                                v-model="item.interest"
+                                placeholder="ex: 1200"
+                                size="small"
+                                :ref="`interest${index}`"
+                                @keyup="onChangeInterest($event, index)"
+                                type="number"
+                                inputmode="decimal"
+                                style="margin-left: 2px"
+                                @focus="$event.target.select()"
+                            >
+                                <template #suffix>元</template>
+                            </el-input>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :xs="5" :sm="5" :md="3" :lg="3" :xl="2" style="display: flex; align-items: center">
+                        &nbsp;&nbsp;<el-button type="danger" size="small" @click="onDel(index)"
+                            ><i class="el-icon-minus"></i></el-button
+                    ></el-col>
+                </el-row>
+                <el-form-item>
+                    <el-button type="primary" size="small" @click="onAdd" style="margin-left: 5px"
+                        ><i class="el-icon-plus"></i>&nbsp;新增利息</el-button
+                    >
+                </el-form-item>
+            </el-form>
+        </el-config-provider>
     </el-drawer>
 </template>
 
 <script>
 import _ from 'lodash';
 import moment from 'moment';
-import { ElMessageBox, ElMessage } from 'element-plus';
+import { ElMessageBox, ElMessage, ElConfigProvider } from 'element-plus';
+import zhTw from 'element-plus/lib/locale/lang/zh-tw';
 
 export default {
     name: 'component-form-interest',
+    components: {
+    ElConfigProvider,
+    },
     data() {
         return {
             isShow: false,
@@ -63,7 +69,11 @@ export default {
             ],
         };
     },
-    computed: {},
+    computed: {
+        locale() {
+            return zhTw; // 設置為繁中語言包
+        },
+    },
     mounted() {},
     methods: {
         onInit() {
@@ -143,4 +153,7 @@ export default {
 @media only screen and (max-width: 767px)
     .el-input.el-date-editor--date
         width: 120px
+@media only screen and (min-width: 1201px)
+    .el-input.el-date-editor--date
+        width: 180px
 </style>
