@@ -1,7 +1,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
-import { saveStockListToDb } from '@/shared/idbUtils.js';
+import { saveStockToDb, saveStockListToDb } from '@/shared/idbUtils.js';
 import GlobalSettings from '@/store/data/global-settings.json';
 
 const defaultState = {
@@ -1075,12 +1075,12 @@ const stock = {
             if (lastDate) {
                 foundStock.crawler_dividend_last_date = lastDate;
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-                saveStockListToDb('stockList', state.stockList);
+                saveListToDb('stockList', foundStock);
             } else if (_.has(foundStock, 'crawler_dividend_last_date')) {
                 // 有存在才去刪，避免初始還要去呼叫 setItem
                 delete foundStock.crawler_dividend_last_date;
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-                saveStockListToDb('stockList', state.stockList);
+                saveListToDb('stockList', foundStock);
             }
             // console.log(foundStock);
         },
@@ -1091,7 +1091,7 @@ const stock = {
             state.stockList.push(data);
             // console.log(state.currStockDayData);
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb('stockList', state.stockList);
+            saveStockToDb('stockList', data);
             this.dispatch('GET_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
         SAVE_ALL_STOCK(state, data) {
@@ -1118,7 +1118,7 @@ const stock = {
             foundStock.is_dividend = isDvidend;
             // state.stockList.push(data);
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb('stockList', state.stockList);
+            saveStockToDb('stockList', foundStock);
         },
         MOVE_A_STOCK(state, { stockId, direction }) {
             // data 是 object {name: XXX, id: XXX}
@@ -1181,14 +1181,14 @@ const stock = {
 
             // save to localstorage
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb('stockList', state.stockList);
+            saveStockToDb('stockList', found);
         },
         SAVE_SHOW_TRADING_VOLUME(state, { stockId }) {
             // object of array 去 find 並 update
             const found = state.stockList.find((v) => v.id === stockId);
             found.show_trading_volume = !found.show_trading_volume;
 
-            saveStockListToDb('stockList', state.stockList);
+            saveStockToDb('stockList', found);
         },
         SAVE_STOCK_BACKGROUND_COLOR(state, stockId) {
             // object of array 去 find 並 update
@@ -1201,7 +1201,7 @@ const stock = {
             }
             // save to localstorage
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb('stockList', state.stockList);
+            saveStockToDb('stockList', found);
         },
         async SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
             console.log('SAVE_STOCK_COST');
@@ -1235,7 +1235,7 @@ const stock = {
 
             // save to localstorage
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb('stockList', state.stockList);
+            saveStockToDb('stockList', foundStock);
             // 因為有可能是刪除的
             if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId);
             this.dispatch('GET_STOCK_DIVIDEND', stockId);
@@ -1251,7 +1251,7 @@ const stock = {
 
             // save to localstorage
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb('stockList', state.stockList);
+            saveStockToDb('stockList', foundStock);
         },
         SAVE_STOCK_COST_RETURN(state, stockId) {
             console.log('SAVE_STOCK_COST_RETURN');
@@ -1294,7 +1294,7 @@ const stock = {
 
                 // save to localstorage
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-                saveStockListToDb('stockList', state.stockList);
+                saveStockToDb('stockList', foundStock);
             }
         },
         SAVE_STOCK_POLICY(state, { stockId, policyList }) {
@@ -1321,7 +1321,7 @@ const stock = {
             // alert(JSON.stringify(state.stockList));
             try {
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
-                saveStockListToDb('stockList', state.stockList);
+                saveStockToDb('stockList', foundStock);
             } catch (err) {
                 alert(err);
             }
@@ -1475,7 +1475,7 @@ const stock = {
 
                 // ===================塞入localstorage===================
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
-                saveStockListToDb('stockList', state.stockList);
+                saveStockToDb('stockList', foundStock);
 
                 if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId); // 有新值就要更新成本的報酬率
                 console.log('SAVE_STOCK_PRICE OK');
@@ -1553,7 +1553,7 @@ const stock = {
                 });
             });
             foundStock.data.dividend.push(...values);
-            saveStockListToDb('stockList', state.stockList);
+            saveStockToDb('stockList', foundStock);
         },
         async SAVE_STOCK_POLICY_RESULT(state, stockId) {
             console.log('SAVE_STOCK_POLICY_RESULT');
@@ -2527,7 +2527,7 @@ const stock = {
             foundStock.last_update_hash = stockLastUpdateHash;
             // foundStock.calc_policy_date = foundStock.last_price_date; // 設成一樣，之後判斷有無相同來知道是否當天真的計算完成
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb('stockList', state.stockList);
+            saveStockToDb('stockList', foundStock);
             console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE OK');
         },
     },

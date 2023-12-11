@@ -21,6 +21,7 @@ const router = createRouter({
             beforeEnter: (to, from, next) => {
                 console.log('clear localstorage');
                 localStorage.clear();
+                indexedDB.deleteDatabase('wc');
                 next('/');
             },
         },

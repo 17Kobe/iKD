@@ -75,7 +75,7 @@
                 <el-select v-model="recordSelected" class="m-2" placeholder="選擇記錄" style="max-width: 110px">
                     <el-option v-for="item in recordOptions" :key="item.value" :label="item.label" :value="item.value" />
                 </el-select>
-                
+
                 <el-button type="warning" @click="onUploadSync"><i class="el-icon-upload2"></i> 上傳</el-button>
                 <el-button type="primary" @click="onDownloadSync"><i class="el-icon-download"></i> 下載</el-button>
                 <br />
@@ -456,6 +456,8 @@ export default {
 
         onDel10YearsOld() {
             this.$store.commit('DEL_10_YEARS_OLD');
+            localStorage.removeItem('stockList');
+            indexedDB.deleteDatabase('wc');
             // this.$cache.save('aaa', { id: 123, data: '1231' });
             // console.log('Value added to cache.');
             // this.$cache.get('aaa', (result) => {
@@ -463,6 +465,7 @@ export default {
             //     //     sendData(`get: ${JSON.stringify(result)}`);
             // });
             // console.log(this.$cache.get('aaa', { id: 123, data: '1231' }));
+
             ElMessage({
                 type: 'success',
                 message: '完成刪除10年前舊資料!',
