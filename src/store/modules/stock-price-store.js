@@ -1269,11 +1269,11 @@ const stock = {
 
                 // 若有 buy_exchange，則要取到最新匯率
                 const sellExchange =
-                    foundStock.currency === 'USD' && foundExchange && foundExchange.data.daily.length > 0
+                    foundStock.currency === 'USD' && foundExchange && foundExchange.data.daily.length >= 1
                         ? foundExchange.data.daily[foundExchange.data.daily.length - 1][1] - 0.075
                         : 1;
                 const sellExchangeNextToLast =
-                    foundStock.currency === 'USD' && foundExchange && foundExchange.data.daily.length > 0
+                    foundStock.currency === 'USD' && foundExchange && foundExchange.data.daily.length >= 2
                         ? foundExchange.data.daily[foundExchange.data.daily.length - 2][1] - 0.075
                         : 1;
 
@@ -1349,6 +1349,7 @@ const stock = {
                 foundStock.data.ma_buy = foundStock.data.ma_buy || []; // 有可能是 null 就變成 [] 第一條MA線
                 foundStock.data.ma_sell = foundStock.data.ma_sell || []; // 有可能是 null 就變成 [] 第二條MA線
                 foundStock.data.cost = foundStock.data.cost || []; // 有可能是 null 就變成 [] 第二條MA線
+                foundStock.data.dividend = foundStock.data.dividend || []; // 有可能是 null 就變成 [] 
                 foundStock.last_price = foundStock.last_price || null;
                 foundStock.last_price_date = foundStock.last_price_date || null;
                 foundStock.last_price_spread = foundStock.last_price_spread || null;
