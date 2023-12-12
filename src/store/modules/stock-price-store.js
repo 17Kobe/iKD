@@ -1084,43 +1084,43 @@ const stock = {
             }
             // console.log(foundStock);
         },
-        SAVE_A_STOCK(state, data) {
+        async SAVE_A_STOCK(state, data) {
             // data 是 object {name: XXX, id: XXX}
             console.log('SAVE_A_STOCK');
             // console.log(data);
             state.stockList.push(data);
             // console.log(state.currStockDayData);
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockToDb('stockList', data);
+            await saveStockToDb('stockList', data);
             this.dispatch('GET_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
-        SAVE_ALL_STOCK(state, data) {
+        async SAVE_ALL_STOCK(state, data) {
             // data 是 object {name: XXX, id: XXX}
             console.log('SAVE_ALL_STOCK');
             // console.log(data);
             // state.stockList.push(data);
             // console.log(state.currStockDayData);
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb('stockList', data);
+            await saveStockListToDb('stockList', data);
         },
-        SAVE_STOCK_DIVIDEND_LAST_DATE(state) {
+        async SAVE_STOCK_DIVIDEND_LAST_DATE(state) {
             console.log('SAVE_STOCK_DIVIDEND_LAST_DATE');
             state.stockList.forEach((o) => {
                 o.crawler_dividend_last_date = '2022-10-01';
             });
 
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb('stockList', state.stockList);
+            await saveStockListToDb('stockList', state.stockList);
         },
-        ADD_A_STOCK_KEY(state, { stockId, isDvidend }) {
+        async ADD_A_STOCK_KEY(state, { stockId, isDvidend }) {
             console.log('ADD_A_STOCK_KEY');
             const foundStock = state.stockList.find((v) => v.id === stockId);
             foundStock.is_dividend = isDvidend;
             // state.stockList.push(data);
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockToDb('stockList', foundStock);
+            await saveStockToDb('stockList', foundStock);
         },
-        MOVE_A_STOCK(state, { stockId, direction }) {
+        async MOVE_A_STOCK(state, { stockId, direction }) {
             // data 是 object {name: XXX, id: XXX}
             console.log('MOVE_A_STOCK');
             // const index = _.findIndex(state.stockList, ['id', stockId]);
@@ -1149,17 +1149,17 @@ const stock = {
             }
 
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb('stockList', state.stockList);
+            await saveStockListToDb('stockList', state.stockList);
         },
-        DEL_A_STOCK(state, data) {
+        async DEL_A_STOCK(state, data) {
             // data 是 object {name: XXX, id: XXX}
             console.log('DEL_A_STOCK');
             // 移除某個自選股
             _.remove(state.stockList, (obj) => obj.id === data);
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb('stockList', state.stockList);
+            await saveStockListToDb('stockList', state.stockList);
         },
-        DEL_10_YEARS_OLD(state, data) {
+        async DEL_10_YEARS_OLD(state, data) {
             // data 是 object {name: XXX, id: XXX}
             console.log('DEL_10_YEARS_OLD');
             _.forEach(state.stockList, (item) => {
@@ -1170,10 +1170,10 @@ const stock = {
             });
 
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockListToDb('stockList', state.stockList);
+            await saveStockListToDb('stockList', state.stockList);
         },
 
-        SAVE_STOCK_STAR(state, { stockId, star }) {
+        async SAVE_STOCK_STAR(state, { stockId, star }) {
             // object of array 去 find 並 update
             const found = state.stockList.find((v) => v.id === stockId);
             found.star = 0;
@@ -1181,16 +1181,16 @@ const stock = {
 
             // save to localstorage
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockToDb('stockList', found);
+            await saveStockToDb('stockList', found);
         },
-        SAVE_SHOW_TRADING_VOLUME(state, { stockId }) {
+        async SAVE_SHOW_TRADING_VOLUME(state, { stockId }) {
             // object of array 去 find 並 update
             const found = state.stockList.find((v) => v.id === stockId);
             found.show_trading_volume = !found.show_trading_volume;
 
-            saveStockToDb('stockList', found);
+            await saveStockToDb('stockList', found);
         },
-        SAVE_STOCK_BACKGROUND_COLOR(state, stockId) {
+        async SAVE_STOCK_BACKGROUND_COLOR(state, stockId) {
             // object of array 去 find 並 update
             const found = state.stockList.find((v) => v.id === stockId);
             if (found.background) {
@@ -1201,7 +1201,7 @@ const stock = {
             }
             // save to localstorage
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockToDb('stockList', found);
+            await saveStockToDb('stockList', found);
         },
         async SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
             console.log('SAVE_STOCK_COST');
@@ -1235,7 +1235,7 @@ const stock = {
 
             // save to localstorage
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockToDb('stockList', foundStock);
+            await saveStockToDb('stockList', foundStock);
             // 因為有可能是刪除的
             if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId);
             this.dispatch('GET_STOCK_DIVIDEND', stockId);
@@ -1251,9 +1251,9 @@ const stock = {
 
             // save to localstorage
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockToDb('stockList', foundStock);
+            await saveStockToDb('stockList', foundStock);
         },
-        SAVE_STOCK_COST_RETURN(state, stockId) {
+        async SAVE_STOCK_COST_RETURN(state, stockId) {
             console.log('SAVE_STOCK_COST_RETURN');
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
@@ -1294,10 +1294,10 @@ const stock = {
 
                 // save to localstorage
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-                saveStockToDb('stockList', foundStock);
+                await saveStockToDb('stockList', foundStock);
             }
         },
-        SAVE_STOCK_POLICY(state, { stockId, policyList }) {
+        async SAVE_STOCK_POLICY(state, { stockId, policyList }) {
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
 
@@ -1321,7 +1321,7 @@ const stock = {
             // alert(JSON.stringify(state.stockList));
             try {
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
-                saveStockToDb('stockList', foundStock);
+                await saveStockToDb('stockList', foundStock);
             } catch (err) {
                 alert(err);
             }
@@ -1476,7 +1476,7 @@ const stock = {
 
                 // ===================塞入localstorage===================
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
-                saveStockToDb('stockList', foundStock);
+                await saveStockToDb('stockList', foundStock);
 
                 if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId); // 有新值就要更新成本的報酬率
                 console.log('SAVE_STOCK_PRICE OK');
@@ -1554,7 +1554,7 @@ const stock = {
                 });
             });
             foundStock.data.dividend.push(...values);
-            saveStockToDb('stockList', foundStock);
+            await saveStockToDb('stockList', foundStock);
         },
         async SAVE_STOCK_POLICY_RESULT(state, stockId) {
             console.log('SAVE_STOCK_POLICY_RESULT');
@@ -2528,7 +2528,7 @@ const stock = {
             foundStock.last_update_hash = stockLastUpdateHash;
             // foundStock.calc_policy_date = foundStock.last_price_date; // 設成一樣，之後判斷有無相同來知道是否當天真的計算完成
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            saveStockToDb('stockList', foundStock);
+            await saveStockToDb('stockList', foundStock);
             console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE OK');
         },
     },
