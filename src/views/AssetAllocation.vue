@@ -933,13 +933,42 @@ export default {
         bar2Data() {
             const years = _.map(this.annualPassiveIncome, (item) => `${item.year} 年`);
             const totals = _.map(this.annualPassiveIncome, 'total');
+            const sumSpread = _.map(this.annualPassiveIncome, 'sumSpread');
+            const sumDividend = _.map(this.annualPassiveIncome, 'sumDividend');
+            const sumInterest = _.map(this.annualPassiveIncome, 'sumInterest');
+
+            // if (foundObj.sumSpread) label += `價差 $ ${foundObj.sumSpread.toLocaleString('en-US')}`;
+            // if (foundObj.sumDividend) label += `; 股利 $ ${foundObj.sumDividend.toLocaleString('en-US')}`;
+            // if (foundObj.sumInterest) label += `; 利息 $ ${foundObj.sumInterest.toLocaleString('en-US')}`;
             return {
                 labels: years,
                 datasets: [
                     {
-                        data: totals,
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgb(54, 162, 235)',
+                        data: sumSpread,
+                        backgroundColor: 'rgb(212, 241, 241)',
+                        borderColor: 'rgba(100, 199, 200, 1)',
+                        borderWidth: 2, // 外框寬度
+                        options: {
+                            legend: {
+                                display: false,
+                            },
+                        },
+                    },
+                    {
+                        data: sumDividend,
+                        backgroundColor: 'rgb(232, 214, 255)',
+                        borderColor: 'rgb(156, 110, 254)',
+                        borderWidth: 2, // 外框寬度
+                        options: {
+                            legend: {
+                                display: false,
+                            },
+                        },
+                    },
+                    {
+                        data: sumInterest,
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        borderColor: 'rgb(255, 159, 64)',
                         borderWidth: 2, // 外框寬度
                         options: {
                             legend: {
@@ -954,7 +983,11 @@ export default {
             const { annualPassiveIncome } = this;
             return {
                 scales: {
+                    x: {
+                        stacked: true,
+                    },
                     y: {
+                        stacked: true,
                         ticks: {
                             callback(value, index, ticks) {
                                 if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
@@ -979,11 +1012,18 @@ export default {
                     },
                     datalabels: {
                         anchor: 'end', // remove this line to get label in middle of the bar
-                        align: 'end',
-                        formatter: (val) => {
+                        align: 'start',
+                        formatter: (val, context) => {
+                            // console.log(context);
+                            let name = '';
+
+                            if (context.datasetIndex === 0) name = '價差';
+                            else if (context.datasetIndex === 1) name = '股利';
+                            else if (context.datasetIndex === 2) name = '利息';
+
                             if (!val || val === 0) return '';
-                            else if (val > 100000) return `$ ${Number((val / 10000).toFixed(1))} 萬`;
-                            else return `$ ${Number(val.toFixed(1)).toLocaleString('en-US')} 元`;
+                            else if (val > 100000) return `${name} $ ${Number((val / 10000).toFixed(1))} 萬`;
+                            else return `${name} $ ${Number(val.toFixed(1)).toLocaleString('en-US')} 元`;
                         },
                         labels: {
                             // value: {
