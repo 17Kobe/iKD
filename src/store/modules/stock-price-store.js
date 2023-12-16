@@ -1,7 +1,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
-import { saveStockToDb, saveStockListToDb } from '@/shared/idbUtils.js';
+import { saveStockToDb, delStockToDb, saveStockListToDb } from '@/shared/idbUtils.js';
 import GlobalSettings from '@/store/data/global-settings.json';
 
 const defaultState = {
@@ -1157,7 +1157,8 @@ const stock = {
             // 移除某個自選股
             _.remove(state.stockList, (obj) => obj.id === data);
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            await saveStockListToDb('stockList', state.stockList);
+            console.log(state.stockList);
+            await delStockToDb('stockList', data);
         },
         async DEL_10_YEARS_OLD(state, data) {
             // data 是 object {name: XXX, id: XXX}
@@ -1349,7 +1350,7 @@ const stock = {
                 foundStock.data.ma_buy = foundStock.data.ma_buy || []; // 有可能是 null 就變成 [] 第一條MA線
                 foundStock.data.ma_sell = foundStock.data.ma_sell || []; // 有可能是 null 就變成 [] 第二條MA線
                 foundStock.data.cost = foundStock.data.cost || []; // 有可能是 null 就變成 [] 第二條MA線
-                foundStock.data.dividend = foundStock.data.dividend || []; // 有可能是 null 就變成 [] 
+                foundStock.data.dividend = foundStock.data.dividend || []; // 有可能是 null 就變成 []
                 foundStock.last_price = foundStock.last_price || null;
                 foundStock.last_price_date = foundStock.last_price_date || null;
                 foundStock.last_price_spread = foundStock.last_price_spread || null;

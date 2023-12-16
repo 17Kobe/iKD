@@ -245,7 +245,7 @@ export default {
                 .then(() => {
                     // console.log(stockId);
                     this.$store.commit('DEL_A_STOCK', stockId);
-                    this.$store.commit('DEL_A_STOCK_DIVIDENDLIST', stockId);
+                    // this.$store.commit('DEL_A_STOCK_DIVIDENDLIST', stockId);
                     ElMessage({
                         type: 'success',
                         message: '完成刪除!',
@@ -330,7 +330,7 @@ export default {
                         data[key] = JSON.parse(localStorage.getItem(key));
                 }
                 // 因為 stockList 沒有儲存在 localstorage，只在 indexedDB 及 vuex
-                data['stockList'] = this.stockList;  // 有包括 個股data
+                data['stockList'] = this.stockList; // 有包括 個股data
                 const dataString = JSON.stringify(data);
 
                 // console.log(dataString);
