@@ -954,7 +954,10 @@ export default {
                     // console.log('commit real over');
                 }
                 // console.log('timerIdOfSetStockData');
-                const partialStockData = this.queueStockDataList.splice(0); // 一次取6個
+                let partialStockData;
+                if (this.isMobile) partialStockData = this.queueStockDataList.splice(0, 6);
+                // 一次取6個
+                else partialStockData = this.queueStockDataList.splice(0);
                 // console.log('commit begin');
                 // console.log(stockDataAndPolicy);
                 if (partialStockData && !_.isEmpty(partialStockData))
