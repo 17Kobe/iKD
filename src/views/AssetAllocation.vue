@@ -770,7 +770,7 @@ export default {
                                 // console.log(stockList);
                                 // console.log(this.stockList);
                                 // 用股票名稱去找
-                                const foundStock = _.find(stockList, { name: context.label });
+                                const foundStock = _.find(stockList, (stock) => _.includes(stock.name, context.label));
                                 // console.log(foundStock);
 
                                 let label = context.dataset.label || '';
