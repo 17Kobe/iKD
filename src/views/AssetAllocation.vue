@@ -738,16 +738,23 @@ export default {
             };
         },
         horizontalBarOptions() {
-            const { stockList } = this;
+            const { stockList, stockCostExistOfReturn } = this;
+            const maxReturn = Math.max(...stockCostExistOfReturn);
+            const minReturn = Math.min(...stockCostExistOfReturn);
+
             return {
                 indexAxis: 'y',
 
                 scales: {
                     x: {
+                        min: minReturn < 0 ? minReturn : 0, // 如果最小值小於零，則設為最小值；否則設為零
+                        max: maxReturn > 0 ? maxReturn : 0,
                         ticks: {
                             callback(value, index, ticks) {
-                                if (value >= 10000 || value <= -10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
-                                else return `$ ${value}`;
+                                if (Math.abs(value) >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                else if (Math.abs(value) >= 1000) {
+                                    return `$ ${Number((value / 1000).toFixed(1))} 千`;
+                                } else return `$ ${value}`;
                             },
                         },
                     },
@@ -792,10 +799,10 @@ export default {
                         // color: 'blue',
                     },
                     datalabels: {
-                        clip: true,
-                        anchor: 'start',
+                        clip: false, // 設為 false 避免數值被截斷
+                        anchor: 'center',
                         align: 'end',
-                        offset: -30,
+                        offset: -2,
                         formatter: (val) => {
                             if (!val || val === 0) return '';
                             return `$ ${Number(val.toFixed(1)).toLocaleString('en-US')}`;
