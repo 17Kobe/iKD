@@ -68,6 +68,26 @@ export async function delStockToDb(key, id) {
     }
 }
 
+export async function delStockListToDb(key) {
+    try {
+        // 開啟資料庫
+        const db = await dbPromise;
+        // 使用事務進行資料表的清空
+        const tx = db.transaction(key, 'readwrite');
+        const stockListStore = tx.objectStore(key);
+
+        // 使用 clear 方法清空資料表中的所有記錄
+        await stockListStore.clear();
+
+        // 完成事務
+        await tx.done;
+
+        console.log(`成功刪除 ${key} 中的所有記錄`);
+    } catch (error) {
+        console.error('發生錯誤：', error);
+    }
+}
+
 export async function saveStockListToDb(key, value) {
     // key=stockList
     try {

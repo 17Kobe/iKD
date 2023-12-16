@@ -1,7 +1,7 @@
 import axios from 'axios';
 import moment from 'moment';
 import _ from 'lodash';
-import { saveStockToDb, delStockToDb, saveStockListToDb } from '@/shared/idbUtils.js';
+import { saveStockToDb, delStockToDb, delStockListToDb, saveStockListToDb } from '@/shared/idbUtils.js';
 import GlobalSettings from '@/store/data/global-settings.json';
 
 const defaultState = {
@@ -1101,6 +1101,7 @@ const stock = {
             // state.stockList.push(data);
             // console.log(state.currStockDayData);
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            await delStockListToDb('stockList');
             await saveStockListToDb('stockList', data);
         },
         async SAVE_STOCK_DIVIDEND_LAST_DATE(state) {
