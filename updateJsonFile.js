@@ -80,9 +80,10 @@ function getPromise(url) {
                         (err, res, html) => {
                             if (!err && res.statusCode === 200) {
                                 const $ = cheerio.load(html);
-                                const targetTable = $('table[width="99%"]');
+                                const targetTable = $('td[width="33%"] > table.t01');
                                 let data = [];
                                 const today = moment();
+                                // console.log(url2);
 
                                 targetTable.find('tr').each((i, row) => {
                                     const td = $(row).find(
@@ -91,6 +92,8 @@ function getPromise(url) {
                                     const date = $(td[0]).text().trim();
                                     const value = $(td[1]).text().trim();
 
+                                    // console.log(date);
+                                    // console.log(value);
                                     if (date && value) {
                                         const extractDate = moment(today.format('YYYY') + '/' + date, 'YYYY/MM/DD');
                                         if (extractDate.isAfter(today) || !extractDate.isValid()) {
