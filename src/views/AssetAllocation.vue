@@ -268,6 +268,14 @@
                 >
             </el-col>
         </el-row>
+        <br />
+        <el-row style="display: flex; flex-wrap: wrap">
+            <el-col :xs="24" :sm="20" :md="14" :lg="14" :xl="10" style="display: flex; padding: 4px 2px 0 4px">
+                <el-card shadow="hover" ref="leftCard" style="flex: 1">
+                    <BarChart :chartData="bar3Data" :options="bar3Options" />
+                </el-card>
+            </el-col>
+        </el-row>
         <br /><br />
         <br /><br />
         <FormInterest ref="childFormInterest" />
@@ -423,6 +431,33 @@ export default {
         historyAssetList() {
             return this.$store.getters.getHistoryAssetList();
         },
+        annualCloseOfHistoryAssetList() {
+            // [
+            //  ["2021-01-19", 858909],
+            //  ["2021-01-20", 860678],
+            //  ["2022-04-19", 858909],
+            //  ["2022-04-20", 860678],
+            //  ["2022-04-21", 859798],
+            //  ["2023-12-20", 860678],
+            //  ["2023-12-21", 859798],
+            // ]
+            // 我想用lodash 取得每年最後一天的值如下
+            // [
+            // ["2021-01-20", 860678],
+            // ["2022-04-21", 859798],
+            // ["2023-12-21", 859798],
+            // ]
+
+            // 將數據按年分組
+            const groupedByYear = _.groupBy(this.$store.state.asset.historyAssetList, (item) => item[0].split('-')[0]);
+            console.log(groupedByYear);
+            // 從每個組中選擇最後一項
+            return _.takeRight(_.map(groupedByYear, (group) => [
+                group[0][0].split('-')[0], // 獲取年份部份
+                _.last(group)[1], // 獲取最後一項的值
+            ]), 6);
+        },
+
         todayAsset() {
             const historyAssetList = this.historyAssetList;
             if (_.size(historyAssetList) === 1) {
@@ -1054,6 +1089,75 @@ export default {
                                 label += ' )';
                                 return label;
                             },
+                        },
+                    },
+                },
+            };
+        },
+        bar3Data() {
+            const years = this.annualCloseOfHistoryAssetList.map(item => `${item[0]} 年`);
+            const values = this.annualCloseOfHistoryAssetList.map(item => item[1]);
+
+            return {
+                labels: years,
+                datasets: [
+                    {
+                        data: values,
+                        backgroundColor:  'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        borderWidth: 2, // 外框寬度
+                        options: {
+                            legend: {
+                                display: false,
+                            },
+                        },
+                    },
+                ],
+            };
+        },
+        bar3Options() {
+            const { annualPassiveIncome } = this;
+            return {
+                scales: {
+                    x: {
+                        stacked: true,
+                    },
+                    y: {
+                        stacked: true,
+                        ticks: {
+                            callback(value, index, ticks) {
+                                if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                else return `$ ${value}`;
+                            },
+                        },
+                    },
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                    },
+                    title: {
+                        display: true,
+                        text: `歷年資產結算`,
+                        // align: 'start',
+                        padding: {
+                            top: 5,
+                            bottom: 20,
+                        },
+                        // color: 'blue',
+                    },
+                    datalabels: {
+                        anchor: 'end', // remove this line to get label in middle of the bar
+                        align: 'start',
+                        formatter: (val, context) => {
+                            if (!val || val === 0) return '';
+                            else if (val > 100000) return `$ ${Number((val / 10000).toFixed(1))} 萬`;
+                            else return `$ ${Number(val.toFixed(1)).toLocaleString('en-US')} 元`;
+                        },
+                        labels: {
+                            // value: {
+                            //     color: 'blue',
+                            // },
                         },
                     },
                 },
