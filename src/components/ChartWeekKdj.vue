@@ -75,7 +75,7 @@
                             '每年固定日買',
                             '每年固定日賣',
                         ].includes(status) &&
-                            !['取消買', '取消買x2', '取消賣', '取消賣½'].includes(stockData.badge))
+                            !['取消買', '取消買x2', '取消賣', '取消賣½', '取消賣⅓'].includes(stockData.badge))
                             ? 'shake-base'
                             : '',
                         'cell-chart',

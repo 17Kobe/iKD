@@ -27,7 +27,7 @@
                             :title="getBadgeTitle(scope.row.badge_reason)"
                             :value="scope.row.badge"
                             class="item"
-                            :class="[['買', '買x2', '賣', '賣½'].includes(scope.row.badge) ? 'shake-base' : '', 'item']"
+                            :class="[['買', '買x2', '賣', '賣½', '賣⅓'].includes(scope.row.badge) ? 'shake-base' : '', 'item']"
                             :type="
                                 ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge)
                                     ? 'danger'

@@ -60,7 +60,7 @@
                     }"
                     :class="[
                         ['RSI 超買', 'RSI 超賣', 'RSI 往下轉折', 'RSI 往上轉折'].includes(status) &&
-                        !['取消買', '取消買x2', '取消賣', '取消賣½'].includes(stockData.badge)
+                        !['取消買', '取消買x2', '取消賣', '取消賣½', '取消賣⅓'].includes(stockData.badge)
                             ? 'shake-base'
                             : '',
                         'cell-chart',

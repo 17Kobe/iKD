@@ -99,7 +99,7 @@
                             :value="scope.row.badge"
                             class="item"
                             :class="[
-                                ['買', '買x2', '賣', '賣½'].includes(scope.row.badge) ? 'shake-base' : '',
+                                ['買', '買x2', '賣', '賣½', '賣⅓'].includes(scope.row.badge) ? 'shake-base' : '',
                                 scope.row.name.length >= 6
                                     ? 'l6'
                                     : scope.row.name.length >= 5
