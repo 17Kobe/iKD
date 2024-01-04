@@ -121,7 +121,11 @@
                                 <span style="font-size: 13px">
                                     {{ scope.row.last_price_spread !== null ? scope.row.last_price_spread + '%' : '' }}
                                 </span>
-                                <div style="color: #cccccc; font-size: 14px">{{ scope.row.last_price_time ? scope.row.last_price_time : fmtDate(scope.row.last_price_date) }}</div>
+                                <div style="color: #cccccc; font-size: 14px">
+                                    {{
+                                        scope.row.last_price_time ? scope.row.last_price_time : fmtDate(scope.row.last_price_date)
+                                    }}
+                                </div>
                             </span>
                         </span>
                     </div>
@@ -820,7 +824,7 @@
         <br />
         <FormCost ref="childFormCost" />
         <FormPolicy ref="childFormPolicy" />
-        <FormExport ref="childFormExport" />
+        <!-- <FormExport ref="childFormExport" /> -->
         <FormComment ref="childFormComment" />
     </div>
 </template>

@@ -175,9 +175,9 @@ export default {
             // return this.$store.state.price.stockList;
             return this.$store.getters.getStockSortedList();
         },
-        stockList() {
-            return this.$store.state.price.stockList;
-        },
+        // stockList() {
+        //     return this.$store.state.price.stockList;
+        // },
     },
     mounted() {},
     methods: {
@@ -330,7 +330,7 @@ export default {
                         data[key] = JSON.parse(localStorage.getItem(key));
                 }
                 // 因為 stockList 沒有儲存在 localstorage，只在 indexedDB 及 vuex
-                data['stockList'] = this.stockList; // 有包括 個股data
+                data['stockList'] = this.$store.state.price.stockList; // 有包括 個股data
                 const dataString = JSON.stringify(data);
 
                 // console.log(dataString);
