@@ -121,7 +121,7 @@
                                 <span style="font-size: 13px">
                                     {{ scope.row.last_price_spread !== null ? scope.row.last_price_spread + '%' : '' }}
                                 </span>
-                                <div style="color: #cccccc; font-size: 14px">{{ fmtDate(scope.row.last_price_date) }}</div>
+                                <div style="color: #cccccc; font-size: 14px">{{ scope.row.last_price_time ? scope.row.last_price_time : fmtDate(scope.row.last_price_date) }}</div>
                             </span>
                         </span>
                     </div>
@@ -951,6 +951,17 @@ export default {
                     // console.log('GET_STOCK_PRICE');
                     this.$store.dispatch('GET_STOCK_PRICE');
                     clearInterval(timerIdOfSetStockData);
+
+                    // 開始時先延遲45秒
+                    setTimeout(() => {
+                        // 第一次觸發
+                        this.getRealtimeStockPrice();
+
+                        // 接著每15秒執行一次
+                        setInterval(() => {
+                            this.getRealtimeStockPrice();
+                        }, 15 * 1000);
+                    }, 60 * 1000);
                     // console.log('commit real over');
                 }
                 // console.log('timerIdOfSetStockData');
@@ -988,6 +999,18 @@ export default {
         // });
     },
     methods: {
+        getRealtimeStockPrice() {
+            const now = moment();
+            // 設定開始時間為09:00
+            const startTime = moment().set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
+            // 設定結束時間為13:30
+            const endTime = moment().set({ hour: 13, minute: 30, second: 0, millisecond: 0 });
+            // 確認現在時間是否在範圍內
+            if (now.isBetween(startTime, endTime) && document.visibilityState === 'visible') {
+                this.$store.dispatch('GET_REALTIME_STOCK_PRICE');
+            }
+        },
+
         fmtDate(timestamp) {
             // (${dayOfWeek[currStockLastDate.day()]})`;
             const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];

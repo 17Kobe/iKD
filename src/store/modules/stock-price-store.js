@@ -16,6 +16,53 @@ const stock = {
         return defaultState;
     },
     actions: {
+        async GET_REALTIME_STOCK_PRICE({ state, commit }) {
+            console.log('GET_REALTIME_STOCK_PRICE 0');
+            // 使用 map 函數取得所有 stockObj.id 的陣列
+            const idsArray = state.stockList
+                .filter((stockObj) => !stockObj.type || stockObj.type === 'stock')
+                .map((stockObj) => `tse_${stockObj.id}.tw`);
+
+            // 使用 join 函數將陣列合併成一個字串，以 "|" 分隔
+            const idsString = idsArray.join('|');
+            console.log(idsString);
+
+            // const url = `https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=${idsString}`
+            const url = `http://localhost:5566/api/realtime?ids=${idsString}`;
+
+            try {
+                const response = await axios.get(url);
+                // 在這裡處理 response 的內容
+                // console.log(response.data);
+
+                response.data.data.forEach((stockObj) => {
+                    // 將 ch 值中的 '.tw' 刪除
+                    const stockId = stockObj.ch.replace('.tw', '');
+
+                    // 準備要 commit 的數據
+                    const commitData = {
+                        stockId,
+                        data: { 
+                            data: [{
+                                d: stockObj.d,
+                                t: stockObj.t,
+                                o: stockObj.o,
+                                h: stockObj.h,
+                                l: stockObj.l,
+                                z: stockObj.z,
+                                v: stockObj.v,
+                            }]
+                        },
+                        realtime: true,
+                    };
+                    // 調用 commit
+                    commit('SAVE_STOCK_PRICE', commitData);
+                });
+            } catch (error) {
+                // 如果有錯誤，可以在這裡處理
+                console.error('Error:', error.message);
+            }
+        },
         async GET_STOCK_PRICE({ state, commit }, force = false) {
             // GET_STOCK_PRICE(context, force = false) {
             console.log('GET_STOCK_PRICE 0');
@@ -30,7 +77,13 @@ const stock = {
                     if (stcokObj.type) stcokObjType = stcokObj.type; // 'fund' or 'exchange';
 
                     console.log('GET_STOCK_PRICE 1');
-                    const stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
+                    let stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
+                    // 清除即時股票
+                    if (stcokObjType === 'stock') {
+                        // 濾除 即時，即時會有7個元素，正常只有6個元素
+                        stockDataDaily = _.filter(stockDataDaily, arr => arr.length !== 7);
+                    }
+
                     // console.log(stockDataDaily);
                     // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
                     const stockStartDate = moment(
@@ -80,7 +133,7 @@ const stock = {
                                         dataset: 'TaiwanStockPrice',
                                         data_id: stcokObj.id,
                                         start_date: stockStartDate,
-                                        token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
+                                        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk',
                                     },
                                 })
                                 // 成功
@@ -103,7 +156,7 @@ const stock = {
                                         dataset: 'TaiwanExchangeRate',
                                         data_id: stcokObj.id,
                                         start_date: stockStartDate,
-                                        token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
+                                        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk',
                                     },
                                 })
                                 // 成功
@@ -241,7 +294,7 @@ const stock = {
                                     dataset: 'TaiwanStockDividend',
                                     data_id: stcokObj.id,
                                     start_date: localcrawlerDividendLastDate,
-                                    token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRlIjoiMjAyMi0wMi0wOCAxMzoyODozOCIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjQ2In0.QZraZM9320Ut0rkes4YsqtqHR38NitKO-52Sk4KhYHE',
+                                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk',
                                 },
                             })
                             // 成功
@@ -1329,11 +1382,15 @@ const stock = {
             }
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
         },
-        async SAVE_STOCK_PRICE(state, { stockId, data }) {
+        async SAVE_STOCK_PRICE(state, { stockId, data, realtime = false }) {
             console.log('SAVE_STOCK_PRICE');
             console.log(stockId);
+            // console.log(data);
+            // console.log(realtime);
             const foundStock = state.stockList.find((v) => v.id === stockId);
             let currStockLastDate = null;
+
+            let values = [];
             if (data.data.length > 0) {
                 // 在此其實不用"避免重覆"的資料，因我的我 start_date 已是控制好我的DB沒有的日期，若強制抓回只是 data.data=[] 沒有資料而已
                 // 預設值
@@ -1354,6 +1411,7 @@ const stock = {
                 foundStock.data.dividend = foundStock.data.dividend || []; // 有可能是 null 就變成 []
                 foundStock.last_price = foundStock.last_price || null;
                 foundStock.last_price_date = foundStock.last_price_date || null;
+                foundStock.last_price_time = foundStock.last_price_time || null;
                 foundStock.last_price_spread = foundStock.last_price_spread || null;
 
                 // 塞入股價日線資料
@@ -1361,19 +1419,72 @@ const stock = {
                 let stcokObjType = 'stock';
                 if (foundStock.type) stcokObjType = foundStock.type; // 'fund' or 'exchange';
 
-                let values = [];
                 // 股票
                 if (stcokObjType === 'stock') {
-                    data.data.forEach((element) => {
-                        values.push([
-                            element.date,
-                            element.open,
-                            element.max,
-                            element.min,
-                            element.close,
-                            element.Trading_Volume,
-                        ]);
-                    });
+                    if (realtime) {
+                        // 濾除 即時，即時會有7個元素，正常只有6個元素
+                        const foundRealtime = _.find(foundStock.data.daily, arr => arr.length === 7);
+
+                        // console.log(foundStock.data.daily);
+                        const realtimeObj = data.data[0];
+                        const dateString = realtimeObj.d;
+                        const open = parseFloat(realtimeObj.o) >= 1000 
+                            ? Number( parseFloat(realtimeObj.o).toFixed(0))
+                            :  parseFloat(realtimeObj.o) >= 100
+                            ? Number( parseFloat(realtimeObj.o).toFixed(1))
+                            : Number( parseFloat(realtimeObj.o).toFixed(2));
+                        const high = parseFloat(realtimeObj.h) >= 1000 
+                            ? Number( parseFloat(realtimeObj.h).toFixed(0))
+                            :  parseFloat(realtimeObj.h) >= 100
+                            ? Number( parseFloat(realtimeObj.h).toFixed(1))
+                            : Number( parseFloat(realtimeObj.h).toFixed(2));
+                        const low = parseFloat(realtimeObj.l) >= 1000 
+                            ? Number( parseFloat(realtimeObj.l).toFixed(0))
+                            :  parseFloat(realtimeObj.l) >= 100
+                            ? Number( parseFloat(realtimeObj.l).toFixed(1))
+                            : Number( parseFloat(realtimeObj.l).toFixed(2));
+                        let close = 0;
+                        if (realtimeObj.z !== '-')
+                            close = parseFloat(realtimeObj.z) >= 1000 
+                                ? Number( parseFloat(realtimeObj.z).toFixed(0))
+                                :  parseFloat(realtimeObj.z) >= 100
+                                ? Number( parseFloat(realtimeObj.z).toFixed(1))
+                                : Number( parseFloat(realtimeObj.z).toFixed(2));
+                        const commonElements = [
+                            `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`,
+                            open,
+                            high,
+                            low
+                        ];
+                        console.log(commonElements);
+                        
+                        if (realtimeObj.t === '13:30:00' && realtimeObj.z !== '-') { // 代表是當天已結束了
+                            // 使用 _.reject 一次性過濾掉符合條件的元素
+                            foundStock.data.daily = _.filter(foundStock.data.daily, arr => arr.length !== 7);
+                            values.push([...commonElements, close, parseInt(realtimeObj.v), realtimeObj.t]);
+                        } else if (realtimeObj.z === '-' && foundRealtime) { // 代表目前是價格是 '-' 那用上一個值
+                            // 使用 _.reject 一次性過濾掉符合條件的元素
+                            foundStock.data.daily = _.filter(foundStock.data.daily, arr => arr.length !== 7);
+                            values.push([...commonElements, foundRealtime[4], parseInt(realtimeObj.v), realtimeObj.t]);
+                        } else if (realtimeObj.z !== '-') {
+                            // 使用 _.reject 一次性過濾掉符合條件的元素
+                            foundStock.data.daily = _.filter(foundStock.data.daily, arr => arr.length !== 7);
+                            values.push([...commonElements, close, parseInt(realtimeObj.v), realtimeObj.t]);
+                        }
+                        // console.log(values);
+                        // console.log(values.length);
+                    } else {
+                        data.data.forEach((element) => {
+                            values.push([
+                                element.date,
+                                element.open,
+                                element.max,
+                                element.min,
+                                element.close,
+                                element.Trading_Volume,
+                            ]);
+                        });
+                    }
                 } else if (stcokObjType === 'exchange') {
                     //匯率
                     data.data.forEach((element) => {
@@ -1421,7 +1532,7 @@ const stock = {
             if (
                 foundStock.data &&
                 foundStock.data.daily.length > 0 &&
-                (data.data.length > 0 || // 股票正常進來
+                (values.length > 0 || // 股票正常及即時進來，且濾除小於DB日期的值，仍有值時
                     !_.has(foundStock, 'data.weekly') || // 基金, 第一次
                     foundStock.data.weekly.length === 0 || // 第一次股票抓資料後，但沒更新 weekly時
                     (foundStock.data.weekly.length > 0 && // 基金，第二次以後
@@ -1437,7 +1548,9 @@ const stock = {
                 foundStock.last_price = v1;
 
                 currStockLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
+                const currStockLastTime = foundStock.data.daily[foundStock.data.daily.length - 1].length === 7 ? foundStock.data.daily[foundStock.data.daily.length - 1][6] : null;
                 foundStock.last_price_date = `${currStockLastDate.format('YYYY-MM-DD')}`;
+                foundStock.last_price_time = currStockLastTime;
 
                 foundStock.last_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
 
