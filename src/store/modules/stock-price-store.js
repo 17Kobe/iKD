@@ -1589,7 +1589,7 @@ const stock = {
 
                 // ===================塞入localstorage===================
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
-                await saveStockToDb('stockList', foundStock);
+                if (!_.has(foundStock, 'policy') && !_.has(foundStock, 'cost.settings')) await saveStockToDb('stockList', foundStock); // 如果沒有 policy才要save
 
                 if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId); // 有新值就要更新成本的報酬率
                 console.log('SAVE_STOCK_PRICE OK');
