@@ -144,7 +144,7 @@ const stock = {
                                 // 失敗
                                 .catch((err) => {
                                     console.log('GET_STOCK_PRICE error. ' + stcokObj.id);
-                                    commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
+                                    // commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // ／跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                                     console.log(err);
                                 });
                         } else if (stcokObjType === 'exchange') {
@@ -167,7 +167,7 @@ const stock = {
                                 // 失敗
                                 .catch((err) => {
                                     console.log('GET_STOCK_PRICE error. ' + stcokObj.id);
-                                    commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
+                                    // commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                                     console.log(err);
                                 });
                         } else if (stcokObjType === 'fund') {
@@ -200,7 +200,7 @@ const stock = {
                     } else {
                         // 股票
                         if (stcokObjType === 'stock' || stcokObjType === 'exchange') {
-                            commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
+                            // commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                         } else if (stcokObjType === 'fund') {
                             // 基金
                             commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
