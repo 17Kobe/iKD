@@ -1367,6 +1367,9 @@ const stock = {
                 // delete foundStock.calc_policy_date;
                 // delete foundStock.data.ma_buy;
                 // delete foundStock.data.ma_sell;
+                // localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
+                await saveStockToDb('stockList', foundStock);
+
             } else {
                 if (!foundStock.policy) foundStock.policy = { settings: { buy: [], sell: [] } };
                 foundStock.policy.settings = policyList; // 複製數據複本
@@ -1374,12 +1377,7 @@ const stock = {
                 // save to localstorage
             }
             // alert(JSON.stringify(state.stockList));
-            try {
-                // localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
-                await saveStockToDb('stockList', foundStock);
-            } catch (err) {
-                alert(err);
-            }
+
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
         },
         async SAVE_STOCK_PRICE(state, { stockId, data, realtime = false }) {
