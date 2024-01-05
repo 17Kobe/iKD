@@ -1308,7 +1308,7 @@ const stock = {
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             await saveStockToDb('stockList', foundStock);
         },
-        async SAVE_STOCK_COST_RETURN(state, stockId) {
+        async SAVE_STOCK_COST_RETURN(state, stockId, saveToDB = true) {
             console.log('SAVE_STOCK_COST_RETURN');
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
@@ -1348,7 +1348,11 @@ const stock = {
 
                 // save to localstorage
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-                await saveStockToDb('stockList', foundStock);
+                if (saveToDB) {
+                    // TODO: save daily to another db
+                    // TODO: foundStock.data delete daily
+                    await saveStockToDb('stockList', foundStock);
+                }
             }
         },
         async SAVE_STOCK_POLICY(state, { stockId, policyList }) {
@@ -1454,7 +1458,7 @@ const stock = {
                             low
                         ];
                         console.log(commonElements);
-                        
+                        // TODO: daily filter
                         if (realtimeObj.t === '13:30:00' && realtimeObj.z !== '-') { // 代表是當天已結束了
                             // 使用 _.reject 一次性過濾掉符合條件的元素
                             foundStock.data.daily = _.filter(foundStock.data.daily, arr => arr.length !== 7);
@@ -1519,7 +1523,9 @@ const stock = {
                         return moment(array[0]).isSameOrBefore(currStockLastDate);
                     });
                 }
-                foundStock.data.daily.push(...values);
+                // TODO: get daily to vuex daily add
+                if (values.length > 0)
+                    foundStock.data.daily.push(...values);
                 // console.log(foundStock.data.daily);
                 // console.log(values);
 
@@ -1537,6 +1543,8 @@ const stock = {
                             foundStock.data.weekly[foundStock.data.weekly.length - 1][0]))
             ) {
                 console.log('weekly');
+                // TODO: maybe to get dailly
+
                 // 塞入漲跌幅、最後股價
                 const closeValueIndex = foundStock.data.daily[0].length === 2 ? 1 : 4;
                 const v1 = foundStock.data.daily[foundStock.data.daily.length - 1][closeValueIndex];
@@ -1587,11 +1595,16 @@ const stock = {
 
                 // console.log(foundStock);
 
+
                 // ===================塞入localstorage===================
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
-                if (!_.has(foundStock, 'policy') && !_.has(foundStock, 'cost.settings')) await saveStockToDb('stockList', foundStock); // 如果沒有 policy才要save
+                if (!_.has(foundStock, 'policy') && !_.has(foundStock, 'cost.settings')) {
+                    // TODO: save daily to another db
+                    // TODO: foundStock.data delete daily
+                    await saveStockToDb('stockList', foundStock); // 如果沒有 policy才要save
+                }
 
-                if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId); // 有新值就要更新成本的報酬率
+                if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId, !_.has(foundStock, 'policy')); // 有新值就要更新成本的報酬率, 沒有 policy 才能要更新DB
                 console.log('SAVE_STOCK_PRICE OK');
             }
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
@@ -1680,6 +1693,7 @@ const stock = {
                 // 像是從 UI改policy會沒有 tempStockList，需要重新計算
                 let foundTempStock = state.tempStockList.find((v) => v.id === stockId);
                 if (typeof foundTempStock === 'undefined') {
+                    // TODO: get daily
                     let tempStockListStockData = {};
                     const weekly_data = await this.dispatch('CALC_STOCK_WEEKLY', stockId);
                     tempStockListStockData.weekly = weekly_data;
@@ -1729,6 +1743,7 @@ const stock = {
                         this.commit('SAVE_STOCK_POLICY_RETURN_RESULT', stockId); // 計算policy且有關報酬率的結果
                     }
                 }
+
                 // 算完就清除，如此不占用記憶體
                 _.remove(state.tempStockList, (obj) => obj.id === stockId);
 
@@ -2640,6 +2655,8 @@ const stock = {
             foundStock.last_update_hash = stockLastUpdateHash;
             // foundStock.calc_policy_date = foundStock.last_price_date; // 設成一樣，之後判斷有無相同來知道是否當天真的計算完成
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            // TODO: save daily to another db
+            // TODO: foundStock.data delete daily
             await saveStockToDb('stockList', foundStock);
             console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE OK');
         },
