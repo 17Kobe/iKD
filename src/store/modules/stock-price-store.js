@@ -77,19 +77,41 @@ const stock = {
                     if (stcokObj.type) stcokObjType = stcokObj.type; // 'fund' or 'exchange';
 
                     console.log('GET_STOCK_PRICE 1');
-                    let stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
+
                     // 清除即時股票
                     if (stcokObjType === 'stock') {
                         // 濾除 即時，即時會有7個元素，正常只有6個元素
-                        stockDataDaily = _.filter(stockDataDaily, arr => arr.length !== 7);
+                        // stockDataDaily = _.filter(stockDataDaily, arr => arr.length !== 7);
+                        if (stcokObj.last_price_time) {
+                            // TODO: get daily
+                            let stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
+                            const foundIndex = _.findIndex(stockDataDaily, arr => arr.length === 7)
+                            if (foundIndex !== -1) {
+                                stockDataDaily.splice(foundIndex, 1); // 刪除該元素
+                                // 塞入漲跌幅、最後股價
+                                const closeValueIndex = stcokObj.data.daily[0].length === 2 ? 1 : 4;
+                                const v1 = stcokObj.data.daily[stcokObj.data.daily.length - 1][closeValueIndex];
+                                const v2 = stcokObj.data.daily[stcokObj.data.daily.length - 2][closeValueIndex];
+
+                                stcokObj.last_price = v1;
+                                stcokObj.last_second_price = v2;
+
+                                currStockLastDate = moment(stcokObj.data.daily[stcokObj.data.daily.length - 1][0]);
+                                const currStockLastTime = stcokObj.data.daily[stcokObj.data.daily.length - 1].length === 7 ? stcokObj.data.daily[stcokObj.data.daily.length - 1][6] : null;
+                                stcokObj.last_price_date = `${currStockLastDate.format('YYYY-MM-DD')}`;
+                                stcokObj.last_price_time = currStockLastTime;
+
+                                stcokObj.last_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
+                            }
+                        }
                     }
 
                     // console.log(stockDataDaily);
                     // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
                     const stockStartDate = moment(
-                        stockDataDaily.length === 0
+                        !stcokObj.last_price_date
                             ? moment().subtract(10, 'years').format('YYYY-MM-DD')
-                            : moment(stockDataDaily[stockDataDaily.length - 1][0]).add(1, 'days')
+                            : moment(stcokObj.last_price_date).add(1, 'days')
                     ).format('YYYY-MM-DD');
 
                     console.log('GET_STOCK_PRICE 2');
@@ -1462,7 +1484,7 @@ const stock = {
                         if (realtimeObj.t === '13:30:00' && realtimeObj.z !== '-') { // 代表是當天已結束了
                             // 使用 _.reject 一次性過濾掉符合條件的元素
                             foundStock.data.daily = _.filter(foundStock.data.daily, arr => arr.length !== 7);
-                            values.push([...commonElements, close, parseInt(realtimeObj.v), realtimeObj.t]);
+                            values.push([...commonElements, close, parseInt(realtimeObj.v)]);
                         } else if (realtimeObj.z === '-' && foundRealtime) { // 代表目前是價格是 '-' 那用上一個值
                             // 使用 _.reject 一次性過濾掉符合條件的元素
                             foundStock.data.daily = _.filter(foundStock.data.daily, arr => arr.length !== 7);
