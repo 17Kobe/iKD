@@ -1078,7 +1078,7 @@ const stock = {
         async CALC_HASH({ state }, stockId) {
             const foundStock = state.stockList.find((v) => v.id === stockId);
             const obj = {
-                last_price: !foundStock ? 'none' : !foundStock.data ? 'no data' : _.last(foundStock.data.daily)[0],
+                last_price: !foundStock ? 'none' : !foundStock.data ? 'no data' : foundStock.last_price_date,
                 policy_settings: !foundStock
                     ? 'none'
                     : !foundStock.policy || !foundStock.policy.settings
@@ -1314,22 +1314,21 @@ const stock = {
             const foundStock = state.stockList.find((v) => v.id === stockId);
             const foundExchange = state.stockList.find((v) => v.name === '美金匯率');
 
-            if (foundStock.cost && foundStock.data.daily && foundStock.data.daily.length >= 2) {
+            if (foundStock.cost && foundStock.last_price && foundStock.last_second_price) {
                 // 因為下面有-2，所以至少要2筆
-                const closeValueIndex = foundStock.data.daily[0].length === 2 ? 1 : 4;
-                const close = foundStock.data.daily[foundStock.data.daily.length - 1][closeValueIndex];
-                const closeNextToLast = foundStock.data.daily[foundStock.data.daily.length - 2][closeValueIndex];
+                const close = foundStock.last_price;
+                const closeNextToLast = foundStock.last_second_price;
                 // console.log(close);
                 // console.log(foundStock.cost.sum);
 
                 // 若有 buy_exchange，則要取到最新匯率
                 const sellExchange =
-                    foundStock.currency === 'USD' && foundExchange && foundExchange.data.daily.length >= 1
-                        ? foundExchange.data.daily[foundExchange.data.daily.length - 1][1] - 0.075
+                    foundStock.currency === 'USD' && foundExchange && foundExchange.last_price
+                        ? foundExchange.last_price - 0.075
                         : 1;
                 const sellExchangeNextToLast =
-                    foundStock.currency === 'USD' && foundExchange && foundExchange.data.daily.length >= 2
-                        ? foundExchange.data.daily[foundExchange.data.daily.length - 2][1] - 0.075
+                    foundStock.currency === 'USD' && foundExchange && foundExchange.last_second_price
+                        ? foundExchange.last_second_price - 0.075
                         : 1;
 
                 // 代表有匯率，美金中值+-0.075
@@ -1544,6 +1543,7 @@ const stock = {
                 const v2 = foundStock.data.daily[foundStock.data.daily.length - 2][closeValueIndex];
 
                 foundStock.last_price = v1;
+                foundStock.last_second_price = v2;
 
                 currStockLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
                 const currStockLastTime = foundStock.data.daily[foundStock.data.daily.length - 1].length === 7 ? foundStock.data.daily[foundStock.data.daily.length - 1][6] : null;
@@ -1636,7 +1636,7 @@ const stock = {
                     'YYYY-MM-DD'
                 );
 
-                // 取得對應的股價
+                // TODO: 取得對應的股價
                 foundStock.data.daily.forEach((item) => {
                     const itemDate = moment(item[0], 'YYYY-MM-DD');
                     if (itemDate.isBefore(targetMoment)) {
@@ -1764,14 +1764,13 @@ const stock = {
             let dataDailyLastDate = null;
             if (foundStock.policy.result.length > 0) {
                 const policyResultLastDate = moment(foundStock.policy.result[foundStock.policy.result.length - 1].date);
-                dataDailyLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
+                dataDailyLastDate = moment(foundStock.last_price_date);
 
-                const closeValueIndex = foundStock.data.daily[0].length === 2 ? 1 : 4;
                 if (dataDailyLastDate.isAfter(policyResultLastDate)) {
                     foundStock.policy.result.push({
                         date: dataDailyLastDate.format('YYYY-MM-DD'),
                         is_latest: true,
-                        price: foundStock.data.daily[foundStock.data.daily.length - 1][closeValueIndex],
+                        price: foundStock.last_price,
                         reason: ['latest'],
                     });
                 }
@@ -2296,7 +2295,7 @@ const stock = {
 
                 if (
                     foundStock.policy.result[foundStock.policy.result.length - 1].date ===
-                    foundStock.data.daily[foundStock.data.daily.length - 1][0]
+                    foundStock.last_price_date
                 ) {
                     // 等於代表沒pop，可預測賣
                     if (_.has(foundStock, 'policy.settings.sell')) {
@@ -2661,6 +2660,7 @@ const stock = {
             console.log('getDatetoExchange');
 
             const foundExchange = state.stockList.find((v) => v.name === '美金匯率');
+            // TODO: daily
             const matchingExchange = foundExchange.data.daily.find(function (exchangeObj) {
                 const exchangeDate = moment(exchangeObj[0]); // 轉換成日期物件
                 return exchangeDate.isSameOrBefore(date);
