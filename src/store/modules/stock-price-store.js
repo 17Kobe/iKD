@@ -84,32 +84,32 @@ const stock = {
                     // 清除即時股票
                     if (stcokObjType === 'stock') {
                         // 濾除 即時，即時會有7個元素，正常只有6個元素
-                        // stockDataDaily = _.filter(stockDataDaily, arr => arr.length !== 7);
-                        if (stcokObj.last_price_time) {
-                            // TODO: get daily
-                            // let stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
-                            const foundIndex = _.findIndex(stockDataDaily, (arr) => arr.length === 7);
-                            if (foundIndex !== -1) {
-                                stockDataDaily.splice(foundIndex, 1); // 刪除該元素
-                                // 塞入漲跌幅、最後股價
-                                const closeValueIndex = stcokObj.data.daily[0].length === 2 ? 1 : 4;
-                                const v1 = stcokObj.data.daily[stcokObj.data.daily.length - 1][closeValueIndex];
-                                const v2 = stcokObj.data.daily[stcokObj.data.daily.length - 2][closeValueIndex];
+                        stockDataDaily = _.filter(stockDataDaily, (arr) => arr.length !== 7);
+                        // if (stcokObj.last_price_time) {
+                        //     // TODO: get daily
+                        //     // let stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
+                        //     const foundIndex = _.findIndex(stockDataDaily, (arr) => arr.length === 7);
+                        //     if (foundIndex !== -1) {
+                        //         stockDataDaily.splice(foundIndex, 1); // 刪除該元素
+                        //         // 塞入漲跌幅、最後股價
+                        //         const closeValueIndex = stcokObj.data.daily[0].length === 2 ? 1 : 4;
+                        //         const v1 = stcokObj.data.daily[stcokObj.data.daily.length - 1][closeValueIndex];
+                        //         const v2 = stcokObj.data.daily[stcokObj.data.daily.length - 2][closeValueIndex];
 
-                                stcokObj.last_price = v1;
-                                stcokObj.last_second_price = v2;
+                        //         stcokObj.last_price = v1;
+                        //         stcokObj.last_second_price = v2;
 
-                                currStockLastDate = moment(stcokObj.data.daily[stcokObj.data.daily.length - 1][0]);
-                                const currStockLastTime =
-                                    stcokObj.data.daily[stcokObj.data.daily.length - 1].length === 7
-                                        ? stcokObj.data.daily[stcokObj.data.daily.length - 1][6]
-                                        : null;
-                                stcokObj.last_price_date = `${currStockLastDate.format('YYYY-MM-DD')}`;
-                                stcokObj.last_price_time = currStockLastTime;
+                        //         currStockLastDate = moment(stcokObj.data.daily[stcokObj.data.daily.length - 1][0]);
+                        //         const currStockLastTime =
+                        //             stcokObj.data.daily[stcokObj.data.daily.length - 1].length === 7
+                        //                 ? stcokObj.data.daily[stcokObj.data.daily.length - 1][6]
+                        //                 : null;
+                        //         stcokObj.last_price_date = `${currStockLastDate.format('YYYY-MM-DD')}`;
+                        //         stcokObj.last_price_time = currStockLastTime;
 
-                                stcokObj.last_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
-                            }
-                        }
+                        //         stcokObj.last_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
+                        //     }
+                        // }
                     }
 
                     // console.log(stockDataDaily);
