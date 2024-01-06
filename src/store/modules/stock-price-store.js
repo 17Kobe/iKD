@@ -42,16 +42,18 @@ const stock = {
                     // 準備要 commit 的數據
                     const commitData = {
                         stockId,
-                        data: { 
-                            data: [{
-                                d: stockObj.d,
-                                t: stockObj.t,
-                                o: stockObj.o,
-                                h: stockObj.h,
-                                l: stockObj.l,
-                                z: stockObj.z,
-                                v: stockObj.v,
-                            }]
+                        data: {
+                            data: [
+                                {
+                                    d: stockObj.d,
+                                    t: stockObj.t,
+                                    o: stockObj.o,
+                                    h: stockObj.h,
+                                    l: stockObj.l,
+                                    z: stockObj.z,
+                                    v: stockObj.v,
+                                },
+                            ],
                         },
                         realtime: true,
                     };
@@ -77,6 +79,7 @@ const stock = {
                     if (stcokObj.type) stcokObjType = stcokObj.type; // 'fund' or 'exchange';
 
                     console.log('GET_STOCK_PRICE 1');
+                    let stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
 
                     // 清除即時股票
                     if (stcokObjType === 'stock') {
@@ -84,8 +87,8 @@ const stock = {
                         // stockDataDaily = _.filter(stockDataDaily, arr => arr.length !== 7);
                         if (stcokObj.last_price_time) {
                             // TODO: get daily
-                            let stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
-                            const foundIndex = _.findIndex(stockDataDaily, arr => arr.length === 7)
+                            // let stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
+                            const foundIndex = _.findIndex(stockDataDaily, (arr) => arr.length === 7);
                             if (foundIndex !== -1) {
                                 stockDataDaily.splice(foundIndex, 1); // 刪除該元素
                                 // 塞入漲跌幅、最後股價
@@ -97,7 +100,10 @@ const stock = {
                                 stcokObj.last_second_price = v2;
 
                                 currStockLastDate = moment(stcokObj.data.daily[stcokObj.data.daily.length - 1][0]);
-                                const currStockLastTime = stcokObj.data.daily[stcokObj.data.daily.length - 1].length === 7 ? stcokObj.data.daily[stcokObj.data.daily.length - 1][6] : null;
+                                const currStockLastTime =
+                                    stcokObj.data.daily[stcokObj.data.daily.length - 1].length === 7
+                                        ? stcokObj.data.daily[stcokObj.data.daily.length - 1][6]
+                                        : null;
                                 stcokObj.last_price_date = `${currStockLastDate.format('YYYY-MM-DD')}`;
                                 stcokObj.last_price_time = currStockLastTime;
 
@@ -109,9 +115,9 @@ const stock = {
                     // console.log(stockDataDaily);
                     // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
                     const stockStartDate = moment(
-                        !stcokObj.last_price_date
+                        stockDataDaily.length === 0
                             ? moment().subtract(10, 'years').format('YYYY-MM-DD')
-                            : moment(stcokObj.last_price_date).add(1, 'days')
+                            : moment(stockDataDaily[stockDataDaily.length - 1][0]).add(1, 'days')
                     ).format('YYYY-MM-DD');
 
                     console.log('GET_STOCK_PRICE 2');
@@ -1100,7 +1106,7 @@ const stock = {
         async CALC_HASH({ state }, stockId) {
             const foundStock = state.stockList.find((v) => v.id === stockId);
             const obj = {
-                last_price: !foundStock ? 'none' : !foundStock.data ? 'no data' : foundStock.last_price_date,
+                last_price: !foundStock ? 'none' : !foundStock.data ? 'no data' : _.last(foundStock.data.daily)[0],
                 policy_settings: !foundStock
                     ? 'none'
                     : !foundStock.policy || !foundStock.policy.settings
@@ -1336,21 +1342,22 @@ const stock = {
             const foundStock = state.stockList.find((v) => v.id === stockId);
             const foundExchange = state.stockList.find((v) => v.name === '美金匯率');
 
-            if (foundStock.cost && foundStock.last_price && foundStock.last_second_price) {
+            if (foundStock.cost && foundStock.data.daily && foundStock.data.daily.length >= 2) {
                 // 因為下面有-2，所以至少要2筆
-                const close = foundStock.last_price;
-                const closeNextToLast = foundStock.last_second_price;
+                const closeValueIndex = foundStock.data.daily[0].length === 2 ? 1 : 4;
+                const close = foundStock.data.daily[foundStock.data.daily.length - 1][closeValueIndex];
+                const closeNextToLast = foundStock.data.daily[foundStock.data.daily.length - 2][closeValueIndex];
                 // console.log(close);
                 // console.log(foundStock.cost.sum);
 
                 // 若有 buy_exchange，則要取到最新匯率
                 const sellExchange =
-                    foundStock.currency === 'USD' && foundExchange && foundExchange.last_price
-                        ? foundExchange.last_price - 0.075
+                    foundStock.currency === 'USD' && foundExchange && foundExchange.data.daily.length >= 1
+                        ? foundExchange.data.daily[foundExchange.data.daily.length - 1][1] - 0.075
                         : 1;
                 const sellExchangeNextToLast =
-                    foundStock.currency === 'USD' && foundExchange && foundExchange.last_second_price
-                        ? foundExchange.last_second_price - 0.075
+                    foundStock.currency === 'USD' && foundExchange && foundExchange.data.daily.length >= 2
+                        ? foundExchange.data.daily[foundExchange.data.daily.length - 2][1] - 0.075
                         : 1;
 
                 // 代表有匯率，美金中值+-0.075
@@ -1394,7 +1401,6 @@ const stock = {
                 // delete foundStock.data.ma_sell;
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
                 await saveStockToDb('stockList', foundStock);
-
             } else {
                 if (!foundStock.policy) foundStock.policy = { settings: { buy: [], sell: [] } };
                 foundStock.policy.settings = policyList; // 複製數據複本
@@ -1446,52 +1452,58 @@ const stock = {
                 if (stcokObjType === 'stock') {
                     if (realtime) {
                         // 濾除 即時，即時會有7個元素，正常只有6個元素
-                        const foundRealtime = _.find(foundStock.data.daily, arr => arr.length === 7);
+                        const foundRealtime = _.find(foundStock.data.daily, (arr) => arr.length === 7);
 
                         // console.log(foundStock.data.daily);
                         const realtimeObj = data.data[0];
                         const dateString = realtimeObj.d;
-                        const open = parseFloat(realtimeObj.o) >= 1000 
-                            ? Number( parseFloat(realtimeObj.o).toFixed(0))
-                            :  parseFloat(realtimeObj.o) >= 100
-                            ? Number( parseFloat(realtimeObj.o).toFixed(1))
-                            : Number( parseFloat(realtimeObj.o).toFixed(2));
-                        const high = parseFloat(realtimeObj.h) >= 1000 
-                            ? Number( parseFloat(realtimeObj.h).toFixed(0))
-                            :  parseFloat(realtimeObj.h) >= 100
-                            ? Number( parseFloat(realtimeObj.h).toFixed(1))
-                            : Number( parseFloat(realtimeObj.h).toFixed(2));
-                        const low = parseFloat(realtimeObj.l) >= 1000 
-                            ? Number( parseFloat(realtimeObj.l).toFixed(0))
-                            :  parseFloat(realtimeObj.l) >= 100
-                            ? Number( parseFloat(realtimeObj.l).toFixed(1))
-                            : Number( parseFloat(realtimeObj.l).toFixed(2));
+                        const open =
+                            parseFloat(realtimeObj.o) >= 1000
+                                ? Number(parseFloat(realtimeObj.o).toFixed(0))
+                                : parseFloat(realtimeObj.o) >= 100
+                                ? Number(parseFloat(realtimeObj.o).toFixed(1))
+                                : Number(parseFloat(realtimeObj.o).toFixed(2));
+                        const high =
+                            parseFloat(realtimeObj.h) >= 1000
+                                ? Number(parseFloat(realtimeObj.h).toFixed(0))
+                                : parseFloat(realtimeObj.h) >= 100
+                                ? Number(parseFloat(realtimeObj.h).toFixed(1))
+                                : Number(parseFloat(realtimeObj.h).toFixed(2));
+                        const low =
+                            parseFloat(realtimeObj.l) >= 1000
+                                ? Number(parseFloat(realtimeObj.l).toFixed(0))
+                                : parseFloat(realtimeObj.l) >= 100
+                                ? Number(parseFloat(realtimeObj.l).toFixed(1))
+                                : Number(parseFloat(realtimeObj.l).toFixed(2));
                         let close = 0;
                         if (realtimeObj.z !== '-')
-                            close = parseFloat(realtimeObj.z) >= 1000 
-                                ? Number( parseFloat(realtimeObj.z).toFixed(0))
-                                :  parseFloat(realtimeObj.z) >= 100
-                                ? Number( parseFloat(realtimeObj.z).toFixed(1))
-                                : Number( parseFloat(realtimeObj.z).toFixed(2));
+                            close =
+                                parseFloat(realtimeObj.z) >= 1000
+                                    ? Number(parseFloat(realtimeObj.z).toFixed(0))
+                                    : parseFloat(realtimeObj.z) >= 100
+                                    ? Number(parseFloat(realtimeObj.z).toFixed(1))
+                                    : Number(parseFloat(realtimeObj.z).toFixed(2));
                         const commonElements = [
                             `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(6, 8)}`,
                             open,
                             high,
-                            low
+                            low,
                         ];
                         console.log(commonElements);
                         // TODO: daily filter
-                        if (realtimeObj.t === '13:30:00' && realtimeObj.z !== '-') { // 代表是當天已結束了
+                        if (realtimeObj.t === '13:30:00' && realtimeObj.z !== '-') {
+                            // 代表是當天已結束了
                             // 使用 _.reject 一次性過濾掉符合條件的元素
-                            foundStock.data.daily = _.filter(foundStock.data.daily, arr => arr.length !== 7);
+                            foundStock.data.daily = _.filter(foundStock.data.daily, (arr) => arr.length !== 7);
                             values.push([...commonElements, close, parseInt(realtimeObj.v)]);
-                        } else if (realtimeObj.z === '-' && foundRealtime) { // 代表目前是價格是 '-' 那用上一個值
+                        } else if (realtimeObj.z === '-' && foundRealtime) {
+                            // 代表目前是價格是 '-' 那用上一個值
                             // 使用 _.reject 一次性過濾掉符合條件的元素
-                            foundStock.data.daily = _.filter(foundStock.data.daily, arr => arr.length !== 7);
+                            foundStock.data.daily = _.filter(foundStock.data.daily, (arr) => arr.length !== 7);
                             values.push([...commonElements, foundRealtime[4], parseInt(realtimeObj.v), realtimeObj.t]);
                         } else if (realtimeObj.z !== '-') {
                             // 使用 _.reject 一次性過濾掉符合條件的元素
-                            foundStock.data.daily = _.filter(foundStock.data.daily, arr => arr.length !== 7);
+                            foundStock.data.daily = _.filter(foundStock.data.daily, (arr) => arr.length !== 7);
                             values.push([...commonElements, close, parseInt(realtimeObj.v), realtimeObj.t]);
                         }
                         // console.log(values);
@@ -1546,8 +1558,7 @@ const stock = {
                     });
                 }
                 // TODO: get daily to vuex daily add
-                if (values.length > 0)
-                    foundStock.data.daily.push(...values);
+                if (values.length > 0) foundStock.data.daily.push(...values);
                 // console.log(foundStock.data.daily);
                 // console.log(values);
 
@@ -1576,7 +1587,10 @@ const stock = {
                 foundStock.last_second_price = v2;
 
                 currStockLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
-                const currStockLastTime = foundStock.data.daily[foundStock.data.daily.length - 1].length === 7 ? foundStock.data.daily[foundStock.data.daily.length - 1][6] : null;
+                const currStockLastTime =
+                    foundStock.data.daily[foundStock.data.daily.length - 1].length === 7
+                        ? foundStock.data.daily[foundStock.data.daily.length - 1][6]
+                        : null;
                 foundStock.last_price_date = `${currStockLastDate.format('YYYY-MM-DD')}`;
                 foundStock.last_price_time = currStockLastTime;
 
@@ -1617,7 +1631,6 @@ const stock = {
 
                 // console.log(foundStock);
 
-
                 // ===================塞入localstorage===================
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList)); // 要放在 then後才能保證完成，放在最後面還可能
                 if (!_.has(foundStock, 'policy') && !_.has(foundStock, 'cost.settings')) {
@@ -1626,7 +1639,8 @@ const stock = {
                     await saveStockToDb('stockList', foundStock); // 如果沒有 policy才要save
                 }
 
-                if (_.has(foundStock, 'cost.settings')) this.commit('SAVE_STOCK_COST_RETURN', stockId, !_.has(foundStock, 'policy')); // 有新值就要更新成本的報酬率, 沒有 policy 才能要更新DB
+                if (_.has(foundStock, 'cost.settings'))
+                    this.commit('SAVE_STOCK_COST_RETURN', stockId, !_.has(foundStock, 'policy')); // 有新值就要更新成本的報酬率, 沒有 policy 才能要更新DB
                 console.log('SAVE_STOCK_PRICE OK');
             }
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
@@ -1801,13 +1815,14 @@ const stock = {
             let dataDailyLastDate = null;
             if (foundStock.policy.result.length > 0) {
                 const policyResultLastDate = moment(foundStock.policy.result[foundStock.policy.result.length - 1].date);
-                dataDailyLastDate = moment(foundStock.last_price_date);
+                dataDailyLastDate = moment(foundStock.data.daily[foundStock.data.daily.length - 1][0]);
 
+                const closeValueIndex = foundStock.data.daily[0].length === 2 ? 1 : 4;
                 if (dataDailyLastDate.isAfter(policyResultLastDate)) {
                     foundStock.policy.result.push({
                         date: dataDailyLastDate.format('YYYY-MM-DD'),
                         is_latest: true,
-                        price: foundStock.last_price,
+                        price: foundStock.data.daily[foundStock.data.daily.length - 1][closeValueIndex],
                         reason: ['latest'],
                     });
                 }
@@ -2332,7 +2347,7 @@ const stock = {
 
                 if (
                     foundStock.policy.result[foundStock.policy.result.length - 1].date ===
-                    foundStock.last_price_date
+                    foundStock.data.daily[foundStock.data.daily.length - 1][0]
                 ) {
                     // 等於代表沒pop，可預測賣
                     if (_.has(foundStock, 'policy.settings.sell')) {
