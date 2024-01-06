@@ -153,17 +153,26 @@
                                         scope.row.cost.return >= 0 ? { color: '#2cc8fb' } : { color: '#f56c70' },
                                         { 'font-size': '13px', 'font-weight': 'bold' },
                                     ]"
-                                    >$ {{ Number(Math.round(scope.row.cost.return * 10) / 10).toLocaleString('en-US') }}</span
+                                    >$
+                                    {{
+                                        scope.row.cost.return
+                                            ? Number(Math.round(scope.row.cost.return * 10) / 10).toLocaleString('en-US')
+                                            : '0'
+                                    }}</span
                                 >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #545454">{{
                                     scope.row.cost.rate_of_return === 0
                                         ? '0'
-                                        : scope.row.cost.rate_of_return === null
-                                        ? 'N/A'
+                                        : scope.row.cost.rate_of_return === null || isNaN(scope.row.cost.rate_of_return)
+                                        ? ''
                                         : Math.abs(scope.row.cost.rate_of_return) >= 1000
                                         ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
                                         : Number(Math.round(scope.row.cost.rate_of_return * 10) / 10)
                                 }}</span>
-                                <span style="color: #999999" v-if="scope.row.cost.rate_of_return !== null">%</span>
+                                <span
+                                    style="color: #999999"
+                                    v-if="scope.row.cost.rate_of_return !== null && !isNaN(scope.row.cost.rate_of_return)"
+                                    >%</span
+                                >
                             </span>
                         </el-progress>
                     </div>
@@ -964,7 +973,7 @@ export default {
                         // 接著每15秒執行一次
                         setInterval(() => {
                             this.getRealtimeStockPrice();
-                        }, 15 * 1000);
+                        }, 20 * 1000);
                     }, 60 * 1000);
                     // console.log('commit real over');
                 }
@@ -1004,14 +1013,24 @@ export default {
     },
     methods: {
         getRealtimeStockPrice() {
-            const now = moment();
-            // 設定開始時間為09:00
-            const startTime = moment().set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
-            // 設定結束時間為13:30
-            const endTime = moment().set({ hour: 13, minute: 30, second: 0, millisecond: 0 });
-            // 確認現在時間是否在範圍內
-            if (now.isBetween(startTime, endTime) && document.visibilityState === 'visible') {
-                this.$store.dispatch('GET_REALTIME_STOCK_PRICE');
+            // 讀取 localStorage 中的 'realtimeStock' 數據
+            const realtimeStockValue = localStorage.getItem('realtimeStock');
+
+            // 使用 JSON.parse 轉換為布爾值，如果無法解析，則使用預設值（這裡假設預設值為 false）
+            const isRealtimeStock = JSON.parse(realtimeStockValue) || false;
+
+            if (isRealtimeStock) {
+                console.log(isRealtimeStock);
+
+                const now = moment();
+                // 設定開始時間為09:00
+                const startTime = moment().set({ hour: 9, minute: 0, second: 0, millisecond: 0 });
+                // 設定結束時間為13:30
+                const endTime = moment().set({ hour: 13, minute: 30, second: 0, millisecond: 0 });
+                // 確認現在時間是否在範圍內
+                if (now.isBetween(startTime, endTime) && document.visibilityState === 'visible') {
+                    this.$store.dispatch('GET_REALTIME_STOCK_PRICE');
+                }
             }
         },
 

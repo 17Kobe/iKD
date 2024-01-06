@@ -40,12 +40,12 @@
             <el-table-column fixed label="名稱" width="200">
                 <template #default="scope">
                     <span
-                        style="font-size: 16px; font-weight: bold; margin-left: 8px"
+                        style="font-size: 16px; font-weight: bold; margin-left: 5px"
                         @click="onChangeBackgroundColor(scope.row.id)"
                     >
-                        {{ scope.row.name }} </span
-                    >&nbsp;
-                    <span style="color: #cccccc" v-if="scope.row.type !== 'fund'">{{ scope.row.id }}</span>
+                        {{ scope.row.name }}
+                    </span>
+                    <span style="color: #cccccc; margin-left: 2px" v-if="scope.row.type !== 'fund'">{{ scope.row.id }}</span>
                 </template>
             </el-table-column>
             <el-table-column fixed label="功能">
@@ -86,14 +86,24 @@
                         ><i class="el-icon-refresh-right"></i> 立即更新股價</el-button
                     >
                 </el-tooltip>
-                <br />
+                <!-- <br />
                 <br />
                 &nbsp;
                 <el-tooltip class="box-item" effect="dark" content="避免手機 localstorage 5M 限制" placement="top">
                     <el-button type="danger" @click="onDel10YearsOld"
                         ><i class="el-icon-refresh-right"></i> 刪除10年前舊資料</el-button
                     >
-                </el-tooltip>
+                </el-tooltip> -->
+                <br />
+                <br />
+                <el-switch
+                    v-model="realtimeStock"
+                    class="ml-2"
+                    inline-prompt
+                    style="--el-switch-on-color: #13ce66"
+                    active-text="開啟即時股價模式"
+                    inactive-text="關閉"
+                />
             </el-collapse-item>
         </el-collapse>
     </el-drawer>
@@ -121,6 +131,7 @@ export default {
         return {
             isShow: false,
             title: '新增股票',
+            realtimeStock: false,
 
             activeNames: ['1'],
 
@@ -267,6 +278,15 @@ export default {
         onInit() {
             console.log('onInit');
             this.isShow = true;
+            // 讀取 localStorage 中的 'realtimeStock' 數據
+            const realtimeStockValue = localStorage.getItem('realtimeStock');
+
+            // 使用 JSON.parse 轉換為布爾值，如果無法解析，則使用預設值（這裡假設預設值為 false）
+            const isRealtimeStock = JSON.parse(realtimeStockValue) || false;
+
+            console.log(isRealtimeStock);
+
+            this.realtimeStock = isRealtimeStock;
         },
         onOpend() {
             // set focus 要寫在這不能寫在 onInit，否則會影響動畫lag
@@ -275,6 +295,7 @@ export default {
             // });
         },
         onClosed() {
+            localStorage.setItem('realtimeStock', this.realtimeStock);
             // console.log(this.form);
             // this.$store.commit('SAVE_STOCK_COST', {
             //     stockId: this.stockId,
