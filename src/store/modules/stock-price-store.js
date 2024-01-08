@@ -79,18 +79,25 @@ const stock = {
                     if (stcokObj.type) stcokObjType = stcokObj.type; // 'fund' or 'exchange';
 
                     console.log('GET_STOCK_PRICE 1');
-                    let stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
+                    if (stcokObjType === 'stock' && _.has(stcokObj, 'data.daily')) {
+                        // 濾除 即時，即時會有7個元素，正常只有6個元素
+                        stcokObj.data.daily = _.filter(stcokObj.data.daily, (arr) => arr.length !== 7);
+                        // 應該不用算 hash 因為有加時間跟沒加時間是不同
+                        // const stockLastUpdateHash = await this.dispatch('CALC_HASH', stcokObj.id);
+                        // foundStock.last_update_hash = stockLastUpdateHash;
+                    }
+                    // let stcokObj.data.daily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
 
                     // 清除即時股票
                     if (stcokObjType === 'stock') {
                         // 濾除 即時，即時會有7個元素，正常只有6個元素
-                        stockDataDaily = _.filter(stockDataDaily, (arr) => arr.length !== 7);
+                        // stcokObj.data.daily = _.has(stcokObj, 'data.daily') ? _.filter(stcokObj.data.daily, (arr) => arr.length !== 7);
                         // if (stcokObj.last_price_time) {
                         //     // TODO: get daily
-                        //     // let stockDataDaily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
-                        //     const foundIndex = _.findIndex(stockDataDaily, (arr) => arr.length === 7);
+                        //     // let stcokObj.data.daily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
+                        //     const foundIndex = _.findIndex(stcokObj.data.daily, (arr) => arr.length === 7);
                         //     if (foundIndex !== -1) {
-                        //         stockDataDaily.splice(foundIndex, 1); // 刪除該元素
+                        //         stcokObj.data.daily.splice(foundIndex, 1); // 刪除該元素
                         //         // 塞入漲跌幅、最後股價
                         //         const closeValueIndex = stcokObj.data.daily[0].length === 2 ? 1 : 4;
                         //         const v1 = stcokObj.data.daily[stcokObj.data.daily.length - 1][closeValueIndex];
@@ -112,12 +119,12 @@ const stock = {
                         // }
                     }
 
-                    // console.log(stockDataDaily);
+                    // console.log(stcokObj.data.daily);
                     // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
                     const stockStartDate = moment(
-                        stockDataDaily.length === 0
+                        stcokObj.data.daily.length === 0
                             ? moment().subtract(10, 'years').format('YYYY-MM-DD')
-                            : moment(stockDataDaily[stockDataDaily.length - 1][0]).add(1, 'days')
+                            : moment(stcokObj.data.daily[stcokObj.data.daily.length - 1][0]).add(1, 'days')
                     ).format('YYYY-MM-DD');
 
                     console.log('GET_STOCK_PRICE 2');
@@ -1105,8 +1112,19 @@ const stock = {
         },
         async CALC_HASH({ state }, stockId) {
             const foundStock = state.stockList.find((v) => v.id === stockId);
+
+            let lastPrice;
+            if (!foundStock) {
+                lastPrice = 'none';
+            } else if (!foundStock.data) {
+                lastPrice = 'no data';
+            } else if (foundStock.data.daily.length >= 7) { // 加上時間
+                lastPrice = foundStock.data.daily[0] + ' ' + foundStock.data.daily[6];
+            } else {
+                lastPrice = foundStock.data.daily[0];
+            }
             const obj = {
-                last_price: !foundStock ? 'none' : !foundStock.data ? 'no data' : _.last(foundStock.data.daily)[0],
+                last_price: lastPrice,
                 policy_settings: !foundStock
                     ? 'none'
                     : !foundStock.policy || !foundStock.policy.settings
@@ -1725,7 +1743,9 @@ const stock = {
             const foundStock = state.stockList.find((v) => v.id === stockId);
 
             const stockLastUpdateHash = await this.dispatch('CALC_HASH', stockId);
+            console.log("stockId = ", stockId, ", last_update_hash = ", foundStock.last_update_hash, ", stockLastUpdateHash = ", stockLastUpdateHash);
             if (foundStock.last_update_hash !== stockLastUpdateHash) {
+                console.log("stockId = ", stockId, ", hash 有不同 ");
                 // 像是從 UI改policy會沒有 tempStockList，需要重新計算
                 let foundTempStock = state.tempStockList.find((v) => v.id === stockId);
                 if (typeof foundTempStock === 'undefined') {

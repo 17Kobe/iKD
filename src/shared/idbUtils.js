@@ -14,6 +14,7 @@ const dbPromise = openDB('ikd', 1, {
 });
 
 export async function saveStockToDb(key, value) {
+    console.log("saveStockToDb() stockId = ", value.id);
     try {
         // 儲存至 IndexedDB
         // wcache.save(key, JSON.parse(JSON.stringify(value)));
