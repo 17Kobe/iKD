@@ -102,10 +102,8 @@ const stock = {
                         //         const closeValueIndex = stcokObj.data.daily[0].length === 2 ? 1 : 4;
                         //         const v1 = stcokObj.data.daily[stcokObj.data.daily.length - 1][closeValueIndex];
                         //         const v2 = stcokObj.data.daily[stcokObj.data.daily.length - 2][closeValueIndex];
-
                         //         stcokObj.last_price = v1;
                         //         stcokObj.last_second_price = v2;
-
                         //         currStockLastDate = moment(stcokObj.data.daily[stcokObj.data.daily.length - 1][0]);
                         //         const currStockLastTime =
                         //             stcokObj.data.daily[stcokObj.data.daily.length - 1].length === 7
@@ -113,18 +111,18 @@ const stock = {
                         //                 : null;
                         //         stcokObj.last_price_date = `${currStockLastDate.format('YYYY-MM-DD')}`;
                         //         stcokObj.last_price_time = currStockLastTime;
-
                         //         stcokObj.last_price_spread = parseFloat((((v1 - v2) * 100) / v2).toFixed(2));
                         //     }
                         // }
                     }
 
-                    // console.log(stcokObj.data.daily);
+                    // console.log('stockId=', stcokObj.id);
+                    // console.log('daily=', stcokObj.data.daily);
                     // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
                     const stockStartDate = moment(
-                        stcokObj.data.daily.length === 0
-                            ? moment().subtract(10, 'years').format('YYYY-MM-DD')
-                            : moment(stcokObj.data.daily[stcokObj.data.daily.length - 1][0]).add(1, 'days')
+                        stcokObj.data && stcokObj.data.daily && stcokObj.data.daily.length > 0
+                            ? moment(stcokObj.data.daily[stcokObj.data.daily.length - 1][0]).add(1, 'days')
+                            : moment().subtract(10, 'years').format('YYYY-MM-DD')
                     ).format('YYYY-MM-DD');
 
                     console.log('GET_STOCK_PRICE 2');
@@ -603,6 +601,7 @@ const stock = {
 
         // 訊號技術線報酬
         async CALC_STOCK_INDICATORS_RESULT({ state }, stockId) {
+            console.log('stockId = ', stockId, ' CALC_STOCK_INDICATORS_RESULT');
             const foundStock = state.stockList.find((v) => v.id === stockId);
             const foundTempStock = state.tempStockList.find((v) => v.id === stockId);
 
@@ -1116,12 +1115,13 @@ const stock = {
             let lastPrice;
             if (!foundStock) {
                 lastPrice = 'none';
-            } else if (!foundStock.data) {
+            } else if (!foundStock.data || !foundStock.data.daily || foundStock.data.daily.length === 0) {
                 lastPrice = 'no data';
-            } else if (foundStock.data.daily.length >= 7) { // 加上時間
-                lastPrice = foundStock.data.daily[0] + ' ' + foundStock.data.daily[6];
+            } else if (_.last(foundStock.data.daily).length >= 7) {
+                // 加上時間
+                lastPrice = _.last(foundStock.data.daily)[0] + ' ' + _.last(foundStock.data.daily)[6];
             } else {
-                lastPrice = foundStock.data.daily[0];
+                lastPrice = _.last(foundStock.data.daily)[0];
             }
             const obj = {
                 last_price: lastPrice,
@@ -1131,7 +1131,7 @@ const stock = {
                     ? 'no policy'
                     : foundStock.policy.settings,
             };
-            // console.log(obj);
+            console.log(obj);
             const jsonString = JSON.stringify(obj);
             let hash = 0;
 
@@ -1576,7 +1576,7 @@ const stock = {
                     });
                 }
                 // TODO: get daily to vuex daily add
-                if (values.length > 0) foundStock.data.daily.push(...values);
+                foundStock.data.daily.push(...values);
                 // console.log(foundStock.data.daily);
                 // console.log(values);
 
@@ -1743,9 +1743,16 @@ const stock = {
             const foundStock = state.stockList.find((v) => v.id === stockId);
 
             const stockLastUpdateHash = await this.dispatch('CALC_HASH', stockId);
-            console.log("stockId = ", stockId, ", last_update_hash = ", foundStock.last_update_hash, ", stockLastUpdateHash = ", stockLastUpdateHash);
+            console.log(
+                'stockId = ',
+                stockId,
+                ', last_update_hash = ',
+                foundStock.last_update_hash,
+                ', stockLastUpdateHash = ',
+                stockLastUpdateHash
+            );
             if (foundStock.last_update_hash !== stockLastUpdateHash) {
-                console.log("stockId = ", stockId, ", hash 有不同 ");
+                console.log('stockId = ', stockId, ', hash 有不同 ');
                 // 像是從 UI改policy會沒有 tempStockList，需要重新計算
                 let foundTempStock = state.tempStockList.find((v) => v.id === stockId);
                 if (typeof foundTempStock === 'undefined') {
@@ -1787,7 +1794,7 @@ const stock = {
                 }
 
                 const policyResult = await this.dispatch('CALC_STOCK_INDICATORS_RESULT', stockId);
-
+                console.log('stockId = ', stockId, 'policyResult = ', policyResult);
                 if (policyResult !== null) {
                     // policyResult 有可能因為是calc一樣所以沒計算，此時就不要去異動 result
                     foundStock.policy.result = [];
@@ -1797,6 +1804,13 @@ const stock = {
                     // localStorage.setItem('stockList', JSON.stringify(state.stockList));
                     if (Array.isArray(policyResult) && policyResult.length > 0) {
                         this.commit('SAVE_STOCK_POLICY_RETURN_RESULT', stockId); // 計算policy且有關報酬率的結果
+                    } else {
+                        // policyResult = []
+                        // 有可能新的股票，daily 很少值，所以有設policy但還沒有產生任何的 買賣點，但是仍要儲存至DB
+                        const stockLastUpdateHash = await this.dispatch('CALC_HASH', stockId);
+                        foundStock.last_update_hash = stockLastUpdateHash;
+
+                        await saveStockToDb('stockList', foundStock);
                     }
                 }
 
