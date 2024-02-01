@@ -696,6 +696,9 @@ export default {
                             `股票：$ ${this.stockDeposit.toLocaleString('en-US')} 元 ( ${(this.stockDeposit / 10000).toFixed(
                                 1
                             )} 萬 ) `,
+                            `其它：$ ${this.otherDeposit.toLocaleString('en-US')} 元 ( ${(this.otherDeposit / 10000).toFixed(
+                                1
+                            )} 萬 ) `,
                         ],
                         font: {
                             size: 13,
