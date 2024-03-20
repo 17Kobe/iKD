@@ -136,6 +136,8 @@
                                         .replace('元大台灣高息低波', '元大高息低波')
                                         .replace('復華台灣科技優息', '復華科技優息')
                                         .replace('元大AAA至A公司債', '元大AAA公司債')
+                                        .replace('群益ESG投等債20+', '群益ESG投等債')
+                                        .replace('元大2至10年企業債券', '元大2至10年債')
                                 }}</span
                             >
                         </el-badge>
@@ -147,6 +149,8 @@
                             .replace('元大台灣高息低波', '元大高息低波')
                             .replace('復華台灣科技優息', '復華科技優息')
                             .replace('元大AAA至A公司債', '元大AAA公司債')
+                            .replace('群益ESG投等債20+', '群益ESG投等債')
+                            .replace('元大2至10年企業債券', '元大2至10年債')
                     }}</span>
                 </template>
             </el-table-column>

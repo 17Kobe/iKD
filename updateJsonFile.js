@@ -43,9 +43,12 @@ const urls = [
     'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04K8F:FO;timeslot=2012-01-01T00:00:00Z-' +
         today +
         'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
+    'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F00001EM6G:FO;timeslot=2012-01-01T00:00:00Z-' +
+        today +
+        'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
 ];
 
-const fundName = ['富達全球科技基金', '安聯台灣智慧基金', '貝萊德世界黃金基金A2', '貝萊德世界能源基金A2'];
+const fundName = ['富達全球科技基金', '安聯台灣智慧基金', '貝萊德世界黃金基金A2', '貝萊德世界能源基金A2', '元大2至10年投資級企業債券基金'];
 
 function getPromise(url) {
     return new Promise(function (resolve) {
@@ -69,6 +72,7 @@ function getPromise(url) {
                 else if (url.includes('F000001V09')) url2 = 'https://www.moneydj.com/funddj/ya/yp010000.djhtm?a=ACDD19';
                 else if (url.includes('F0GBR04AR8')) url2 = 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=SHZ18';
                 else if (url.includes('F0GBR04K8F')) url2 = 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=shza6';
+                else if (url.includes('F00001EM6G')) url2 = 'https://www.moneydj.com/funddj/ya/yp010000.djhtm?a=ACYT175';
                 if (url2 !== '') {
                     // proxy
                     // 如果IP地址存在於列表中，則設定代理
