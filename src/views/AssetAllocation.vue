@@ -136,7 +136,7 @@
                                 ? 'demand-deposit-bg'
                                 : item.account.includes('定存')
                                 ? 'fixed-deposit-bg'
-                                : item.account.includes('股票')
+                                : item.account.includes('股票') || item.account.includes('存股')
                                 ? 'stock-deposit-bg'
                                 : 'other-deposit-bg',
                         ]"
@@ -157,7 +157,7 @@
                                 ? 'demand-deposit-bg'
                                 : item.account.includes('定存')
                                 ? 'fixed-deposit-bg'
-                                : item.account.includes('股票')
+                                : item.account.includes('股票') || item.account.includes('存股')
                                 ? 'stock-deposit-bg'
                                 : 'other-deposit-bg',
                         ]"
@@ -480,12 +480,15 @@ export default {
         assets() {
             const tempAssets =
                 this.stockDeposit +
-                this.assetList.reduce((acc, { amount, isPositive }) => {
-                    if (isPositive) return acc + amount;
+                this.assetList.reduce((acc, { account, amount, isPositive }) => {
+                    console.log("amount", amount);
+                    console.log("isPositive", isPositive);
+                    console.log("acc", acc);
+                    if (isPositive && !/存股|股票/.test(account)) return acc + amount;
                     return acc;
                 }, 0);
 
-            // console.log('=======assets');
+            console.log('tempAssets', tempAssets);
 
             // 存到歷史存款去
             this.$store.commit('ADD_OR_UPDATE_HISTORY_ASSET_LIST', [
@@ -530,11 +533,15 @@ export default {
             }, 0);
         },
         stockDeposit() {
-            // 定存 sum
-            return this.$store.state.price.stockList.reduce((acc, { cost }) => {
-                if (cost && cost.sum) return acc + cost.sum + cost.return;
-                return acc;
-            }, 0);
+            const stockSum = this.$store.state.price.stockList.reduce((acc, { cost }) => 
+                cost?.sum ? acc + cost.sum + cost.return : acc
+            , 0);
+
+            const assetSum = this.assetList.reduce((acc, { account, amount, isPositive }) => 
+                (isPositive && /存股|股票/.test(account)) ? acc + Math.abs(amount) : acc
+            , 0);
+
+            return stockSum + assetSum;
         },
         // fundDeposit() {
         //     // 定存 sum
@@ -544,12 +551,9 @@ export default {
         //     }, 0);
         // },
         otherDeposit() {
-            // 其它 sum
-            return this.assetList.reduce((acc, { account, amount, isPositive }) => {
-                if (!account.includes('定存') && !account.includes('活存') && !account.includes('現金') && isPositive)
-                    return acc + Math.abs(amount);
-                return acc;
-            }, 0);
+            return this.assetList.reduce((acc, { account, amount, isPositive }) => 
+                (isPositive && !/定存|活存|現金|存股|股票/.test(account)) ? acc + Math.abs(amount) : acc
+            , 0);
         },
         stockSumOfCostReturn() {
             return _.sumBy(this.spreadList, 'cost.return');
