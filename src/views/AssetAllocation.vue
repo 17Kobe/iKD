@@ -1339,6 +1339,8 @@ export default {
     background: #f7f7f7
 .bond-deposit-bg > .el-input-group__prepend
     background: rgba(66, 202, 162, 0.4)
+.bond-deposit-bg > input
+    background: #f7f7f7
 .other-deposit-bg > .el-input-group__prepend
     background: rgba(153, 102, 255, 0.5)
 .liabilities-deposit-bg > .el-input-group__prepend
