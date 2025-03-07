@@ -92,7 +92,7 @@
                         size="small"
                         placeholder=""
                         v-model="item.name"
-                        class="stock-deposit-bg"
+                        :class="item.name.includes('債') ? 'bond-deposit-bg' : 'stock-deposit-bg'"
                         readonly
                         :style="{ 'pointer-events': 'none' }"
                     >
@@ -104,7 +104,7 @@
                         size="small"
                         placeholder=""
                         v-model="item.cost.market_value"
-                        class="stock-deposit-bg"
+                        :class="item.name.includes('債') ? 'bond-deposit-bg' : 'stock-deposit-bg'"
                         :is-stock="true"
                         :options="{
                             locale: 'en-US',
@@ -138,6 +138,8 @@
                                 ? 'fixed-deposit-bg'
                                 : item.account.includes('股票') || item.account.includes('存股')
                                 ? 'stock-deposit-bg'
+                                : item.account.includes('債')
+                                ? 'bond-deposit-bg'
                                 : 'other-deposit-bg',
                         ]"
                         @change="onChangeAccount($event, index)"
@@ -159,6 +161,8 @@
                                 ? 'fixed-deposit-bg'
                                 : item.account.includes('股票') || item.account.includes('存股')
                                 ? 'stock-deposit-bg'
+                                : item.account.includes('債')
+                                ? 'bond-deposit-bg'
                                 : 'other-deposit-bg',
                         ]"
                         :options="{
@@ -480,6 +484,7 @@ export default {
         assets() {
             const tempAssets =
                 this.stockDeposit +
+                this.bondDeposit +
                 this.assetList.reduce((acc, { account, amount, isPositive }) => {
                     console.log("amount", amount);
                     console.log("isPositive", isPositive);
@@ -533,8 +538,8 @@ export default {
             }, 0);
         },
         stockDeposit() {
-            const stockSum = this.$store.state.price.stockList.reduce((acc, { cost }) => 
-                cost?.sum ? acc + cost.sum + cost.return : acc
+            const stockSum = this.$store.state.price.stockList.reduce((acc, { name, cost }) => 
+                (!/債/.test(name) && cost?.sum) ? acc + cost.sum + cost.return : acc
             , 0);
 
             const assetSum = this.assetList.reduce((acc, { account, amount, isPositive }) => 
@@ -542,6 +547,11 @@ export default {
             , 0);
 
             return stockSum + assetSum;
+        },
+        bondDeposit() {
+            return this.$store.state.price.stockList.reduce((acc, { name, cost }) => 
+                (/債/.test(name) && cost?.sum) ? acc + cost.sum + cost.return : acc
+            , 0);
         },
         // fundDeposit() {
         //     // 定存 sum
@@ -700,6 +710,9 @@ export default {
                             `股票：$ ${this.stockDeposit.toLocaleString('en-US')} 元 ( ${(this.stockDeposit / 10000).toFixed(
                                 1
                             )} 萬 ) `,
+                            `債券：$ ${this.bondDeposit.toLocaleString('en-US')} 元 ( ${(this.bondDeposit / 10000).toFixed(
+                                1
+                            )} 萬 ) `,
                             `其它：$ ${this.otherDeposit.toLocaleString('en-US')} 元 ( ${(this.otherDeposit / 10000).toFixed(
                                 1
                             )} 萬 ) `,
@@ -717,7 +730,7 @@ export default {
                             dataArr.map((data) => {
                                 sum += data;
                             });
-                            const itemName = ['現金', '定存', '股票', '其它'];
+                            const itemName = ['現金', '定存', '股票', '債券', '其它'];
                             // console.log(value);
                             if (value === 0) return '';
                             const percentage = `  ${itemName[ctx.dataIndex]}\n${((value * 100) / sum).toFixed(2)} %`;
@@ -860,15 +873,16 @@ export default {
         },
         pieData() {
             return {
-                labels: ['活存', '定存', '股票', '其它'],
+                labels: ['活存', '定存', '股票', '債券', '其它'],
                 datasets: [
                     {
-                        data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.otherDeposit],
+                        data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.bondDeposit, this.otherDeposit],
                         backgroundColor: [
                             // 背景色
                             'rgba(255, 205, 86, 0.5)',
                             'rgba(255, 159, 64, 0.5)',
                             'rgba(75, 192, 192, 0.4)',
+                            'rgba(66, 202, 162, 0.4)',
                             'rgba(153, 102, 255, 0.5)',
                             'rgba(204, 255, 144, 0.5)',
                         ],
@@ -1323,6 +1337,8 @@ export default {
     background: rgba(75, 192, 192, 0.4)
 .stock-deposit-bg > input
     background: #f7f7f7
+.bond-deposit-bg > .el-input-group__prepend
+    background: rgba(66, 202, 162, 0.4)
 .other-deposit-bg > .el-input-group__prepend
     background: rgba(153, 102, 255, 0.5)
 .liabilities-deposit-bg > .el-input-group__prepend
