@@ -188,7 +188,17 @@
                     <span @click="toggleChildJLine">{{ showJLine ? '週KDJ' : '週KD' }}</span>
                 </template>
                 <template #default="scope">
-                    <ChartWeekKdj :parentData="scope.row.id" :showJLine="showJLine" />
+                    <div
+                    class="chart-wrapper"
+                    :ref="el => observeChart(el, scope.$index, 'kdj')"
+                    :data-index="`${scope.$index}-kdj`"
+                    >
+                        <ChartWeekKdj
+                            v-if="visibleCharts.includes(`${scope.$index}-kdj`)"
+                            :parentData="scope.row.id"
+                            :showJLine="showJLine"
+                        />
+                    </div>
                     <!-- <ChartWeekKd :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
                 </template>
             </el-table-column>
@@ -198,7 +208,16 @@
                     <span @click="toggleWeekRSI">週RSI</span>
                 </template>
                 <template #default="scope">
-                    <ChartWeekRsi :parentData="scope.row.id" />
+                    <div
+                    class="chart-wrapper"
+                    :ref="el => observeChart(el, scope.$index, 'rsi')"
+                    :data-index="`${scope.$index}-rsi`"
+                    >
+                        <ChartWeekRsi
+                            v-if="visibleCharts.includes(`${scope.$index}-rsi`)"
+                            :parentData="scope.row.id"
+                        />
+                    </div>
                 </template>
             </el-table-column>
 
@@ -207,7 +226,16 @@
                     <span @click="toggleWeekK">週K線</span>
                 </template>
                 <template #default="scope">
-                    <ChartWeekK :parentData="scope.row.id" />
+                    <div
+                    class="chart-wrapper"
+                    :ref="el => observeChart(el, scope.$index, 'kline')"
+                    :data-index="`${scope.$index}-kline`"
+                    >
+                        <ChartWeekK
+                            v-if="visibleCharts.includes(`${scope.$index}-kline`)"
+                            :parentData="scope.row.id"
+                        />
+                    </div>
                     <!-- <ChartWeekK :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
                 </template>
             </el-table-column>
@@ -874,6 +902,9 @@ export default {
             showJLine: false,
             currentStockId: null,
             showMoreButton: [],
+
+            visibleCharts: [],
+            observer: null,
         };
     },
     computed: {
@@ -1015,7 +1046,36 @@ export default {
         //     });
         // });
     },
+    beforeDestroy() {
+        if (this.observer) {
+            this.observer.disconnect();
+        }
+    },
     methods: {
+        observeChart(el, rowIndex, chartType) {
+            if (!el) return;
+            const key = `${rowIndex}-${chartType}`;
+            el.dataset.index = key;
+
+            if (!this.observer) {
+                this.observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                    const index = entry.target.dataset.index;
+                    if (!this.visibleCharts.includes(index)) {
+                        this.visibleCharts.push(index);
+                    }
+                    }
+                });
+                }, {
+                root: null,
+                threshold: 0.1,
+                });
+            }
+
+            this.observer.observe(el);
+        },
+
         getRealtimeStockPrice() {
             // 讀取 localStorage 中的 'realtimeStock' 數據
             const realtimeStockValue = localStorage.getItem('realtimeStock');
