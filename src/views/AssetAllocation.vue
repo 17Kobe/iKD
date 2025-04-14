@@ -136,8 +136,10 @@
                                 ? 'demand-deposit-bg'
                                 : item.account.includes('定存')
                                 ? 'fixed-deposit-bg'
-                                : item.account.includes('股票') || item.account.includes('存股')
+                                : item.account.includes('股票')
                                 ? 'stock-deposit-bg'
+                                : item.account.includes('存股')
+                                ? 'cht-stock-deposit-bg'
                                 : item.account.includes('債')
                                 ? 'bond-deposit-bg'
                                 : 'other-deposit-bg',
@@ -159,8 +161,10 @@
                                 ? 'demand-deposit-bg'
                                 : item.account.includes('定存')
                                 ? 'fixed-deposit-bg'
-                                : item.account.includes('股票') || item.account.includes('存股')
+                                : item.account.includes('股票')
                                 ? 'stock-deposit-bg'
+                                : item.account.includes('存股')
+                                ? 'cht-stock-deposit-bg'
                                 : item.account.includes('債')
                                 ? 'bond-deposit-bg'
                                 : 'other-deposit-bg',
@@ -483,6 +487,7 @@ export default {
         },
         assets() {
             const tempAssets =
+                this.chtStockDeposit +
                 this.stockDeposit +
                 this.bondDeposit +
                 this.assetList.reduce((acc, { account, amount, isPositive }) => {
@@ -543,10 +548,15 @@ export default {
             , 0);
 
             const assetSum = this.assetList.reduce((acc, { account, amount, isPositive }) => 
-                (isPositive && /存股|股票/.test(account)) ? acc + Math.abs(amount) : acc
+                (isPositive && /股票/.test(account)) ? acc + Math.abs(amount) : acc
             , 0);
 
             return stockSum + assetSum;
+        },
+        chtStockDeposit() {
+            return this.assetList.reduce((acc, { account, amount, isPositive }) => 
+                (isPositive && /存股/.test(account)) ? acc + Math.abs(amount) : acc
+            , 0);
         },
         bondDeposit() {
             return this.$store.state.price.stockList.reduce((acc, { name, cost }) => 
@@ -707,6 +717,9 @@ export default {
                             `定存：$ ${this.fixedDeposit.toLocaleString('en-US')} 元 ( ${(this.fixedDeposit / 10000).toFixed(
                                 1
                             )} 萬 ) `,
+                            `存股：$ ${this.chtStockDeposit.toLocaleString('en-US')} 元 ( ${(this.chtStockDeposit / 10000).toFixed(
+                                1
+                            )} 萬 ) `,
                             `股票：$ ${this.stockDeposit.toLocaleString('en-US')} 元 ( ${(this.stockDeposit / 10000).toFixed(
                                 1
                             )} 萬 ) `,
@@ -730,7 +743,7 @@ export default {
                             dataArr.map((data) => {
                                 sum += data;
                             });
-                            const itemName = ['現金', '定存', '股票', '債券', '其它'];
+                            const itemName = ['現金', '定存', '存股', '股票', '債券', '其它'];
                             // console.log(value);
                             if (value === 0) return '';
                             const percentage = `  ${itemName[ctx.dataIndex]}\n${((value * 100) / sum).toFixed(2)} %`;
@@ -873,14 +886,15 @@ export default {
         },
         pieData() {
             return {
-                labels: ['活存', '定存', '股票', '債券', '其它'],
+                labels: ['活存', '定存', '存股', '股票', '債券', '其它'],
                 datasets: [
                     {
-                        data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.bondDeposit, this.otherDeposit],
+                        data: [this.demandDeposit, this.fixedDeposit, this.chtStockDeposit, this.stockDeposit, this.bondDeposit, this.otherDeposit],
                         backgroundColor: [
                             // 背景色
                             'rgba(255, 205, 86, 0.5)',
                             'rgba(255, 159, 64, 0.5)',
+                            'rgba(75, 162, 230, 0.4)',
                             'rgba(75, 192, 192, 0.4)',
                             'rgba(66, 202, 162, 0.4)',
                             'rgba(153, 102, 255, 0.5)',
@@ -1335,6 +1349,8 @@ export default {
     background: rgba(255, 159, 64, 0.5)
 .stock-deposit-bg > .el-input-group__prepend
     background: rgba(75, 192, 192, 0.4)
+.cht-stock-deposit-bg > .el-input-group__prepend
+    background: rgba(75, 162, 230, 0.4)
 .stock-deposit-bg > input
     background: #f7f7f7
 .bond-deposit-bg > .el-input-group__prepend
