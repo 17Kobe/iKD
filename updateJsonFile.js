@@ -146,6 +146,11 @@ Promise.all(urls.map(getPromise)).then(function (stats) {
 
     stats.forEach((price, index) => {
         const foundStock = myLocalstorageStockList.find((obj) => obj.name === fundName[index]);
+        if (!foundStock) {
+            console.warn(`找不到名稱為 ${fundName[index]} 的股票`);
+            return; // 跳過這筆
+        }
+    
         foundStock.data = foundStock.data || {};
         foundStock.data.daily = foundStock.data.daily || [];
         foundStock.data.daily = price;
