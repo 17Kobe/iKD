@@ -345,7 +345,7 @@ export default {
                     zoomType: 'none',
                     pinchType: 'none',
                     // marginLeft: 2, // 調整左邊邊界的空白
-                    marginRight: 5, // 調整右邊邊界的空白
+                    marginRight: 15, // 調整右邊邊界的空白
                     marginBottom: 27,
                     marginTop: 1,
                     panning: false,

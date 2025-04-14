@@ -183,7 +183,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="週KDJ" width="230" align="center">
+            <el-table-column label="週KDJ" width="256" align="center">
                 <template #header>
                     <span @click="toggleChildJLine">{{ showJLine ? '週KDJ' : '週KD' }}</span>
                 </template>
