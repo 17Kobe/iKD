@@ -130,28 +130,25 @@ export async function saveStockListToDb(key, value) {
 }
 
 export async function loadStockListFromDb(key, callback) {
-    // wcache.get(key, (ret) => {
-    //     if (callback) {
-    //         callback(ret.isOk ? ret.data : JSON.parse(localStorage.getItem('stockList')) || []);
-    //     }
-    // });
     try {
-        // 開啟資料庫
         const db = await dbPromise;
-        // 使用事務進行資料表的讀取
         const tx = db.transaction(key, 'readonly');
         const stockListStore = tx.objectStore(key);
 
-        // 使用 getAll 方法讀取所有資料
-        const allData = await stockListStore.getAll();
-
-        // 完成事務
-        await tx.done;
-
-        if (callback) {
-            callback(allData || []);
-        }
+        const result = [];
+        const cursor = await stockListStore.openCursor();
+        const processCursor = (cursor) => {
+            if (!cursor) {
+                callback(result);
+                return;
+            }
+            result.push(cursor.value);
+            cursor.continue().then(processCursor);
+        };
+        processCursor(cursor);
     } catch (error) {
         console.error('發生錯誤：', error);
     }
 }
+
+
