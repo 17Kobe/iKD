@@ -96,7 +96,7 @@
                         readonly
                         :style="{ 'pointer-events': 'none' }"
                     >
-                        <template #prepend><span>股票</span></template>
+                        <template #prepend><span>{{ item.name.includes('債') ? '債券' : '股票' }}</span></template>
                     </el-input>
                 </el-col>
                 <el-col :xs="9" :sm="10" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
@@ -146,7 +146,7 @@
                         ]"
                         @change="onChangeAccount($event, index)"
                     >
-                        <template #prepend><span>帳戶</span></template>
+                        <template #prepend><span>{{ item.account.includes('活存')  || item.account.includes('現金') ? '現金' : item.account.includes('定存') ? '定存' : item.account.includes('存股') ? '存股' : '其它' }}</span></template>
                     </el-input>
                 </el-col>
                 <el-col :xs="9" :sm="10" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
@@ -212,7 +212,7 @@
                         class="liabilities-deposit-bg"
                         @change="onChangeAccount($event, index)"
                     >
-                        <template #prepend>帳戶</template>
+                        <template #prepend>負債</template>
                     </el-input>
                 </el-col>
                 <el-col :xs="9" :sm="10" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
@@ -882,11 +882,11 @@ export default {
                             // 背景色
                             'rgba(255, 205, 86, 0.5)',
                             'rgba(255, 159, 64, 0.5)',
-                            'rgba(75, 162, 230, 0.4)',
-                            'rgba(75, 192, 192, 0.4)',
-                            'rgba(66, 202, 162, 0.4)',
-                            'rgba(153, 102, 255, 0.5)',
                             'rgba(204, 255, 144, 0.5)',
+                            'rgba(66, 202, 162, 0.4)',
+                            'rgba(186, 85, 211, 0.5)',   // 紫羅蘭
+                            'rgba(100, 100, 100, 0.4)',  // 灰色
+                            'rgba(153, 102, 255, 0.5)',
                         ],
                         // borderColor: ['rgb(66, 66, 66)'],
                         borderWidth: 2, // 外框寬度
@@ -1336,17 +1336,17 @@ export default {
 .fixed-deposit-bg > .el-input-group__prepend
     background: rgba(255, 159, 64, 0.5)
 .stock-deposit-bg > .el-input-group__prepend
-    background: rgba(75, 192, 192, 0.4)
+    background: rgba(66, 202, 162, 0.4)
 .cht-stock-deposit-bg > .el-input-group__prepend
-    background: rgba(75, 162, 230, 0.4)
+    background: rgba(204, 255, 144, 0.5)
 .stock-deposit-bg > input
     background: #f7f7f7
 .bond-deposit-bg > .el-input-group__prepend
-    background: rgba(66, 202, 162, 0.4)
+    background: rgba(186, 85, 211, 0.5)
 .bond-deposit-bg > input
     background: #f7f7f7
 .other-deposit-bg > .el-input-group__prepend
-    background: rgba(153, 102, 255, 0.5)
+    background: rgba(100, 100, 100, 0.4)
 .liabilities-deposit-bg > .el-input-group__prepend
     background: rgba(255, 99, 132, 0.2)
 #line-chart-card > .el-card__body
