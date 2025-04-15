@@ -17,7 +17,7 @@
             <el-table-column
                 fixed
                 label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名稱&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;股價"
-                width="160"
+                width="162"
                 align="center"
                 header-align="left"
             >
@@ -92,7 +92,7 @@
                         <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
                         </el-rate>
                     </div>
-                    <div style="width: 60px; display: inline-block; text-align: right">
+                    <div style="width: 62px; display: inline-block; text-align: right">
                         <span v-if="scope.row.last_price">
                             <!-- vue style if 寫法 https://stackoverflow.com/questions/48455909/condition-in-v-bindstyle -->
                             <span
@@ -183,7 +183,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="週KDJ" width="256" align="center">
+            <el-table-column label="週KDJ" width="254" align="center">
                 <template #header>
                     <span @click="toggleChildJLine">{{ showJLine ? '週KDJ' : '週KD' }}</span>
                 </template>
