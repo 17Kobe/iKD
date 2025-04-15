@@ -203,7 +203,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="週RSI" width="230" align="center" :visible="showWeekRSI" v-if="showWeekRSI">
+            <el-table-column label="週RSI" width="214" align="center" :visible="showWeekRSI" v-if="showWeekRSI">
                 <template #header>
                     <span @click="toggleWeekRSI">週RSI</span>
                 </template>
