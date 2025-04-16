@@ -1697,6 +1697,14 @@ const stock = {
                     return; // continue
                 }
 
+                const cash = parseFloat(element.CashEarningsDistribution || 0); //  + parseFloat(element.CashStatutorySurplus || 0)
+                const stock = parseFloat(element.StockEarningsDistribution || 0);
+        
+                // 若現金 + 股票股利同時為 0，跳過，因為0056有同時為0，可能是日期出來但還沒確定多少的
+                if (cash === 0 && stock === 0) {
+                    return;
+                }
+
                 let lastStockPrice = null;
                 const targetMoment = moment(
                     element.CashExDividendTradingDate ? element.CashExDividendTradingDate : element.StockExDividendTradingDate,
