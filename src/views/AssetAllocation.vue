@@ -884,7 +884,7 @@ export default {
                             'rgba(255, 159, 64, 0.5)',
                             'rgba(204, 255, 144, 0.5)',
                             'rgba(66, 202, 162, 0.4)',
-                            'rgba(153, 102, 255, 0.5)',
+                            'rgba(200, 160, 255, 0.4)',
                             'rgba(200, 200, 200, 0.2)',  // 灰色
                         ],
                         // borderColor: ['rgb(66, 66, 66)'],
@@ -1341,7 +1341,7 @@ export default {
 .stock-deposit-bg > input
     background: #f7f7f7
 .bond-deposit-bg > .el-input-group__prepend
-    background: rgba(153, 102, 255, 0.5)
+    background: rgba(200, 160, 255, 0.4)
 .bond-deposit-bg > input
     background: #f7f7f7
 .other-deposit-bg > .el-input-group__prepend
