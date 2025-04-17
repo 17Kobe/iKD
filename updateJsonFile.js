@@ -77,6 +77,11 @@ const funds = [
         url: 'https://www.moneydj.com/funddj/yp/funddividend.djhtm?a=ACYT175',
         type: 'fund_dividend',
     },
+    {
+        name: '元大美債20年',
+        url: 'https://www.cmoney.tw/forum/stock/00679B?s=dividend',
+        type: 'stock_dividend',
+    },
 ];
 
 function getPromise(fund) {
@@ -213,6 +218,62 @@ function getPromise(fund) {
                     }
                 }
             );
+        } else if (fund.type === 'stock_dividend') {
+            request(
+                {
+                    url: fund.url,
+                    proxy: proxy,
+                },
+                (error, response, html) => {
+                    if (!error && response.statusCode === 200) {
+                        console.log(`處理 ${fund.name} 的股息數據`);
+                        
+                        const $ = cheerio.load(html);
+                        const data = [];
+                        
+                        // 找到股息表格 - 這裡需要根據實際的網頁結構調整選擇器
+                        // 這個範例假設股息信息在名為 "配息紀錄" 的表格中
+                        const targetTable = $('table[data-v-f68ae462]');
+
+                        targetTable.find('tbody tr').each((i, row) => {
+                            const tds = $(row).find('td');
+                        
+                            if (tds.length >= 6) {
+                                const date = ""; //配息基準日
+                                const cashExDividendDate = $(tds[2]).text().trim();  // 除息日
+                                const cashDividendPaymentDate = $(tds[3]).text().trim(); // 發放日
+                                const cashEarningsDistribution = parseFloat($(tds[1]).text().trim()); // 每單位分配金額
+                                const dividendYield = cashEarningsDistribution / parseFloat($(tds[4]).text().trim()) * 100; // 配息率
+                        
+                                // console.log('配息基準日:', date);
+                                // console.log('除息日:', cashExDividendDate);
+                                // console.log('發放日:', cashDividendPaymentDate);
+                                // console.log('每單位分配金額:', cashEarningsDistribution);
+                                // console.log('配息率:', dividendYield);
+
+                                data.push({
+                                    CashDividendPaymentDate: moment(cashDividendPaymentDate, 'YYYY/MM/DD').format('YYYY-MM-DD'),
+                                    CashEarningsDistribution: cashEarningsDistribution,
+                                    CashExDividendTradingDate: moment(cashExDividendDate, 'YYYY/MM/DD').format('YYYY-MM-DD'),
+                                    StockEarningsDistribution: 0,
+                                    StockExDividendTradingDate: "",
+                                    date: "",
+                                    dividendYield: dividendYield  // 若無法算出配息率，可先填 null
+                                });
+                            }
+                        });
+                        
+                        resolve({ 
+                            name: fund.name, 
+                            values: data.reverse(), 
+                            type: fund.type 
+                        });
+                    } else {
+                        console.error(`取得 ${fund.name} 股息數據時發生錯誤:`, error);
+                        resolve({ name: fund.name, values: [], type: fund.type });
+                    }
+                }
+            );
         } else {
             // 如果不是 'price' 類型，直接返回空值
             resolve({ name: fund.name, values: [], type: fund.type });
@@ -238,7 +299,7 @@ Promise.all(funds.map(getPromise)).then(function (results) {
             foundStock.data = foundStock.data || {};
             foundStock.data.daily = foundStock.data.daily || [];
             foundStock.data.daily = result.values;
-        } else if (result.type === 'fund_dividend') {
+        } else if (result.type === 'fund_dividend' || result.type === 'stock_dividend') {
             foundStock.data = foundStock.data || {};
             foundStock.data.dividend = foundStock.data.dividend || []; 
             foundStock.data.dividend = result.values;
@@ -249,6 +310,19 @@ Promise.all(funds.map(getPromise)).then(function (results) {
         if (_.includes(item.name, '基金')) {
             item.data.daily = _.map(item.data.daily, ([date, value]) => [date, value]); // 移掉open close high low 節省空間
             return item;
+        } else if (item.name === "元大美債20年") {
+            // 先複製一份data.dividend用於保留
+            const dividendData = _.get(item, 'data.dividend', null);
+            
+            // 刪除整個data對象，之後再將dividend放回去
+            const newItem = _.omit(item, ['data', 'cost', 'crawler_dividend_last_date']);
+            
+            // 如果原本有dividend數據，則建立新的data對象只包含dividend
+            if (dividendData) {
+                newItem.data = { dividend: dividendData };
+            }
+            
+            return newItem;
         } else {
             // 非基金，刪除 data, cost, calc_policy_date, crawler_dividend_last_date
             return _.omit(item, ['data', 'cost', 'crawler_dividend_last_date']);

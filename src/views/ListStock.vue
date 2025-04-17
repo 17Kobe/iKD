@@ -971,6 +971,7 @@ export default {
                         let tempStockObj = _.pick(obj, ['id', 'data']);
                         // 若是基金時，在這裡是塞JSON的data.daily資料，因為是可能最新的。但不修改data.weekly資料喔，這部份還是由vuex去算
                         if (obj.type === 'fund') {
+                            // 基金是從 defaultStockList 去拿 data.daily 及 data.dividend
                             const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
                             // tempStockObj.data.daily = _.cloneDeep(foundStock.data.daily);
                             // tempStockObj.data.dividend = _.cloneDeep(foundStock.data.dividend);
@@ -980,6 +981,9 @@ export default {
                                 daily: foundStock.data.daily,
                                 dividend: foundStock.data.dividend
                             }));
+                        } else if (obj.name === '元大美債20年') {
+                            const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
+                            tempStockObj.data.dividend = _.cloneDeep(foundStock.data.dividend);
                         }
                         // console.log(tempStockObj);
                         this.queueStockDataList.push(tempStockObj);
