@@ -37,7 +37,7 @@ const funds = [
         url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F00000VTAH:FO;timeslot=2012-01-01T00:00:00Z-' +
             today +
             'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
-        type: 'share_price',
+        type: 'price',
         moneyDjUrl: 'https://www.moneydj.com/funddj/yp/yp010001.djhtm?a=FTZR0'
     },
     {
@@ -45,7 +45,7 @@ const funds = [
         url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F000001V09:FO;timeslot=2012-01-01T00:00:00Z-' +
             today +
             'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
-        type: 'share_price',
+        type: 'price',
         moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010000.djhtm?a=ACDD19'
     },
     {
@@ -53,7 +53,7 @@ const funds = [
         url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04AR8:FO;timeslot=2012-01-01T00:00:00Z-' +
             today +
             'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
-        type: 'share_price',
+        type: 'price',
         moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=SHZ18'
     },
     // {
@@ -61,7 +61,7 @@ const funds = [
     //     url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04K8F:FO;timeslot=2012-01-01T00:00:00Z-' +
     //         today +
     //         'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
-    //     type: 'share_price',
+    //     type: 'price',
     //     moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=shza6'
     // },
     {
@@ -69,87 +69,154 @@ const funds = [
         url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F00001EM6G:FO;timeslot=2012-01-01T00:00:00Z-' +
             today +
             'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
-        type: 'share_price',
+        type: 'price',
         moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010000.djhtm?a=ACYT175'
+    },
+    {
+        name: '元大2至10年投資級企業債券基金',
+        url: 'https://www.moneydj.com/funddj/yp/funddividend.djhtm?a=ACYT175',
+        type: 'fund_dividend',
     },
 ];
 
 function getPromise(fund) {
     return new Promise(function (resolve) {
-        request(
-            {
-                url: fund.url,
-                json: true,
-                proxy: proxy,
-            },
-            (error, response, body) => {
-                console.log(response.statusCode);
-                let values = [];
-                if (body.data.dates.length > 0) {
-                    body.data.dates.forEach((date, index) => {
-                        const closePrice = parseFloat(body.data.closePrices[index]);
-                        values.push([date, closePrice]);
-                    });
-                }
-                
-                const url2 = fund.moneyDjUrl;
-                
-                if (url2 !== '') {
-                    // proxy
-                    // 如果IP地址存在於列表中，則設定代理
-                    request(
-                        {
-                            url: url2,
-                            proxy: proxy,
-                        },
-                        (err, res, html) => {
-                            if (!err && res.statusCode === 200) {
-                                const $ = cheerio.load(html);
-                                const targetTable = $('td[width="33%"] > table.t01');
-                                let data = [];
-                                const today = moment();
-                                // console.log(url2);
+        // 檢查類型是否為 'price'
+        if (fund.type === 'price') {
+            request(
+                {
+                    url: fund.url,
+                    json: true,
+                    proxy: proxy,
+                },
+                (error, response, body) => {
+                    console.log(response.statusCode);
+                    let values = [];
+                    if (body.data.dates.length > 0) {
+                        body.data.dates.forEach((date, index) => {
+                            const closePrice = parseFloat(body.data.closePrices[index]);
+                            values.push([date, closePrice]);
+                        });
+                    }
+                    
+                    const url2 = fund.moneyDjUrl;
+                    
+                    if (url2 !== '') {
+                        // proxy
+                        // 如果IP地址存在於列表中，則設定代理
+                        request(
+                            {
+                                url: url2,
+                                proxy: proxy,
+                            },
+                            (err, res, html) => {
+                                if (!err && res.statusCode === 200) {
+                                    const $ = cheerio.load(html);
+                                    const targetTable = $('td[width="33%"] > table.t01');
+                                    let data = [];
+                                    const today = moment();
+                                    // console.log(url2);
 
-                                targetTable.find('tr').each((i, row) => {
-                                    const td = $(row).find(
-                                        'td.t3n0c1, td.t3n1, td.t3n1_rev, td.t3n0c1, td.t3n0, td.t3n0_rev, td.t3n0c1_rev'
-                                    );
-                                    const date = $(td[0]).text().trim();
-                                    const value = $(td[1]).text().trim();
+                                    targetTable.find('tr').each((i, row) => {
+                                        const td = $(row).find(
+                                            'td.t3n0c1, td.t3n1, td.t3n1_rev, td.t3n0c1, td.t3n0, td.t3n0_rev, td.t3n0c1_rev'
+                                        );
+                                        const date = $(td[0]).text().trim();
+                                        const value = $(td[1]).text().trim();
 
-                                    // console.log(date);
-                                    // console.log(value);
-                                    if (date && value) {
-                                        const extractDate = moment(today.format('YYYY') + '/' + date, 'YYYY/MM/DD');
-                                        if (extractDate.isAfter(today) || !extractDate.isValid()) {
-                                            extractDate.subtract(1, 'years');
+                                        // console.log(date);
+                                        // console.log(value);
+                                        if (date && value) {
+                                            const extractDate = moment(today.format('YYYY') + '/' + date, 'YYYY/MM/DD');
+                                            if (extractDate.isAfter(today) || !extractDate.isValid()) {
+                                                extractDate.subtract(1, 'years');
+                                            }
+
+                                            data.push([extractDate.format('YYYY-MM-DD'), parseFloat(value)]);
                                         }
+                                    });
 
-                                        data.push([extractDate.format('YYYY-MM-DD'), parseFloat(value)]);
+                                    const lastValueDate = moment(_.last(values)[0], 'YYYY-MM-DD');
+                                    data = data.reverse();
+                                    for (let i = 0; i < data.length; i++) {
+                                        const currentDate = moment(data[i][0], 'YYYY-MM-DD');
+
+                                        if (currentDate.isAfter(lastValueDate)) {
+                                            values.push(data[i]);
+                                        }
                                     }
-                                });
-
-                                const lastValueDate = moment(_.last(values)[0], 'YYYY-MM-DD');
-                                data = data.reverse();
-                                for (let i = 0; i < data.length; i++) {
-                                    const currentDate = moment(data[i][0], 'YYYY-MM-DD');
-
-                                    if (currentDate.isAfter(lastValueDate)) {
-                                        values.push(data[i]);
-                                    }
+                                    resolve({ name: fund.name, values: values, type: fund.type });
+                                } else {
+                                    console.error('錯誤：', err);
+                                    resolve({ name: fund.name, values: [], type: fund.type });
                                 }
-                                resolve({ name: fund.name, values: values });
-                            } else {
-                                console.error('錯誤：', err);
-                                resolve({ name: fund.name, values: [] });
                             }
-                        }
-                    );
-                } else {
-                    resolve({ name: fund.name, values: response.statusCode === 200 ? values : [] });
+                        );
+                    } else {
+                        resolve({ name: fund.name, values: response.statusCode === 200 ? values : [], type: fund.type });
+                    }
                 }
-            }
-        );
+            );
+        } else if (fund.type === 'fund_dividend') {
+            request(
+                {
+                    url: fund.url,
+                    proxy: proxy,
+                },
+                (error, response, html) => {
+                    if (!error && response.statusCode === 200) {
+                        console.log(`處理 ${fund.name} 的股息數據`);
+                        
+                        const $ = cheerio.load(html);
+                        const data = [];
+                        
+                        // 找到股息表格 - 這裡需要根據實際的網頁結構調整選擇器
+                        // 這個範例假設股息信息在名為 "配息紀錄" 的表格中
+                        const targetTable = $('table.t01');
+
+                        targetTable.find('tbody tr').each((i, row) => {
+                            const tds = $(row).find('td');
+                        
+                            if (tds.length >= 6) {
+                                const date = $(tds[0]).text().trim(); //配息基準日
+                                const cashExDividendDate = $(tds[1]).text().trim();  // 除息日
+                                const cashDividendPaymentDate = $(tds[2]).text().trim(); // 發放日
+                                const cashEarningsDistribution = parseFloat($(tds[4]).text().trim()); // 每單位分配金額
+                                const dividendYield = parseFloat($(tds[5]).text().trim()) / 4; // 年化配息率
+                        
+                                // console.log('配息基準日:', date);
+                                // console.log('除息日:', cashExDividendDate);
+                                // console.log('發放日:', cashDividendPaymentDate);
+                                // console.log('每單位分配金額:', cashEarningsDistribution);
+                                // console.log('配息率:', dividendYield);
+
+                                data.push({
+                                    CashDividendPaymentDate: moment(cashDividendPaymentDate, 'YYYY/MM/DD').format('YYYY-MM-DD'),
+                                    CashEarningsDistribution: cashEarningsDistribution,
+                                    CashExDividendTradingDate: moment(cashExDividendDate, 'YYYY/MM/DD').format('YYYY-MM-DD'),
+                                    StockEarningsDistribution: 0,
+                                    StockExDividendTradingDate: "",
+                                    date: moment(date, 'YYYY/MM/DD').format('YYYY-MM-DD'),
+                                    dividendYield: dividendYield  // 若無法算出配息率，可先填 null
+                                });
+                            }
+                        });
+                        
+                        resolve({ 
+                            name: fund.name, 
+                            values: data.reverse(), 
+                            type: fund.type 
+                        });
+                    } else {
+                        console.error(`取得 ${fund.name} 股息數據時發生錯誤:`, error);
+                        resolve({ name: fund.name, values: [], type: fund.type });
+                    }
+                }
+            );
+        } else {
+            // 如果不是 'price' 類型，直接返回空值
+            resolve({ name: fund.name, values: [], type: fund.type });
+        }
     });
 }
 
@@ -165,10 +232,17 @@ Promise.all(funds.map(getPromise)).then(function (results) {
             console.warn(`找不到名稱為 ${result.name} 的股票`);
             return; // 跳過這筆
         }
-    
-        foundStock.data = foundStock.data || {};
-        foundStock.data.daily = foundStock.data.daily || [];
-        foundStock.data.daily = result.values;
+        
+        // 只有在 type 為 'price' 時才更新資料
+        if (result.type === 'price') {
+            foundStock.data = foundStock.data || {};
+            foundStock.data.daily = foundStock.data.daily || [];
+            foundStock.data.daily = result.values;
+        } else if (result.type === 'fund_dividend') {
+            foundStock.data = foundStock.data || {};
+            foundStock.data.dividend = foundStock.data.dividend || []; 
+            foundStock.data.dividend = result.values;
+        }
     });
 
     const defaultStockList = _.map(myLocalstorageStockList, (item) => {

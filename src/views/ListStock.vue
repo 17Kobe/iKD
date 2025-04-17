@@ -972,7 +972,14 @@ export default {
                         // 若是基金時，在這裡是塞JSON的data.daily資料，因為是可能最新的。但不修改data.weekly資料喔，這部份還是由vuex去算
                         if (obj.type === 'fund') {
                             const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
-                            tempStockObj.data.daily = _.cloneDeep(foundStock.data.daily);
+                            // tempStockObj.data.daily = _.cloneDeep(foundStock.data.daily);
+                            // tempStockObj.data.dividend = _.cloneDeep(foundStock.data.dividend);
+
+                            // 用此語法取代上面二行
+                            Object.assign(tempStockObj.data, _.cloneDeep({
+                                daily: foundStock.data.daily,
+                                dividend: foundStock.data.dividend
+                            }));
                         }
                         // console.log(tempStockObj);
                         this.queueStockDataList.push(tempStockObj);
