@@ -161,7 +161,7 @@
                         :plain="true"
                         size="mini"
                         style="position: absolute; left: 17px; top: 6px; padding: 0px 8px"
-                        v-if="stockData.type !== 'exchange' && stockData.type !== 'fund' && stockData.is_dividend !== false"
+                        v-if="(stockData.type !== 'exchange' && stockData.type !== 'fund' && stockData.is_dividend !== false) || stockData.name.includes('債')"
                         @click="getDividend"
                         >息</el-button
                     >
