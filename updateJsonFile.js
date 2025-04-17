@@ -30,31 +30,55 @@ console.log('proxy=' + proxy);
 
 const today = moment().format('YYYY-MM-DD');
 
-const urls = [
-    'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F00000VTAH:FO;timeslot=2012-01-01T00:00:00Z-' +
-        today +
-        'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
-    'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F000001V09:FO;timeslot=2012-01-01T00:00:00Z-' +
-        today +
-        'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
-    'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04AR8:FO;timeslot=2012-01-01T00:00:00Z-' +
-        today +
-        'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
-    'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04K8F:FO;timeslot=2012-01-01T00:00:00Z-' +
-        today +
-        'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
-    'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F00001EM6G:FO;timeslot=2012-01-01T00:00:00Z-' +
-        today +
-        'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
+// 新的結構：將 fundName 和 urls 合併為一個物件數組
+const funds = [
+    {
+        name: '富達全球科技基金',
+        url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F00000VTAH:FO;timeslot=2012-01-01T00:00:00Z-' +
+            today +
+            'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
+        type: 'share_price',
+        moneyDjUrl: 'https://www.moneydj.com/funddj/yp/yp010001.djhtm?a=FTZR0'
+    },
+    {
+        name: '安聯台灣智慧基金',
+        url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F000001V09:FO;timeslot=2012-01-01T00:00:00Z-' +
+            today +
+            'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
+        type: 'share_price',
+        moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010000.djhtm?a=ACDD19'
+    },
+    {
+        name: '貝萊德世界黃金基金A2',
+        url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04AR8:FO;timeslot=2012-01-01T00:00:00Z-' +
+            today +
+            'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
+        type: 'share_price',
+        moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=SHZ18'
+    },
+    // {
+    //     name: '貝萊德世界能源基金A2',
+    //     url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04K8F:FO;timeslot=2012-01-01T00:00:00Z-' +
+    //         today +
+    //         'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
+    //     type: 'share_price',
+    //     moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=shza6'
+    // },
+    {
+        name: '元大2至10年投資級企業債券基金',
+        url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F00001EM6G:FO;timeslot=2012-01-01T00:00:00Z-' +
+            today +
+            'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
+        type: 'share_price',
+        moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010000.djhtm?a=ACYT175'
+    },
 ];
 
-const fundName = ['富達全球科技基金', '安聯台灣智慧基金', '貝萊德世界黃金基金A2', '貝萊德世界能源基金A2', '元大2至10年投資級企業債券基金'];
-
-function getPromise(url) {
+function getPromise(fund) {
     return new Promise(function (resolve) {
         request(
             {
-                url: url,
+                url: fund.url,
                 json: true,
                 proxy: proxy,
             },
@@ -67,12 +91,9 @@ function getPromise(url) {
                         values.push([date, closePrice]);
                     });
                 }
-                let url2 = '';
-                if (url.includes('F00000VTAH')) url2 = 'https://www.moneydj.com/funddj/yp/yp010001.djhtm?a=FTZR0';
-                else if (url.includes('F000001V09')) url2 = 'https://www.moneydj.com/funddj/ya/yp010000.djhtm?a=ACDD19';
-                else if (url.includes('F0GBR04AR8')) url2 = 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=SHZ18';
-                else if (url.includes('F0GBR04K8F')) url2 = 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=shza6';
-                else if (url.includes('F00001EM6G')) url2 = 'https://www.moneydj.com/funddj/ya/yp010000.djhtm?a=ACYT175';
+                
+                const url2 = fund.moneyDjUrl;
+                
                 if (url2 !== '') {
                     // proxy
                     // 如果IP地址存在於列表中，則設定代理
@@ -117,43 +138,37 @@ function getPromise(url) {
                                         values.push(data[i]);
                                     }
                                 }
-                                resolve(values);
+                                resolve({ name: fund.name, values: values });
                             } else {
                                 console.error('錯誤：', err);
-                                resolve([]);
+                                resolve({ name: fund.name, values: [] });
                             }
                         }
                     );
                 } else {
-                    resolve(response.statusCode === 200 ? values : []);
+                    resolve({ name: fund.name, values: response.statusCode === 200 ? values : [] });
                 }
             }
         );
     });
 }
 
-Promise.all(urls.map(getPromise)).then(function (stats) {
+// 使用 Promise.all 和映射新的 funds 結構
+Promise.all(funds.map(getPromise)).then(function (results) {
     // 載入 JSON 資料，後面加日期是為了避免手機用快取下載，而非真正抓最新的資料
     const myLocalstorageFile = JSON.parse(fs.readFileSync('./dist/assets/data/my_localstorage1.json'));
-    // let rawdata = fs.readFileSync('./src/store/data/default-stock-list.json');
-    // console.log(myLocalstorageFile);
     let myLocalstorageStockList = myLocalstorageFile.stockList;
-    // console.log(myLocalstorageFile);
-    // console.log(typeof myLocalstorage.stockList);
-    // console.log(myLocalstorage);
-    // console.log(myLocalstorage);
-    // console.log(stats);
 
-    stats.forEach((price, index) => {
-        const foundStock = myLocalstorageStockList.find((obj) => obj.name === fundName[index]);
+    results.forEach((result) => {
+        const foundStock = myLocalstorageStockList.find((obj) => obj.name === result.name);
         if (!foundStock) {
-            console.warn(`找不到名稱為 ${fundName[index]} 的股票`);
+            console.warn(`找不到名稱為 ${result.name} 的股票`);
             return; // 跳過這筆
         }
     
         foundStock.data = foundStock.data || {};
         foundStock.data.daily = foundStock.data.daily || [];
-        foundStock.data.daily = price;
+        foundStock.data.daily = result.values;
     });
 
     const defaultStockList = _.map(myLocalstorageStockList, (item) => {
