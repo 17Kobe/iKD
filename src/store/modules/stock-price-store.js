@@ -297,13 +297,7 @@ const stock = {
                 siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
 
             state.stockList.forEach((stcokObj) => {
-                const stockDataDividend = _.has(stcokObj, 'data.dividend') ? stcokObj.data.dividend : [];
-                const localcrawlerDividendLastDate = moment(
-                    stockDataDividend.length === 0
-                        ? moment().subtract(10, 'years').format('YYYY-MM-DD')
-                        : moment(stockDataDividend[stockDataDividend.length - 1].date).add(1, 'days')
-                ).format('YYYY-MM-DD');
-                console.log(localcrawlerDividendLastDate);
+
                 // const localcrawlerDividendLastDate =
                 //     moment(stcokObj.crawler_dividend_last_date).add(1, 'days') || moment().subtract(10, 'years');
                 // const localcrawlerDividendLastDate = moment(stcokObj.crawler_dividend_last_date).add(1, 'days') || moment().subtract(10, 'years');
@@ -314,6 +308,14 @@ const stock = {
                     ((stcokObj.type !== 'fund' &&
                     stcokObj.type !== 'exchange' && stcokObj.is_dividend !== false) || stcokObj.name.includes('債'))
                 ) {
+                    const stockDataDividend = _.has(stcokObj, 'data.dividend') ? stcokObj.data.dividend : [];
+                    const localcrawlerDividendLastDate = moment(
+                        stockDataDividend.length === 0
+                            ? moment().subtract(10, 'years').format('YYYY-MM-DD')
+                            : moment(stockDataDividend[stockDataDividend.length - 1].date).add(1, 'days')
+                    ).format('YYYY-MM-DD');
+                    console.log(localcrawlerDividendLastDate);
+
                     if (
                         // 因為我有將 localcrawlerDividendLastDate + 1天，所以有 Same
                         moment(siteExistsLatestDate).isSameOrAfter(localcrawlerDividendLastDate)
