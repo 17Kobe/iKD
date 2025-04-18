@@ -82,6 +82,11 @@ const funds = [
         url: 'https://www.cmoney.tw/forum/stock/00679B?s=dividend',
         type: 'stock_dividend',
     },
+    {
+        name: '元大高股息',
+        url: 'https://www.cmoney.tw/forum/stock/0056?s=dividend',
+        type: 'stock_dividend',
+    },
 ];
 
 function getPromise(fund) {
@@ -310,7 +315,7 @@ Promise.all(funds.map(getPromise)).then(function (results) {
         if (_.includes(item.name, '基金')) {
             item.data.daily = _.map(item.data.daily, ([date, value]) => [date, value]); // 移掉open close high low 節省空間
             return item;
-        } else if (item.name === "元大美債20年") {
+        } else if (item.name === "元大美債20年" || item.name === "元大高股息") {
             // 先複製一份data.dividend用於保留
             const dividendData = _.get(item, 'data.dividend', null);
             

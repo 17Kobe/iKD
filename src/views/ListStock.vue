@@ -981,7 +981,7 @@ export default {
                                 daily: foundStock.data.daily,
                                 dividend: foundStock.data.dividend
                             }));
-                        } else if (obj.name === '元大美債20年') {
+                        } else if (obj.name === '元大美債20年' || obj.name === '元大高股息') {
                             const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
                             tempStockObj.data.dividend = _.cloneDeep(foundStock.data.dividend);
                         }
