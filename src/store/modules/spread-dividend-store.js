@@ -380,8 +380,7 @@ const dividend = {
             },
         // 該股票的股數，是另外再去撈的，如此才能當股數改變時又能即時反應
         getDividendList: (state, getters, rootState) => (mode) => {
-            console.log('getDividendList');
-            console.log(mode);
+            console.log('getDividendList', mode);
             // const { dividendList } = state;
             let tempDividendList = [];
 

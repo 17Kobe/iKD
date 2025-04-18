@@ -67,7 +67,7 @@ const stock = {
         },
         async GET_STOCK_PRICE({ state, commit }, force = false) {
             // GET_STOCK_PRICE(context, force = false) {
-            console.log('GET_STOCK_PRICE 0');
+            // console.log('GET_STOCK_PRICE 0');
 
             await Promise.all(
                 _.map(state.stockList, async (stcokObj) => {
@@ -78,7 +78,7 @@ const stock = {
                     let stcokObjType = 'stock';
                     if (stcokObj.type) stcokObjType = stcokObj.type; // 'fund' or 'exchange';
 
-                    console.log('GET_STOCK_PRICE 1');
+                    // console.log('GET_STOCK_PRICE 1');
                     if (stcokObjType === 'stock' && _.has(stcokObj, 'data.daily')) {
                         // 濾除 即時，即時會有7個元素，正常只有6個元素
                         stcokObj.data.daily = _.filter(stcokObj.data.daily, (arr) => arr.length !== 7);
@@ -125,7 +125,7 @@ const stock = {
                             : moment().subtract(10, 'years').format('YYYY-MM-DD')
                     ).format('YYYY-MM-DD');
 
-                    console.log('GET_STOCK_PRICE 2');
+                    // console.log('GET_STOCK_PRICE 2');
                     // 按照網站存在的日期才發出API需求
                     // https://stackoverflow.com/questions/36197031/how-to-use-moment-js-to-check-whether-the-current-time-is-between-2-times
                     const currentTime = moment(); // 目前時間
@@ -204,7 +204,7 @@ const stock = {
                                     console.log(err);
                                 });
                         } else if (stcokObjType === 'fund') {
-                            console.log('GET_STOCK_PRICE 32');
+                            // console.log('GET_STOCK_PRICE 32');
                             // 基金
                             commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
                             // axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
@@ -1438,8 +1438,7 @@ const stock = {
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
         },
         async SAVE_STOCK_PRICE(state, { stockId, data, realtime = false }) {
-            console.log('SAVE_STOCK_PRICE');
-            console.log(stockId);
+            console.log('SAVE_STOCK_PRICE', stockId);
             // console.log(data);
             // console.log(realtime);
             const foundStock = state.stockList.find((v) => v.id === stockId);
@@ -1768,7 +1767,7 @@ const stock = {
                 stockLastUpdateHash
             );
             if (foundStock.last_update_hash !== stockLastUpdateHash) {
-                console.log('stockId = ', stockId, ', hash 有不同 ');
+                // console.log('stockId = ', stockId, ', hash 有不同 ');
                 // 像是從 UI改policy會沒有 tempStockList，需要重新計算
                 let foundTempStock = state.tempStockList.find((v) => v.id === stockId);
                 if (typeof foundTempStock === 'undefined') {
@@ -1810,7 +1809,7 @@ const stock = {
                 }
 
                 const policyResult = await this.dispatch('CALC_STOCK_INDICATORS_RESULT', stockId);
-                console.log('stockId = ', stockId, 'policyResult = ', policyResult);
+                // console.log('stockId = ', stockId, 'policyResult = ', policyResult);
                 if (policyResult !== null) {
                     // policyResult 有可能因為是calc一樣所以沒計算，此時就不要去異動 result
                     foundStock.policy.result = [];
