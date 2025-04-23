@@ -188,6 +188,21 @@
                     </span>
                 </template>
             </el-table-column>
+            <el-table-column label="市值&nbsp;&nbsp;" width="80" align="right" header-align="right" v-if="modeSpread === '歷史'">
+                <template #default="scope">
+                    <span
+                        v-if="scope.row.cost"
+                        :style="[
+                            modeSpread === '目前' && scope.row.cost && scope.row.last_price < scope.row.cost.avg
+                                ? { color: '#f56c6c' }
+                                : modeSpread === '目前'
+                                ? { color: '#409eff' }
+                                : {},
+                        ]"
+                        >$ {{ (scope.row.cost.sum + scope.row.cost.return).toLocaleString('en-US') }}&nbsp;&nbsp;</span
+                    >
+                </template>
+            </el-table-column>
             <el-table-column label="本金&nbsp;" width="80" align="right" header-align="right">
                 <template #default="scope">
                     <span
@@ -228,7 +243,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column label="市值&nbsp;&nbsp;" width="80" align="right" header-align="right">
+            <el-table-column label="市值&nbsp;&nbsp;" width="80" align="right" header-align="right" v-if="modeSpread === '目前'">
                 <template #default="scope">
                     <span
                         v-if="scope.row.cost"
