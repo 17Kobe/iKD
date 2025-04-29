@@ -180,6 +180,61 @@ const stock = {
                                     // commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // ／跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                                     console.log(err);
                                 });
+
+                                // 如果 stcokObj.id 不是以 "00" 開頭，額外取得 PER 和 PBR
+                                if (!stcokObj.id.startsWith('00')) {
+
+                                    console.log("0000 stcokObj.id", stcokObj.id);
+                                    
+                                    axios
+                                    .get('https://api.finmindtrade.com/api/v4/data', {
+                                        params: {
+                                            dataset: 'TaiwanStockPER',
+                                            data_id: stcokObj.id,
+                                            start_date: stockStartDate,
+                                            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk',
+                                        },
+                                    })
+                                    .then((res) => {
+                                        // res.data 內容如下
+                                        // {
+                                        //     "msg": "success",
+                                        //     "status": 200,
+                                        //     "data": [
+                                        //         {
+                                        //         "date": "2025-04-25",
+                                        //         "stock_id": "2330",
+                                        //         "dividend_yield": 1.91,
+                                        //         "PER": 19.63,
+                                        //         "PBR": 5.37
+                                        //         },
+                                        //         {
+                                        //         "date": "2025-04-28",
+                                        //         "stock_id": "2330",
+                                        //         "dividend_yield": 1.9,
+                                        //         "PER": 19.83,
+                                        //         "PBR": 5.42
+                                        //         }
+                                        //     ]
+                                        // }
+                                        if (res.data && res.data.data && res.data.data.length > 0) {
+                                            // 取得最後一筆資料
+                                            const lastRecord = res.data.data[res.data.data.length - 1];
+                                            // 準備要存入的物件
+                                            const perPbrData = {
+                                                date: lastRecord.date,
+                                                dividend_yield: lastRecord.dividend_yield,
+                                                per: lastRecord.PER,
+                                                pbr: lastRecord.PBR,
+                                            };
+                                            // 儲存至 DB 的 per_pbr
+                                            commit('SAVE_STOCK_PER_PBR', { stockId: stcokObj.id, per_pbr: perPbrData });
+                                        }
+                                    })
+                                    .catch((error) => {
+                                        console.error('Error fetching PER and PBR for stockId: ' + stcokObj.id, error);
+                                    });
+                                }
                         } else if (stcokObjType === 'exchange') {
                             // console.log('GET_STOCK_PRICE 31');
                             // 因為 axios 是非同步，但我要確實等它執行完才 resolve
@@ -1437,6 +1492,15 @@ const stock = {
 
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
         },
+
+        async SAVE_STOCK_PER_PBR(state, { stockId, per_pbr }) {
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            if (foundStock) {
+                foundStock.per_pbr = per_pbr;
+                await saveStockToDb('stockList', foundStock);
+            }
+        },
+
         async SAVE_STOCK_PRICE(state, { stockId, data, realtime = false }) {
             console.log('SAVE_STOCK_PRICE', stockId);
             // console.log(data);
@@ -2509,9 +2573,9 @@ const stock = {
             let kdStatus = [];
             const stockFairValueList = GlobalSettings.stock_fair_value;
             const foundFairValueStock = stockFairValueList.find((v) => v.id === stockId);
-            if (foundFairValueStock) {
-                kdStatus.push('合理價 ' + foundFairValueStock.fair_value);
-            }
+            // if (foundFairValueStock) {
+            //     kdStatus.push('合理價 ' + foundFairValueStock.fair_value);
+            // }
             if (['買', '賣', '取消買', '取消買x2', '取消賣', '取消賣½'].includes(foundStock.badge)) {
                 if (foundStock.badge_reason.includes('kd_gold')) kdStatus.push('KD 黃金交叉');
                 if (foundStock.badge_reason.includes('kd_turn_up')) kdStatus.push('KD 往上轉折');

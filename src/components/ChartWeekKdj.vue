@@ -7,6 +7,7 @@
             style="position: relative; top: 5px; background: transparent"
         >
         </highcharts>
+
         <div
             v-if="kdj && kdj.length > 0"
             style="
@@ -84,11 +85,69 @@
                     {{ status }}
                 </span>
             </span>
+
             <span style="order: 2">
                 <span style="color: #4286f5">K</span>: {{ kdj[kdj.length - 1][1].toFixed(2) }}
                 <span style="color: #e75c9a">D</span>:
                 {{ kdj[kdj.length - 1][2].toFixed(2) }}
                 <span v-if="showJLine"><span style="color: #febd09">J</span>: {{ kdj[kdj.length - 1][3].toFixed(2) }}</span>
+            </span>
+        </div>
+
+        <div
+            v-if="stockData && stockData.per_pbr"
+            style="
+                display: flex;
+                justify-content: space-between;
+                font-size: 12px;
+                position: absolute;
+                top: 80px;
+                left: 79px;
+                padding: 0px 12px 0px 6px;
+                width: 100%;
+            "
+        >
+            <span style="order: 1; position: relative">
+                <span
+                    style="
+                        position: absolute;
+                        top: 0px;
+                        display: inline-block;
+                        min-width: 60px;
+                        background: rgb(241, 256, 209);
+                        color: rgb(97, 131, 81);
+                        padding: 0px 3px;
+                        border-radius: 10px;
+                        font-size: 12px;
+                        opacity: 0.83;
+                        line-height: 1.5;
+                        text-align: left;
+                        padding-left: 6px;
+                    "
+                    :title="`${stockData.per_pbr.date}，PE: 本益比，評估股價相對於獲益及成長率是否合理`"
+                >
+                    PE {{ stockData.per_pbr.per.toFixed(2) }}
+                </span>
+                <span
+                    style="
+                        position: absolute;
+                        top: -21px;
+                        display: inline-block;
+                        min-width: 60px;
+                        background: rgb(229, 217, 255);
+                        color: rgb(106, 65, 133);
+                        padding: 0px 3px;
+                        border-radius: 10px;
+                        font-size: 12px;
+                        opacity: 0.83;
+                        line-height: 1.5;
+                        text-align: left;
+                        padding-left: 6px;
+                    "
+                    :title="`${stockData.per_pbr.date}，PB: 股價淨值比，評估公司股價相對於其資產價值的高低`"
+                >
+                    PB&nbsp;&nbsp;&nbsp;{{ stockData.per_pbr.pbr.toFixed(2) }}
+                </span>
             </span>
         </div>
 

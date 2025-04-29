@@ -292,8 +292,8 @@
                     </span>
                 </template>
             </el-table-column>
-            <el-table-column label="合理價" width="66" align="center" prop="fair_value" v-if="modeSpread === '目前'">
-            </el-table-column>
+            <!-- <el-table-column label="合理價" width="66" align="center" prop="fair_value" v-if="modeSpread === '目前'">
+            </el-table-column> -->
             <el-table-column
                 :label="modeSpread === '目前' ? '累積股數&nbsp;&nbsp;' : '賣出股數&nbsp;&nbsp;'"
                 width="80"
@@ -326,7 +326,7 @@
             </el-table-column>
             <el-table-column label="賣出日期" prop="sell_date" width="90" align="center" v-if="modeSpread === '歷史'">
             </el-table-column>
-            <el-table-column label="代號&nbsp;&nbsp;" width="98" align="right" v-if="modeSpread === '目前'">
+            <el-table-column label="代號&nbsp;&nbsp;" width="110" align="right" v-if="modeSpread === '目前'">
                 <template #default="scope"> {{ scope.row.id }}&nbsp;&nbsp; </template>
             </el-table-column>
         </el-table>
