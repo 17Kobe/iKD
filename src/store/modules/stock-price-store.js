@@ -180,61 +180,6 @@ const stock = {
                                     // commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // ／跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                                     console.log(err);
                                 });
-
-                                // 如果 stcokObj.id 不是以 "00" 開頭，額外取得 PER 和 PBR
-                                if (!stcokObj.id.startsWith('00')) {
-
-                                    console.log("0000 stcokObj.id", stcokObj.id);
-                                    
-                                    axios
-                                    .get('https://api.finmindtrade.com/api/v4/data', {
-                                        params: {
-                                            dataset: 'TaiwanStockPER',
-                                            data_id: stcokObj.id,
-                                            start_date: stockStartDate,
-                                            token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk',
-                                        },
-                                    })
-                                    .then((res) => {
-                                        // res.data 內容如下
-                                        // {
-                                        //     "msg": "success",
-                                        //     "status": 200,
-                                        //     "data": [
-                                        //         {
-                                        //         "date": "2025-04-25",
-                                        //         "stock_id": "2330",
-                                        //         "dividend_yield": 1.91,
-                                        //         "PER": 19.63,
-                                        //         "PBR": 5.37
-                                        //         },
-                                        //         {
-                                        //         "date": "2025-04-28",
-                                        //         "stock_id": "2330",
-                                        //         "dividend_yield": 1.9,
-                                        //         "PER": 19.83,
-                                        //         "PBR": 5.42
-                                        //         }
-                                        //     ]
-                                        // }
-                                        if (res.data && res.data.data && res.data.data.length > 0) {
-                                            // 取得最後一筆資料
-                                            const lastRecord = res.data.data[res.data.data.length - 1];
-                                            // 準備要存入的物件
-                                            const perPbrData = {
-                                                date: lastRecord.date,
-                                                dividend_yield: lastRecord.dividend_yield,
-                                                per: lastRecord.PER,
-                                                pbr: lastRecord.PBR,
-                                            };
-                                            // 儲存至 DB 的 per_pbr
-                                            commit('SAVE_STOCK_PER_PBR', { stockId: stcokObj.id, per_pbr: perPbrData });
-                                        }
-                                    })
-                                    .catch((error) => {
-                                        console.error('Error fetching PER and PBR for stockId: ' + stcokObj.id, error);
-                                    });
-                                }
                         } else if (stcokObjType === 'exchange') {
                             // console.log('GET_STOCK_PRICE 31');
                             // 因為 axios 是非同步，但我要確實等它執行完才 resolve
@@ -294,6 +239,70 @@ const stock = {
                             commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
                         }
                     }
+
+                    // 如果 stcokObj.id 不是以 "00" 開頭，額外取得 PER 和 PBR
+                    const stockPerPbrStartDate = moment(
+                        stcokObj.per_pbr && stcokObj.per_pbr.date
+                            ? moment(stcokObj.per_pbr.date).add(1, 'days')
+                            : moment().subtract(7, 'days').format('YYYY-MM-DD')
+                    ).format('YYYY-MM-DD');
+
+                    if (moment(siteExistsLatestDate).isSameOrAfter(stockPerPbrStartDate) || force) {
+                        if (stcokObjType === 'stock' && !stcokObj.id.startsWith('00')) {
+
+                            console.log("0000 stcokObj.id", stcokObj.id);
+                            
+                            axios
+                            .get('https://api.finmindtrade.com/api/v4/data', {
+                                params: {
+                                    dataset: 'TaiwanStockPER',
+                                    data_id: stcokObj.id,
+                                    start_date: stockPerPbrStartDate,
+                                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk',
+                                },
+                            })
+                            .then((res) => {
+                                // res.data 內容如下
+                                // {
+                                //     "msg": "success",
+                                //     "status": 200,
+                                //     "data": [
+                                //         {
+                                //         "date": "2025-04-25",
+                                //         "stock_id": "2330",
+                                //         "dividend_yield": 1.91,
+                                //         "PER": 19.63,
+                                //         "PBR": 5.37
+                                //         },
+                                //         {
+                                //         "date": "2025-04-28",
+                                //         "stock_id": "2330",
+                                //         "dividend_yield": 1.9,
+                                //         "PER": 19.83,
+                                //         "PBR": 5.42
+                                //         }
+                                //     ]
+                                // }
+                                if (res.data && res.data.data && res.data.data.length > 0) {
+                                    // 取得最後一筆資料
+                                    const lastRecord = res.data.data[res.data.data.length - 1];
+                                    // 準備要存入的物件
+                                    const perPbrData = {
+                                        date: lastRecord.date,
+                                        dividend_yield: lastRecord.dividend_yield,
+                                        per: lastRecord.PER,
+                                        pbr: lastRecord.PBR,
+                                    };
+                                    // 儲存至 DB 的 per_pbr
+                                    commit('SAVE_STOCK_PER_PBR', { stockId: stcokObj.id, per_pbr: perPbrData });
+                                }
+                            })
+                            .catch((error) => {
+                                console.error('Error fetching PER and PBR for stockId: ' + stcokObj.id, error);
+                            });
+                        }
+                    }
+
                     return 'ok';
                 })
             );

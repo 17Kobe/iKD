@@ -115,7 +115,7 @@
                         display: inline-block;
                         min-width: 60px;
                         background: rgb(241, 256, 209);
-                        color: rgb(97, 131, 81);
+                        color: rgb(81 177 35);
                         padding: 0px 3px;
                         border-radius: 10px;
                         font-size: 12px;
@@ -126,7 +126,7 @@
                     "
                     :title="`${stockData.per_pbr.date}，PE: 本益比，評估股價相對於獲益及成長率是否合理`"
                 >
-                    PE {{ stockData.per_pbr.per.toFixed(2) }}
+                    PE <b>{{ stockData.per_pbr.per.toFixed(2) }}</b>
                 </span>
                 <span
                     style="
@@ -134,8 +134,8 @@
                         top: -21px;
                         display: inline-block;
                         min-width: 60px;
-                        background: rgb(229, 217, 255);
-                        color: rgb(106, 65, 133);
+                        background: rgb(255 248 232);
+                        color: rgb(249 201 86);
                         padding: 0px 3px;
                         border-radius: 10px;
                         font-size: 12px;
@@ -146,7 +146,7 @@
                     "
                     :title="`${stockData.per_pbr.date}，PB: 股價淨值比，評估公司股價相對於其資產價值的高低`"
                 >
-                    PB&nbsp;&nbsp;&nbsp;{{ stockData.per_pbr.pbr.toFixed(2) }}
+                    PB&nbsp;&nbsp;&nbsp;<b>{{ stockData.per_pbr.pbr.toFixed(2) }}</b>
                 </span>
             </span>
         </div>
