@@ -326,6 +326,16 @@
             </el-table-column>
             <el-table-column label="賣出日期" prop="sell_date" width="90" align="center" v-if="modeSpread === '歷史'">
             </el-table-column>
+            <el-table-column label="本益比" width="55" align="right" v-if="modeSpread === '目前'">
+                <template #default="scope">
+                    {{ scope.row.per_pbr && scope.row.per_pbr.per !== undefined ? parseFloat(scope.row.per_pbr.per).toFixed(2) : '' }}
+                </template>
+            </el-table-column>
+            <el-table-column label="股價淨值比" width="78" align="right" v-if="modeSpread === '目前'">
+                <template #default="scope">
+                    {{ scope.row.per_pbr && scope.row.per_pbr.pbr !== undefined ? parseFloat(scope.row.per_pbr.pbr).toFixed(2) : '' }}
+                </template>
+            </el-table-column>
             <el-table-column label="代號&nbsp;&nbsp;" width="110" align="right" v-if="modeSpread === '目前'">
                 <template #default="scope"> {{ scope.row.id }}&nbsp;&nbsp; </template>
             </el-table-column>
