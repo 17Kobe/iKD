@@ -135,7 +135,7 @@
                         display: inline-block;
                         min-width: 60px;
                         background: rgb(255 248 232);
-                        color: rgb(249 201 86);
+                        color: rgb(237 172 15);
                         padding: 0px 3px;
                         border-radius: 10px;
                         font-size: 12px;
