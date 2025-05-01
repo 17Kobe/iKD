@@ -109,56 +109,12 @@
         >
             <span style="order: 1; position: relative">
                 <span
-                    v-if="stockData.per_pbr"
-                    style="
-                        position: absolute;
-                        top: 0px;
-                        display: inline-block;
-                        min-width: 60px;
-                        background: rgb(241, 256, 209);
-                        color: rgb(81 177 35);
-                        padding: 0px 3px;
-                        border-radius: 10px;
-                        font-size: 12px;
-                        opacity: 0.83;
-                        line-height: 1.5;
-                        text-align: left;
-                        padding-left: 6px;
-                    "
-                    :title="`${stockData.per_pbr.date}，PE: 本益比，評估股價相對於獲益及成長率是否合理`"
-                >
-                    <span style="color: rgb(34, 35, 38); font-size: 11px">PE</span> <b>{{ stockData.per_pbr.per.toFixed(2) }}</b>
-                </span>
-                <span
-                    v-if="stockData.per_pbr"
-                    style="
-                        position: absolute;
-                        top: -21px;
-                        display: inline-block;
-                        min-width: 60px;
-                        background: rgb(255 248 232);
-                        color: rgb(237 172 15);
-                        padding: 0px 3px;
-                        border-radius: 10px;
-                        font-size: 12px;
-                        opacity: 0.83;
-                        line-height: 1.5;
-                        text-align: left;
-                        padding-left: 6px;
-                    "
-                    :title="`${stockData.per_pbr.date}，PB: 股價淨值比，評估公司股價相對於其資產價值的高低`"
-                >
-                    <span style="color: rgb(34, 35, 38); font-size: 11px">PB</span>&nbsp;&nbsp;&nbsp;<b>{{
-                        stockData.per_pbr.pbr.toFixed(2)
-                    }}</b>
-                </span>
-                <span
                     v-if="stockData.eps && stockData.eps.length > 0"
                     style="
                         position: absolute;
-                        top: -44px;
+                        top: -42px;
                         display: inline-block;
-                        min-width: 66px;
+                        min-width: 64px;
                         background: rgb(231 255 251);
                         color: rgb(62 207 188);
                         padding: 0px 3px;
@@ -167,7 +123,7 @@
                         opacity: 0.83;
                         line-height: 1.5;
                         text-align: left;
-                        padding-left: 6px;
+                        padding-left: 5px;
                     "
                     :title="
                         (() => {
@@ -180,17 +136,68 @@
                         })()
                     "
                 >
-                    <span style="color: rgb(34, 35, 38); font-size: 11px">EPS</span
-                    ><b
-                        >{{
-                            (() => {
-                                const latest = stockData.eps.slice().sort((a, b) => b.year - a.year)[0];
-                                const formatted = latest.eps.toFixed(2);
-                                const padding = parseInt(formatted) < 10 ? '\u00A0\u00A0\u00A0' : '\u00A0';
-                                return padding + formatted;
-                            })()
+                    <span
+                        :style="{
+                            color: 'rgb(34, 35, 38)',
+                            fontSize: '11px',
+                            marginRight:
+                                parseInt(stockData.eps.slice().sort((a, b) => b.year - a.year)[0].eps) < 10 ? '9px' : '3px',
+                        }"
+                    >
+                        EPS</span
+                    ><b>
+                        {{
+                            stockData.eps
+                                .slice()
+                                .sort((a, b) => b.year - a.year)[0]
+                                .eps.toFixed(2)
                         }}
                     </b>
+                </span>
+                <span
+                    v-if="stockData.per_pbr"
+                    style="
+                        position: absolute;
+                        top: -21px;
+                        display: inline-block;
+                        min-width: 64px;
+                        background: rgb(241, 256, 209);
+                        color: rgb(81 177 35);
+                        padding: 0px 3px;
+                        border-radius: 10px;
+                        font-size: 12px;
+                        opacity: 0.83;
+                        line-height: 1.5;
+                        text-align: left;
+                        padding-left: 5px;
+                    "
+                    :title="`${stockData.per_pbr.date}，PE: 本益比，評估股價相對於獲益及成長率是否合理`"
+                >
+                    <span style="color: rgb(34, 35, 38); font-size: 11px">PE</span>&nbsp;&nbsp;&nbsp;<b>{{
+                        stockData.per_pbr.per.toFixed(2)
+                    }}</b>
+                </span>
+                <span
+                    v-if="stockData.per_pbr"
+                    style="
+                        position: absolute;
+                        top: 0px;
+                        display: inline-block;
+                        min-width: 64px;
+                        background: rgb(255 241 208);
+                        color: rgb(237 172 15);
+                        padding: 0px 3px;
+                        border-radius: 10px;
+                        font-size: 12px;
+                        opacity: 0.83;
+                        line-height: 1.5;
+                        text-align: left;
+                        padding-left: 5px;
+                    "
+                    :title="`${stockData.per_pbr.date}，PB: 股價淨值比，評估公司股價相對於其資產價值的高低`"
+                >
+                    <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 16px">PB</span
+                    ><b>{{ stockData.per_pbr.pbr.toFixed(2) }}</b>
                 </span>
             </span>
         </div>
