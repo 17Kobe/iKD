@@ -31,6 +31,12 @@ GET https://api.finmindtrade.com/api/v4/data
     &start_date=2020-01-13
     &token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk
 
+### EPS
+GET https://api.finmindtrade.com/api/v4/data
+    ?dataset=TaiwanStockFinancialStatements
+    &data_id=2330
+    &start_date=2020-01-13
+    &token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk
 
 ###
 GET https://api.finmindtrade.com/api/v4/data

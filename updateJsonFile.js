@@ -34,27 +34,30 @@ const today = moment().format('YYYY-MM-DD');
 const funds = [
     {
         name: '富達全球科技基金',
-        url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F00000VTAH:FO;timeslot=2012-01-01T00:00:00Z-' +
+        url:
+            'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F00000VTAH:FO;timeslot=2012-01-01T00:00:00Z-' +
             today +
             'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
         type: 'price',
-        moneyDjUrl: 'https://www.moneydj.com/funddj/yp/yp010001.djhtm?a=FTZR0'
+        moneyDjUrl: 'https://www.moneydj.com/funddj/yp/yp010001.djhtm?a=FTZR0',
     },
     {
         name: '安聯台灣智慧基金',
-        url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F000001V09:FO;timeslot=2012-01-01T00:00:00Z-' +
+        url:
+            'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F000001V09:FO;timeslot=2012-01-01T00:00:00Z-' +
             today +
             'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
         type: 'price',
-        moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010000.djhtm?a=ACDD19'
+        moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010000.djhtm?a=ACDD19',
     },
     {
         name: '貝萊德世界黃金基金A2',
-        url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04AR8:FO;timeslot=2012-01-01T00:00:00Z-' +
+        url:
+            'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04AR8:FO;timeslot=2012-01-01T00:00:00Z-' +
             today +
             'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
         type: 'price',
-        moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=SHZ18'
+        moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=SHZ18',
     },
     // {
     //     name: '貝萊德世界能源基金A2',
@@ -66,11 +69,12 @@ const funds = [
     // },
     {
         name: '元大2至10年投資級企業債券基金',
-        url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F00001EM6G:FO;timeslot=2012-01-01T00:00:00Z-' +
+        url:
+            'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F00001EM6G:FO;timeslot=2012-01-01T00:00:00Z-' +
             today +
             'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
         type: 'price',
-        moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010000.djhtm?a=ACYT175'
+        moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010000.djhtm?a=ACYT175',
     },
     {
         name: '元大2至10年投資級企業債券基金',
@@ -108,9 +112,9 @@ function getPromise(fund) {
                             values.push([date, closePrice]);
                         });
                     }
-                    
+
                     const url2 = fund.moneyDjUrl;
-                    
+
                     if (url2 !== '') {
                         // proxy
                         // 如果IP地址存在於列表中，則設定代理
@@ -176,24 +180,24 @@ function getPromise(fund) {
                 (error, response, html) => {
                     if (!error && response.statusCode === 200) {
                         console.log(`處理 ${fund.name} 的股息數據`);
-                        
+
                         const $ = cheerio.load(html);
                         const data = [];
-                        
+
                         // 找到股息表格 - 這裡需要根據實際的網頁結構調整選擇器
                         // 這個範例假設股息信息在名為 "配息紀錄" 的表格中
                         const targetTable = $('table.t01');
 
                         targetTable.find('tbody tr').each((i, row) => {
                             const tds = $(row).find('td');
-                        
+
                             if (tds.length >= 6) {
                                 const date = $(tds[0]).text().trim(); //配息基準日
-                                const cashExDividendDate = $(tds[1]).text().trim();  // 除息日
+                                const cashExDividendDate = $(tds[1]).text().trim(); // 除息日
                                 const cashDividendPaymentDate = $(tds[2]).text().trim(); // 發放日
                                 const cashEarningsDistribution = parseFloat($(tds[4]).text().trim()); // 每單位分配金額
                                 const dividendYield = parseFloat($(tds[5]).text().trim()) / 4; // 年化配息率
-                        
+
                                 // console.log('配息基準日:', date);
                                 // console.log('除息日:', cashExDividendDate);
                                 // console.log('發放日:', cashDividendPaymentDate);
@@ -205,17 +209,17 @@ function getPromise(fund) {
                                     CashEarningsDistribution: cashEarningsDistribution,
                                     CashExDividendTradingDate: moment(cashExDividendDate, 'YYYY/MM/DD').format('YYYY-MM-DD'),
                                     StockEarningsDistribution: 0,
-                                    StockExDividendTradingDate: "",
+                                    StockExDividendTradingDate: '',
                                     date: moment(date, 'YYYY/MM/DD').format('YYYY-MM-DD'),
-                                    dividendYield: dividendYield  // 若無法算出配息率，可先填 null
+                                    dividendYield: dividendYield, // 若無法算出配息率，可先填 null
                                 });
                             }
                         });
-                        
-                        resolve({ 
-                            name: fund.name, 
-                            values: data.reverse(), 
-                            type: fund.type 
+
+                        resolve({
+                            name: fund.name,
+                            values: data.reverse(),
+                            type: fund.type,
                         });
                     } else {
                         console.error(`取得 ${fund.name} 股息數據時發生錯誤:`, error);
@@ -232,24 +236,24 @@ function getPromise(fund) {
                 (error, response, html) => {
                     if (!error && response.statusCode === 200) {
                         console.log(`處理 ${fund.name} 的股息數據`);
-                        
+
                         const $ = cheerio.load(html);
                         const data = [];
-                        
+
                         // 找到股息表格 - 這裡需要根據實際的網頁結構調整選擇器
                         // 這個範例假設股息信息在名為 "配息紀錄" 的表格中
                         const targetTable = $('table[data-v-f68ae462]');
 
                         targetTable.find('tbody tr').each((i, row) => {
                             const tds = $(row).find('td');
-                        
+
                             if (tds.length >= 6) {
-                                const date = ""; //配息基準日
-                                const cashExDividendDate = $(tds[2]).text().trim();  // 除息日
+                                const date = ''; //配息基準日
+                                const cashExDividendDate = $(tds[2]).text().trim(); // 除息日
                                 const cashDividendPaymentDate = $(tds[3]).text().trim(); // 發放日
                                 const cashEarningsDistribution = parseFloat($(tds[1]).text().trim()); // 每單位分配金額
-                                const dividendYield = cashEarningsDistribution / parseFloat($(tds[4]).text().trim()) * 100; // 配息率
-                        
+                                const dividendYield = (cashEarningsDistribution / parseFloat($(tds[4]).text().trim())) * 100; // 配息率
+
                                 // console.log('配息基準日:', date);
                                 // console.log('除息日:', cashExDividendDate);
                                 // console.log('發放日:', cashDividendPaymentDate);
@@ -261,17 +265,17 @@ function getPromise(fund) {
                                     CashEarningsDistribution: cashEarningsDistribution,
                                     CashExDividendTradingDate: moment(cashExDividendDate, 'YYYY/MM/DD').format('YYYY-MM-DD'),
                                     StockEarningsDistribution: 0,
-                                    StockExDividendTradingDate: "",
-                                    date: "",
-                                    dividendYield: dividendYield  // 若無法算出配息率，可先填 null
+                                    StockExDividendTradingDate: '',
+                                    date: '',
+                                    dividendYield: dividendYield, // 若無法算出配息率，可先填 null
                                 });
                             }
                         });
-                        
-                        resolve({ 
-                            name: fund.name, 
-                            values: data.reverse(), 
-                            type: fund.type 
+
+                        resolve({
+                            name: fund.name,
+                            values: data.reverse(),
+                            type: fund.type,
                         });
                     } else {
                         console.error(`取得 ${fund.name} 股息數據時發生錯誤:`, error);
@@ -298,7 +302,7 @@ Promise.all(funds.map(getPromise)).then(function (results) {
             console.warn(`找不到名稱為 ${result.name} 的股票`);
             return; // 跳過這筆
         }
-        
+
         // 只有在 type 為 'price' 時才更新資料
         if (result.type === 'price') {
             foundStock.data = foundStock.data || {};
@@ -306,7 +310,7 @@ Promise.all(funds.map(getPromise)).then(function (results) {
             foundStock.data.daily = result.values;
         } else if (result.type === 'fund_dividend' || result.type === 'stock_dividend') {
             foundStock.data = foundStock.data || {};
-            foundStock.data.dividend = foundStock.data.dividend || []; 
+            foundStock.data.dividend = foundStock.data.dividend || [];
             foundStock.data.dividend = result.values;
         }
     });
@@ -315,22 +319,22 @@ Promise.all(funds.map(getPromise)).then(function (results) {
         if (_.includes(item.name, '基金')) {
             item.data.daily = _.map(item.data.daily, ([date, value]) => [date, value]); // 移掉open close high low 節省空間
             return item;
-        } else if (item.name === "元大美債20年" || item.name === "元大高股息") {
+        } else if (item.name === '元大美債20年' || item.name === '元大高股息') {
             // 先複製一份data.dividend用於保留
             const dividendData = _.get(item, 'data.dividend', null);
-            
+
             // 刪除整個data對象，之後再將dividend放回去
-            const newItem = _.omit(item, ['data', 'cost', 'crawler_dividend_last_date']);
-            
+            const newItem = _.omit(item, ['data', 'cost', 'crawler_dividend_last_date', 'crawler_eps_last_date']);
+
             // 如果原本有dividend數據，則建立新的data對象只包含dividend
             if (dividendData) {
                 newItem.data = { dividend: dividendData };
             }
-            
+
             return newItem;
         } else {
-            // 非基金，刪除 data, cost, calc_policy_date, crawler_dividend_last_date
-            return _.omit(item, ['data', 'cost', 'crawler_dividend_last_date']);
+            // 非基金，刪除 data, cost, calc_policy_date, crawler_dividend_last_date, 'crawler_eps_last_date'
+            return _.omit(item, ['data', 'cost', 'crawler_dividend_last_date', 'crawler_eps_last_date']);
         }
     });
 

@@ -70,18 +70,18 @@ const stock = {
             // console.log('GET_STOCK_PRICE 0');
 
             await Promise.all(
-                _.map(state.stockList, async (stcokObj) => {
+                _.map(state.stockList, async (stockObj) => {
                     // 為了修改，所以多加 index 及 theArray 參數
                     // console.log(stcokObj);
 
                     // console.log(currStock[index]);
                     let stcokObjType = 'stock';
-                    if (stcokObj.type) stcokObjType = stcokObj.type; // 'fund' or 'exchange';
+                    if (stockObj.type) stcokObjType = stockObj.type; // 'fund' or 'exchange';
 
                     // console.log('GET_STOCK_PRICE 1');
-                    if (stcokObjType === 'stock' && _.has(stcokObj, 'data.daily')) {
+                    if (stcokObjType === 'stock' && _.has(stockObj, 'data.daily')) {
                         // 濾除 即時，即時會有7個元素，正常只有6個元素
-                        stcokObj.data.daily = _.filter(stcokObj.data.daily, (arr) => arr.length !== 7);
+                        stockObj.data.daily = _.filter(stockObj.data.daily, (arr) => arr.length !== 7);
                         // 應該不用算 hash 因為有加時間跟沒加時間是不同
                         // const stockLastUpdateHash = await this.dispatch('CALC_HASH', stcokObj.id);
                         // foundStock.last_update_hash = stockLastUpdateHash;
@@ -120,8 +120,8 @@ const stock = {
                     // console.log('daily=', stcokObj.data.daily);
                     // 判斷若是沒值(即 [] 空array)，若從資料庫取得日期要加1天喔
                     const stockStartDate = moment(
-                        stcokObj.data && stcokObj.data.daily && stcokObj.data.daily.length > 0
-                            ? moment(stcokObj.data.daily[stcokObj.data.daily.length - 1][0]).add(1, 'days')
+                        stockObj.data && stockObj.data.daily && stockObj.data.daily.length > 0
+                            ? moment(stockObj.data.daily[stockObj.data.daily.length - 1][0]).add(1, 'days')
                             : moment().subtract(10, 'years').format('YYYY-MM-DD')
                     ).format('YYYY-MM-DD');
 
@@ -164,7 +164,7 @@ const stock = {
                                 .get('https://api.finmindtrade.com/api/v4/data', {
                                     params: {
                                         dataset: 'TaiwanStockPrice',
-                                        data_id: stcokObj.id,
+                                        data_id: stockObj.id,
                                         start_date: stockStartDate,
                                         token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk',
                                     },
@@ -172,11 +172,11 @@ const stock = {
                                 // 成功
                                 .then((res) => {
                                     // console.log('GET_STOCK_PRICE 4');
-                                    commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: res.data });
+                                    commit('SAVE_STOCK_PRICE', { stockId: stockObj.id, data: res.data });
                                 })
                                 // 失敗
                                 .catch((err) => {
-                                    console.log('GET_STOCK_PRICE error. ' + stcokObj.id);
+                                    console.log('GET_STOCK_PRICE error. ' + stockObj.id);
                                     // commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // ／跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                                     console.log(err);
                                 });
@@ -187,7 +187,7 @@ const stock = {
                                 .get('https://api.finmindtrade.com/api/v4/data', {
                                     params: {
                                         dataset: 'TaiwanExchangeRate',
-                                        data_id: stcokObj.id,
+                                        data_id: stockObj.id,
                                         start_date: stockStartDate,
                                         token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk',
                                     },
@@ -195,18 +195,18 @@ const stock = {
                                 // 成功
                                 .then((res) => {
                                     // console.log('GET_STOCK_PRICE 4');
-                                    commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: res.data });
+                                    commit('SAVE_STOCK_PRICE', { stockId: stockObj.id, data: res.data });
                                 })
                                 // 失敗
                                 .catch((err) => {
-                                    console.log('GET_STOCK_PRICE error. ' + stcokObj.id);
+                                    console.log('GET_STOCK_PRICE error. ' + stockObj.id);
                                     // commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                                     console.log(err);
                                 });
                         } else if (stcokObjType === 'fund') {
                             // console.log('GET_STOCK_PRICE 32');
                             // 基金
-                            commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
+                            commit('SAVE_STOCK_PRICE', { stockId: stockObj.id, data: { data: [] } });
                             // axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
                             // axios
                             //     .get(
@@ -236,70 +236,141 @@ const stock = {
                             // commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                         } else if (stcokObjType === 'fund') {
                             // 基金
-                            commit('SAVE_STOCK_PRICE', { stockId: stcokObj.id, data: { data: [] } });
+                            commit('SAVE_STOCK_PRICE', { stockId: stockObj.id, data: { data: [] } });
                         }
                     }
 
+                    // 取得 PER 和 PBR
                     // 如果 stcokObj.id 不是以 "00" 開頭，額外取得 PER 和 PBR
                     const stockPerPbrStartDate = moment(
-                        stcokObj.per_pbr && stcokObj.per_pbr.date
-                            ? moment(stcokObj.per_pbr.date).add(1, 'days')
+                        stockObj.per_pbr && stockObj.per_pbr.date
+                            ? moment(stockObj.per_pbr.date).add(1, 'days')
                             : moment().subtract(7, 'days').format('YYYY-MM-DD')
                     ).format('YYYY-MM-DD');
 
                     if (moment(siteExistsLatestDate).isSameOrAfter(stockPerPbrStartDate) || force) {
-                        if (stcokObjType === 'stock' && !stcokObj.id.startsWith('00')) {
-
-                            console.log("0000 stcokObj.id", stcokObj.id);
-                            
+                        if (stcokObjType === 'stock' && !stockObj.id.startsWith('00')) {
                             axios
-                            .get('https://api.finmindtrade.com/api/v4/data', {
-                                params: {
-                                    dataset: 'TaiwanStockPER',
-                                    data_id: stcokObj.id,
-                                    start_date: stockPerPbrStartDate,
-                                    token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk',
-                                },
-                            })
-                            .then((res) => {
-                                // res.data 內容如下
-                                // {
-                                //     "msg": "success",
-                                //     "status": 200,
-                                //     "data": [
-                                //         {
-                                //         "date": "2025-04-25",
-                                //         "stock_id": "2330",
-                                //         "dividend_yield": 1.91,
-                                //         "PER": 19.63,
-                                //         "PBR": 5.37
-                                //         },
-                                //         {
-                                //         "date": "2025-04-28",
-                                //         "stock_id": "2330",
-                                //         "dividend_yield": 1.9,
-                                //         "PER": 19.83,
-                                //         "PBR": 5.42
-                                //         }
-                                //     ]
-                                // }
-                                if (res.data && res.data.data && res.data.data.length > 0) {
-                                    // 取得最後一筆資料
-                                    const lastRecord = res.data.data[res.data.data.length - 1];
-                                    // 準備要存入的物件
-                                    const perPbrData = {
-                                        date: lastRecord.date,
-                                        dividend_yield: lastRecord.dividend_yield,
-                                        per: lastRecord.PER,
-                                        pbr: lastRecord.PBR,
-                                    };
-                                    // 儲存至 DB 的 per_pbr
-                                    commit('SAVE_STOCK_PER_PBR', { stockId: stcokObj.id, per_pbr: perPbrData });
-                                }
-                            })
-                            .catch((error) => {
-                                console.error('Error fetching PER and PBR for stockId: ' + stcokObj.id, error);
-                            });
+                                .get('https://api.finmindtrade.com/api/v4/data', {
+                                    params: {
+                                        dataset: 'TaiwanStockPER',
+                                        data_id: stockObj.id,
+                                        start_date: stockPerPbrStartDate,
+                                        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk',
+                                    },
+                                })
+                                .then((res) => {
+                                    // res.data 內容如下
+                                    // {
+                                    //     "msg": "success",
+                                    //     "status": 200,
+                                    //     "data": [
+                                    //         {
+                                    //         "date": "2025-04-25",
+                                    //         "stock_id": "2330",
+                                    //         "dividend_yield": 1.91,
+                                    //         "PER": 19.63,
+                                    //         "PBR": 5.37
+                                    //         },
+                                    //         {
+                                    //         "date": "2025-04-28",
+                                    //         "stock_id": "2330",
+                                    //         "dividend_yield": 1.9,
+                                    //         "PER": 19.83,
+                                    //         "PBR": 5.42
+                                    //         }
+                                    //     ]
+                                    // }
+                                    if (res.data && res.data.data && res.data.data.length > 0) {
+                                        // 取得最後一筆資料
+                                        const lastRecord = res.data.data[res.data.data.length - 1];
+                                        // 準備要存入的物件
+                                        const perPbrData = {
+                                            date: lastRecord.date,
+                                            dividend_yield: lastRecord.dividend_yield,
+                                            per: lastRecord.PER,
+                                            pbr: lastRecord.PBR,
+                                        };
+                                        // 儲存至 DB 的 per_pbr
+                                        commit('SAVE_STOCK_PER_PBR', { stockId: stockObj.id, per_pbr: perPbrData });
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error('Error fetching PER and PBR for stockId: ' + stockObj.id, error);
+                                });
+                        }
+                    }
+
+                    // 取得 EPS
+                    const stockEpsStartDate = moment(
+                        stockObj.crawler_eps_last_date
+                            ? moment(stockObj.crawler_eps_last_date).add(1, 'days')
+                            : moment().subtract(10, 'years').format('YYYY-MM-DD')
+                    ).format('YYYY-MM-DD');
+
+                    if (moment(siteExistsLatestDate).isSameOrAfter(stockEpsStartDate) || force) {
+                        if (stcokObjType === 'stock' && !stockObj.id.startsWith('00')) {
+                            axios
+                                .get('https://api.finmindtrade.com/api/v4/data', {
+                                    params: {
+                                        dataset: 'TaiwanStockFinancialStatements',
+                                        data_id: stockObj.id,
+                                        start_date: stockEpsStartDate,
+                                        token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk',
+                                    },
+                                })
+                                .then((res) => {
+                                    // {
+                                    //     "msg": "success",
+                                    //     "status": 200,
+                                    //     "data": [{
+                                    //             "date": "2024-12-31",
+                                    //             "stock_id": "2330",
+                                    //             "type": "EPS",
+                                    //             "value": 14.45,
+                                    //             "origin_name": "基本每股盈餘（元）"
+                                    //             },]
+                                    // }
+                                    if (res.data && res.data.data && res.data.data.length > 0) {
+                                        // 儲存至 DB 的 EPS
+                                        const epsItems = res.data.data.filter((item) => item.type === 'EPS');
+
+                                        // 建立暫時的 map，累積每年 EPS
+                                        const epsMap = {};
+
+                                        epsItems.forEach((item) => {
+                                            const year = moment(item.date).format('YYYY');
+                                            const epsValue = item.value;
+
+                                            if (!epsMap[year]) {
+                                                epsMap[year] = 0;
+                                            }
+                                            epsMap[year] += epsValue;
+                                        });
+
+                                        // 建立新的 EPS 陣列 (不直接修改 stockObj.eps)
+                                        const oldEps = stockObj.eps || [];
+                                        const newEpsList = [...oldEps]; // 深拷貝
+
+                                        Object.entries(epsMap).forEach(([year, newValue]) => {
+                                            const existing = newEpsList.find((e) => e.year === year);
+                                            if (existing) {
+                                                existing.eps += newValue;
+                                            } else {
+                                                newEpsList.push({ year, eps: newValue });
+                                            }
+                                        });
+
+                                        // 一次性 commit 新的 eps 陣列
+                                        commit('SAVE_STOCK_EPS', {
+                                            stockId: stockObj.id,
+                                            eps: newEpsList,
+                                        });
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error('Error fetching EPS for stockId: ' + stockObj.id, error);
+                                });
                         }
                     }
 
@@ -361,16 +432,15 @@ const stock = {
                 siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
 
             state.stockList.forEach((stcokObj) => {
-
                 // const localcrawlerDividendLastDate =
                 //     moment(stcokObj.crawler_dividend_last_date).add(1, 'days') || moment().subtract(10, 'years');
                 // const localcrawlerDividendLastDate = moment(stcokObj.crawler_dividend_last_date).add(1, 'days') || moment().subtract(10, 'years');
                 // 必須是有買的才要去抓未來配息
-                
+
                 if (
                     ((stockId === null && stcokObj.cost) || stockId === stcokObj.id) &&
-                    ((stcokObj.type !== 'fund' &&
-                    stcokObj.type !== 'exchange' && stcokObj.is_dividend !== false) || stcokObj.name.includes('債'))
+                    ((stcokObj.type !== 'fund' && stcokObj.type !== 'exchange' && stcokObj.is_dividend !== false) ||
+                        stcokObj.name.includes('債'))
                 ) {
                     const stockDataDividend = _.has(stcokObj, 'data.dividend') ? stcokObj.data.dividend : [];
                     const localcrawlerDividendLastDate = moment(
@@ -390,7 +460,6 @@ const stock = {
                         // 為了只下一次API，但還要抓二年的資料回來算平均
                         if (stcokObj.name === '元大2至10年投資級企業債券基金' || stcokObj.name === '元大美債20年') {
                             console.log('不能抓，因為有cors問題');
-
                         } else {
                             axios
                                 .get('https://api.finmindtrade.com/api/v4/data', {
@@ -422,7 +491,7 @@ const stock = {
                                 .catch((err) => {
                                     console.log(err);
                                 });
-                            }
+                        }
                     } else if (stcokObj.cost) {
                         //在 || stockId === stcokObj.id情況，要有 cost 才要結算
                         commit('SAVE_STOCK_HISTORY_DIVIDEND_LIST', {
@@ -1510,6 +1579,15 @@ const stock = {
             }
         },
 
+        async SAVE_STOCK_EPS(state, { stockId, eps }) {
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            if (foundStock) {
+                foundStock.eps = eps;
+                foundStock.crawler_eps_last_date = moment().format('YYYY-MM-DD HH:mm:ss');
+                await saveStockToDb('stockList', foundStock);
+            }
+        },
+
         async SAVE_STOCK_PRICE(state, { stockId, data, realtime = false }) {
             console.log('SAVE_STOCK_PRICE', stockId);
             // console.log(data);
@@ -1779,7 +1857,7 @@ const stock = {
 
                 const cash = parseFloat(element.CashEarningsDistribution || 0); //  + parseFloat(element.CashStatutorySurplus || 0)
                 const stock = parseFloat(element.StockEarningsDistribution || 0);
-        
+
                 // 若現金 + 股票股利同時為 0，跳過，因為0056有同時為0，可能是日期出來但還沒確定多少的
                 if (cash === 0 && stock === 0) {
                     return;
