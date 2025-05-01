@@ -95,7 +95,7 @@
         </div>
 
         <div
-            v-if="stockData && stockData.per_pbr"
+            v-if="stockData"
             style="
                 display: flex;
                 justify-content: space-between;
@@ -109,6 +109,7 @@
         >
             <span style="order: 1; position: relative">
                 <span
+                    v-if="stockData.per_pbr"
                     style="
                         position: absolute;
                         top: 0px;
@@ -126,9 +127,10 @@
                     "
                     :title="`${stockData.per_pbr.date}，PE: 本益比，評估股價相對於獲益及成長率是否合理`"
                 >
-                    PE <b>{{ stockData.per_pbr.per.toFixed(2) }}</b>
+                    <span style="color: rgb(34, 35, 38); font-size: 11px">PE</span> <b>{{ stockData.per_pbr.per.toFixed(2) }}</b>
                 </span>
                 <span
+                    v-if="stockData.per_pbr"
                     style="
                         position: absolute;
                         top: -21px;
@@ -146,7 +148,49 @@
                     "
                     :title="`${stockData.per_pbr.date}，PB: 股價淨值比，評估公司股價相對於其資產價值的高低`"
                 >
-                    PB&nbsp;&nbsp;&nbsp;<b>{{ stockData.per_pbr.pbr.toFixed(2) }}</b>
+                    <span style="color: rgb(34, 35, 38); font-size: 11px">PB</span>&nbsp;&nbsp;&nbsp;<b>{{
+                        stockData.per_pbr.pbr.toFixed(2)
+                    }}</b>
+                </span>
+                <span
+                    v-if="stockData.eps && stockData.eps.length > 0"
+                    style="
+                        position: absolute;
+                        top: -44px;
+                        display: inline-block;
+                        min-width: 66px;
+                        background: rgb(231 255 251);
+                        color: rgb(62 207 188);
+                        padding: 0px 3px;
+                        border-radius: 10px;
+                        font-size: 12px;
+                        opacity: 0.83;
+                        line-height: 1.5;
+                        text-align: left;
+                        padding-left: 6px;
+                    "
+                    :title="
+                        (() => {
+                            const items = stockData.eps
+                                .slice()
+                                .sort((a, b) => b.year - a.year)
+                                .slice(0, 3)
+                                .map((e) => `${e.year}年 [${e.eps.toFixed(2)}]`);
+                            return 'EPS: 每股盈餘，反映公司獲利能力。' + items.join(', ');
+                        })()
+                    "
+                >
+                    <span style="color: rgb(34, 35, 38); font-size: 11px">EPS</span
+                    ><b
+                        >{{
+                            (() => {
+                                const latest = stockData.eps.slice().sort((a, b) => b.year - a.year)[0];
+                                const formatted = latest.eps.toFixed(2);
+                                const padding = parseInt(formatted) < 10 ? '\u00A0\u00A0\u00A0' : '\u00A0';
+                                return padding + formatted;
+                            })()
+                        }}
+                    </b>
                 </span>
             </span>
         </div>
