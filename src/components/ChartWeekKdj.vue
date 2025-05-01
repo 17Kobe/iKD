@@ -140,19 +140,19 @@
                         :style="{
                             color: 'rgb(34, 35, 38)',
                             fontSize: '11px',
-                            marginRight:
-                                parseInt(stockData.eps.slice().sort((a, b) => b.year - a.year)[0].eps) < 10 ? '9px' : '3px',
+                            marginRight: (() => {
+                                const eps = parseInt(stockData.eps.slice().sort((a, b) => b.year - a.year)[0].eps);
+                                const base = eps < 10 ? 9 + (this.isMobile ? 1 : 0) : 3;
+                                return base + (this.isMobile ? 1 : 0) + 'px';
+                            })(),
                         }"
-                    >
-                        EPS</span
-                    ><b>
-                        {{
-                            stockData.eps
-                                .slice()
-                                .sort((a, b) => b.year - a.year)[0]
-                                .eps.toFixed(2)
-                        }}
-                    </b>
+                        >EPS</span
+                    ><b>{{
+                        stockData.eps
+                            .slice()
+                            .sort((a, b) => b.year - a.year)[0]
+                            .eps.toFixed(2)
+                    }}</b>
                 </span>
                 <span
                     v-if="stockData.per_pbr"
@@ -216,10 +216,15 @@ export default {
     props: ['parentData', 'showJLine'],
     data() {
         return {
+            isMobile: true,
             // chartOptions: {
             // },
             //
         };
+    },
+    mounted() {
+        this.isMobile =
+            /Mobi|Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
     },
     computed: {
         // 如果您希望最大值和最小值使用天花板和地板的十進位值，而不使用偏移量，您可以將 chartMinMaxValues 函數修改如下：
@@ -883,7 +888,6 @@ export default {
             };
         },
     },
-    created() {},
     watch: {},
     methods: {},
 };
