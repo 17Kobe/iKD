@@ -4,12 +4,25 @@
 # 當發生錯誤時終止腳本運行
 set -e
 # 先將 遠端部份檔案備份回來
-cd dist
 # 因為dist資料夾預設是被ignore的，因此在進入dist資料夾後初始化git，先取回 dist 的 my_localstorage.json
-git fetch origin gh-pages
-git reset --hard origin/gh-pages
-# 先強制拉碼，公司也可以更新家裡已commit內容
-cd -
+# 定義變數
+DIST_DIR="dist"
+BRANCH="gh-pages"
+REPO_URL=$(git config --get remote.origin.url)
+
+# 如果 dist/.git 不存在，就 clone gh-pages 分支
+if [ ! -d "$DIST_DIR/.git" ]; then
+    echo "Cloning $BRANCH branch into $DIST_DIR..."
+    rm -rf "$DIST_DIR" # 確保乾淨
+    git clone --branch $BRANCH $REPO_URL $DIST_DIR
+else
+    echo "Using existing git repo in $DIST_DIR..."
+    cd $DIST_DIR
+    git fetch origin $BRANCH
+    git reset --hard origin/$BRANCH
+    cd -
+fi
+
 git pull origin master --force
 # 更新美金匯率及基金每日淨值至JSON檔案內
 node updateJsonFile.js
