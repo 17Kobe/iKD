@@ -332,39 +332,18 @@ const stock = {
                                     //             },]
                                     // }
                                     if (res.data && res.data.data && res.data.data.length > 0) {
-                                        // 儲存至 DB 的 EPS
-                                        const epsItems = res.data.data.filter((item) => item.type === 'EPS');
-
-                                        // 建立暫時的 map，累積每年 EPS
-                                        const epsMap = {};
-
-                                        epsItems.forEach((item) => {
-                                            const year = moment(item.date).format('YYYY');
-                                            const epsValue = item.value;
-
-                                            if (!epsMap[year]) {
-                                                epsMap[year] = 0;
-                                            }
-                                            epsMap[year] += epsValue;
-                                        });
-
-                                        // 建立新的 EPS 陣列 (不直接修改 stockObj.eps)
-                                        const oldEps = stockObj.eps || [];
-                                        const newEpsList = [...oldEps]; // 深拷貝
-
-                                        Object.entries(epsMap).forEach(([year, newValue]) => {
-                                            const existing = newEpsList.find((e) => e.year === year);
-                                            if (existing) {
-                                                existing.eps += newValue;
-                                            } else {
-                                                newEpsList.push({ year, eps: newValue });
-                                            }
-                                        });
-
-                                        // 一次性 commit 新的 eps 陣列
+                                        // 只保留 type 為 EPS 的項目，並精簡欄位
+                                        const epsRawItems = res.data.data
+                                            .filter((item) => item.type === 'EPS')
+                                            .map((item) => ({
+                                                date: item.date,
+                                                value: item.value,
+                                            }));
+                    
+                                        // 儲存原始 EPS 資料
                                         commit('SAVE_STOCK_EPS', {
                                             stockId: stockObj.id,
-                                            eps: newEpsList,
+                                            eps: epsRawItems,
                                         });
                                     }
                                 })
@@ -1582,7 +1561,19 @@ const stock = {
         async SAVE_STOCK_EPS(state, { stockId, eps }) {
             const foundStock = state.stockList.find((v) => v.id === stockId);
             if (foundStock) {
-                foundStock.eps = eps;
+                const oldEps = foundStock.eps || [];
+        
+                // 合併舊資料與新資料，避免重複日期
+                const merged = [...oldEps];
+        
+                eps.forEach((newItem) => {
+                    const exists = merged.find((item) => item.date === newItem.date);
+                    if (!exists) {
+                        merged.push(newItem);
+                    }
+                });
+        
+                foundStock.eps = merged;
                 foundStock.crawler_eps_last_date = moment().format('YYYY-MM-DD HH:mm:ss');
                 await saveStockToDb('stockList', foundStock);
             }

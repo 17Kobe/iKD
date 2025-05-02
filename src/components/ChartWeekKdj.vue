@@ -126,36 +126,38 @@
                         padding-left: 5px;
                     "
                 >
-                    <el-tooltip :visible="tooltipVisible" :content="
-                        (() => {
-                            const items = stockData.eps
-                                .slice()
-                                .sort((a, b) => b.year - a.year)
-                                .slice(0, 3)
-                                .map((e) => `${e.year}年 [${e.eps.toFixed(2)}]`);
-                            return 'EPS: 每股盈餘，反映公司獲利能力。' + items.join(', ');
-                        })()
-                    " placement="top">
-                        <div @click="tooltipVisible = !tooltipVisible">
-                            <span
-                                :style="{
-                                    color: 'rgb(34, 35, 38)',
-                                    fontSize: '11px',
-                                    marginRight: (() => {
-                                        const eps = parseInt(stockData.eps.slice().sort((a, b) => b.year - a.year)[0].eps);
-                                        const base = eps < 10 ? 9 + (this.isMobile ? 1 : 0) : 3;
-                                        return base + (this.isMobile ? 1 : 0) + 'px';
-                                    })(),
-                                }"
-                                >EPS</span
-                            ><b>{{
-                                stockData.eps
-                                    .slice()
-                                    .sort((a, b) => b.year - a.year)[0]
-                                    .eps.toFixed(2)
-                            }}</b>
+                <el-tooltip
+                    :visible="tooltipVisible"
+                    raw-content
+                    placement="bottom-end"
+                    >
+                    <template #content>
+                        <div>
+                        EPS: 每股盈餘，反映公司獲利能力。
+                        <br />
+                        <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0;"></span>
+                        <span v-for="(item, index) in formattedEps.slice().reverse()" :key="index">
+                            {{ item.date }}　[{{ item.value < 10 ? '&nbsp;&nbsp;' : '' }}{{ item.value.toFixed(2) }}]
+                            <span v-if="item.acc">　[{{ item.acc < 10 ? '&nbsp;&nbsp;' : '' }}{{ item.acc }}]</span>
+                            <br />
+                            <span v-if="item.date.endsWith('03-31')" style="display: block; border-top: 1px solid #ccc; margin: 4px 0;"></span>
+                        </span>
                         </div>
-                    </el-tooltip>
+                    </template>
+                    <div @click="tooltipVisible = !tooltipVisible">
+                        <span
+                        :style="{
+                            color: 'rgb(34, 35, 38)',
+                            fontSize: '11px',
+                            marginRight: (() => {
+                            const eps = formattedEps.length > 0 ? formattedEps[formattedEps.length - 1].acc : 0;
+                            const base = eps < 10 ? 9 + (this.isMobile ? 1 : 0) : 3;
+                            return base + (this.isMobile ? 1 : 0) + 'px';
+                            })(),
+                        }"
+                        >EPS</span><b>{{ formattedEps.length > 0 ? formattedEps[formattedEps.length - 1].acc : '' }}</b>
+                    </div>
+                </el-tooltip>
                 </span>
                 <span
                     v-if="stockData.per_pbr"
@@ -220,7 +222,7 @@ export default {
     data() {
         return {
             isMobile: true,
-            tooltipVisible: false
+            tooltipVisible: false,
             // chartOptions: {
             // },
             //
@@ -259,6 +261,24 @@ export default {
             console.log('stockData');
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
             return this.$store.getters.getStock(this.parentData);
+        },
+        formattedEps() {
+            if (!this.stockData || !this.stockData.eps) return [];
+
+            // 按年份分組
+            const groupedByYear = _.groupBy(this.stockData.eps, (item) => item.date.split('-')[0]);
+
+            // 計算每年累積值，並保留所有月份資料，但只有最後一個日期有 acc
+            const result = _.flatMap(groupedByYear, (yearData) => {
+                const acc = _.sumBy(yearData, 'value'); // 計算累積值
+                const lastDate = _.last(yearData).date; // 每年最後一個日期
+                return yearData.map((entry) => ({
+                    ...entry,
+                    acc: entry.date === lastDate ? acc.toFixed(2) : null, // 只有最後一個日期有 acc
+                }));
+            });
+
+            return result;
         },
         kdj() {
             console.log('kdj');
