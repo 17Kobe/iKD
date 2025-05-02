@@ -106,7 +106,7 @@ function getPromise(fund) {
                 (error, response, body) => {
                     console.log(response.statusCode);
                     let values = [];
-                    if (body.data.dates.length > 0) {
+                    if (body && body.data && body.data.dates && body.data.dates.length > 0) {
                         body.data.dates.forEach((date, index) => {
                             const closePrice = parseFloat(body.data.closePrices[index]);
                             values.push([date, closePrice]);

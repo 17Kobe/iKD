@@ -125,7 +125,8 @@
                         text-align: left;
                         padding-left: 5px;
                     "
-                    :title="
+                >
+                    <el-tooltip :visible="tooltipVisible" :content="
                         (() => {
                             const items = stockData.eps
                                 .slice()
@@ -134,25 +135,27 @@
                                 .map((e) => `${e.year}年 [${e.eps.toFixed(2)}]`);
                             return 'EPS: 每股盈餘，反映公司獲利能力。' + items.join(', ');
                         })()
-                    "
-                >
-                    <span
-                        :style="{
-                            color: 'rgb(34, 35, 38)',
-                            fontSize: '11px',
-                            marginRight: (() => {
-                                const eps = parseInt(stockData.eps.slice().sort((a, b) => b.year - a.year)[0].eps);
-                                const base = eps < 10 ? 9 + (this.isMobile ? 1 : 0) : 3;
-                                return base + (this.isMobile ? 1 : 0) + 'px';
-                            })(),
-                        }"
-                        >EPS</span
-                    ><b>{{
-                        stockData.eps
-                            .slice()
-                            .sort((a, b) => b.year - a.year)[0]
-                            .eps.toFixed(2)
-                    }}</b>
+                    " placement="top">
+                        <div @click="tooltipVisible = !tooltipVisible">
+                            <span
+                                :style="{
+                                    color: 'rgb(34, 35, 38)',
+                                    fontSize: '11px',
+                                    marginRight: (() => {
+                                        const eps = parseInt(stockData.eps.slice().sort((a, b) => b.year - a.year)[0].eps);
+                                        const base = eps < 10 ? 9 + (this.isMobile ? 1 : 0) : 3;
+                                        return base + (this.isMobile ? 1 : 0) + 'px';
+                                    })(),
+                                }"
+                                >EPS</span
+                            ><b>{{
+                                stockData.eps
+                                    .slice()
+                                    .sort((a, b) => b.year - a.year)[0]
+                                    .eps.toFixed(2)
+                            }}</b>
+                        </div>
+                    </el-tooltip>
                 </span>
                 <span
                     v-if="stockData.per_pbr"
@@ -217,6 +220,7 @@ export default {
     data() {
         return {
             isMobile: true,
+            tooltipVisible: false
             // chartOptions: {
             // },
             //
