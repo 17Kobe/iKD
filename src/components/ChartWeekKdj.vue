@@ -132,16 +132,17 @@
                     placement="bottom-end"
                     >
                     <template #content>
-                        <div>
-                        EPS: 每股盈餘，反映公司獲利能力。
-                        <br />
-                        <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0;"></span>
-                        <span v-for="(item, index) in formattedEps.slice().reverse()" :key="index">
-                            {{ item.date }}　[{{ item.value < 10 ? '&nbsp;&nbsp;' : '' }}{{ item.value.toFixed(2) }}]
-                            <span v-if="item.acc">　[{{ item.acc < 10 ? '&nbsp;&nbsp;' : '' }}{{ item.acc }}]</span>
+                        <div style="white-space: pre; font-family: 'Lucida Console', monospace;">
+                            EPS: 每股盈餘，反映公司獲利能力。
                             <br />
-                            <span v-if="item.date.endsWith('03-31')" style="display: block; border-top: 1px solid #ccc; margin: 4px 0;"></span>
-                        </span>
+                            <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0;"></span>
+                            <span v-for="(item, index) in formattedEps.slice().reverse()" :key="index">
+                                <span style="margin-left: 10px">{{ item.date }}</span>
+                                <span style="margin-left: 23px">{{ item.value < 10 ? ' ' : '' }}{{ item.value.toFixed(2) }}</span>
+                                <span v-if="item.acc" style="margin-left: 23px">{{ item.acc < 10 ? ' ' : '' }}{{ item.acc }}</span>
+                                <br />
+                                <span v-if="item.date.endsWith('03-31')" style="display: block; border-top: 1px solid #ccc; margin: 4px 0;"></span>
+                            </span>
                         </div>
                     </template>
                     <div @click="tooltipVisible = !tooltipVisible">
