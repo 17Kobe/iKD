@@ -126,7 +126,7 @@
                         padding-left: 5px;
                     "
                 >
-                    <el-tooltip :visible="tooltipVisible" raw-content placement="bottom-end">
+                    <el-tooltip :visible="epsTooltipVisible" raw-content placement="bottom-end">
                         <template #content>
                             <div style="white-space: pre; font-family: 'Lucida Console', monospace">
                                 EPS: 每股盈餘，反映公司獲利能力。
@@ -148,7 +148,7 @@
                                 </span>
                             </div>
                         </template>
-                        <div @click="tooltipVisible = !tooltipVisible">
+                        <div @click="epsTooltipVisible = !epsTooltipVisible">
                             <span
                                 :style="{
                                     color: 'rgb(34, 35, 38)',
@@ -182,12 +182,18 @@
                         padding-left: 5px;
                     "
                 >
-                    <el-tooltip
-                        effect="dark"
-                        placement="bottom-end"
-                        :content="`${stockData.per_pbr.date}，PE: 本益比，評估股價相對於獲益及成長率是否合理`"
-                    >
-                        <div>
+                    <el-tooltip :visible="peTooltipVisible" effect="dark" placement="bottom-end">
+                        <template #content>
+                            <div style="white-space: pre; font-family: 'Lucida Console', monospace">
+                                PE: 本益比，評估股價相對於獲益及成長率是否合理。
+                                <br />
+                                <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
+                                計算日期: {{ stockData.per_pbr.date }}
+                                <br />
+                                本益比(PE): {{ stockData.per_pbr.per.toFixed(2) }}
+                            </div>
+                        </template>
+                        <div @click="peTooltipVisible = !peTooltipVisible">
                             <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 10px">PE</span>
                             <b>{{ stockData.per_pbr.per.toFixed(2) }}</b>
                         </div>
@@ -212,13 +218,18 @@
                         padding-left: 5px;
                     "
                 >
-                    <el-tooltip
-                        effect="dark"
-                        placement="bottom-end"
-                        :content="`PB: 股價淨值比，評估公司股價相對於其資產價值的高低<br>${stockData.per_pbr.date}`"
-                        raw-content
-                    >
-                        <div>
+                    <el-tooltip :visible="pbTooltipVisible" effect="dark" placement="bottom-end">
+                        <template #content>
+                            <div style="white-space: pre; font-family: 'Lucida Console', monospace">
+                                PB: 股價淨值比，評估公司股價相對於其資產價值的高低。
+                                <br />
+                                <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
+                                計算日期: {{ stockData.per_pbr.date }}
+                                <br />
+                                股價淨值比(PB): {{ stockData.per_pbr.pbr.toFixed(2) }}
+                            </div>
+                        </template>
+                        <div @click="pbTooltipVisible = !pbTooltipVisible">
                             <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 16px">PB</span>
                             <b>{{ stockData.per_pbr.pbr.toFixed(2) }}</b>
                         </div>
@@ -242,7 +253,9 @@ export default {
     data() {
         return {
             isMobile: true,
-            tooltipVisible: false,
+            epsTooltipVisible: false,
+            peTooltipVisible: false,
+            pbTooltipVisible: false,
             // chartOptions: {
             // },
             //
