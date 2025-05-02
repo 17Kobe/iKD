@@ -82,7 +82,26 @@
                         'cell-chart',
                     ]"
                 >
-                    {{ status }}
+                    <el-tooltip :visible="tooltipVisible[index]" effect="dark" placement="bottom-end">
+                        <template #content>
+                            <div style="white-space: pre; font-family: 'Lucida Console', monospace">
+                                {{
+                                    status === 'KD 高檔鈍化'
+                                        ? '連續3根K值在80以上'
+                                        : status === 'KD 低檔鈍化'
+                                        ? '連續3根K值在20以下'
+                                        : status === 'KD ≥ 80超買'
+                                        ? 'K值>=80為超買'
+                                        : status === 'KD ≤ 20超賣'
+                                        ? 'K值<=20為超賣'
+                                        : status.includes('合理價')
+                                        ? '近7年平均殖利率的20倍作為估算(中華電使用25倍)'
+                                        : '無說明'
+                                }}
+                            </div>
+                        </template>
+                        <div @click="toggleTooltip(index)">{{ status }}</div>
+                    </el-tooltip>
                 </span>
             </span>
 
@@ -253,6 +272,9 @@ export default {
     data() {
         return {
             isMobile: true,
+
+            tooltipVisible: [], // 用來儲存每個 status 的 tooltip 狀態
+
             epsTooltipVisible: false,
             peTooltipVisible: false,
             pbTooltipVisible: false,
@@ -945,7 +967,21 @@ export default {
             };
         },
     },
-    watch: {},
-    methods: {},
+    watch: {
+        stockData: {
+            immediate: true,
+            handler(newVal) {
+                if (newVal && newVal.kd_status) {
+                    // 初始化 tooltipVisible 陣列
+                    this.tooltipVisible = newVal.kd_status.map(() => false);
+                }
+            },
+        },
+    },
+    methods: {
+        toggleTooltip(index) {
+            this.tooltipVisible[index] = !this.tooltipVisible[index];
+        },
+    },
 };
 </script>
