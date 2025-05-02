@@ -23,19 +23,6 @@
                 <span
                     v-for="(status, index) in stockData.rsi_status"
                     :key="index"
-                    :title="
-                        status === 'RSI ≥ 70超買'
-                            ? 'RSI(5)值>=70為超買'
-                            : status === 'RSI ≤ 30超賣'
-                            ? 'RSI(5)值<=30為超賣'
-                            : status === 'RSI 接近最高'
-                            ? 'RSI(5)值接近歷史最高(<=3以內)'
-                            : status === 'RSI 最高' && rsi5[rsi5.length - 1][1] >= 50
-                            ? 'RSI(5)值高於歷史最高值(' + Math.round(stockData.data.weekly_rsi_max * 100) / 100 + ')'
-                            : status === 'RSI 最高' && rsi5[rsi5.length - 1][1] <= 50
-                            ? 'RSI(5)值低於歷史最低值(' + Math.round(stockData.data.weekly_rsi_min * 100) / 100 + ')'
-                            : ''
-                    "
                     :style="{
                         position: 'absolute',
                         top: -index * 22 + 'px',
@@ -66,7 +53,24 @@
                         'cell-chart',
                     ]"
                 >
-                    {{ status }}
+                    <el-tooltip :trigger="popoverTrigger" effect="dark" placement="bottom-end">
+                        <template #content>
+                            {{
+                                status === 'RSI ≥ 70超買'
+                                    ? 'RSI(5)值>=70為超買'
+                                    : status === 'RSI ≤ 30超賣'
+                                    ? 'RSI(5)值<=30為超賣'
+                                    : status === 'RSI 接近最高'
+                                    ? 'RSI(5)值接近歷史最高(<=3以內)'
+                                    : status === 'RSI 最高' && rsi5[rsi5.length - 1][1] >= 50
+                                    ? 'RSI(5)值高於歷史最高值(' + Math.round(stockData.data.weekly_rsi_max * 100) / 100 + ')'
+                                    : status === 'RSI 最高' && rsi5[rsi5.length - 1][1] <= 50
+                                    ? 'RSI(5)值低於歷史最低值(' + Math.round(stockData.data.weekly_rsi_min * 100) / 100 + ')'
+                                    : ''
+                            }}
+                        </template>
+                        <div>{{ status }}</div>
+                    </el-tooltip>
                 </span>
             </span>
             <span style="order: 2">
@@ -161,7 +165,10 @@
                         :plain="true"
                         size="mini"
                         style="position: absolute; left: 17px; top: 6px; padding: 0px 8px"
-                        v-if="(stockData.type !== 'exchange' && stockData.type !== 'fund' && stockData.is_dividend !== false) || stockData.name.includes('債')"
+                        v-if="
+                            (stockData.type !== 'exchange' && stockData.type !== 'fund' && stockData.is_dividend !== false) ||
+                            stockData.name.includes('債')
+                        "
                         @click="getDividend"
                         >息</el-button
                     >
