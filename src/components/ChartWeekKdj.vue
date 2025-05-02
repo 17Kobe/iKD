@@ -126,39 +126,43 @@
                         padding-left: 5px;
                     "
                 >
-                <el-tooltip
-                    :visible="tooltipVisible"
-                    raw-content
-                    placement="bottom-end"
-                    >
-                    <template #content>
-                        <div style="white-space: pre; font-family: 'Lucida Console', monospace;">
-                            EPS: 每股盈餘，反映公司獲利能力。
-                            <br />
-                            <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0;"></span>
-                            <span v-for="(item, index) in formattedEps.slice().reverse()" :key="index">
-                                <span style="margin-left: 10px">{{ item.date }}</span>
-                                <span style="margin-left: 23px">{{ item.value < 10 ? ' ' : '' }}{{ item.value.toFixed(2) }}</span>
-                                <span v-if="item.acc" style="margin-left: 23px">{{ item.acc < 10 ? ' ' : '' }}{{ item.acc }}</span>
+                    <el-tooltip :visible="tooltipVisible" raw-content placement="bottom-end">
+                        <template #content>
+                            <div style="white-space: pre; font-family: 'Lucida Console', monospace">
+                                EPS: 每股盈餘，反映公司獲利能力。
                                 <br />
-                                <span v-if="item.date.endsWith('03-31')" style="display: block; border-top: 1px solid #ccc; margin: 4px 0;"></span>
-                            </span>
+                                <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
+                                <span v-for="(item, index) in formattedEps.slice().reverse()" :key="index">
+                                    <span style="margin-left: 10px">{{ item.date }}</span>
+                                    <span style="margin-left: 23px"
+                                        >{{ item.value < 10 ? ' ' : '' }}{{ item.value.toFixed(2) }}</span
+                                    >
+                                    <span v-if="item.acc" style="margin-left: 23px"
+                                        >{{ item.acc < 10 ? ' ' : '' }}{{ item.acc }}</span
+                                    >
+                                    <br />
+                                    <span
+                                        v-if="item.date.endsWith('03-31')"
+                                        style="display: block; border-top: 1px solid #ccc; margin: 4px 0"
+                                    ></span>
+                                </span>
+                            </div>
+                        </template>
+                        <div @click="tooltipVisible = !tooltipVisible">
+                            <span
+                                :style="{
+                                    color: 'rgb(34, 35, 38)',
+                                    fontSize: '11px',
+                                    marginRight: (() => {
+                                        const eps = formattedEps.length > 0 ? formattedEps[formattedEps.length - 1].acc : 0;
+                                        const base = eps < 10 ? 9 + (this.isMobile ? 1 : 0) : 3;
+                                        return base + (this.isMobile ? 1 : 0) + 'px';
+                                    })(),
+                                }"
+                                >EPS</span
+                            ><b>{{ formattedEps.length > 0 ? formattedEps[formattedEps.length - 1].acc : '' }}</b>
                         </div>
-                    </template>
-                    <div @click="tooltipVisible = !tooltipVisible">
-                        <span
-                        :style="{
-                            color: 'rgb(34, 35, 38)',
-                            fontSize: '11px',
-                            marginRight: (() => {
-                            const eps = formattedEps.length > 0 ? formattedEps[formattedEps.length - 1].acc : 0;
-                            const base = eps < 10 ? 9 + (this.isMobile ? 1 : 0) : 3;
-                            return base + (this.isMobile ? 1 : 0) + 'px';
-                            })(),
-                        }"
-                        >EPS</span><b>{{ formattedEps.length > 0 ? formattedEps[formattedEps.length - 1].acc : '' }}</b>
-                    </div>
-                </el-tooltip>
+                    </el-tooltip>
                 </span>
                 <span
                     v-if="stockData.per_pbr"
@@ -177,12 +181,19 @@
                         text-align: left;
                         padding-left: 5px;
                     "
-                    :title="`${stockData.per_pbr.date}，PE: 本益比，評估股價相對於獲益及成長率是否合理`"
                 >
-                    <span style="color: rgb(34, 35, 38); font-size: 11px">PE</span>&nbsp;&nbsp;&nbsp;<b>{{
-                        stockData.per_pbr.per.toFixed(2)
-                    }}</b>
+                    <el-tooltip
+                        effect="dark"
+                        placement="bottom-end"
+                        :content="`${stockData.per_pbr.date}，PE: 本益比，評估股價相對於獲益及成長率是否合理`"
+                    >
+                        <div>
+                            <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 10px">PE</span>
+                            <b>{{ stockData.per_pbr.per.toFixed(2) }}</b>
+                        </div>
+                    </el-tooltip>
                 </span>
+
                 <span
                     v-if="stockData.per_pbr"
                     style="
@@ -200,10 +211,18 @@
                         text-align: left;
                         padding-left: 5px;
                     "
-                    :title="`${stockData.per_pbr.date}，PB: 股價淨值比，評估公司股價相對於其資產價值的高低`"
                 >
-                    <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 16px">PB</span
-                    ><b>{{ stockData.per_pbr.pbr.toFixed(2) }}</b>
+                    <el-tooltip
+                        effect="dark"
+                        placement="bottom-end"
+                        :content="`PB: 股價淨值比，評估公司股價相對於其資產價值的高低<br>${stockData.per_pbr.date}`"
+                        raw-content
+                    >
+                        <div>
+                            <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 16px">PB</span>
+                            <b>{{ stockData.per_pbr.pbr.toFixed(2) }}</b>
+                        </div>
+                    </el-tooltip>
                 </span>
             </span>
         </div>
