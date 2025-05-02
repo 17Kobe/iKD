@@ -23,64 +23,75 @@
             >
                 <template #default="scope">
                     <div style="width: 95px; display: inline-block">
-                        <el-badge
-                            :title="getBadgeTitle(scope.row.badge_reason)"
-                            :value="scope.row.badge"
-                            class="item"
-                            :class="[['買', '買x2', '賣', '賣½', '賣⅓'].includes(scope.row.badge) ? 'shake-base' : '', 'item']"
-                            :type="
-                                ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge)
-                                    ? 'danger'
-                                    : ['取消買', '取消買x2', '取消賣', '取消賣½'].includes(scope.row.badge)
-                                    ? 'info'
-                                    : 'success'
-                            "
-                            :style="{
-                                'border-radius': '8px',
-                                padding: '3px',
-                                color: 'white',
-                                background:
-                                    scope.row.type === 'fund' ? '#e6a23c' : scope.row.type === 'exchange' ? '#f56c6c' : '#409eff',
-                            }"
-                        >
-                            <span
-                                style="font-size: 16px; font-weight: bold; cursor: pointer"
-                                @click="goToStockAnalysis(scope.row.id, scope.row.url)"
-                                v-html="
-                                    [
-                                        '元大美債20年',
-                                        '群益台灣精選高息',
-                                        '國泰永續高股息',
-                                        '安聯台灣智慧基金',
-                                        '富達全球科技基金',
-                                        '期元大S&P黃金',
-                                        '期元大S&P石油',
-                                        '元大S&P500',
-                                        '國泰20年美債',
-                                        '元大台灣高息低波',
-                                        '復華台灣科技優息',
-                                        '群益ESG投等債20+',
-                                        '元大2至10年投資級企業債券基金',
-                                    ].includes(scope.row.name)
-                                        ? scope.row.name
-                                              .replace('美債20年', '<br />美債20年')
-                                              .replace('精選高息', '<br />精選高息')
-                                              .replace('高股息', '<br />高股息')
-                                              .replace('智慧基金', '<br />智慧基金')
-                                              .replace('科技基金', '<br />科技基金')
-                                              .replace('S&P黃金', '<br />S&P黃金')
-                                              .replace('S&P石油', '<br />S&P石油')
-                                              .replace('S&P500', '<br />S&P500')
-                                              .replace('20年美債', '<br />20年美債')
-                                              .replace('高息低波', '<br />高息低波')
-                                              .replace('科技優息', '<br />科技優息')
-                                              .replace('年投資級企業債券基金', '<br />年債券基金')
-                                              .replace('投等債20+', '<br />投等債20+')
-                                        : scope.row.name
+                        <el-tooltip :trigger="popoverTrigger" effect="dark" placement="right">
+                            <template #content>
+                                {{ getBadgeTitle(scope.row.badge_reason) }}
+                            </template>
+                            <el-badge
+                                :value="scope.row.badge"
+                                class="item"
+                                :class="[
+                                    ['買', '買x2', '賣', '賣½', '賣⅓'].includes(scope.row.badge) ? 'shake-base' : '',
+                                    'item',
+                                ]"
+                                :type="
+                                    ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge)
+                                        ? 'danger'
+                                        : ['取消買', '取消買x2', '取消賣', '取消賣½'].includes(scope.row.badge)
+                                        ? 'info'
+                                        : 'success'
                                 "
+                                :style="{
+                                    'border-radius': '8px',
+                                    padding: '3px',
+                                    color: 'white',
+                                    background:
+                                        scope.row.type === 'fund'
+                                            ? '#e6a23c'
+                                            : scope.row.type === 'exchange'
+                                            ? '#f56c6c'
+                                            : '#409eff',
+                                }"
                             >
-                            </span>
-                        </el-badge>
+                                <span
+                                    style="font-size: 16px; font-weight: bold; cursor: pointer"
+                                    @click="goToStockAnalysis(scope.row.id, scope.row.url)"
+                                    v-html="
+                                        [
+                                            '元大美債20年',
+                                            '群益台灣精選高息',
+                                            '國泰永續高股息',
+                                            '安聯台灣智慧基金',
+                                            '富達全球科技基金',
+                                            '期元大S&P黃金',
+                                            '期元大S&P石油',
+                                            '元大S&P500',
+                                            '國泰20年美債',
+                                            '元大台灣高息低波',
+                                            '復華台灣科技優息',
+                                            '群益ESG投等債20+',
+                                            '元大2至10年投資級企業債券基金',
+                                        ].includes(scope.row.name)
+                                            ? scope.row.name
+                                                  .replace('美債20年', '<br />美債20年')
+                                                  .replace('精選高息', '<br />精選高息')
+                                                  .replace('高股息', '<br />高股息')
+                                                  .replace('智慧基金', '<br />智慧基金')
+                                                  .replace('科技基金', '<br />科技基金')
+                                                  .replace('S&P黃金', '<br />S&P黃金')
+                                                  .replace('S&P石油', '<br />S&P石油')
+                                                  .replace('S&P500', '<br />S&P500')
+                                                  .replace('20年美債', '<br />20年美債')
+                                                  .replace('高息低波', '<br />高息低波')
+                                                  .replace('科技優息', '<br />科技優息')
+                                                  .replace('年投資級企業債券基金', '<br />年債券基金')
+                                                  .replace('投等債20+', '<br />投等債20+')
+                                            : scope.row.name
+                                    "
+                                >
+                                </span>
+                            </el-badge>
+                        </el-tooltip>
                         <br />
 
                         <span
@@ -189,9 +200,9 @@
                 </template>
                 <template #default="scope">
                     <div
-                    class="chart-wrapper"
-                    :ref="el => observeChart(el, scope.$index, 'kdj')"
-                    :data-index="`${scope.$index}-kdj`"
+                        class="chart-wrapper"
+                        :ref="(el) => observeChart(el, scope.$index, 'kdj')"
+                        :data-index="`${scope.$index}-kdj`"
                     >
                         <ChartWeekKdj
                             v-if="visibleCharts.includes(`${scope.$index}-kdj`)"
@@ -209,14 +220,11 @@
                 </template>
                 <template #default="scope">
                     <div
-                    class="chart-wrapper"
-                    :ref="el => observeChart(el, scope.$index, 'rsi')"
-                    :data-index="`${scope.$index}-rsi`"
+                        class="chart-wrapper"
+                        :ref="(el) => observeChart(el, scope.$index, 'rsi')"
+                        :data-index="`${scope.$index}-rsi`"
                     >
-                        <ChartWeekRsi
-                            v-if="visibleCharts.includes(`${scope.$index}-rsi`)"
-                            :parentData="scope.row.id"
-                        />
+                        <ChartWeekRsi v-if="visibleCharts.includes(`${scope.$index}-rsi`)" :parentData="scope.row.id" />
                     </div>
                 </template>
             </el-table-column>
@@ -227,14 +235,11 @@
                 </template>
                 <template #default="scope">
                     <div
-                    class="chart-wrapper"
-                    :ref="el => observeChart(el, scope.$index, 'kline')"
-                    :data-index="`${scope.$index}-kline`"
+                        class="chart-wrapper"
+                        :ref="(el) => observeChart(el, scope.$index, 'kline')"
+                        :data-index="`${scope.$index}-kline`"
                     >
-                        <ChartWeekK
-                            v-if="visibleCharts.includes(`${scope.$index}-kline`)"
-                            :parentData="scope.row.id"
-                        />
+                        <ChartWeekK v-if="visibleCharts.includes(`${scope.$index}-kline`)" :parentData="scope.row.id" />
                     </div>
                     <!-- <ChartWeekK :parentData="scope.row.id" v-if="renderStockCount >= scope.$index" /> -->
                 </template>
@@ -905,6 +910,8 @@ export default {
 
             visibleCharts: [],
             observer: null,
+
+            popoverTrigger: 'hover', // 預設為 hover
         };
     },
     computed: {
@@ -977,10 +984,13 @@ export default {
                             // tempStockObj.data.dividend = _.cloneDeep(foundStock.data.dividend);
 
                             // 用此語法取代上面二行
-                            Object.assign(tempStockObj.data, _.cloneDeep({
-                                daily: foundStock.data.daily,
-                                dividend: foundStock.data.dividend
-                            }));
+                            Object.assign(
+                                tempStockObj.data,
+                                _.cloneDeep({
+                                    daily: foundStock.data.daily,
+                                    dividend: foundStock.data.dividend,
+                                })
+                            );
                         } else if (obj.name === '元大美債20年' || obj.name === '元大高股息') {
                             const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
                             tempStockObj.data.dividend = _.cloneDeep(foundStock.data.dividend);
@@ -1045,6 +1055,8 @@ export default {
         // 在 mounted() 事件時就可以發送，因為此時不須 data 及 computed 資料都準備好(因為沒有要data 參數，在create())
         this.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
+        // 根據裝置類型設定觸發方式
+        this.popoverTrigger = this.isMobile ? 'click' : 'hover';
         // setTimeout(() => {
         //     // 加這個確定是2秒後才會去 dispatch
         //     this.$store.dispatch('GET_STOCK_PRICE');
@@ -1069,19 +1081,22 @@ export default {
             el.dataset.index = key;
 
             if (!this.observer) {
-                this.observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                    const index = entry.target.dataset.index;
-                    if (!this.visibleCharts.includes(index)) {
-                        this.visibleCharts.push(index);
+                this.observer = new IntersectionObserver(
+                    (entries) => {
+                        entries.forEach((entry) => {
+                            if (entry.isIntersecting) {
+                                const index = entry.target.dataset.index;
+                                if (!this.visibleCharts.includes(index)) {
+                                    this.visibleCharts.push(index);
+                                }
+                            }
+                        });
+                    },
+                    {
+                        root: null,
+                        threshold: 0.1,
                     }
-                    }
-                });
-                }, {
-                root: null,
-                threshold: 0.1,
-                });
+                );
             }
 
             this.observer.observe(el);
