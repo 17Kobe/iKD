@@ -82,7 +82,7 @@
                         'cell-chart',
                     ]"
                 >
-                    <el-tooltip :visible="tooltipVisible[index]" effect="dark" placement="bottom-end">
+                    <el-tooltip :trigger="popoverTrigger" effect="dark" placement="bottom-end">
                         <template #content>
                             <div style="white-space: pre; font-family: 'Lucida Console', monospace">
                                 {{
@@ -100,7 +100,9 @@
                                 }}
                             </div>
                         </template>
-                        <div @click="toggleTooltip(index)">{{ status }}</div>
+                        <div>
+                            {{ status }}
+                        </div>
                     </el-tooltip>
                 </span>
             </span>
@@ -145,7 +147,7 @@
                         padding-left: 5px;
                     "
                 >
-                    <el-tooltip :visible="epsTooltipVisible" raw-content placement="bottom-end">
+                    <el-tooltip :trigger="popoverTrigger" raw-content placement="bottom-end">
                         <template #content>
                             <div style="white-space: pre; font-family: 'Lucida Console', monospace">
                                 EPS: 每股盈餘，反映公司獲利能力。
@@ -167,7 +169,7 @@
                                 </span>
                             </div>
                         </template>
-                        <div @click="epsTooltipVisible = !epsTooltipVisible">
+                        <div>
                             <span
                                 :style="{
                                     color: 'rgb(34, 35, 38)',
@@ -201,7 +203,7 @@
                         padding-left: 5px;
                     "
                 >
-                    <el-tooltip :visible="peTooltipVisible" effect="dark" placement="bottom-end">
+                    <el-tooltip :trigger="popoverTrigger" effect="dark" placement="bottom-end">
                         <template #content>
                             <div style="white-space: pre; font-family: 'Lucida Console', monospace">
                                 PE: 本益比，評估股價相對於獲益及成長率是否合理。
@@ -212,7 +214,7 @@
                                 本益比(PE): {{ stockData.per_pbr.per.toFixed(2) }}
                             </div>
                         </template>
-                        <div @click="peTooltipVisible = !peTooltipVisible">
+                        <div>
                             <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 10px">PE</span>
                             <b>{{ stockData.per_pbr.per.toFixed(2) }}</b>
                         </div>
@@ -237,7 +239,7 @@
                         padding-left: 5px;
                     "
                 >
-                    <el-tooltip :visible="pbTooltipVisible" effect="dark" placement="bottom-end">
+                    <el-tooltip :trigger="popoverTrigger" effect="dark" placement="bottom-end">
                         <template #content>
                             <div style="white-space: pre; font-family: 'Lucida Console', monospace">
                                 PB: 股價淨值比，評估公司股價相對於其資產價值的高低。
@@ -248,7 +250,7 @@
                                 股價淨值比(PB): {{ stockData.per_pbr.pbr.toFixed(2) }}
                             </div>
                         </template>
-                        <div @click="pbTooltipVisible = !pbTooltipVisible">
+                        <div>
                             <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 16px">PB</span>
                             <b>{{ stockData.per_pbr.pbr.toFixed(2) }}</b>
                         </div>
@@ -273,11 +275,7 @@ export default {
         return {
             isMobile: true,
 
-            tooltipVisible: [], // 用來儲存每個 status 的 tooltip 狀態
-
-            epsTooltipVisible: false,
-            peTooltipVisible: false,
-            pbTooltipVisible: false,
+            popoverTrigger: 'hover', // 預設為 hover
             // chartOptions: {
             // },
             //
@@ -286,6 +284,9 @@ export default {
     mounted() {
         this.isMobile =
             /Mobi|Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+        // 根據裝置類型設定觸發方式
+        this.popoverTrigger = this.isMobile ? 'click' : 'hover';
     },
     computed: {
         // 如果您希望最大值和最小值使用天花板和地板的十進位值，而不使用偏移量，您可以將 chartMinMaxValues 函數修改如下：
@@ -965,22 +966,6 @@ export default {
                     },
                 ],
             };
-        },
-    },
-    watch: {
-        stockData: {
-            immediate: true,
-            handler(newVal) {
-                if (newVal && newVal.kd_status) {
-                    // 初始化 tooltipVisible 陣列
-                    this.tooltipVisible = newVal.kd_status.map(() => false);
-                }
-            },
-        },
-    },
-    methods: {
-        toggleTooltip(index) {
-            this.tooltipVisible[index] = !this.tooltipVisible[index];
         },
     },
 };
