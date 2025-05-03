@@ -158,9 +158,15 @@
                                     <span style="margin-left: 23px"
                                         >{{ item.value < 10 ? ' ' : '' }}{{ item.value.toFixed(2) }}</span
                                     >
-                                    <span v-if="item.acc" style="margin-left: 23px"
-                                        >{{ item.acc < 10 ? ' ' : '' }}{{ item.acc }}</span
+                                    <span
+                                        v-if="item.acc"
+                                        :style="{
+                                            marginLeft: '23px',
+                                            color: index === 0 ? 'rgb(255, 182, 193)' : 'inherit',
+                                        }"
                                     >
+                                        {{ item.acc < 10 ? ' ' : '' }}{{ item.acc }}
+                                    </span>
                                     <br />
                                     <span
                                         v-if="item.date.endsWith('03-31')"
