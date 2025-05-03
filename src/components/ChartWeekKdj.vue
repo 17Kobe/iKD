@@ -209,9 +209,14 @@
                                 PE: 本益比，評估股價相對於獲益及成長率是否合理。
                                 <br />
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
-                                計算日期: {{ stockData.per_pbr.date }}
+                                &nbsp;最新 本益比:
+                                <span style="color: rgb(255, 182, 193)"> {{ stockData.per_pbr.per.toFixed(2) }} </span>
                                 <br />
-                                本益比(PE): {{ stockData.per_pbr.per.toFixed(2) }}
+                                <span v-if="stockData.name === '台積電'">&nbsp;&nbsp;近 5 年平均本益比: 21.34</span>
+                                <span v-else-if="stockData.name === '聯發科'">&nbsp;&nbsp;近 5 年平均本益比: 21.8</span>
+                                <span v-else-if="stockData.name === '元大金'">&nbsp;&nbsp;近 5 年平均本益比: 11.2</span>
+                                <br />
+                                &nbsp;計算日期: {{ stockData.per_pbr.date }}
                             </div>
                         </template>
                         <div>
@@ -245,9 +250,14 @@
                                 PB: 股價淨值比，評估公司股價相對於其資產價值的高低。
                                 <br />
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
-                                計算日期: {{ stockData.per_pbr.date }}
+                                &nbsp;最新 股價淨值比:
+                                <span style="color: rgb(255, 182, 193)">{{ stockData.per_pbr.pbr.toFixed(2) }}</span>
                                 <br />
-                                股價淨值比(PB): {{ stockData.per_pbr.pbr.toFixed(2) }}
+                                <span v-if="stockData.name === '台積電'">&nbsp;&nbsp;近 5 年平均股價淨值比: 6.2</span>
+                                <span v-else-if="stockData.name === '聯發科'">&nbsp;&nbsp;近 5 年平均股價淨值比: 4.0</span>
+                                <span v-else-if="stockData.name === '元大金'">&nbsp;&nbsp;近 5 年平均股價淨值比: 1.2</span>
+                                <br />
+                                &nbsp;計算日期: {{ stockData.per_pbr.date }}
                             </div>
                         </template>
                         <div>
