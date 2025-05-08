@@ -711,16 +711,16 @@ export default {
                         align: 'end',
                         position: 'bottom',
                         text: [
-                            `【現金】${(this.demandDeposit / 10000).toFixed(1).padStart(5)} 萬    ` +
+                            `【現金】${(this.demandDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
                             `【定存】${(this.fixedDeposit / 10000).toFixed(1).padStart(5)} 萬`,
-                            `【存股】${(this.chtStockDeposit / 10000).toFixed(1).padStart(5)} 萬    ` +
+                            `【存股】${(this.chtStockDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
                             `【股票】${(this.stockDeposit / 10000).toFixed(1).padStart(5)} 萬`,
-                            `【債券】${(this.bondDeposit / 10000).toFixed(1).padStart(5)} 萬    ` +
+                            `【債券】${(this.bondDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
                             `【其它】${(this.otherDeposit / 10000).toFixed(1).padStart(5)} 萬`,
                         ],
                         font: {
                             size: 13,
-                            family: "'Lucida Console', monospace",
+                            family: '"PingFang TC", monospace'
                         },
                     },
                     datalabels: {
