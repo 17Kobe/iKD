@@ -302,13 +302,35 @@ const stock = {
                     }
 
                     // 取得 EPS
-                    const stockEpsStartDate = moment(
+                    const stockMarketEnsuredCloseTime = moment('15:00:00', 'hh:mm:ss');
+                    let siteEnsuredExistsLatestDate = moment().format('YYYY-MM-DD');
+                    // console.log(currentTime.day());
+                    if (currentTime.day() === 6)
+                        // 星期六，不算了，就減一天
+                        siteEnsuredExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
+                    else if (currentTime.day() === 0)
+                        // 星期日，不算了，就減二天
+                        siteEnsuredExistsLatestDate = moment().subtract(2, 'days').format('YYYY-MM-DD');
+                    else if (currentTime.day() === 1 && currentTime.isBefore(stockMarketEnsuredCloseTime))
+                        // 星期一且還沒交易結束時間，不算了，就減三天
+                        siteEnsuredExistsLatestDate = moment().subtract(3, 'days').format('YYYY-MM-DD');
+                    else if (currentTime.isBefore(stockMarketEnsuredCloseTime))
+                        // 如果目前時間少於交易結束時間，則要減一天
+                        siteEnsuredExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
+
+                    const stockEpsCrawlerDate = moment(
                         stockObj.crawler_eps_last_date
                             ? moment(stockObj.crawler_eps_last_date).add(1, 'days')
                             : moment().subtract(10, 'years').format('YYYY-MM-DD')
                     ).format('YYYY-MM-DD');
 
-                    if (moment(siteExistsLatestDate).isSameOrAfter(stockEpsStartDate) || force) {
+                    const stockEpsStartDate = moment(
+                        stockObj.crawler_eps_last_date
+                            ? moment(stockObj.crawler_done_eps_last_date).add(1, 'days')
+                            : moment().subtract(10, 'years').format('YYYY-MM-DD')
+                    ).format('YYYY-MM-DD');
+
+                    if (moment(siteEnsuredExistsLatestDate).isSameOrAfter(stockEpsCrawlerDate) || force) {
                         if (stcokObjType === 'stock' && !stockObj.id.startsWith('00')) {
                             axios
                                 .get('https://api.finmindtrade.com/api/v4/data', {
@@ -331,6 +353,10 @@ const stock = {
                                     //             "origin_name": "基本每股盈餘（元）"
                                     //             },]
                                     // }
+                                    commit('SAVE_STOCK_EPS_CRAWLER_LAST_DATE', {
+                                        stockId: stockObj.id,
+                                    });
+
                                     if (res.data && res.data.data && res.data.data.length > 0) {
                                         // 只保留 type 為 EPS 的項目，並精簡欄位
                                         const epsRawItems = res.data.data
@@ -339,7 +365,7 @@ const stock = {
                                                 date: item.date,
                                                 value: item.value,
                                             }));
-                    
+
                                         // 儲存原始 EPS 資料
                                         commit('SAVE_STOCK_EPS', {
                                             stockId: stockObj.id,
@@ -1558,23 +1584,31 @@ const stock = {
             }
         },
 
+        async SAVE_STOCK_EPS_CRAWLER_LAST_DATE(state, { stockId }) {
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            if (foundStock) {
+                foundStock.crawler_eps_last_date = moment().format('YYYY-MM-DD HH:mm:ss');
+                await saveStockToDb('stockList', foundStock);
+            }
+        },
+
         async SAVE_STOCK_EPS(state, { stockId, eps }) {
             const foundStock = state.stockList.find((v) => v.id === stockId);
             if (foundStock) {
                 const oldEps = foundStock.eps || [];
-        
+
                 // 合併舊資料與新資料，避免重複日期
                 const merged = [...oldEps];
-        
+
                 eps.forEach((newItem) => {
                     const exists = merged.find((item) => item.date === newItem.date);
                     if (!exists) {
                         merged.push(newItem);
                     }
                 });
-        
+
                 foundStock.eps = merged;
-                foundStock.crawler_eps_last_date = moment().format('YYYY-MM-DD HH:mm:ss');
+                foundStock.crawler_done_eps_last_date = moment().format('YYYY-MM-DD HH:mm:ss');
                 await saveStockToDb('stockList', foundStock);
             }
         },
