@@ -240,22 +240,22 @@ const stock = {
                         }
                     }
 
-                    // 取得 PER 和 PBR
-                    // 如果 stcokObj.id 不是以 "00" 開頭，額外取得 PER 和 PBR
-                    const stockPerPbrStartDate = moment(
-                        stockObj.per_pbr && stockObj.per_pbr.date
-                            ? moment(stockObj.per_pbr.date).add(1, 'days')
-                            : moment().subtract(7, 'days').format('YYYY-MM-DD')
+                    // 取得 DY 和 PER 和 PBR
+                    // 如果 stcokObj.id 不是以 "00" 開頭，額外取得 DY 和 PER 和 PBR
+                    const stockDyPerPbrStartDate = moment(
+                        stockObj.data && stockObj.data.dy_per_pbr_date
+                            ? moment(stockObj.data.dy_per_pbr_date).add(1, 'days')
+                            : moment().subtract(5, 'years').format('YYYY-MM-DD')
                     ).format('YYYY-MM-DD');
 
-                    if (moment(siteExistsLatestDate).isSameOrAfter(stockPerPbrStartDate) || force) {
+                    if (moment(siteExistsLatestDate).isSameOrAfter(stockDyPerPbrStartDate) || force) {
                         if (stcokObjType === 'stock' && !stockObj.id.startsWith('00')) {
                             axios
                                 .get('https://api.finmindtrade.com/api/v4/data', {
                                     params: {
                                         dataset: 'TaiwanStockPER',
                                         data_id: stockObj.id,
-                                        start_date: stockPerPbrStartDate,
+                                        start_date: stockDyPerPbrStartDate,
                                         token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRlIjoiMjAyNC0wMS0wMiAxNTowODoyMyIsInVzZXJfaWQiOiIxN2tvYmUiLCJpcCI6IjIxMC43MS4yMTcuMjUxIn0.Dl5cEreMFOqT_4rrpwHwApyVn6vrEovKPMP3-zygpHk',
                                     },
                                 })
@@ -282,17 +282,24 @@ const stock = {
                                     //     ]
                                     // }
                                     if (res.data && res.data.data && res.data.data.length > 0) {
-                                        // 取得最後一筆資料
-                                        const lastRecord = res.data.data[res.data.data.length - 1];
-                                        // 準備要存入的物件
-                                        const perPbrData = {
-                                            date: lastRecord.date,
-                                            dividend_yield: lastRecord.dividend_yield,
-                                            per: lastRecord.PER,
-                                            pbr: lastRecord.PBR,
-                                        };
-                                        // 儲存至 DB 的 per_pbr
-                                        commit('SAVE_STOCK_PER_PBR', { stockId: stockObj.id, per_pbr: perPbrData });
+                                        // // 取得最後一筆資料
+                                        // const lastRecord = res.data.data[res.data.data.length - 1];
+                                        // // 準備要存入的物件
+                                        // const perPbrData = {
+                                        //     date: lastRecord.date,
+                                        //     dividend_yield: lastRecord.dividend_yield,
+                                        //     per: lastRecord.PER,
+                                        //     pbr: lastRecord.PBR,
+                                        // };
+                                        // 每天的資料都存進 DB
+                                        const dyPerPbrList = res.data.data.map((record) => ({
+                                            date: record.date,
+                                            dy: record.dividend_yield,
+                                            per: record.PER,
+                                            pbr: record.PBR,
+                                        }));
+                                        // 儲存至 DB 的 dy_per_pbr
+                                        commit('SAVE_STOCK_DY_PER_PBR', { stockId: stockObj.id, dy_per_pbr: dyPerPbrList });
                                     }
                                 })
                                 .catch((error) => {
@@ -1576,10 +1583,49 @@ const stock = {
             this.commit('SAVE_STOCK_POLICY_RESULT', stockId);
         },
 
-        async SAVE_STOCK_PER_PBR(state, { stockId, per_pbr }) {
-            const foundStock = state.stockList.find((v) => v.id === stockId);
+        async SAVE_STOCK_DY_PER_PBR(state, { stockId, dy_per_pbr }) {
+            const foundStock = _.find(state.stockList, { id: stockId });
             if (foundStock) {
-                foundStock.per_pbr = per_pbr;
+                if (!_.isArray(foundStock.data.dy_per_pbr)) {
+                    foundStock.data.dy_per_pbr = [];
+                }
+
+                const newItems = _.isArray(dy_per_pbr) ? dy_per_pbr : [dy_per_pbr];
+
+                // 直接 append
+                Array.prototype.push.apply(foundStock.data.dy_per_pbr, newItems);
+
+                // 取近5年的資料
+                const fiveYearsAgo = moment().subtract(5, 'years');
+                const last5Years = _.filter(foundStock.data.dy_per_pbr, (item) =>
+                    moment(item.date, 'YYYY-MM-DD').isSameOrAfter(fiveYearsAgo)
+                );
+
+                const extract = (arr, key) => _.map(arr, key).filter(_.isNumber);
+
+                const calcStats = (values) => {
+                    const sorted = _.sortBy(values);
+                    const mean = _.mean(sorted);
+                    const median =
+                        sorted.length % 2 === 1
+                            ? sorted[Math.floor(sorted.length / 2)]
+                            : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
+                    const last = _.last(values);
+                    const max = _.max(sorted);
+                    const min = _.min(sorted);
+                    return { mean, median, last, max, min };
+                };
+
+                const perList = extract(last5Years, 'per');
+                const pbrList = extract(last5Years, 'pbr');
+                const dyList = extract(last5Years, 'dy');
+
+                const lastItem = _.last(_.sortBy(last5Years, (item) => moment(item.date, 'YYYY-MM-DD')));
+
+                foundStock.data.per = calcStats(perList);
+                foundStock.data.pbr = calcStats(pbrList);
+                foundStock.data.dy = calcStats(dyList);
+                foundStock.data.dy_per_pbr_date = lastItem?.date || null;
                 await saveStockToDb('stockList', foundStock);
             }
         },
@@ -1595,7 +1641,7 @@ const stock = {
         async SAVE_STOCK_EPS(state, { stockId, eps }) {
             const foundStock = state.stockList.find((v) => v.id === stockId);
             if (foundStock) {
-                const oldEps = foundStock.eps || [];
+                const oldEps = foundStock.data.eps || [];
 
                 // 合併舊資料與新資料，避免重複日期
                 const merged = [...oldEps];
@@ -1607,7 +1653,7 @@ const stock = {
                     }
                 });
 
-                foundStock.eps = merged;
+                foundStock.data.eps = merged;
                 foundStock.crawler_done_eps_last_date = moment().format('YYYY-MM-DD HH:mm:ss');
                 await saveStockToDb('stockList', foundStock);
             }

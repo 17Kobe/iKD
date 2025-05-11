@@ -328,12 +328,28 @@
             </el-table-column>
             <el-table-column label="本益比" width="55" align="right" v-if="modeSpread === '目前'">
                 <template #default="scope">
-                    {{ scope.row.per_pbr && scope.row.per_pbr.per !== undefined ? parseFloat(scope.row.per_pbr.per).toFixed(2) : '' }}
+                    {{
+                        scope.row.data && scope.row.data.per && scope.row.data.per.last !== undefined
+                            ? parseFloat(scope.row.data.per.last).toFixed(2)
+                            : ''
+                    }}
                 </template>
             </el-table-column>
             <el-table-column label="股價淨值比" width="78" align="right" v-if="modeSpread === '目前'">
                 <template #default="scope">
-                    {{ scope.row.per_pbr && scope.row.per_pbr.pbr !== undefined ? parseFloat(scope.row.per_pbr.pbr).toFixed(2) : '' }}
+                    {{
+                        scope.row.data && scope.row.data.pbr && scope.row.data.pbr.last !== undefined
+                            ? parseFloat(scope.row.data.pbr.last).toFixed(2)
+                            : ''
+                    }}
+                </template>
+            </el-table-column>
+            <el-table-column label="殖利率" width="78" align="right" v-if="modeSpread === '目前'">
+                <template #default="scope">
+                    <span v-if="scope.row.data && scope.row.data.dy && scope.row.data.dy.last !== undefined">
+                        {{ parseFloat(scope.row.data.dy.last).toFixed(2) }}<span style="margin-left: 2px">%</span>
+                    </span>
+                    <span v-else></span>
                 </template>
             </el-table-column>
             <el-table-column label="代號&nbsp;&nbsp;" width="110" align="right" v-if="modeSpread === '目前'">

@@ -130,10 +130,10 @@
         >
             <span style="order: 1; position: relative">
                 <span
-                    v-if="stockData.eps && stockData.eps.length > 0"
+                    v-if="stockData.data && stockData.data.eps && stockData.data.eps.length > 0"
                     style="
                         position: absolute;
-                        top: -42px;
+                        top: -63px;
                         display: inline-block;
                         min-width: 64px;
                         background: rgb(231 255 251);
@@ -192,10 +192,10 @@
                     </el-tooltip>
                 </span>
                 <span
-                    v-if="stockData.per_pbr"
+                    v-if="stockData.data && stockData.data.per && stockData.data.dy_per_pbr_date"
                     style="
                         position: absolute;
-                        top: -21px;
+                        top: -42px;
                         display: inline-block;
                         min-width: 64px;
                         background: rgb(241, 256, 209);
@@ -215,28 +215,37 @@
                                 PE: 本益比，評估股價相對於獲益及成長率是否合理。
                                 <br />
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
-                                &nbsp;最新 本益比:
-                                <span style="color: rgb(255, 182, 193)"> {{ stockData.per_pbr.per.toFixed(2) }} </span>
+                                &nbsp;<span style="color: #bbb">最新</span> 本益比:
+                                <span style="color: rgb(255, 182, 193)"> {{ stockData.data.per.last.toFixed(2) }} </span>
                                 <br />
-                                <span v-if="stockData.name === '台積電'">&nbsp;&nbsp;近 5 年平均本益比: 21.34</span>
-                                <span v-else-if="stockData.name === '聯發科'">&nbsp;&nbsp;近 5 年平均本益比: 21.8</span>
-                                <span v-else-if="stockData.name === '元大金'">&nbsp;&nbsp;近 5 年平均本益比: 11.2</span>
+                                &nbsp;近 5 年 <span style="color: #bbb">平均</span> 本益比:
+                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.per.mean.toFixed(2) }}</span>
                                 <br />
-                                &nbsp;計算日期: {{ stockData.per_pbr.date }}
+                                &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 本益比:
+                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.per.median.toFixed(2) }}</span>
+                                <br />
+                                &nbsp;近 5 年 <span style="color: #bbb">最高</span> 本益比:
+                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.per.max.toFixed(2) }}</span>
+                                <br />
+                                &nbsp;近 5 年 <span style="color: #bbb">最低</span> 本益比:
+                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.per.min.toFixed(2) }}</span>
+                                <br />
+                                &nbsp;計算日期:
+                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
                             </div>
                         </template>
                         <div>
                             <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 10px">PE</span>
-                            <b>{{ stockData.per_pbr.per.toFixed(2) }}</b>
+                            <b>{{ stockData.data.per.last.toFixed(2) }}</b>
                         </div>
                     </el-tooltip>
                 </span>
 
                 <span
-                    v-if="stockData.per_pbr"
+                    v-if="stockData.data && stockData.data.pbr && stockData.data.dy_per_pbr_date"
                     style="
                         position: absolute;
-                        top: 0px;
+                        top: -21px;
                         display: inline-block;
                         min-width: 64px;
                         background: rgb(255 241 208);
@@ -256,19 +265,89 @@
                                 PB: 股價淨值比，評估公司股價相對於其資產價值的高低。
                                 <br />
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
-                                &nbsp;最新 股價淨值比:
-                                <span style="color: rgb(255, 182, 193)">{{ stockData.per_pbr.pbr.toFixed(2) }}</span>
+                                &nbsp;<span style="color: #bbb">最新</span> 股價淨值比:
+                                <span style="color: rgb(255, 182, 193)">{{ stockData.data.pbr.last.toFixed(2) }}</span>
                                 <br />
-                                <span v-if="stockData.name === '台積電'">&nbsp;&nbsp;近 5 年平均股價淨值比: 6.2</span>
-                                <span v-else-if="stockData.name === '聯發科'">&nbsp;&nbsp;近 5 年平均股價淨值比: 4.0</span>
-                                <span v-else-if="stockData.name === '元大金'">&nbsp;&nbsp;近 5 年平均股價淨值比: 1.2</span>
+                                &nbsp;近 5 年 <span style="color: #bbb">平均</span> 股價淨值比:
+                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.pbr.mean.toFixed(2) }}</span>
                                 <br />
-                                &nbsp;計算日期: {{ stockData.per_pbr.date }}
+                                &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 股價淨值比:
+                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.pbr.median.toFixed(2) }}</span>
+                                <br />
+                                &nbsp;近 5 年 <span style="color: #bbb">最高</span> 股價淨值比:
+                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.pbr.max.toFixed(2) }}</span>
+                                <br />
+                                &nbsp;近 5 年 <span style="color: #bbb">最低</span> 股價淨值比:
+                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.pbr.min.toFixed(2) }}</span>
+                                <br />
+                                &nbsp;計算日期:
+                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
                             </div>
                         </template>
                         <div>
                             <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 16px">PB</span>
-                            <b>{{ stockData.per_pbr.pbr.toFixed(2) }}</b>
+                            <b>{{ stockData.data.pbr.last.toFixed(2) }}</b>
+                        </div>
+                    </el-tooltip>
+                </span>
+
+                <span
+                    v-if="stockData.data && stockData.data.pbr && stockData.data.dy_per_pbr_date"
+                    style="
+                        position: absolute;
+                        top: 0px;
+                        display: inline-block;
+                        min-width: 64px;
+                        background: rgb(235 246 255);
+                        color: rgb(48 152 241);
+                        padding: 0px 3px;
+                        border-radius: 10px;
+                        font-size: 12px;
+                        opacity: 0.83;
+                        line-height: 1.5;
+                        text-align: left;
+                        padding-left: 5px;
+                    "
+                >
+                    <el-tooltip :trigger="popoverTrigger" effect="dark" placement="bottom-end">
+                        <template #content>
+                            <div style="white-space: pre; font-family: 'Lucida Console', monospace">
+                                DY: 殖利率，該日的年化股息收益率。
+                                <br />
+                                <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
+                                &nbsp;<span style="color: #bbb">最新</span> 殖利率:
+                                <span style="color: rgb(255, 182, 193)"
+                                    >{{ stockData.data.dy.last.toFixed(2) }}<span style="margin-left: 2px">%</span></span
+                                >
+                                <br />
+                                &nbsp;近 5 年 <span style="color: #bbb">平均</span> 殖利率:
+                                <span style="color: rgb(176, 224, 230)"
+                                    >{{ stockData.data.dy.mean.toFixed(2) }}<span style="margin-left: 2px">%</span></span
+                                >
+                                <br />
+                                &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 殖利率:
+                                <span style="color: rgb(176, 224, 230)"
+                                    >{{ stockData.data.dy.median.toFixed(2) }}<span style="margin-left: 2px">%</span></span
+                                >
+                                <br />
+                                &nbsp;近 5 年 <span style="color: #bbb">最高</span> 殖利率:
+                                <span style="color: rgb(176, 224, 230)"
+                                    >{{ stockData.data.dy.max.toFixed(2) }}<span style="margin-left: 2px">%</span></span
+                                >
+                                <br />
+                                &nbsp;近 5 年 <span style="color: #bbb">最低</span> 殖利率:
+                                <span style="color: rgb(176, 224, 230)"
+                                    >{{ stockData.data.dy.min.toFixed(2) }}<span style="margin-left: 2px">%</span></span
+                                >
+                                <br />
+                                &nbsp;計算日期:
+                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
+                            </div>
+                        </template>
+                        <div>
+                            <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 4px">DY</span>
+                            <b>{{ stockData.data.dy.last.toFixed(2) }}</b
+                            ><span style="margin-left: 1px">%</span>
                         </div>
                     </el-tooltip>
                 </span>
@@ -335,10 +414,10 @@ export default {
             return this.$store.getters.getStock(this.parentData);
         },
         formattedEps() {
-            if (!this.stockData || !this.stockData.eps) return [];
+            if (!this.stockData || !this.stockData.data || !this.stockData.data.eps) return [];
 
             // 按年份分組
-            const groupedByYear = _.groupBy(this.stockData.eps, (item) => item.date.split('-')[0]);
+            const groupedByYear = _.groupBy(this.stockData.data.eps, (item) => item.date.split('-')[0]);
 
             // 計算每年累積值，並保留所有月份資料，但只有最後一個日期有 acc
             const result = _.flatMap(groupedByYear, (yearData) => {
