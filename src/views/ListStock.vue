@@ -984,13 +984,17 @@ export default {
                             // tempStockObj.data.dividend = _.cloneDeep(foundStock.data.dividend);
 
                             // 用此語法取代上面二行
-                            Object.assign(
-                                tempStockObj.data,
-                                _.cloneDeep({
-                                    daily: foundStock.data.daily,
-                                    dividend: foundStock.data.dividend,
-                                })
-                            );
+                            if (foundStock?.data) {
+                                Object.assign(
+                                    tempStockObj.data,
+                                    _.cloneDeep({
+                                        daily: foundStock.data.daily,
+                                        dividend: foundStock.data.dividend,
+                                    })
+                                );
+                            } else {
+                                console.warn(`DefaultStockList 找不到基金 ID: ${tempStockObj.id}，或資料缺失`);
+                            }
                         } else if (obj.name === '元大美債20年' || obj.name === '元大高股息') {
                             const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
                             tempStockObj.data.dividend = _.cloneDeep(foundStock.data.dividend);
