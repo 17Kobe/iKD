@@ -45,6 +45,12 @@
                                 EPS: 每股盈餘，反映公司獲利能力。
                                 <br />
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
+                                <!-- 標題列 -->
+                                <div style="margin-left: 10px">
+                                    &nbsp;&nbsp;&nbsp;日期&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EPS&nbsp;&nbsp;累積EPS
+                                    &nbsp;&nbsp;&nbsp;YOY(%)
+                                </div>
+                                <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
                                 <span v-for="(item, index) in formattedEps.slice().reverse()" :key="index">
                                     <span style="margin-left: 10px">{{ item.date }}</span>
                                     <span style="margin-left: 23px"
@@ -58,6 +64,33 @@
                                         }"
                                     >
                                         {{ item.acc < 10 ? ' ' : '' }}{{ item.acc }}
+                                    </span>
+                                    <!-- YOY 對齊處理，考慮負數與空值 -->
+                                    <!-- YOY 顯示，只有在 YOY 有有效數據時顯示百分比 -->
+                                    <span
+                                        :style="{
+                                            marginLeft: '10px',
+                                            color:
+                                                index === 0 && item.yoy && item.yoy !== null ? 'rgb(255, 202, 100)' : 'inherit',
+                                        }"
+                                    >
+                                        {{
+                                            item.yoy && item.yoy !== null
+                                                ? item.yoy.startsWith('-')
+                                                    ? item.yoy.padStart(7)
+                                                    : (' ' + item.yoy).padStart(7)
+                                                : '       '
+                                        }}
+                                    </span>
+
+                                    <!-- 僅在 YOY 有有效數據時，顯示百分比符號 -->
+                                    <span
+                                        v-if="item.yoy && item.yoy !== null"
+                                        :style="{
+                                            marginLeft: '4px',
+                                            color: index === 0 ? 'rgb(255, 202, 100)' : 'inherit',
+                                        }"
+                                        >%
                                     </span>
                                     <br />
                                     <span
@@ -416,18 +449,53 @@ export default {
         formattedEps() {
             if (!this.stockData || !this.stockData.data || !this.stockData.data.eps) return [];
 
-            // 按年份分組
-            const groupedByYear = _.groupBy(this.stockData.data.eps, (item) => item.date.split('-')[0]);
+            const epsList = this.stockData.data.eps;
+            const groupedByYear = _.groupBy(epsList, (item) => item.date.split('-')[0]);
 
-            // 計算每年累積值，並保留所有月份資料，但只有最後一個日期有 acc
-            const result = _.flatMap(groupedByYear, (yearData) => {
-                const acc = _.sumBy(yearData, 'value'); // 計算累積值
-                const lastDate = _.last(yearData).date; // 每年最後一個日期
-                return yearData.map((entry) => ({
-                    ...entry,
-                    acc: entry.date === lastDate ? acc.toFixed(2) : null, // 只有最後一個日期有 acc
-                }));
-            });
+            const result = [];
+
+            for (const [year, data] of Object.entries(groupedByYear)) {
+                let acc = 0;
+                let cumValues = []; // 用於累積 Q1、Q1+Q2... 計算用
+
+                const sortedData = _.sortBy(data, 'date'); // 確保順序 3→6→9→12
+
+                for (let i = 0; i < sortedData.length; i++) {
+                    const entry = { ...sortedData[i] };
+                    acc += entry.value;
+                    cumValues.push(entry.value);
+
+                    const date = entry.date;
+                    const month = date.split('-')[1];
+
+                    // 判斷是否為 3、6、9、12月
+                    if (['03', '06', '09', '12'].includes(month)) {
+                        let yoy = null;
+
+                        const lastYear = (parseInt(year) - 1).toString();
+                        const lastYearData = groupedByYear[lastYear];
+
+                        if (lastYearData) {
+                            const lastSorted = _.sortBy(lastYearData, 'date');
+                            const prevCum = _.take(lastSorted, i + 1).reduce((sum, item) => sum + item.value, 0);
+
+                            // 計算 YOY
+                            if (prevCum !== 0) {
+                                const thisCum = _.sum(cumValues);
+                                yoy = (((thisCum - prevCum) / prevCum) * 100).toFixed(2);
+                            }
+                        }
+
+                        entry.acc = acc.toFixed(2);
+                        entry.yoy = yoy;
+                    } else {
+                        entry.acc = null;
+                        entry.yoy = null;
+                    }
+
+                    result.push(entry);
+                }
+            }
 
             return result;
         },
