@@ -110,17 +110,17 @@
                                 &nbsp;<span style="color: #bbb">最新</span> 本益比:
                                 <span style="color: rgb(255, 182, 193)"> {{ stockData.data.per.last.toFixed(2) }} </span>
                                 <br />
+                                &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 本益比:
+                                <span style="color: rgb(255 202 100)">{{ stockData.data.per.median.toFixed(2) }}</span>
+                                <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">平均</span> 本益比:
                                 <span style="color: rgb(176, 224, 230)">{{ stockData.data.per.mean.toFixed(2) }}</span>
-                                <br />
-                                &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 本益比:
-                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.per.median.toFixed(2) }}</span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">最高</span> 本益比:
                                 <span style="color: rgb(176, 224, 230)">{{ stockData.data.per.max.toFixed(2) }}</span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">最低</span> 本益比:
-                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.per.min.toFixed(2) }}</span>
+                                <span style="color: rgb(255 202 100)">{{ stockData.data.per.min.toFixed(2) }}</span>
                                 <br />
                                 &nbsp;計算日期:
                                 <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
@@ -160,17 +160,17 @@
                                 &nbsp;<span style="color: #bbb">最新</span> 股價淨值比:
                                 <span style="color: rgb(255, 182, 193)">{{ stockData.data.pbr.last.toFixed(2) }}</span>
                                 <br />
+                                &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 股價淨值比:
+                                <span style="color: rgb(255 202 100)">{{ stockData.data.pbr.median.toFixed(2) }}</span>
+                                <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">平均</span> 股價淨值比:
                                 <span style="color: rgb(176, 224, 230)">{{ stockData.data.pbr.mean.toFixed(2) }}</span>
-                                <br />
-                                &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 股價淨值比:
-                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.pbr.median.toFixed(2) }}</span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">最高</span> 股價淨值比:
                                 <span style="color: rgb(176, 224, 230)">{{ stockData.data.pbr.max.toFixed(2) }}</span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">最低</span> 股價淨值比:
-                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.pbr.min.toFixed(2) }}</span>
+                                <span style="color: rgb(255 202 100)">{{ stockData.data.pbr.min.toFixed(2) }}</span>
                                 <br />
                                 &nbsp;計算日期:
                                 <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
@@ -212,14 +212,14 @@
                                     >{{ stockData.data.dy.last.toFixed(2) }}<span style="margin-left: 2px">%</span></span
                                 >
                                 <br />
+                                &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 殖利率:
+                                <span style="color: rgb(255 202 100)"
+                                    >{{ stockData.data.dy.median.toFixed(2) }}<span style="margin-left: 2px">%</span></span
+                                >
+                                <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">平均</span> 殖利率:
                                 <span style="color: rgb(176, 224, 230)"
                                     >{{ stockData.data.dy.mean.toFixed(2) }}<span style="margin-left: 2px">%</span></span
-                                >
-                                <br />
-                                &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 殖利率:
-                                <span style="color: rgb(176, 224, 230)"
-                                    >{{ stockData.data.dy.median.toFixed(2) }}<span style="margin-left: 2px">%</span></span
                                 >
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">最高</span> 殖利率:
@@ -228,7 +228,7 @@
                                 >
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">最低</span> 殖利率:
-                                <span style="color: rgb(176, 224, 230)"
+                                <span style="color: rgb(255 202 100)"
                                     >{{ stockData.data.dy.min.toFixed(2) }}<span style="margin-left: 2px">%</span></span
                                 >
                                 <br />
