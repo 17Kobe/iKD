@@ -9,113 +9,6 @@
         </highcharts>
 
         <div
-            v-if="kdj && kdj.length > 0"
-            style="
-                display: flex;
-                justify-content: space-between;
-                font-size: 12px;
-                position: absolute;
-                top: 80px;
-                padding: 0px 12px 0px 6px;
-                width: 100%;
-            "
-        >
-            <span style="order: 1; position: relative">
-                <span
-                    v-for="(status, index) in stockData.kd_status"
-                    :key="index"
-                    :title="
-                        status === 'KD 高檔鈍化'
-                            ? '連續3根K值在80以上'
-                            : status === 'KD 低檔鈍化'
-                            ? '連續3根K值在20以下'
-                            : status === 'KD ≥ 80超買'
-                            ? 'K值>=80為超買'
-                            : status === 'KD ≤ 20超賣'
-                            ? 'K值<=20為超賣'
-                            : status.includes('合理價')
-                            ? '近7年平均殖利率的20倍作為估算(中華電使用25倍)'
-                            : ''
-                    "
-                    :style="{
-                        position: 'absolute',
-                        top: -index * 22 + 'px',
-                        left: '0', // 左對齊
-                        display: 'inline-block',
-                        minWidth: ['KD W底', 'KD M頭'].includes(status)
-                            ? '53px'
-                            : ['KD ≥ 80超買', 'KD ≤ 20超賣'].includes(status)
-                            ? '76px'
-                            : ['成本價未跌過'].includes(status)
-                            ? '83px'
-                            : ['每年固定日買', '每年固定日賣'].includes(status)
-                            ? '81px'
-                            : '77px',
-                        background: ['KD 高檔鈍化', 'KD 低檔鈍化', '成本價未跌過'].includes(status)
-                            ? 'rgb(170, 170, 170)'
-                            : ['KD ≥ 80超買', 'KD 死亡交叉', 'KD 往下轉折', 'KD M頭', '每年固定日賣'].includes(status)
-                            ? 'rgb(103, 194, 58)'
-                            : 'rgb(242, 139, 130)',
-                        color: 'white',
-                        padding: '0px 3px',
-                        borderRadius: '10px',
-                        fontSize: '12px',
-                        opacity: '0.83',
-                        lineHeight: '1.5',
-                        boxShadow: status.includes('合理價') ? '1px 1px 5px rgba(0, 0, 0, 0.3)' : 'none',
-                    }"
-                    :class="[
-                        (status.includes('合理價') && stockData.last_price < parseFloat(status.split(' ')[1])) ||
-                        ([
-                            'KD 黃金交叉',
-                            'KD 往上轉折',
-                            'KD W底',
-                            'KD 死亡交叉',
-                            'KD 往下轉折',
-                            'KD M頭',
-                            '每年固定日買',
-                            '每年固定日賣',
-                        ].includes(status) &&
-                            !['取消買', '取消買x2', '取消賣', '取消賣½', '取消賣⅓'].includes(stockData.badge))
-                            ? 'shake-base'
-                            : '',
-                        'cell-chart',
-                    ]"
-                >
-                    <el-tooltip :trigger="popoverTrigger" effect="dark" placement="bottom-end">
-                        <template #content>
-                            <div style="white-space: pre; font-family: 'Lucida Console', monospace">
-                                {{
-                                    status === 'KD 高檔鈍化'
-                                        ? '連續3根K值在80以上'
-                                        : status === 'KD 低檔鈍化'
-                                        ? '連續3根K值在20以下'
-                                        : status === 'KD ≥ 80超買'
-                                        ? 'K值>=80為超買'
-                                        : status === 'KD ≤ 20超賣'
-                                        ? 'K值<=20為超賣'
-                                        : status.includes('合理價')
-                                        ? '近7年平均殖利率的20倍作為估算(中華電使用25倍)'
-                                        : '無說明'
-                                }}
-                            </div>
-                        </template>
-                        <div>
-                            {{ status }}
-                        </div>
-                    </el-tooltip>
-                </span>
-            </span>
-
-            <span style="order: 2">
-                <span style="color: #4286f5">K</span>: {{ kdj[kdj.length - 1][1].toFixed(2) }}
-                <span style="color: #e75c9a">D</span>:
-                {{ kdj[kdj.length - 1][2].toFixed(2) }}
-                <span v-if="showJLine"><span style="color: #febd09">J</span>: {{ kdj[kdj.length - 1][3].toFixed(2) }}</span>
-            </span>
-        </div>
-
-        <div
             v-if="stockData"
             style="
                 display: flex;
@@ -123,7 +16,6 @@
                 font-size: 12px;
                 position: absolute;
                 top: 80px;
-                left: 79px;
                 padding: 0px 12px 0px 6px;
                 width: 100%;
             "
@@ -351,6 +243,114 @@
                         </div>
                     </el-tooltip>
                 </span>
+            </span>
+        </div>
+
+        <div
+            v-if="kdj && kdj.length > 0"
+            style="
+                display: flex;
+                justify-content: space-between;
+                font-size: 12px;
+                position: absolute;
+                top: 80px;
+                left: 65px;
+                padding: 0px 12px 0px 6px;
+                width: 74%;
+            "
+        >
+            <span style="order: 1; position: relative">
+                <span
+                    v-for="(status, index) in stockData.kd_status"
+                    :key="index"
+                    :title="
+                        status === 'KD 高檔鈍化'
+                            ? '連續3根K值在80以上'
+                            : status === 'KD 低檔鈍化'
+                            ? '連續3根K值在20以下'
+                            : status === 'KD ≥ 80超買'
+                            ? 'K值>=80為超買'
+                            : status === 'KD ≤ 20超賣'
+                            ? 'K值<=20為超賣'
+                            : status.includes('合理價')
+                            ? '近7年平均殖利率的20倍作為估算(中華電使用25倍)'
+                            : ''
+                    "
+                    :style="{
+                        position: 'absolute',
+                        top: -index * 22 + 'px',
+                        left: '0', // 左對齊
+                        display: 'inline-block',
+                        minWidth: ['KD W底', 'KD M頭'].includes(status)
+                            ? '53px'
+                            : ['KD ≥ 80超買', 'KD ≤ 20超賣'].includes(status)
+                            ? '76px'
+                            : ['成本價未跌過'].includes(status)
+                            ? '83px'
+                            : ['每年固定日買', '每年固定日賣'].includes(status)
+                            ? '81px'
+                            : '77px',
+                        background: ['KD 高檔鈍化', 'KD 低檔鈍化', '成本價未跌過'].includes(status)
+                            ? 'rgb(170, 170, 170)'
+                            : ['KD ≥ 80超買', 'KD 死亡交叉', 'KD 往下轉折', 'KD M頭', '每年固定日賣'].includes(status)
+                            ? 'rgb(103, 194, 58)'
+                            : 'rgb(242, 139, 130)',
+                        color: 'white',
+                        padding: '0px 3px',
+                        borderRadius: '10px',
+                        fontSize: '12px',
+                        opacity: '0.83',
+                        lineHeight: '1.5',
+                        boxShadow: status.includes('合理價') ? '1px 1px 5px rgba(0, 0, 0, 0.3)' : 'none',
+                    }"
+                    :class="[
+                        (status.includes('合理價') && stockData.last_price < parseFloat(status.split(' ')[1])) ||
+                        ([
+                            'KD 黃金交叉',
+                            'KD 往上轉折',
+                            'KD W底',
+                            'KD 死亡交叉',
+                            'KD 往下轉折',
+                            'KD M頭',
+                            '每年固定日買',
+                            '每年固定日賣',
+                        ].includes(status) &&
+                            !['取消買', '取消買x2', '取消賣', '取消賣½', '取消賣⅓'].includes(stockData.badge))
+                            ? 'shake-base'
+                            : '',
+                        'cell-chart',
+                    ]"
+                >
+                    <el-tooltip :trigger="popoverTrigger" effect="dark" placement="bottom-end">
+                        <template #content>
+                            <div style="white-space: pre; font-family: 'Lucida Console', monospace">
+                                {{
+                                    status === 'KD 高檔鈍化'
+                                        ? '連續3根K值在80以上'
+                                        : status === 'KD 低檔鈍化'
+                                        ? '連續3根K值在20以下'
+                                        : status === 'KD ≥ 80超買'
+                                        ? 'K值>=80為超買'
+                                        : status === 'KD ≤ 20超賣'
+                                        ? 'K值<=20為超賣'
+                                        : status.includes('合理價')
+                                        ? '近7年平均殖利率的20倍作為估算(中華電使用25倍)'
+                                        : '無說明'
+                                }}
+                            </div>
+                        </template>
+                        <div>
+                            {{ status }}
+                        </div>
+                    </el-tooltip>
+                </span>
+            </span>
+
+            <span style="order: 2">
+                <span style="color: #4286f5">K</span>: {{ kdj[kdj.length - 1][1].toFixed(2) }}
+                <span style="color: #e75c9a">D</span>:
+                {{ kdj[kdj.length - 1][2].toFixed(2) }}
+                <span v-if="showJLine"><span style="color: #febd09">J</span>: {{ kdj[kdj.length - 1][3].toFixed(2) }}</span>
             </span>
         </div>
 
