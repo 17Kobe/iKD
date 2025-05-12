@@ -256,12 +256,12 @@
                                 >
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">最高</span> 殖利率:
-                                <span style="color: rgb(176, 224, 230)"
+                                <span style="color: rgb(255 202 100)"
                                     >{{ stockData.data.dy.max.toFixed(2) }}<span style="margin-left: 2px">%</span></span
                                 >
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">最低</span> 殖利率:
-                                <span style="color: rgb(255 202 100)"
+                                <span style="color: rgb(176, 224, 230)"
                                     >{{ stockData.data.dy.min.toFixed(2) }}<span style="margin-left: 2px">%</span></span
                                 >
                                 <br />
