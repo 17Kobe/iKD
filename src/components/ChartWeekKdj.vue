@@ -157,6 +157,7 @@
                                 <br />
                                 &nbsp;計算日期:
                                 <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
+                                <LineChart :chart-data="combinedChartData" :options="peChartOptions" />
                             </div>
                         </template>
                         <div>
@@ -395,9 +396,16 @@
 import { Chart } from 'highcharts-vue';
 import moment from 'moment';
 import _ from 'lodash';
+import { Chart as ChartJS, registerables } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { LineChart } from 'vue-chart-3';
+
+ChartJS.register(...registerables);
+// Register the plugin to all charts:
+ChartJS.register(ChartDataLabels);
 
 export default {
-    components: { highcharts: Chart },
+    components: { highcharts: Chart, LineChart },
     props: ['parentData', 'showJLine'],
     data() {
         return {
@@ -407,6 +415,64 @@ export default {
             // chartOptions: {
             // },
             //
+
+            peChartOptions: {
+                responsive: true,
+                plugins: {
+                    background: {
+                        color: '#ffffff',
+                    },
+                    tooltip: {
+                        backgroundColor: '#ffffff',
+                        titleColor: '#000000',
+                        bodyColor: '#000000',
+                    },
+                    legend: { display: false },
+                    datalabels: {
+                        display: false,
+                    },
+                },
+                layout: {
+                    padding: 10,
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'year',
+                            displayFormats: {
+                                year: 'YYYY/MM', // 顯示格式為 YYYY/MM
+                            },
+                        },
+                        ticks: {
+                            color: '#ffffff', // 白色字體
+                            callback: function (value, index, ticks) {
+                                const tick = ticks[index];
+                                if (!tick || !tick.value) return ''; // 確保 tick 和 tick.value 存在
+
+                                // 使用 moment 將 tick.value 轉換為日期
+                                const date = moment(tick.value);
+                                if (!date.isValid()) return ''; // 確保日期有效
+
+                                // 判斷是否為每年的 1 月
+                                const year = date.format('YYYY');
+                                const month = date.format('MM');
+                                return month === '01' ? `${year}` : ''; // 只顯示每年的 1 月
+                            },
+                        },
+                        grid: {
+                            display: true, // 顯示格線
+                            color: '#aaa', // 格線顏色為淡灰色
+                        },
+                    },
+                    y: {
+                        beginAtZero: false,
+                        ticks: { color: '#fff' }, // Y 軸刻度白色
+                        grid: { display: false }, // 不顯示 Y 軸格線
+                        title: { display: false }, // 不顯示 Y 軸標題
+                    },
+                },
+            },
         };
     },
     mounted() {
@@ -417,6 +483,123 @@ export default {
         this.popoverTrigger = this.isMobile ? 'click' : 'hover';
     },
     computed: {
+        peChartData() {
+            const daily = this.stockData.data.daily || [];
+
+            if (!daily.length) return { labels: [], datasets: [] };
+
+            const cutoff = moment().subtract(5, 'years'); // 五年前的日期
+
+            // 建立 YYYY-MM => 最後日期的 close
+            const monthlyMap = new Map();
+
+            _.forEach(daily, (item) => {
+                const dateStr = item[0];
+                const close = item[4];
+                const date = moment(dateStr, 'YYYY-MM-DD');
+
+                if (!date.isValid() || date.isBefore(cutoff)) return;
+
+                const ym = date.format('YYYY-MM');
+                monthlyMap.set(ym, { date: dateStr, close }); // 覆蓋表示保留當月最後一筆
+            });
+
+            const sorted = _.sortBy(Array.from(monthlyMap.entries()), ([ym]) => ym);
+
+            const monthlyLabels = _.map(sorted, ([, { date }]) => date);
+            const monthlyCloses = _.map(sorted, ([, { close }]) => close);
+
+            return {
+                labels: monthlyLabels,
+                datasets: [
+                    {
+                        label: '月收盤價',
+                        data: monthlyCloses,
+                        borderColor: 'rgba(255, 255, 255, 1)', // 純白線條
+                        backgroundColor: 'rgba(255, 255, 255, 0.08)', // 非常淡的底色，避免干擾
+                        fill: false,
+                        pointRadius: 0,
+                        borderWidth: 2,
+                        tension: 0.3,
+                    },
+                ],
+            };
+        },
+        peRiverChartData() {
+            const peMultiples = [10, 15, 20, 25, 30]; // 本益比倍數
+            const labels = this.peChartData.labels; // 使用 peChartData 的 X 軸日期
+            const datasets = []; // 用於存放每個倍數的數據
+
+            // 初始化 datasets
+            const colorMap = [
+                { borderColor: 'rgba(0, 128, 255, 1)', backgroundColor: 'rgba(0, 128, 255, 0.4)' },
+                { borderColor: 'rgba(0, 255, 191, 1)', backgroundColor: 'rgba(0, 255, 191, 0.4)' },
+                { borderColor: 'rgba(255, 255, 0, 1)', backgroundColor: 'rgba(255, 255, 0, 0.4)' },
+                { borderColor: 'rgba(255, 100, 0, 1)', backgroundColor: 'rgba(255, 100, 0, 0.4)' },
+                { borderColor: 'rgba(255, 0, 80, 1)', backgroundColor: 'rgba(255, 0, 80, 0.4)' },
+            ];
+
+            peMultiples.forEach((multiple, index) => {
+                datasets.push({
+                    label: `${multiple} 倍本益比`,
+                    data: [],
+                    borderColor: colorMap[index].borderColor,
+                    backgroundColor: colorMap[index].backgroundColor,
+                    fill: true,
+                    pointRadius: 0,
+                    borderWidth: 1,
+                    tension: 0.3,
+                });
+            });
+
+            // 遍歷每個日期，計算當時的本益比範圍
+            labels.forEach((label) => {
+                const currentDate = moment(label, 'YYYY-MM-DD');
+
+                // 找到當前日期及之前的近四季 EPS
+                const recentFourQuarters = this.formattedEps
+                    .filter((eps) => moment(eps.date, 'YYYY-MM-DD').isSameOrBefore(currentDate))
+                    .slice(-4);
+
+                // 如果不足四季，跳過
+                if (recentFourQuarters.length < 4) {
+                    peMultiples.forEach((_, index) => {
+                        datasets[index].data.push(null); // 填充空值
+                    });
+                    return;
+                }
+
+                // 計算近四季 EPS 總和
+                const recentEpsSum = recentFourQuarters.reduce((sum, item) => sum + item.value, 0);
+
+                // 計算本益比範圍，並填充到對應的 dataset
+                peMultiples.forEach((multiple, index) => {
+                    datasets[index].data.push((recentEpsSum * multiple).toFixed(2));
+                });
+            });
+
+            return {
+                labels,
+                datasets,
+            };
+        },
+        combinedChartData() {
+            // 獲取原始的 peChartData 和 peRiverChartData
+            const peChartData = this.peChartData;
+            const peRiverChartData = this.peRiverChartData;
+
+            // 合併 datasets
+            const combinedDatasets = [
+                ...peChartData.datasets, // 原始的月收盤價數據
+                ...peRiverChartData.datasets, // 河流圖數據
+            ];
+
+            return {
+                labels: peChartData.labels, // 使用相同的 X 軸標籤
+                datasets: combinedDatasets,
+            };
+        },
+
         // 如果您希望最大值和最小值使用天花板和地板的十進位值，而不使用偏移量，您可以將 chartMinMaxValues 函數修改如下：
         // chartMinMaxValues() {
         //     const kValues = this.kdj.map((value) => value[1]);
