@@ -143,6 +143,21 @@
                                 &nbsp;<span style="color: #bbb">最新</span> 本益比:
                                 <span style="color: rgb(255, 182, 193)"> {{ stockData.data.per.last.toFixed(2) }} </span>
                                 <br />
+                                &nbsp;<span style="color: #bbb">最新 10 倍</span> 本益比:
+                                <span style="color: rgb(176, 224, 230)"> {{ lastPERatios[0] }} </span>
+                                <br />
+                                &nbsp;<span style="color: #bbb">最新 15 倍</span> 本益比:
+                                <span style="color: rgb(176, 224, 230)"> {{ lastPERatios[1] }} </span>
+                                <br />
+                                &nbsp;<span style="color: #bbb">最新 20 倍</span> 本益比:
+                                <span style="color: rgb(255 202 100)"> {{ lastPERatios[2] }} </span>
+                                <br />
+                                &nbsp;<span style="color: #bbb">最新 25 倍</span> 本益比:
+                                <span style="color: rgb(176, 224, 230)"> {{ lastPERatios[3] }} </span>
+                                <br />
+                                &nbsp;<span style="color: #bbb">最新 30 倍</span> 本益比:
+                                <span style="color: rgb(176, 224, 230)"> {{ lastPERatios[4] }} </span>
+                                <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 本益比:
                                 <span style="color: rgb(255 202 100)">{{ stockData.data.per.median.toFixed(2) }}</span>
                                 <br />
@@ -598,6 +613,14 @@ export default {
                 labels: peChartData.labels, // 使用相同的 X 軸標籤
                 datasets: combinedDatasets,
             };
+        },
+        lastPERatios() {
+            if (!this.peRiverChartData || !this.peRiverChartData.datasets) return [];
+
+            return this.peRiverChartData.datasets.map((dataset) => {
+                const data = dataset.data;
+                return data.length > 0 ? data[data.length - 1] : null;
+            });
         },
 
         // 如果您希望最大值和最小值使用天花板和地板的十進位值，而不使用偏移量，您可以將 chartMinMaxValues 函數修改如下：
