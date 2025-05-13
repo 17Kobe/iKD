@@ -143,21 +143,17 @@
                                 &nbsp;<span style="color: #bbb">最新</span> 本益比:
                                 <span style="color: rgb(255, 182, 193)"> {{ stockData.data.per.last.toFixed(2) }} </span>
                                 <br />
-                                &nbsp;<span style="color: #bbb">最新 10 倍</span> 本益比:
-                                <span style="color: rgb(176, 224, 230)"> {{ lastPERatios[0] }} </span>
-                                <br />
-                                &nbsp;<span style="color: #bbb">最新 15 倍</span> 本益比:
-                                <span style="color: rgb(176, 224, 230)"> {{ lastPERatios[1] }} </span>
-                                <br />
-                                &nbsp;<span style="color: #bbb">最新 20 倍</span> 本益比:
-                                <span style="color: rgb(255 202 100)"> {{ lastPERatios[2] }} </span>
-                                <br />
-                                &nbsp;<span style="color: #bbb">最新 25 倍</span> 本益比:
-                                <span style="color: rgb(176, 224, 230)"> {{ lastPERatios[3] }} </span>
-                                <br />
-                                &nbsp;<span style="color: #bbb">最新 30 倍</span> 本益比:
-                                <span style="color: rgb(176, 224, 230)"> {{ lastPERatios[4] }} </span>
-                                <br />
+                                <span v-for="(zone, index) in peZones" :key="index">
+                                    &nbsp;近 4 季 EPS 估算 <span style="color: #bbb">{{ zone }} 倍</span> 本益比的股價:
+                                    <span
+                                        :style="{
+                                        color: index === 2 ? 'rgb(255, 202, 100)' : 'rgb(176, 224, 230)',
+                                        }"
+                                    >
+                                        {{ lastPERatios[index] }}
+                                    </span>
+                                    <br />
+                                </span>
                                 &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 本益比:
                                 <span style="color: rgb(255 202 100)">{{ stockData.data.per.median.toFixed(2) }}</span>
                                 <br />
@@ -450,6 +446,15 @@ export default {
                 layout: {
                     padding: 10,
                 },
+                animation: {
+                    x: {
+                        duration: 0 // 禁用 x 軸動畫
+                    },
+                    y: {
+                        duration: 1000, // 動畫時間
+                        easing: 'easeOutBounce' // 動畫效果，可自訂
+                    }
+                },
                 scales: {
                     x: {
                         type: 'time',
@@ -497,7 +502,35 @@ export default {
         // 根據裝置類型設定觸發方式
         this.popoverTrigger = this.isMobile ? 'click' : 'hover';
     },
+    methods: {
+        calculatePEZones(max, min, median) {
+            // 四捨五入平均
+            let center = Math.round(median);
+
+            // 根據範圍大小決定 step（可調整策略）
+            let step = (max - min > 10) ? 5 : 1;
+
+            // 從中心往左右擴展兩格，得到五個區間
+            return [
+            center - 2 * step,
+            center - step,
+            center,
+            center + step,
+            center + 2 * step
+            ];
+        }
+    },
     computed: {
+        peZones() {
+            if (!this.stockData || !this.stockData.data || !this.stockData.data.per) return [];
+
+            const max = this.stockData.data.per.max;
+            const min = this.stockData.data.per.min;
+            const median = this.stockData.data.per.median;
+
+            // 使用 calculatePEZones 方法計算區間
+            return this.calculatePEZones(max, min, median);
+        },
         peChartData() {
             const daily = this.stockData.data.daily || [];
 
@@ -541,61 +574,61 @@ export default {
             };
         },
         peRiverChartData() {
-            const peMultiples = [10, 15, 20, 25, 30]; // 本益比倍數
             const labels = this.peChartData.labels; // 使用 peChartData 的 X 軸日期
             const datasets = []; // 用於存放每個倍數的數據
 
             // 初始化 datasets
             const colorMap = [
-                { borderColor: 'rgba(0, 128, 255, 1)', backgroundColor: 'rgba(0, 128, 255, 0.4)' },
-                { borderColor: 'rgba(0, 255, 191, 1)', backgroundColor: 'rgba(0, 255, 191, 0.4)' },
-                { borderColor: 'rgba(255, 255, 0, 1)', backgroundColor: 'rgba(255, 255, 0, 0.4)' },
-                { borderColor: 'rgba(255, 100, 0, 1)', backgroundColor: 'rgba(255, 100, 0, 0.4)' },
-                { borderColor: 'rgba(255, 0, 80, 1)', backgroundColor: 'rgba(255, 0, 80, 0.4)' },
+            { borderColor: 'rgba(0, 128, 255, 1)', backgroundColor: 'rgba(0, 128, 255, 0.4)' },
+            { borderColor: 'rgba(0, 255, 191, 1)', backgroundColor: 'rgba(0, 255, 191, 0.4)' },
+            { borderColor: 'rgba(255, 255, 0, 1)', backgroundColor: 'rgba(255, 255, 0, 0.4)' },
+            { borderColor: 'rgba(255, 100, 0, 1)', backgroundColor: 'rgba(255, 100, 0, 0.4)' },
+            { borderColor: 'rgba(255, 0, 80, 1)', backgroundColor: 'rgba(255, 0, 80, 0.4)' },
             ];
 
-            peMultiples.forEach((multiple, index) => {
-                datasets.push({
-                    label: `${multiple} 倍本益比`,
-                    data: [],
-                    borderColor: colorMap[index].borderColor,
-                    backgroundColor: colorMap[index].backgroundColor,
-                    fill: true,
-                    pointRadius: 0,
-                    borderWidth: 1,
-                    tension: 0.3,
-                });
+            // 使用動態計算的 peZones
+            this.peZones.forEach((multiple, index) => {
+            datasets.push({
+                label: `${multiple} 倍本益比`,
+                data: [],
+                borderColor: colorMap[index].borderColor,
+                backgroundColor: colorMap[index].backgroundColor,
+                fill: true,
+                pointRadius: 0,
+                borderWidth: 1,
+                tension: 0.3,
+            });
             });
 
             // 遍歷每個日期，計算當時的本益比範圍
             labels.forEach((label) => {
-                const currentDate = moment(label, 'YYYY-MM-DD');
+            const currentDate = moment(label, 'YYYY-MM-DD');
 
-                // 找到當前日期及之前的近四季 EPS
-                const recentFourQuarters = this.formattedEps
-                    .filter((eps) => moment(eps.date, 'YYYY-MM-DD').isSameOrBefore(currentDate))
-                    .slice(-4);
+            // 找到當前日期及之前的近四季 EPS
+            const recentFourQuarters = this.formattedEps
+                .filter((eps) => moment(eps.date, 'YYYY-MM-DD').isSameOrBefore(currentDate))
+                .slice(-4);
 
-                // 如果不足四季，跳過
-                if (recentFourQuarters.length < 4) {
-                    peMultiples.forEach((_, index) => {
-                        datasets[index].data.push(null); // 填充空值
-                    });
-                    return;
-                }
-
-                // 計算近四季 EPS 總和
-                const recentEpsSum = recentFourQuarters.reduce((sum, item) => sum + item.value, 0);
-
-                // 計算本益比範圍，並填充到對應的 dataset
-                peMultiples.forEach((multiple, index) => {
-                    datasets[index].data.push((recentEpsSum * multiple).toFixed(2));
+            // 如果不足四季，跳過
+            if (recentFourQuarters.length < 4) {
+                this.peZones.forEach((_, index) => {
+                datasets[index].data.push(null); // 填充空值
                 });
+                return;
+            }
+
+            // 計算近四季 EPS 總和
+            const recentEpsSum = recentFourQuarters.reduce((sum, item) => sum + item.value, 0);
+
+            // 計算本益比範圍，並填充到對應的 dataset
+            this.peZones.forEach((multiple, index) => {
+                datasets[index].data.push((recentEpsSum * multiple).toFixed(2));
+            });
             });
 
             return {
-                labels,
-                datasets,
+            labels,
+            datasets,
             };
         },
         combinedChartData() {
