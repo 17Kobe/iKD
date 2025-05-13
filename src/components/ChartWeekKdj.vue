@@ -681,6 +681,45 @@ export default {
 
         //     return { tickMin, tickMax };
         // },
+
+        yearlyDividends() {
+            if (!this.stockData.data || !this.stockData.data.dividend || this.stockData.data.dividend.length === 0) {
+                return [];
+            }
+
+            // 整理每年的現金股利、股票股利及殖利率
+            const yearlyData = this.stockData.data.dividend.reduce((acc, curr) => {
+                const year = curr.date.split("-")[0];
+                if (!acc[year]) {
+                    acc[year] = {
+                        cashDividend: 0,
+                        stockDividend: 0,
+                        totalDividend: 0,
+                        cashYield: 0,
+                        stockYield: 0,
+                        totalYield: 0,
+                    };
+                }
+
+                acc[year].cashDividend += curr.CashEarningsDistribution || 0;
+                acc[year].stockDividend += curr.StockEarningsDistribution || 0;
+                acc[year].totalDividend += (curr.CashEarningsDistribution || 0) + (curr.StockEarningsDistribution || 0);
+                acc[year].cashYield += curr.dividendYield || 0;
+
+                return acc;
+            }, {});
+
+            // 格式化輸出
+            return Object.entries(yearlyData).map(([year, data]) => ({
+                year,
+                cashDividend: data.cashDividend.toFixed(2),
+                stockDividend: data.stockDividend.toFixed(2),
+                totalDividend: data.totalDividend.toFixed(2),
+                cashYield: data.cashYield.toFixed(2),
+                totalYield: data.cashYield.toFixed(2), // 如果需要累積殖利率，可以在這裡進一步計算
+            }));
+        },
+
         stockData() {
             console.log('stockData');
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
