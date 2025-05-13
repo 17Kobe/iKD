@@ -242,7 +242,7 @@ function getPromise(fund) {
 
                         // 找到股息表格 - 這裡需要根據實際的網頁結構調整選擇器
                         // 這個範例假設股息信息在名為 "配息紀錄" 的表格中
-                        const targetTable = $('table[data-v-f68ae462]');
+                        const targetTable = $('table');
 
                         targetTable.find('tbody tr').each((i, row) => {
                             const tds = $(row).find('td');
