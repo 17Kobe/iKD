@@ -137,7 +137,8 @@
                     <el-tooltip :trigger="popoverTrigger" effect="dark" placement="bottom-end">
                         <template #content>
                             <div style="white-space: pre; font-family: 'Lucida Console', monospace">
-                                PE: 本益比，評估股價相對於獲益及成長率是否合理。
+                                PE: 本益比，評估股價相對於獲益及成長率是否合理。<br />
+                                River Chart: 河流圖，顯示不同倍數本益比的股價範圍。
                                 <br />
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
                                 &nbsp;<span style="color: #bbb">最新</span> 本益比:
