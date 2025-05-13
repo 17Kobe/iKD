@@ -250,7 +250,7 @@
                     <el-tooltip :trigger="popoverTrigger" effect="dark" placement="bottom-end">
                         <template #content>
                             <div style="white-space: pre; font-family: 'Lucida Console', monospace">
-                                DY: 殖利率，該日的年化股息收益率。
+                                DY: 殖利率，該日的年化股息收益率。&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <br />
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
                                 &nbsp;<span style="color: #bbb">最新</span> 殖利率:
@@ -280,6 +280,7 @@
                                 <br />
                                 &nbsp;計算日期:
                                 <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
+                                <BarChart :chartData="dyBarData" :options="dyBarOptions" />
                             </div>
                         </template>
                         <div>
@@ -410,14 +411,14 @@ import moment from 'moment';
 import _ from 'lodash';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { LineChart } from 'vue-chart-3';
+import { LineChart, BarChart } from 'vue-chart-3';
 
 ChartJS.register(...registerables);
 // Register the plugin to all charts:
 ChartJS.register(ChartDataLabels);
 
 export default {
-    components: { highcharts: Chart, LineChart },
+    components: { highcharts: Chart, LineChart, BarChart },
     props: ['parentData', 'showJLine'],
     data() {
         return {
@@ -704,7 +705,12 @@ export default {
                 acc[year].cashDividend += curr.CashEarningsDistribution || 0;
                 acc[year].stockDividend += curr.StockEarningsDistribution || 0;
                 acc[year].totalDividend += (curr.CashEarningsDistribution || 0) + (curr.StockEarningsDistribution || 0);
-                acc[year].cashYield += curr.dividendYield || 0;
+                
+                // 只有當 CashEarningsDistribution > 0 時，才加上 dividendYield
+                acc[year].cashYield += curr.CashEarningsDistribution > 0 ? curr.dividendYield : 0;
+                acc[year].stockYield += curr.StockEarningsDistribution > 0 ? curr.dividendYield : 0;
+
+                acc[year].totalYield = acc[year].cashYield + acc[year].stockYield;
 
                 return acc;
             }, {});
@@ -716,8 +722,111 @@ export default {
                 stockDividend: data.stockDividend.toFixed(2),
                 totalDividend: data.totalDividend.toFixed(2),
                 cashYield: data.cashYield.toFixed(2),
-                totalYield: data.cashYield.toFixed(2), // 如果需要累積殖利率，可以在這裡進一步計算
+                stockYield: data.stockYield.toFixed(2),
+                totalYield: data.totalYield.toFixed(2),
             }));
+        },
+        dyBarData() {
+            // 取得近 6 年的資料
+            const currentYear = new Date().getFullYear();
+            const filteredDividends = this.yearlyDividends.filter(
+                (item) => parseInt(item.year) >= currentYear - 5
+            );
+
+            const labels = filteredDividends.map((item) => item.year);
+            const cashYieldData = filteredDividends.map((item) =>
+                isFinite(item.cashYield) && item.cashYield > 0 ? parseFloat(item.cashYield) : null
+            );
+            const stockYieldData = filteredDividends.map((item) =>
+                isFinite(item.stockYield) && item.stockYield > 0 ? parseFloat(item.stockYield) : null
+            );
+
+            return {
+                labels,
+                datasets: [
+                    {
+                        label: '現金殖利率 (%)',
+                        data: cashYieldData,
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)', // 現金殖利率顏色
+                    },
+                    {
+                        label: '股票殖利率 (%)',
+                        data: stockYieldData,
+                        backgroundColor: 'rgba(255, 159, 64, 0.8)', // 股票殖利率顏色
+                    },
+                ],
+            };
+        },
+
+        dyBarOptions() {
+            return {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false, // 移除圖例
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return `${context.dataset.label}: ${context.raw.toFixed(2)}%`;
+                            },
+                        },
+                    },
+                    datalabels: {
+                        display: function (context) {
+                            // 如果值為 0，則不顯示標籤
+                            return context.raw !== 0;
+                        },
+                        color: '#ffffff', // 標籤文字顏色
+                        font: {
+                            size: 10, // 標籤文字大小
+                        },
+                        formatter: function (value) {
+                            // 確保 value 是有效數字，否則返回空字串
+                            if (value === null || value === undefined || isNaN(value)) {
+                                return '';
+                            }
+                            // 格式化數值，加上 %
+                            return `${value.toFixed(2)} %`;
+                        },
+                    },
+                },
+                animation: {
+                    x: {
+                        duration: 0, // 禁用 X 軸動畫
+                    },
+                    y: {
+                        from: 0, // 動畫從 0 開始
+                        duration: 1000, // 動畫時間
+                        easing: 'easeOutBounce', // 動畫效果，可自訂
+                    },
+                },
+                scales: {
+                    x: {
+                        stacked: true,
+                        title: {
+                            display: false, // 移除 "年份" 標題字
+                        },
+                        ticks: {
+                            color: '#ffffff', // 設定 X 軸刻度值為白色字
+                        },
+                    },
+                    y: {
+                        stacked: true,
+                        title: {
+                            display: true,
+                            text: '殖利率 (%)',
+                            color: '#ffffff', // 設定 Y 軸標題為白色
+                        },
+                        ticks: {
+                            color: '#ffffff', // 設定 Y 軸刻度值為白色字
+                            callback: function (value) {
+                                return `${value}%`;
+                            },
+                        },
+                    },
+                },
+            };
         },
 
         stockData() {
