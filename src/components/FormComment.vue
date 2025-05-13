@@ -1,11 +1,40 @@
 <template>
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="85%">
-        <span style="font-size: 24px">&nbsp;&nbsp;&nbsp;&nbsp;備註</span>
+        
         <el-form ref="formCommentRef" :model="form">
+            <span style="font-size: 24px">&nbsp;&nbsp;&nbsp;&nbsp;備註</span>
             <el-form-item>
                 <el-row>
                     <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" style="padding-left: 3px">
                         <el-input v-model="form.comment" :autosize="{ minRows: 5, maxRows: 8 }" type="textarea" />
+                    </el-col>
+                </el-row>
+            </el-form-item>
+
+            <br>
+            <span style="font-size: 24px">&nbsp;&nbsp;&nbsp;&nbsp;手動新增EPS</span>
+            <el-form-item>
+                <el-row>
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" style="padding-left: 3px">
+                        <el-date-picker
+                            v-model="newEps.date"
+                            size="small"
+                            type="date"
+                            placeholder="選擇日期"
+                            style="margin-bottom: 10px; width: 150px;"
+                        />
+                        <br>
+                        
+                        <el-input
+                            v-model="newEps.value"
+                            size="small"
+                            placeholder="輸入 EPS 值"
+                            type="number"
+                            style="margin-bottom: 10px; width: 150px;"
+                        />
+
+                        <br>
+                        <el-button type="primary" size="small" @click="addEps">新增 EPS</el-button>
                     </el-col>
                 </el-row>
             </el-form-item>
@@ -15,8 +44,9 @@
 
 <script>
 import _ from 'lodash';
-// import moment from 'moment';
+import moment from 'moment';
 // import { ElMessageBox, ElMessage } from 'element-plus';
+import { ElMessage } from 'element-plus';
 
 export default {
     name: 'component-form-comment',
@@ -29,6 +59,11 @@ export default {
 
             form: {
                 comment: '',
+            },
+
+            newEps: {
+                date: '', // 預設下一個日期
+                value: '', // EPS 值
             },
         };
     },
@@ -50,6 +85,56 @@ export default {
             // this.$nextTick(() => {
             // this.$refs.cost0[0].focus();
             // });
+            // 計算下一個 EPS 日期
+            this.calculateNextEpsDate();
+        },
+        calculateNextEpsDate() {
+            if (!this.stockData.data || !this.stockData.data.eps || this.stockData.data.eps.length === 0) {
+                // 如果沒有 EPS 資料，預設為當年的 03-31
+                this.newEps.date = moment().format('YYYY-03-31');
+                return;
+            }
+
+            // 取出最後一個 EPS 的日期
+            const lastEps = this.stockData.data.eps[this.stockData.data.eps.length - 1];
+            const lastDate = moment(lastEps.date, 'YYYY-MM-DD');
+
+            // 計算下一個季度的日期
+            const nextQuarter = (lastDate.month() + 3) % 12; // 下一季度的月份
+            const nextYear = lastDate.month() + 3 > 11 ? lastDate.year() + 1 : lastDate.year(); // 如果超過 12 月，年份加 1
+
+            // 根據季度月份設定固定的日期
+            const nextDate = moment({ year: nextYear, month: nextQuarter, day: 1 }).endOf('month');
+
+            // 設定下一個日期
+            this.newEps.date = nextDate.format('YYYY-MM-DD');
+        },
+        addEps() {
+            if (!this.newEps.value || !this.newEps.date) {
+                this.$message.error('請輸入 EPS 值');
+                return;
+            }
+
+            // 新增 EPS 到資料庫或狀態管理
+            this.$store.commit('SAVE_STOCK_EPS', {
+                stockId: this.stockId,
+                eps: [
+                    {
+                        date: this.newEps.date,
+                        value: parseFloat(this.newEps.value),
+                    },
+                ],
+            });
+
+            // 顯示成功訊息
+            ElMessage({
+                type: 'success',
+                message: `EPS 新增成功！日期：${this.newEps.date}，值：${this.newEps.value}`,
+            });
+
+            // 清空輸入框並重新計算下一個日期
+            this.newEps.value = '';
+            this.calculateNextEpsDate();
         },
         onClosed() {
             // 因為無法解決手機無法輸入.小數點時轉float會連.都沒有，所以最後才轉
