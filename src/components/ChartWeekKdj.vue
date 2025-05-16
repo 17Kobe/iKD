@@ -60,7 +60,7 @@
                                         v-if="item.acc"
                                         :style="{
                                             marginLeft: '23px',
-                                            color: index === 0 ? 'rgb(255, 182, 193)' : 'inherit',
+                                            color: index === 0 ? 'rgb(255 105 105)' : 'inherit',
                                         }"
                                     >
                                         {{ item.acc < 10 ? ' ' : '' }}{{ item.acc }}
@@ -142,13 +142,13 @@
                                 <br />
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
                                 &nbsp;<span style="color: #bbb">最新</span> 本益比:
-                                <span style="color: rgb(255, 182, 193)"> {{ stockData.data.per.last.toFixed(2) }} </span>
+                                <span style="color: rgb(255 105 105)"> {{ stockData.data.per.last.toFixed(2) }} </span>
                                 <br />
                                 <span v-for="(zone, index) in peZones" :key="index">
                                     &nbsp;近 4 季 EPS 估算 <span style="color: #bbb">{{ zone }} 倍</span> 本益比的股價:
                                     <span
                                         :style="{
-                                        color: index === 2 ? 'rgb(255, 202, 100)' : 'rgb(176, 224, 230)',
+                                            color: index === 2 ? 'rgb(255, 202, 100)' : 'rgb(176, 224, 230)',
                                         }"
                                     >
                                         {{ lastPERatios[index] }}
@@ -204,7 +204,7 @@
                                 <br />
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
                                 &nbsp;<span style="color: #bbb">最新</span> 股價淨值比:
-                                <span style="color: rgb(255, 182, 193)">{{ stockData.data.pbr.last.toFixed(2) }}</span>
+                                <span style="color: rgb(255 105 105)">{{ stockData.data.pbr.last.toFixed(2) }}</span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 股價淨值比:
                                 <span style="color: rgb(255 202 100)">{{ stockData.data.pbr.median.toFixed(2) }}</span>
@@ -250,11 +250,12 @@
                     <el-tooltip :trigger="popoverTrigger" effect="dark" placement="bottom-end">
                         <template #content>
                             <div style="white-space: pre; font-family: 'Lucida Console', monospace">
-                                DY: 殖利率，該日的年化股息收益率。&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                DY:
+                                殖利率，該日的年化股息收益率。&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <br />
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
                                 &nbsp;<span style="color: #bbb">最新</span> 殖利率:
-                                <span style="color: rgb(255, 182, 193)"
+                                <span style="color: rgb(255 105 105)"
                                     >{{ stockData.data.dy.last.toFixed(2) }}<span style="margin-left: 2px">%</span></span
                                 >
                                 <br />
@@ -450,12 +451,12 @@ export default {
                 },
                 animation: {
                     x: {
-                        duration: 0 // 禁用 x 軸動畫
+                        duration: 0, // 禁用 x 軸動畫
                     },
                     y: {
                         duration: 1000, // 動畫時間
-                        easing: 'easeOutBounce' // 動畫效果，可自訂
-                    }
+                        easing: 'easeOutBounce', // 動畫效果，可自訂
+                    },
                 },
                 scales: {
                     x: {
@@ -510,17 +511,11 @@ export default {
             let center = Math.round(median);
 
             // 根據範圍大小決定 step（可調整策略）
-            let step = (max - min > 10) ? 5 : 1;
+            let step = max - min > 10 ? 5 : 1;
 
             // 從中心往左右擴展兩格，得到五個區間
-            return [
-            center - 2 * step,
-            center - step,
-            center,
-            center + step,
-            center + 2 * step
-            ];
-        }
+            return [center - 2 * step, center - step, center, center + step, center + 2 * step];
+        },
     },
     computed: {
         peZones() {
@@ -581,56 +576,56 @@ export default {
 
             // 初始化 datasets
             const colorMap = [
-            { borderColor: 'rgba(0, 128, 255, 1)', backgroundColor: 'rgba(0, 128, 255, 0.4)' },
-            { borderColor: 'rgba(0, 255, 191, 1)', backgroundColor: 'rgba(0, 255, 191, 0.4)' },
-            { borderColor: 'rgba(255, 255, 0, 1)', backgroundColor: 'rgba(255, 255, 0, 0.4)' },
-            { borderColor: 'rgba(255, 100, 0, 1)', backgroundColor: 'rgba(255, 100, 0, 0.4)' },
-            { borderColor: 'rgba(255, 0, 80, 1)', backgroundColor: 'rgba(255, 0, 80, 0.4)' },
+                { borderColor: 'rgba(0, 128, 255, 1)', backgroundColor: 'rgba(0, 128, 255, 0.4)' },
+                { borderColor: 'rgba(0, 255, 191, 1)', backgroundColor: 'rgba(0, 255, 191, 0.4)' },
+                { borderColor: 'rgba(255, 255, 0, 1)', backgroundColor: 'rgba(255, 255, 0, 0.4)' },
+                { borderColor: 'rgba(255, 100, 0, 1)', backgroundColor: 'rgba(255, 100, 0, 0.4)' },
+                { borderColor: 'rgba(255, 0, 80, 1)', backgroundColor: 'rgba(255, 0, 80, 0.4)' },
             ];
 
             // 使用動態計算的 peZones
             this.peZones.forEach((multiple, index) => {
-            datasets.push({
-                label: `${multiple} 倍本益比`,
-                data: [],
-                borderColor: colorMap[index].borderColor,
-                backgroundColor: colorMap[index].backgroundColor,
-                fill: true,
-                pointRadius: 0,
-                borderWidth: 1,
-                tension: 0.3,
-            });
+                datasets.push({
+                    label: `${multiple} 倍本益比`,
+                    data: [],
+                    borderColor: colorMap[index].borderColor,
+                    backgroundColor: colorMap[index].backgroundColor,
+                    fill: true,
+                    pointRadius: 0,
+                    borderWidth: 1,
+                    tension: 0.3,
+                });
             });
 
             // 遍歷每個日期，計算當時的本益比範圍
             labels.forEach((label) => {
-            const currentDate = moment(label, 'YYYY-MM-DD');
+                const currentDate = moment(label, 'YYYY-MM-DD');
 
-            // 找到當前日期及之前的近四季 EPS
-            const recentFourQuarters = this.formattedEps
-                .filter((eps) => moment(eps.date, 'YYYY-MM-DD').isSameOrBefore(currentDate))
-                .slice(-4);
+                // 找到當前日期及之前的近四季 EPS
+                const recentFourQuarters = this.formattedEps
+                    .filter((eps) => moment(eps.date, 'YYYY-MM-DD').isSameOrBefore(currentDate))
+                    .slice(-4);
 
-            // 如果不足四季，跳過
-            if (recentFourQuarters.length < 4) {
-                this.peZones.forEach((_, index) => {
-                datasets[index].data.push(null); // 填充空值
+                // 如果不足四季，跳過
+                if (recentFourQuarters.length < 4) {
+                    this.peZones.forEach((_, index) => {
+                        datasets[index].data.push(null); // 填充空值
+                    });
+                    return;
+                }
+
+                // 計算近四季 EPS 總和
+                const recentEpsSum = recentFourQuarters.reduce((sum, item) => sum + item.value, 0);
+
+                // 計算本益比範圍，並填充到對應的 dataset
+                this.peZones.forEach((multiple, index) => {
+                    datasets[index].data.push((recentEpsSum * multiple).toFixed(2));
                 });
-                return;
-            }
-
-            // 計算近四季 EPS 總和
-            const recentEpsSum = recentFourQuarters.reduce((sum, item) => sum + item.value, 0);
-
-            // 計算本益比範圍，並填充到對應的 dataset
-            this.peZones.forEach((multiple, index) => {
-                datasets[index].data.push((recentEpsSum * multiple).toFixed(2));
-            });
             });
 
             return {
-            labels,
-            datasets,
+                labels,
+                datasets,
             };
         },
         combinedChartData() {
@@ -690,7 +685,7 @@ export default {
 
             // 整理每年的現金股利、股票股利及殖利率
             const yearlyData = this.stockData.data.dividend.reduce((acc, curr) => {
-                const year = curr.date.split("-")[0];
+                const year = curr.date.split('-')[0];
                 if (!acc[year]) {
                     acc[year] = {
                         cashDividend: 0,
@@ -705,7 +700,7 @@ export default {
                 acc[year].cashDividend += curr.CashEarningsDistribution || 0;
                 acc[year].stockDividend += curr.StockEarningsDistribution || 0;
                 acc[year].totalDividend += (curr.CashEarningsDistribution || 0) + (curr.StockEarningsDistribution || 0);
-                
+
                 // 只有當 CashEarningsDistribution > 0 時，才加上 dividendYield
                 acc[year].cashYield += curr.CashEarningsDistribution > 0 ? curr.dividendYield : 0;
                 acc[year].stockYield += curr.StockEarningsDistribution > 0 ? curr.dividendYield : 0;
@@ -729,9 +724,7 @@ export default {
         dyBarData() {
             // 取得近 6 年的資料
             const currentYear = new Date().getFullYear();
-            const filteredDividends = this.yearlyDividends.filter(
-                (item) => parseInt(item.year) >= currentYear - 5
-            );
+            const filteredDividends = this.yearlyDividends.filter((item) => parseInt(item.year) >= currentYear - 5);
 
             const labels = filteredDividends.map((item) => item.year);
             const cashYieldData = filteredDividends.map((item) =>
