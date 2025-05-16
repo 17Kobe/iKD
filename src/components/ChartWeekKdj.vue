@@ -104,10 +104,10 @@
                             <span
                                 :style="{
                                     color: 'rgb(34, 35, 38)',
-                                    fontSize: '11px',
+                                    fontSize: '9px',
                                     marginRight: (() => {
                                         const eps = formattedEps.length > 0 ? formattedEps[formattedEps.length - 1].acc : 0;
-                                        const base = eps < 10 ? 9 + (this.isMobile ? 1 : 0) : 3;
+                                        const base = eps < 10 ? 14 : 7;
                                         return base + (this.isMobile ? 1 : 0) + 'px';
                                     })(),
                                 }"
@@ -173,8 +173,8 @@
                             </div>
                         </template>
                         <div>
-                            <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 10px">PE</span>
-                            <b>{{ stockData.data.per.last.toFixed(2) }}</b>
+                            <span style="color: rgb(34, 35, 38); font-size: 9px; margin-right: 4px">本益比</span>
+                            <b>{{ stockData.data.per.last.toFixed(1) }}</b>
                         </div>
                     </el-tooltip>
                 </span>
@@ -223,8 +223,8 @@
                             </div>
                         </template>
                         <div>
-                            <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 16px">PB</span>
-                            <b>{{ stockData.data.pbr.last.toFixed(2) }}</b>
+                            <span style="color: rgb(34, 35, 38); font-size: 9px; margin-right: 10px">股淨比</span>
+                            <b>{{ stockData.data.pbr.last.toFixed(1) }}</b>
                         </div>
                     </el-tooltip>
                 </span>
@@ -284,9 +284,9 @@
                             </div>
                         </template>
                         <div>
-                            <span style="color: rgb(34, 35, 38); font-size: 11px; margin-right: 4px">DY</span>
-                            <b>{{ stockData.data.dy.last.toFixed(2) }}</b
-                            ><span style="margin-left: 1px">%</span>
+                            <span style="color: rgb(34, 35, 38); font-size: 9px; margin-right: 2px">殖利率</span>
+                            <b>{{ stockData.data.dy.last.toFixed(1) }}</b
+                            ><span style="font-size: 9px; margin-left: 1px">%</span>
                         </div>
                     </el-tooltip>
                 </span>
