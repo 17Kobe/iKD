@@ -1335,7 +1335,7 @@ input::-webkit-inner-spin-button
     color: #909399
 
 .sell .el-badge__content
-    background-color: #06e100
+    background-color: #3fff3a
 
 .buy .el-badge__content
     background-color: #ff2828
