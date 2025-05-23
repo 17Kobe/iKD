@@ -664,7 +664,7 @@ export default {
     margin-right: 0
 
 .sell .el-badge__content
-    background-color: #3fff3a
+    background-color: #04ef27
 
 .buy .el-badge__content
     background-color: #ff2828
