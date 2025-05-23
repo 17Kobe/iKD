@@ -29,10 +29,12 @@
                             </template>
                             <el-badge
                                 :value="scope.row.badge"
-                                class="item"
                                 :class="[
                                     ['買', '買x2', '賣', '賣½', '賣⅓'].includes(scope.row.badge) ? 'shake-base' : '',
-                                    'item',
+                                    ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge) ? 'buy' : '',
+                                    ['賣', '賣½', '賣⅓', '準賣'].includes(scope.row.badge) ? 'sell' : '',
+                                    ['取消買', '取消買x2', '取消賣', '取消賣½'].includes(scope.row.badge) ? 'cancel' : '',
+                                    'item'
                                 ]"
                                 :type="
                                     ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge)
@@ -1331,4 +1333,14 @@ input::-webkit-inner-spin-button
     background-color: #f4f4f5
     border-color: #d3d4d6
     color: #909399
+
+.sell .el-badge__content
+    background-color: #06e100
+
+.buy .el-badge__content
+    background-color: #ff2828
+
+.cancel .el-badge__content
+    background-color: #404059
+
 </style>
