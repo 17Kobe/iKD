@@ -425,6 +425,8 @@ export default {
         return {
             isMobile: true,
 
+            _cachedStockData: null,
+
             popoverTrigger: 'hover', // 預設為 hover
             // chartOptions: {
             // },
@@ -824,10 +826,29 @@ export default {
 
         stockData() {
             console.log('stockData');
-            // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            return this.$store.getters.getStock5yearDaily(this.parentData);
+            // parentData 尚未準備好時，直接回傳空物件，避免 undefined
+            if (!this.parentData) return {};
+            // 若快取已存在且 id 相同且有 data，直接回傳快取
+            // console.log('this._cachedStockData', this._cachedStockData);
+            // console.log('this.parentData', this.parentData);
+            if (this._cachedStockData && this._cachedStockData.data) {
+                // console.log('this._cachedStockData.data', this._cachedStockData.data);
+                return this._cachedStockData;
+            }
+            // 重新取得資料
+            // console.log('getStock5yearDaily');
+            const stock = this.$store.getters.getStock5yearDaily(this.parentData);
+            // console.log("stock", stock);
+            
+            if (stock && stock.data) {
+                this._cachedStockData = stock;
+                return stock;
+            }
+            // 沒有資料時，回傳空物件
+            return {};
         },
-        formattedEps() {
+
+ formattedEps() {
             if (!this.stockData || !this.stockData.data || !this.stockData.data.eps) return [];
 
             const epsList = this.stockData.data.eps;
@@ -880,6 +901,7 @@ export default {
 
             return result;
         },
+        
         kdj() {
             console.log('kdj');
             // console.log(this.stockDataOfPolicy);
@@ -898,63 +920,22 @@ export default {
             return this.$store.getters.getStockDataWeeklyKdj(this.parentData);
         },
 
-        stockDataOfPolicyResultBuy() {
-            console.log('stockDataOfPolicyResultBuy');
-            // console.log(this.stockDataOfPolicy);
-            // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            // 需要小於365天，1年
-            // 因為卜蜂曾經stockDataOfPolicyResultBuy只有一筆買訊在365天內而會出錯，所以加上this.stockData.data 來跟有資料一起才顯示
-            return (
-                (this.stockData.data &&
-                    this.stockData.policy &&
-                    this.stockData.policy.result &&
-                    _.filter(
-                        this.stockData.policy.result,
-                        (o) =>
-                            moment().diff(moment(o.date), 'days') <= 365 &&
-                            _.some(o.reason, (el) => _.includes(el, 'kd') || _.includes(el, 'rsi')) && // 必需有 kd 的訊號設定
-                            o.is_sure_buy
-                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
-                []
+        // 合併 policy result filter
+        policyResultFiltered() {
+            if (!this.stockData.data || !this.stockData.policy || !this.stockData.policy.result) return [];
+            return _.filter(this.stockData.policy.result, o =>
+                moment().diff(moment(o.date), 'days') <= 365 &&
+                _.some(o.reason, el => _.includes(el, 'kd') || _.includes(el, 'rsi'))
             );
+        },
+        stockDataOfPolicyResultBuy() {
+            return this.policyResultFiltered.filter(o => o.is_sure_buy).map(obj => [moment(obj.date).valueOf(), obj.k]);
         },
         stockDataOfPolicyResultSell() {
-            console.log('stockDataOfPolicyResultSell');
-            // console.log(this.stockDataOfPolicy);
-            // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            // 需要小於365天，1年
-            return (
-                (this.stockData.data &&
-                    this.stockData.policy &&
-                    this.stockData.policy.result &&
-                    _.filter(
-                        this.stockData.policy.result,
-                        (o) =>
-                            moment().diff(moment(o.date), 'days') <= 365 &&
-                            _.some(o.reason, (el) => _.includes(el, 'kd') || _.includes(el, 'rsi')) && // 必需有 kd 的訊號設定
-                            o.is_sure_sell
-                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
-                []
-            );
+            return this.policyResultFiltered.filter(o => o.is_sure_sell).map(obj => [moment(obj.date).valueOf(), obj.k]);
         },
         stockDataOfPolicyResultBuyOrSellCancel() {
-            console.log('stockDataOfPolicyResultBuyOrSellCancel');
-            // console.log(this.stockDataOfPolicy);
-            // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            // 需要小於365天，1年
-            return (
-                (this.stockData.data &&
-                    this.stockData.policy &&
-                    this.stockData.policy.result &&
-                    _.filter(
-                        this.stockData.policy.result,
-                        (o) =>
-                            moment().diff(moment(o.date), 'days') <= 365 &&
-                            _.some(o.reason, (el) => _.includes(el, 'kd')) && // 必需有 kd 的訊號設定
-                            (o.is_buy_cancel || o.is_sell_cancel)
-                    ).map((obj) => [moment(obj.date).valueOf(), obj.k])) ||
-                []
-            );
+            return this.policyResultFiltered.filter(o => o.is_buy_cancel || o.is_sell_cancel).map(obj => [moment(obj.date).valueOf(), obj.k]);
         },
 
         stockDataDividend() {
@@ -1035,6 +1016,8 @@ export default {
             console.log('kdTurnUpLmit');
             let ret = -999; // 讓他畫線畫在看到到的地方
             if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.sell) {
+                console.log('this.stockData.policy');
+                
                 const found = _.find(this.stockData.policy.settings.sell, ['method', 'kd_turn_down']);
                 if (found) ret = found.limit; // 若非 nundefined
             }

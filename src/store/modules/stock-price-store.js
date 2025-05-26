@@ -3002,7 +3002,8 @@ const stock = {
         getStock5yearDaily: (state) => (id) => {
             // 取得指定股票，並只回傳近5年daily，其它資料不變，eps只取近6年
             const stock = _.find(state.stockList, { id });
-            if (!stock) return undefined;
+            // 早一點就判斷，沒有 stock 或沒有 data 直接回傳 {}
+            if (!stock || !stock.data) return {};
             // 深拷貝，避免直接改到 state
             const stockCopy = _.cloneDeep(stock);
             // daily 只取近5年
