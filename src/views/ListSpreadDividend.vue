@@ -100,8 +100,8 @@
                             :class="[
                                 ['買', '買x2', '賣', '賣½', '賣⅓'].includes(scope.row.badge) ? 'shake-base' : '',
                                 ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge) ? 'buy' : '',
-                                ['賣', '賣½', '賣⅓', '準賣'].includes(scope.row.badge) ? 'sell' : '',
-                                ['取消買', '取消買x2', '取消賣', '取消賣½'].includes(scope.row.badge) ? 'cancel' : '',
+                                ['賣', '賣½', '賣⅓', '準賣', '準賣½', '準賣⅓'].includes(scope.row.badge) ? 'sell' : '',
+                                ['取消買', '取消買x2', '取消賣', '取消賣½', '取消賣⅓'].includes(scope.row.badge) ? 'cancel' : '',
                                 scope.row.name.length >= 6
                                     ? 'l6'
                                     : scope.row.name.length >= 5
