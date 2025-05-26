@@ -443,12 +443,71 @@
                 </span>
             </span>
 
-            <span style="order: 2">
-                <span style="color: #4286f5">K</span>: {{ kdj[kdj.length - 1][1].toFixed(2) }}
-                <span style="color: #e75c9a">D</span>:
-                {{ kdj[kdj.length - 1][2].toFixed(2) }}
-                <span v-if="showJLine"><span style="color: #febd09">J</span>: {{ kdj[kdj.length - 1][3].toFixed(2) }}</span>
-            </span>
+            <el-tooltip :trigger="popoverTrigger" effect="dark" placement="bottom-end">
+                <template #content>
+                    <div
+                        v-if="
+                            stockData.policy &&
+                            stockData.policy.settings &&
+                            stockData.policy.settings.buy &&
+                            stockData.policy.settings.sell &&
+                            (stockData.policy.settings.buy.length >= 1 || stockData.policy.settings.sell.length >= 1)
+                        "
+                        style="font-size: 13px; max-width: 300px"
+                    >
+                        <div v-for="(item, index) in stockData.policy.settings.buy" :key="'buy-' + index">
+                            <div style="line-height: 18px">
+                                <span
+                                    style="
+                                        font-size: 14px;
+                                        color: white;
+                                        background-color: #f28b82;
+                                        padding: 2px 4px;
+                                        border-radius: 10px 100px / 120px;
+                                    "
+                                >買
+                                    <span v-if="item.label.includes('W') || item.label.includes('固定日')" style="font-size: 10px">x2</span>
+                                </span>
+                                <span>
+                                    &nbsp;{{ item.label.replace('買', '').replace(' 底 (2+n倍)', '') }}&nbsp;
+                                    <span style="color: #4386f5; font-size: 14px">{{ item.limit }}</span>&nbsp;{{ item.limit_desc }}
+                                </span>
+                            </div>
+                        </div>
+                        <div v-for="(item, index) in stockData.policy.settings.sell" :key="'sell-' + index">
+                            <div
+                                style="line-height: 18px; width: 100%"
+                            >
+                                <span
+                                    style="
+                                        font-size: 14px;
+                                        color: white;
+                                        background-color: #82d125;
+                                        padding: 2px 4px;
+                                        border-radius: 10px 100px / 120px;
+                                    "
+                                >{{
+                                    stockData.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought') &&
+                                    (item.method === 'kd_dead' || item.method === 'kd_turn_down')
+                                        ? '賣½'
+                                        : '賣'
+                                }}</span>
+                                <span>
+                                    &nbsp;{{ item.label.replace('賣', '') }}&nbsp;
+                                    <span style="color: #4386f5; font-size: 14px">{{ item.limit }}</span>&nbsp;{{ item.limit_desc }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <span style="order: 2">
+                    <span style="color: #4286f5">K</span>: {{ kdj[kdj.length - 1][1].toFixed(2) }}
+                    <span style="color: #e75c9a">D</span>: {{ kdj[kdj.length - 1][2].toFixed(2) }}
+                    <span v-if="showJLine">
+                        <span style="color: #febd09">J</span>: {{ kdj[kdj.length - 1][3].toFixed(2) }}
+                    </span>
+                </span>
+            </el-tooltip>
         </div>
 
         <!-- :updateArgs="[true, true, true]" -->
