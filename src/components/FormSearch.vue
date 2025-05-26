@@ -184,7 +184,7 @@ export default {
         },
         customStockList() {
             // return this.$store.state.price.stockList;
-            return this.$store.getters.getStockSortedList();
+            return this.$store.getters.getStockNoDataSortedList();
         },
         // stockList() {
         //     return this.$store.state.price.stockList;

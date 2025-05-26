@@ -922,7 +922,7 @@ export default {
             // console.log(this.firstRender);
             // // 先畫6筆，符合iphone XR一次可以看到的數量，之後再畫全部
             // if (this.firstRender) return this.$store.state.price.stockList.slice(0, 6);
-            return this.$store.getters.getStockSortedList(this.$route.query);
+            return this.$store.getters.getStockNoDataSortedList(this.$route.query);
             // return this.$store.state.price.stockList;
 
             // return this.$store.state.price.stockList.reduce((acc, obj) => {

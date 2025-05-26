@@ -2972,14 +2972,17 @@ const stock = {
     getters: {
         // http://localhost:3300/#/?export=true
         // 增加 query 判斷，query有可能是 {} 或 {export:true}，若 export =true 時才要 filter，否則不要filter
-        getStockSortedList: (state) => (query) => {
+        getStockNoDataSortedList: (state) => (query) => {
+            // 產生不含 .data 的股票清單
             let filteredList = state.stockList;
             if (query && query.export) {
                 filteredList = _.filter(filteredList, (stock) => {
                     return stock.badge === '買' || stock.badge === '賣';
                 });
             }
-            return _.orderBy(filteredList, ['order'], ['asc']);
+            // 用 _.map 複製每個物件並移除 .data
+            const listWithoutData = _.map(filteredList, (stock) => _.omit(stock, 'data'));
+            return _.orderBy(listWithoutData, ['order'], ['asc']);
         },
         getDatetoExchange: (state, getters) => (date) => {
             console.log('getDatetoExchange');
