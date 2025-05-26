@@ -33,8 +33,10 @@
                                     ['買', '買x2', '賣', '賣½', '賣⅓'].includes(scope.row.badge) ? 'shake-base' : '',
                                     ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge) ? 'buy' : '',
                                     ['賣', '賣½', '賣⅓', '準賣', '準賣½', '準賣⅓'].includes(scope.row.badge) ? 'sell' : '',
-                                    ['取消買', '取消買x2', '取消賣', '取消賣½', '取消賣⅓'].includes(scope.row.badge) ? 'cancel' : '',
-                                    'item'
+                                    ['取消買', '取消買x2', '取消賣', '取消賣½', '取消賣⅓'].includes(scope.row.badge)
+                                        ? 'cancel'
+                                        : '',
+                                    'item',
                                 ]"
                                 :type="
                                     ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge)
@@ -149,7 +151,7 @@
                     <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1">
                         <el-tooltip placement="bottom-end" effect="dark">
                             <template #content>
-                                <div style="line-height: 1.6; min-width: 280px;">
+                                <div style="line-height: 1.6; min-width: 300px">
                                     <div>
                                         成 <span style="margin-left: 4px">本</span>
                                         <span style="margin-left: 5px">價</span>&nbsp;&nbsp;
@@ -172,13 +174,7 @@
                                     </div>
                                     <div>
                                         累積股數&nbsp;&nbsp;
-                                        <el-tag
-                                            type="info"
-                                            effect="plain"
-                                            class="ml-2"
-                                            size="small"
-                                            style="margin: 1px 0px"
-                                        >
+                                        <el-tag type="info" effect="plain" class="ml-2" size="small" style="margin: 1px 0px">
                                             <span style="font-size: 14px; font-weight: bold">
                                                 {{ scope.row.cost.total.toLocaleString('en-US') }}
                                             </span>
@@ -187,13 +183,7 @@
                                     </div>
                                     <div>
                                         本　　金&nbsp;&nbsp;
-                                        <el-tag
-                                            class="ml-2"
-                                            type="info"
-                                            size="small"
-                                            effect="dark"
-                                            style="margin: 1px 0px"
-                                        >
+                                        <el-tag class="ml-2" type="info" size="small" effect="dark" style="margin: 1px 0px">
                                             <span style="font-size: 14px; font-weight: bold">
                                                 {{ scope.row.cost.sum.toLocaleString('en-US') }}
                                             </span>
@@ -211,17 +201,35 @@
                                     >
                                         <!-- 固定列 -->
                                         <div style="display: flex; font-size: 12px; line-height: 1.6">
-                                            <span style="flex: 0 0 80px; text-align: center;">
+                                            <span style="flex: 0 0 80px; text-align: center">
                                                 {{ today }}
                                             </span>
-                                            <span style="flex: 0 0 100px; text-align: left; color: white; background-color: #82e725; border-radius: 10px 100px / 120px; padding: 2px 6px; display: flex; justify-content: space-between">
+                                            <span
+                                                style="
+                                                    flex: 0 0 100px;
+                                                    text-align: left;
+                                                    color: white;
+                                                    background-color: #82e725;
+                                                    border-radius: 10px 100px / 120px;
+                                                    padding: 2px 6px;
+                                                    display: flex;
+                                                    justify-content: space-between;
+                                                "
+                                            >
                                                 今<span>({{ getNumberSum(scope.row.cost.settings) }} 股)</span>
                                             </span>
-                                            <span style="flex: 0 0 60px; text-align: center;">{{ scope.row.last_price }} 元</span>
+                                            <span style="flex: 0 0 70px; text-align: right">
+                                                <span style="font-family: monospace; font-size: 13px">{{
+                                                    scope.row.last_price
+                                                }}</span>
+                                                元</span
+                                            >
                                             <span
                                                 :style="[
-                                                    scope.row.cost.rate_of_return < 0 ? { color: '#01aa00' } : { color: '#ee3333' },
-                                                    { flex: '0 0 30px', 'text-align': 'right' }
+                                                    scope.row.cost.rate_of_return < 0
+                                                        ? { color: '#01aa00' }
+                                                        : { color: 'rgb(255 105 105)' },
+                                                    { flex: '0 0 45px', 'text-align': 'right' },
                                                 ]"
                                             >
                                                 {{ Number(Math.round(scope.row.cost.rate_of_return * 10) / 10) }}%
@@ -234,15 +242,15 @@
                                             :key="'history-' + index"
                                             style="display: flex; font-size: 12px; line-height: 1.6"
                                         >
-                                            <span style="flex: 0 0 80px; text-align: center;">{{ item.buy_date }}</span>
+                                            <span style="flex: 0 0 80px; text-align: center">{{ item.buy_date }}</span>
                                             <!-- 買賣狀態（含顏色區塊） -->
                                             <span
                                                 :style="[
                                                     item.isSell ? { backgroundColor: '#82e725' } : { backgroundColor: '#f28b82' },
                                                     {
-                                                        flex: '0 0 100px', 
+                                                        flex: '0 0 100px',
                                                         textAlign: 'left',
-                                                        display: 'flex', 
+                                                        display: 'flex',
                                                         justifyContent: 'space-between',
                                                         color: 'white',
                                                         borderRadius: '10px 100px / 120px',
@@ -253,12 +261,13 @@
                                                 {{ item.isSell ? '賣' : '買' }}
                                                 <span>({{ item.number.toLocaleString() }} 股)</span>
                                             </span>
-                                                                                    
-                                            <span style="flex: 0 0 60px; text-align: center;">{{ item.cost }} 元</span>
-                                            <span style="flex: 0 0 50px; text-align: right;"></span>
+
+                                            <span style="flex: 0 0 70px; text-align: right">
+                                                <span style="font-family: monospace; font-size: 13px">{{ item.cost }}</span> 元
+                                            </span>
+                                            <span style="flex: 0 0 45px; text-align: right"></span>
                                         </div>
                                     </div>
-
                                 </div>
                             </template>
 
@@ -266,12 +275,16 @@
                             <el-progress
                                 :text-inside="true"
                                 :stroke-width="20"
-                                :percentage="scope.row.cost.rate_of_return === null || Math.abs(scope.row.cost.rate_of_return) > 1000
-                                    ? 100
-                                    : Math.abs(scope.row.cost.rate_of_return) * progressMultiple"
-                                :color="scope.row.cost.rate_of_return !== null && scope.row.cost.rate_of_return <= 0
-                                    ? '#ffc2bd'
-                                    : '#c5f4ff'"
+                                :percentage="
+                                    scope.row.cost.rate_of_return === null || Math.abs(scope.row.cost.rate_of_return) > 1000
+                                        ? 100
+                                        : Math.abs(scope.row.cost.rate_of_return) * progressMultiple
+                                "
+                                :color="
+                                    scope.row.cost.rate_of_return !== null && scope.row.cost.rate_of_return <= 0
+                                        ? '#ffc2bd'
+                                        : '#c5f4ff'
+                                "
                                 style="padding: 0 2px 0 18px"
                             >
                                 <span style="color: #222326; font-size: 9px">
@@ -282,7 +295,11 @@
                                             { 'font-size': '13px', 'font-weight': 'bold' },
                                         ]"
                                     >
-                                        ${{ scope.row.cost.return ? Number(Math.round(scope.row.cost.return * 10) / 10).toLocaleString('en-US') : '0' }}
+                                        ${{
+                                            scope.row.cost.return
+                                                ? Number(Math.round(scope.row.cost.return * 10) / 10).toLocaleString('en-US')
+                                                : '0'
+                                        }}
                                     </span>
                                     &nbsp;&nbsp;
                                     <span style="font-size: 11px; font-weight: bold; color: #545454">
@@ -299,15 +316,12 @@
                                     <span
                                         style="color: #999999"
                                         v-if="scope.row.cost.rate_of_return !== null && !isNaN(scope.row.cost.rate_of_return)"
-                                    >%</span>
-
+                                        >%</span
+                                    >
                                 </span>
-
                             </el-progress>
                         </el-tooltip>
-
                     </div>
-
                 </template>
             </el-table-column>
 
@@ -1457,5 +1471,4 @@ input::-webkit-inner-spin-button
 
 .cancel .el-badge__content
     background-color: #404059
-
 </style>
