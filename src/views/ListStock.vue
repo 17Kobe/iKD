@@ -147,52 +147,167 @@
                         </span>
                     </div>
                     <div v-if="scope.row.cost && scope.row.cost.settings.length >= 1">
-                        <el-progress
-                            :text-inside="true"
-                            :stroke-width="20"
-                            :percentage="
-                                scope.row.cost.rate_of_return === null || Math.abs(scope.row.cost.rate_of_return) > 1000
+                        <el-tooltip placement="bottom-end" effect="dark">
+                            <template #content>
+                                <div style="line-height: 1.6; min-width: 280px;">
+                                    <div>
+                                        成 <span style="margin-left: 4px">本</span>
+                                        <span style="margin-left: 5px">價</span>&nbsp;&nbsp;
+                                        <el-tag
+                                            :type="scope.row.cost.avg <= scope.row.last_price ? 'primary' : 'danger'"
+                                            class="ml-2"
+                                            size="small"
+                                            effect="plain"
+                                            style="margin: 1px 0px"
+                                        >
+                                            <span style="font-size: 14px; font-weight: bold">
+                                                {{
+                                                    scope.row.cost.avg >= 100
+                                                        ? Number(scope.row.cost.avg.toFixed(1)).toLocaleString('en-US')
+                                                        : Number(scope.row.cost.avg.toFixed(2)).toLocaleString('en-US')
+                                                }}
+                                            </span>
+                                            元
+                                        </el-tag>
+                                    </div>
+                                    <div>
+                                        累積股數&nbsp;&nbsp;
+                                        <el-tag
+                                            type="info"
+                                            effect="plain"
+                                            class="ml-2"
+                                            size="small"
+                                            style="margin: 1px 0px"
+                                        >
+                                            <span style="font-size: 14px; font-weight: bold">
+                                                {{ scope.row.cost.total.toLocaleString('en-US') }}
+                                            </span>
+                                            股
+                                        </el-tag>
+                                    </div>
+                                    <div>
+                                        本　　金&nbsp;&nbsp;
+                                        <el-tag
+                                            class="ml-2"
+                                            type="info"
+                                            size="small"
+                                            effect="dark"
+                                            style="margin: 1px 0px"
+                                        >
+                                            <span style="font-size: 14px; font-weight: bold">
+                                                {{ scope.row.cost.sum.toLocaleString('en-US') }}
+                                            </span>
+                                            元
+                                        </el-tag>
+                                    </div>
+
+                                    <!-- 分隔線 -->
+                                    <span style="display: block; border-top: 1px solid #ccc; margin: 10px 0"></span>
+
+                                    <!-- 資料列 -->
+                                    <div
+                                        v-if="scope.row.cost && scope.row.cost.settings && scope.row.cost.settings.length > 0"
+                                        style="margin-top: 8px"
+                                    >
+                                        <!-- 固定列 -->
+                                        <div style="display: flex; font-size: 12px; line-height: 1.6">
+                                            <span style="flex: 0 0 80px; text-align: center;">
+                                                {{ today }}
+                                            </span>
+                                            <span style="flex: 0 0 100px; text-align: left; color: white; background-color: #82e725; border-radius: 10px 100px / 120px; padding: 2px 6px; display: flex; justify-content: space-between">
+                                                今<span>({{ getNumberSum(scope.row.cost.settings) }} 股)</span>
+                                            </span>
+                                            <span style="flex: 0 0 60px; text-align: center;">{{ scope.row.last_price }} 元</span>
+                                            <span
+                                                :style="[
+                                                    scope.row.cost.rate_of_return < 0 ? { color: '#01aa00' } : { color: '#ee3333' },
+                                                    { flex: '0 0 30px', 'text-align': 'right' }
+                                                ]"
+                                            >
+                                                {{ Number(Math.round(scope.row.cost.rate_of_return * 10) / 10) }}%
+                                            </span>
+                                        </div>
+
+                                        <!-- 動態列 -->
+                                        <div
+                                            v-for="(item, index) in scope.row.cost.settings.slice().reverse()"
+                                            :key="'history-' + index"
+                                            style="display: flex; font-size: 12px; line-height: 1.6"
+                                        >
+                                            <span style="flex: 0 0 80px; text-align: center;">{{ item.buy_date }}</span>
+                                            <!-- 買賣狀態（含顏色區塊） -->
+                                            <span
+                                                :style="[
+                                                    item.isSell ? { backgroundColor: '#82e725' } : { backgroundColor: '#f28b82' },
+                                                    {
+                                                        flex: '0 0 100px', 
+                                                        textAlign: 'left',
+                                                        display: 'flex', 
+                                                        justifyContent: 'space-between',
+                                                        color: 'white',
+                                                        borderRadius: '10px 100px / 120px',
+                                                        padding: '2px 6px',
+                                                    },
+                                                ]"
+                                            >
+                                                {{ item.isSell ? '賣' : '買' }}
+                                                <span>({{ item.number.toLocaleString() }} 股)</span>
+                                            </span>
+                                                                                    
+                                            <span style="flex: 0 0 60px; text-align: center;">{{ item.cost }} 元</span>
+                                            <span style="flex: 0 0 50px; text-align: right;"></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </template>
+
+                            <!-- el-progress 本體 -->
+                            <el-progress
+                                :text-inside="true"
+                                :stroke-width="20"
+                                :percentage="scope.row.cost.rate_of_return === null || Math.abs(scope.row.cost.rate_of_return) > 1000
                                     ? 100
-                                    : Math.abs(scope.row.cost.rate_of_return) * progressMultiple
-                            "
-                            :color="
-                                scope.row.cost.rate_of_return !== null && scope.row.cost.rate_of_return <= 0
+                                    : Math.abs(scope.row.cost.rate_of_return) * progressMultiple"
+                                :color="scope.row.cost.rate_of_return !== null && scope.row.cost.rate_of_return <= 0
                                     ? '#ffc2bd'
-                                    : '#c5f4ff'
-                            "
-                            style="padding: 0 2px 0 18px"
-                        >
-                            <!-- style="width: 158px; z-index: 999; top: 3px" -->
-                            <!-- '#fef0f0' #f690a9 -->
-                            <span style="color: #222326; font-size: 9px">
-                                損益&nbsp;&nbsp;<span
-                                    :style="[
-                                        scope.row.cost.return >= 0 ? { color: '#2cc8fb' } : { color: '#f56c70' },
-                                        { 'font-size': '13px', 'font-weight': 'bold' },
-                                    ]"
-                                    >$
-                                    {{
-                                        scope.row.cost.return
-                                            ? Number(Math.round(scope.row.cost.return * 10) / 10).toLocaleString('en-US')
-                                            : '0'
-                                    }}</span
-                                >&nbsp;&nbsp;<span style="font-size: 11px; font-weight: bold; color: #545454">{{
-                                    scope.row.cost.rate_of_return === 0
-                                        ? '0'
-                                        : scope.row.cost.rate_of_return === null || isNaN(scope.row.cost.rate_of_return)
-                                        ? ''
-                                        : Math.abs(scope.row.cost.rate_of_return) >= 1000
-                                        ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
-                                        : Number(Math.round(scope.row.cost.rate_of_return * 10) / 10)
-                                }}</span>
-                                <span
-                                    style="color: #999999"
-                                    v-if="scope.row.cost.rate_of_return !== null && !isNaN(scope.row.cost.rate_of_return)"
-                                    >%</span
-                                >
-                            </span>
-                        </el-progress>
+                                    : '#c5f4ff'"
+                                style="padding: 0 2px 0 18px"
+                            >
+                                <span style="color: #222326; font-size: 9px">
+                                    損益&nbsp;&nbsp;
+                                    <span
+                                        :style="[
+                                            scope.row.cost.return >= 0 ? { color: '#2cc8fb' } : { color: '#f56c70' },
+                                            { 'font-size': '13px', 'font-weight': 'bold' },
+                                        ]"
+                                    >
+                                        ${{ scope.row.cost.return ? Number(Math.round(scope.row.cost.return * 10) / 10).toLocaleString('en-US') : '0' }}
+                                    </span>
+                                    &nbsp;&nbsp;
+                                    <span style="font-size: 11px; font-weight: bold; color: #545454">
+                                        {{
+                                            scope.row.cost.rate_of_return === 0
+                                                ? '0'
+                                                : scope.row.cost.rate_of_return === null || isNaN(scope.row.cost.rate_of_return)
+                                                ? ''
+                                                : Math.abs(scope.row.cost.rate_of_return) >= 1000
+                                                ? (scope.row.cost.rate_of_return / 1000).toFixed(1) + 'k'
+                                                : Number(Math.round(scope.row.cost.rate_of_return * 10) / 10)
+                                        }}
+                                    </span>
+                                    <span
+                                        style="color: #999999"
+                                        v-if="scope.row.cost.rate_of_return !== null && !isNaN(scope.row.cost.rate_of_return)"
+                                    >%</span>
+
+                                </span>
+
+                            </el-progress>
+                        </el-tooltip>
+
                     </div>
+
                 </template>
             </el-table-column>
 
