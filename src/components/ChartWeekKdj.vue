@@ -825,7 +825,7 @@ export default {
         stockData() {
             console.log('stockData');
             // 一開始時this.parentData會是null，所以要給[]來避免出錯
-            return this.$store.getters.getStock(this.parentData);
+            return this.$store.getters.getStock5yearDaily(this.parentData);
         },
         formattedEps() {
             if (!this.stockData || !this.stockData.data || !this.stockData.data.eps) return [];

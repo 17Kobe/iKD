@@ -2999,6 +2999,39 @@ const stock = {
             // return _.find(state.stockList, ['id', id]);
             return state.stockList.find((stock) => stock.id === id);
         },
+        getStock5yearDaily: (state) => (id) => {
+            // 取得指定股票，並只回傳近5年daily，其它資料不變，eps只取近6年
+            const stock = _.find(state.stockList, { id });
+            if (!stock) return undefined;
+            // 深拷貝，避免直接改到 state
+            const stockCopy = _.cloneDeep(stock);
+            // daily 只取近5年
+            if (
+                _.has(stockCopy, 'data.daily') &&
+                _.isArray(stockCopy.data.daily) &&
+                stockCopy.data.daily.length > 0
+            ) {
+                const fiveYearsAgo = moment().subtract(5, 'years');
+                stockCopy.data.daily = _.filter(
+                    stockCopy.data.daily,
+                    (item) => moment(item[0], 'YYYY-MM-DD').isSameOrAfter(fiveYearsAgo)
+                );
+            }
+            // eps 只取近6年
+            if (
+                _.has(stockCopy, 'data.eps') &&
+                _.isArray(stockCopy.data.eps) &&
+                stockCopy.data.eps.length > 0
+            ) {
+                const sixYearsAgo = moment().subtract(6, 'years');
+                stockCopy.data.eps = _.filter(
+                    stockCopy.data.eps,
+                    (item) => moment(item.date, 'YYYY-MM-DD').isSameOrAfter(sixYearsAgo)
+                );
+            }
+            return stockCopy;
+        },
+
         getStockDataDividend: (state, getters) => (id) => {
             console.log('getStockDataDividend');
             const found = getters.getStock(id);
