@@ -282,6 +282,57 @@
                                 &nbsp;計算日期:
                                 <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
                                 <BarChart :chartData="dyBarData" :options="dyBarOptions" />
+
+                                <!-- 歷年股利清單 -->
+                                <!-- 標題列 -->
+                                <span style="display: block; border-bottom: 1px solid #ccc; margin: 7px 0"></span>
+                                <div style="margin-left: 10px">
+                                    &nbsp;&nbsp;除息日&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;股利&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;發放日
+                                    &nbsp;&nbsp;殖利率(%)
+                                </div>
+                                <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
+                                <div v-if="stockData.data.dividend && stockData.data.dividend.length >= 1" style="margin-top: 8px">
+                                    <div
+                                    v-for="(item, index) in stockData.data.dividend.slice().reverse()"
+                                    :key="index"
+                                    >
+                                    <span :style="[
+                                        (item.CashExDividendTradingDate
+                                ? parseInt(item.CashExDividendTradingDate.substring(0, 4))
+                                : parseInt(item.StockExDividendTradingDate.substring(0, 4))) %
+                                2 ===
+                            1
+                                            ? { 'color': '#bbb' }
+                                            : { 'color': '#ffffff' },
+                                            {'flex': '1', 'text-align': 'center', 'margin-left': '3px'}
+                                ]">
+                                        {{ item.CashExDividendTradingDate || item.StockExDividendTradingDate }}
+                                    </span>
+                                    <span style="flex: 1; text-align: center; margin-left: 20px">
+                                        {{ item.CashEarningsDistribution ? '現金股利' : '股票股利' }}<span>(&nbsp;{{
+                                                (item.CashEarningsDistribution
+                                                    ? item.CashEarningsDistribution.toFixed(2)
+                                                    : item.StockEarningsDistribution.toFixed(2)
+                                                ).padStart(5, ' ')
+                                            }}{{ item.CashEarningsDistribution ? '元' : '股' }}&nbsp;)
+                                        </span>
+                                    </span>
+                                    <span
+                                    :style="[
+                                        parseInt(item.CashDividendPaymentDate?.substring(0, 4) || '0') % 2 === 1
+                                        ? { color: '#bbb' }
+                                        : { color: '#ffffff' },
+                                        { display: 'inline-block', width: '90px', 'text-align': 'center', 'margin-left': '11px' }
+                                    ]"
+                                    >
+                                    {{ item.CashDividendPaymentDate || '\u00A0' }}
+                                    </span>
+                                    <span style="flex: 1; text-align: center; margin-left: 17px; color: rgb(255 202 100)">
+                                        {{ item.dividendYield ? item.dividendYield.toFixed(2) + ' %' : '' }}
+                                    </span>
+                                    </div>
+                                </div>
+
                             </div>
                         </template>
                         <div>
@@ -901,7 +952,7 @@ export default {
 
             return result;
         },
-        
+
         kdj() {
             console.log('kdj');
             // console.log(this.stockDataOfPolicy);
