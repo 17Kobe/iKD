@@ -640,9 +640,13 @@
                                             border-radius: 10px 100px / 120px;
                                         "
                                         >{{
-                                            scope.row.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought') &&
-                                            (item.method === 'kd_dead' || item.method === 'kd_turn_down')
-                                                ? '賣½'
+                                            scope.row.star === 3 &&
+                                            scope.row.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought')
+                                                ? item.method === 'rsi_over_bought'
+                                                    ? '賣½'
+                                                    : item.method === 'kd_dead' || item.method === 'kd_turn_down'
+                                                    ? '賣⅓'
+                                                    : '賣'
                                                 : '賣'
                                         }}</span
                                     >

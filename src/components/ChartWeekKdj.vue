@@ -291,46 +291,55 @@
                                     &nbsp;&nbsp;殖利率(%)
                                 </div>
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
-                                <div v-if="stockData.data.dividend && stockData.data.dividend.length >= 1" style="margin-top: 8px">
-                                    <div
-                                    v-for="(item, index) in stockData.data.dividend.slice().reverse()"
-                                    :key="index"
-                                    >
-                                    <span :style="[
-                                        (item.CashExDividendTradingDate
-                                ? parseInt(item.CashExDividendTradingDate.substring(0, 4))
-                                : parseInt(item.StockExDividendTradingDate.substring(0, 4))) %
-                                2 ===
-                            1
-                                            ? { 'color': '#bbb' }
-                                            : { 'color': '#ffffff' },
-                                            {'flex': '1', 'text-align': 'center', 'margin-left': '3px'}
-                                ]">
-                                        {{ item.CashExDividendTradingDate || item.StockExDividendTradingDate }}
-                                    </span>
-                                    <span style="flex: 1; text-align: center; margin-left: 14px">
-                                        {{ item.CashEarningsDistribution ? '現金股利' : '股票股利' }}<span>({{
-                                                (item.CashEarningsDistribution
-                                                    ? item.CashEarningsDistribution.toFixed(2)
-                                                    : item.StockEarningsDistribution.toFixed(2)
-                                                ).padStart(5, ' ')
-                                            }}{{ item.CashEarningsDistribution ? ' 元' : ' 股' }})
+                                <div
+                                    v-if="stockData.data.dividend && stockData.data.dividend.length >= 1"
+                                    style="margin-top: 8px"
+                                >
+                                    <div v-for="(item, index) in stockData.data.dividend.slice().reverse()" :key="index">
+                                        <span
+                                            :style="[
+                                                (item.CashExDividendTradingDate
+                                                    ? parseInt(item.CashExDividendTradingDate.substring(0, 4))
+                                                    : parseInt(item.StockExDividendTradingDate.substring(0, 4))) %
+                                                    2 ===
+                                                1
+                                                    ? { color: '#bbb' }
+                                                    : { color: '#ffffff' },
+                                                { flex: '1', 'text-align': 'center', 'margin-left': '3px' },
+                                            ]"
+                                        >
+                                            {{ item.CashExDividendTradingDate || item.StockExDividendTradingDate }}
                                         </span>
-                                    </span>
-                                    <span
-                                    :style="[
-                                        parseInt(item.CashDividendPaymentDate?.substring(0, 4) || '0') % 2 === 1
-                                        ? { color: '#bbb' }
-                                        : { color: '#ffffff' },
-                                        { display: 'inline-block', 'text-align': 'center', 'width': '74px', 'margin-left': '5px' }
-                                    ]"
-                                    >{{ item.CashDividendPaymentDate || '\u00A0' }}</span>
-                                    <span style="flex: 1; text-align: center; margin-left: 13px; color: rgb(255 202 100)">
-                                        {{ item.dividendYield ? item.dividendYield.toFixed(2) + ' %' : '' }}
-                                    </span>
+                                        <span style="flex: 1; text-align: center; margin-left: 14px">
+                                            {{ item.CashEarningsDistribution ? '現金股利' : '股票股利'
+                                            }}<span
+                                                >({{
+                                                    (item.CashEarningsDistribution
+                                                        ? item.CashEarningsDistribution.toFixed(2)
+                                                        : item.StockEarningsDistribution.toFixed(2)
+                                                    ).padStart(5, ' ')
+                                                }}{{ item.CashEarningsDistribution ? ' 元' : ' 股' }})
+                                            </span>
+                                        </span>
+                                        <span
+                                            :style="[
+                                                parseInt(item.CashDividendPaymentDate?.substring(0, 4) || '0') % 2 === 1
+                                                    ? { color: '#bbb' }
+                                                    : { color: '#ffffff' },
+                                                {
+                                                    display: 'inline-block',
+                                                    'text-align': 'center',
+                                                    width: '74px',
+                                                    'margin-left': '5px',
+                                                },
+                                            ]"
+                                            >{{ item.CashDividendPaymentDate || '\u00A0' }}</span
+                                        >
+                                        <span style="flex: 1; text-align: center; margin-left: 13px; color: rgb(255 202 100)">
+                                            {{ item.dividendYield ? item.dividendYield.toFixed(2) + ' %' : '' }}
+                                        </span>
                                     </div>
                                 </div>
-
                             </div>
                         </template>
                         <div>
@@ -465,19 +474,21 @@
                                         padding: 2px 4px;
                                         border-radius: 10px 100px / 120px;
                                     "
-                                >買
-                                    <span v-if="item.label.includes('W') || item.label.includes('固定日')" style="font-size: 10px">x2</span>
+                                    >買<span
+                                        v-if="item.label.includes('W') || item.label.includes('固定日')"
+                                        style="font-size: 10px"
+                                        >x2</span
+                                    >
                                 </span>
                                 <span>
                                     &nbsp;{{ item.label.replace('買', '').replace(' 底 (2+n倍)', '') }}&nbsp;
-                                    <span style="color: #4386f5; font-size: 14px">{{ item.limit }}</span>&nbsp;{{ item.limit_desc }}
+                                    <span style="color: #4386f5; font-size: 14px">{{ item.limit }}</span
+                                    >&nbsp;{{ item.limit_desc }}
                                 </span>
                             </div>
                         </div>
                         <div v-for="(item, index) in stockData.policy.settings.sell" :key="'sell-' + index">
-                            <div
-                                style="line-height: 18px; width: 100%"
-                            >
+                            <div style="line-height: 18px; width: 100%">
                                 <span
                                     style="
                                         font-size: 14px;
@@ -486,15 +497,21 @@
                                         padding: 2px 4px;
                                         border-radius: 10px 100px / 120px;
                                     "
-                                >{{
-                                    stockData.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought') &&
-                                    (item.method === 'kd_dead' || item.method === 'kd_turn_down')
-                                        ? '賣½'
-                                        : '賣'
-                                }}</span>
+                                    >{{
+                                        stockData.star === 3 &&
+                                        stockData.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought')
+                                            ? item.method === 'rsi_over_bought'
+                                                ? '賣½'
+                                                : item.method === 'kd_dead' || item.method === 'kd_turn_down'
+                                                ? '賣⅓'
+                                                : '賣'
+                                            : '賣'
+                                    }}</span
+                                >
                                 <span>
                                     &nbsp;{{ item.label.replace('賣', '') }}&nbsp;
-                                    <span style="color: #4386f5; font-size: 14px">{{ item.limit }}</span>&nbsp;{{ item.limit_desc }}
+                                    <span style="color: #4386f5; font-size: 14px">{{ item.limit }}</span
+                                    >&nbsp;{{ item.limit_desc }}
                                 </span>
                             </div>
                         </div>
@@ -503,9 +520,7 @@
                 <span style="order: 2">
                     <span style="color: #4286f5">K</span>: {{ kdj[kdj.length - 1][1].toFixed(2) }}
                     <span style="color: #e75c9a">D</span>: {{ kdj[kdj.length - 1][2].toFixed(2) }}
-                    <span v-if="showJLine">
-                        <span style="color: #febd09">J</span>: {{ kdj[kdj.length - 1][3].toFixed(2) }}
-                    </span>
+                    <span v-if="showJLine"> <span style="color: #febd09">J</span>: {{ kdj[kdj.length - 1][3].toFixed(2) }} </span>
                 </span>
             </el-tooltip>
         </div>
@@ -947,7 +962,7 @@ export default {
             // console.log('getStock5yearDaily');
             const stock = this.$store.getters.getStock5yearDaily(this.parentData);
             // console.log("stock", stock);
-            
+
             if (stock && stock.data) {
                 this._cachedStockData = stock;
                 return stock;
@@ -956,7 +971,7 @@ export default {
             return {};
         },
 
- formattedEps() {
+        formattedEps() {
             if (!this.stockData || !this.stockData.data || !this.stockData.data.eps) return [];
 
             const epsList = this.stockData.data.eps;
@@ -1031,19 +1046,23 @@ export default {
         // 合併 policy result filter
         policyResultFiltered() {
             if (!this.stockData.data || !this.stockData.policy || !this.stockData.policy.result) return [];
-            return _.filter(this.stockData.policy.result, o =>
-                moment().diff(moment(o.date), 'days') <= 365 &&
-                _.some(o.reason, el => _.includes(el, 'kd') || _.includes(el, 'rsi'))
+            return _.filter(
+                this.stockData.policy.result,
+                (o) =>
+                    moment().diff(moment(o.date), 'days') <= 365 &&
+                    _.some(o.reason, (el) => _.includes(el, 'kd') || _.includes(el, 'rsi'))
             );
         },
         stockDataOfPolicyResultBuy() {
-            return this.policyResultFiltered.filter(o => o.is_sure_buy).map(obj => [moment(obj.date).valueOf(), obj.k]);
+            return this.policyResultFiltered.filter((o) => o.is_sure_buy).map((obj) => [moment(obj.date).valueOf(), obj.k]);
         },
         stockDataOfPolicyResultSell() {
-            return this.policyResultFiltered.filter(o => o.is_sure_sell).map(obj => [moment(obj.date).valueOf(), obj.k]);
+            return this.policyResultFiltered.filter((o) => o.is_sure_sell).map((obj) => [moment(obj.date).valueOf(), obj.k]);
         },
         stockDataOfPolicyResultBuyOrSellCancel() {
-            return this.policyResultFiltered.filter(o => o.is_buy_cancel || o.is_sell_cancel).map(obj => [moment(obj.date).valueOf(), obj.k]);
+            return this.policyResultFiltered
+                .filter((o) => o.is_buy_cancel || o.is_sell_cancel)
+                .map((obj) => [moment(obj.date).valueOf(), obj.k]);
         },
 
         stockDataDividend() {
@@ -1125,7 +1144,7 @@ export default {
             let ret = -999; // 讓他畫線畫在看到到的地方
             if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.sell) {
                 console.log('this.stockData.policy');
-                
+
                 const found = _.find(this.stockData.policy.settings.sell, ['method', 'kd_turn_down']);
                 if (found) ret = found.limit; // 若非 nundefined
             }
