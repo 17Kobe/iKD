@@ -124,7 +124,9 @@
                                     cursor: 'pointer',
                                     'font-weight': 'bold',
                                     color:
-                                        scope.row.type === 'fund'
+                                        scope.row.type === 'btc'
+                                            ? '#f3c60d'
+                                            : scope.row.type === 'fund'
                                             ? '#e6a23c'
                                             : scope.row.type === 'exchange'
                                             ? '#f56c6c'
@@ -272,9 +274,9 @@
                 </template>
             </el-table-column>
 
-            <el-table-column :label="modeSpread === '目前' ? '現價' : '賣價'" prop="last_price" width="55" align="center">
+            <el-table-column :label="modeSpread === '目前' ? '現價' : '賣價'" prop="last_price" width="70" align="center">
             </el-table-column>
-            <el-table-column label="成本價" width="55" align="center">
+            <el-table-column label="成本價" width="70" align="center">
                 <template #default="scope">
                     <span
                         v-if="scope.row.cost"

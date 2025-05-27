@@ -30,6 +30,7 @@
                             <el-badge
                                 :value="scope.row.badge"
                                 :class="[
+                                    ['比特幣'].includes(scope.row.name) ? 'btc' : '',
                                     ['買', '買x2', '賣', '賣½', '賣⅓'].includes(scope.row.badge) ? 'shake-base' : '',
                                     ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge) ? 'buy' : '',
                                     ['賣', '賣½', '賣⅓', '準賣', '準賣½', '準賣⅓'].includes(scope.row.badge) ? 'sell' : '',
@@ -1415,6 +1416,8 @@ input::-webkit-inner-spin-button
     top: -2px
     right: calc(2px + var(--el-badge-size) / 2)
     opacity: 0.83
+.btc .el-badge__content.is-fixed
+    right: calc(10px + var(--el-badge-size) / 2)
 // group button padding 左右小一點
 .el-input-group__prepend
     padding: 0 10px

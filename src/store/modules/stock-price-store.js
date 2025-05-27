@@ -244,7 +244,7 @@ const stock = {
                             const endTime = moment.utc(siteExistsLatestDate, 'YYYY-MM-DD').endOf('day').valueOf();
 
                             // const url = `https://api.binance.com/api/v3/klines?symbol=${stockObj.id}&interval=1d&startTime=${startTime}&endTime=${endTime}`;
-                            const url = `https://api.binance.com/api/v3/klines?symbol=${stockObj.id}&interval=1d&startTime=${startTime}&limit=1000`;
+                            const url = `https://api.binance.com/api/v3/klines?symbol=${stockObj.id}&interval=1d&startTime=${startTime}&endTime=${endTime}`;
                             console.log(url);
 
                             await axios
