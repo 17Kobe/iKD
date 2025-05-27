@@ -50,7 +50,9 @@
                                     padding: '3px',
                                     color: 'white',
                                     background:
-                                        scope.row.type === 'fund'
+                                        scope.row.type === 'btc'
+                                            ? '#f3c60d'
+                                            : scope.row.type === 'fund'
                                             ? '#e6a23c'
                                             : scope.row.type === 'exchange'
                                             ? '#f56c6c'
@@ -120,7 +122,16 @@
                                     { 'font-size': '16px' },
                                 ]"
                             >
-                                <div style="font-weight: bold">{{ scope.row.last_price }}</div>
+                                <div style="font-weight: bold">
+                                    <template v-if="scope.row.type === 'btc' && scope.row.last_price">
+                                        {{ String(scope.row.last_price).split('.')[0] }}<br />.{{
+                                            String(scope.row.last_price).split('.')[1] || '00'
+                                        }}
+                                    </template>
+                                    <template v-else>
+                                        {{ scope.row.last_price }}
+                                    </template>
+                                </div>
                                 <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
                                 <i
                                     :class="[
