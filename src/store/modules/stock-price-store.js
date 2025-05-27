@@ -135,8 +135,7 @@ const stock = {
 
                     if (stcokObjType === 'btc') {
                         siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
-                    }
-                    else {
+                    } else {
                         // console.log(currentTime.day());
                         if (currentTime.day() === 6)
                             // 星期六，不算了，就減一天
@@ -186,7 +185,7 @@ const stock = {
                                     // commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // ／跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                                     console.log(err);
                                 });
-                        // 匯率
+                            // 匯率
                         } else if (stcokObjType === 'exchange') {
                             // console.log('GET_STOCK_PRICE 31');
                             // 因為 axios 是非同步，但我要確實等它執行完才 resolve
@@ -210,7 +209,7 @@ const stock = {
                                     // commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                                     console.log(err);
                                 });
-                        // 基金
+                            // 基金
                         } else if (stcokObjType === 'fund') {
                             // console.log('GET_STOCK_PRICE 32');
                             // 基金
@@ -237,16 +236,17 @@ const stock = {
                             //         context.commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                             //         console.log(err);
                             //     });
-                        // 比特幣
+                            // 比特幣
                         } else if (stcokObjType === 'btc') {
                             // console.log('GET_STOCK_PRICE 31');
                             // 因為 axios 是非同步，但我要確實等它執行完才 resolve
                             const startTime = moment.utc(stockStartDate, 'YYYY-MM-DD').valueOf();
                             const endTime = moment.utc(siteExistsLatestDate, 'YYYY-MM-DD').endOf('day').valueOf();
 
-                            const url = `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&startTime=${startTime}&endTime=${endTime}`;
+                            // const url = `https://api.binance.com/api/v3/klines?symbol=${stockObj.id}&interval=1d&startTime=${startTime}&endTime=${endTime}`;
+                            const url = `https://api.binance.com/api/v3/klines?symbol=${stockObj.id}&interval=1d&startTime=${startTime}&limit=1000`;
                             console.log(url);
-                            
+
                             await axios
                                 .get(url)
                                 // 成功
@@ -260,6 +260,7 @@ const stock = {
                                     // commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
                                     console.log(err);
                                 });
+                        }
                     } else {
                         // 股票
                         if (stcokObjType === 'stock' || stcokObjType === 'exchange') {
@@ -1831,13 +1832,15 @@ const stock = {
                     });
                 } else if (stcokObjType === 'btc') {
                     //比特幣
-                    values = data.data.map(element => [
+                    console.log(data);
+
+                    values = data.data.map((element) => [
                         moment.utc(element[0]).format('YYYY-MM-DD'), // 0: 日期
-                        parseFloat(element[1]),                         // 1: 開盤價
-                        parseFloat(element[2]),                         // 2: 最高價
-                        parseFloat(element[3]),                         // 3: 最低價
-                        parseFloat(element[4]),                         // 4: 收盤價
-                        parseFloat(element[5])                          // 5: 成交量
+                        parseFloat(element[1]), // 1: 開盤價
+                        parseFloat(element[2]), // 2: 最高價
+                        parseFloat(element[3]), // 3: 最低價
+                        parseFloat(element[4]), // 4: 收盤價
+                        parseFloat(element[5]), // 5: 成交量
                     ]);
                 }
                 // console.log(foundStock.data.daily);
@@ -3056,27 +3059,17 @@ const stock = {
             // 深拷貝，避免直接改到 state
             const stockCopy = _.cloneDeep(stock);
             // daily 只取近5年
-            if (
-                _.has(stockCopy, 'data.daily') &&
-                _.isArray(stockCopy.data.daily) &&
-                stockCopy.data.daily.length > 0
-            ) {
+            if (_.has(stockCopy, 'data.daily') && _.isArray(stockCopy.data.daily) && stockCopy.data.daily.length > 0) {
                 const fiveYearsAgo = moment().subtract(5, 'years');
-                stockCopy.data.daily = _.filter(
-                    stockCopy.data.daily,
-                    (item) => moment(item[0], 'YYYY-MM-DD').isSameOrAfter(fiveYearsAgo)
+                stockCopy.data.daily = _.filter(stockCopy.data.daily, (item) =>
+                    moment(item[0], 'YYYY-MM-DD').isSameOrAfter(fiveYearsAgo)
                 );
             }
             // eps 只取近6年
-            if (
-                _.has(stockCopy, 'data.eps') &&
-                _.isArray(stockCopy.data.eps) &&
-                stockCopy.data.eps.length > 0
-            ) {
+            if (_.has(stockCopy, 'data.eps') && _.isArray(stockCopy.data.eps) && stockCopy.data.eps.length > 0) {
                 const sixYearsAgo = moment().subtract(6, 'years');
-                stockCopy.data.eps = _.filter(
-                    stockCopy.data.eps,
-                    (item) => moment(item.date, 'YYYY-MM-DD').isSameOrAfter(sixYearsAgo)
+                stockCopy.data.eps = _.filter(stockCopy.data.eps, (item) =>
+                    moment(item.date, 'YYYY-MM-DD').isSameOrAfter(sixYearsAgo)
                 );
             }
             return stockCopy;
