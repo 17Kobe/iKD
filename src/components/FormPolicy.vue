@@ -1,6 +1,9 @@
 <template>
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="85%">
         <el-form ref="formPolicyBuyRef" :model="form.buy">
+            <el-button type="success" size="small" @click="onOptimizePolicy" style="margin-left: 10px">
+                <i class="el-icon-magic-stick"></i>&nbsp;最佳參數
+            </el-button>
             <div style="font-size: 24px; margin: 0px 10px 10px">買進策略</div>
 
             <el-row v-for="(item, index) in form.buy" :key="index">
@@ -419,6 +422,56 @@ export default {
             // this.$refs.cost0[0].focus();
             // });
         },
+        async onOptimizePolicy() {
+            const stockId = this.stockId;
+            let bestParams = null;
+            let bestReturn = -Infinity;
+            let bestPolicy = null;
+
+            // 範圍可依需求調整步進
+            for (let kdGold = 60; kdGold >= 25; kdGold -= 1) { // 先找到的優先，所以由大到小
+                for (let kdDead = 65; kdDead <= 90; kdDead += 1) {
+                    for (let rsiOverBought = 85; rsiOverBought <= 97; rsiOverBought += 1) {
+                        // 固定策略組合
+                        const policyList = {
+                            buy: [
+                                { method: 'kd_gold', label: '週 KD 黃金交叉', limit: kdGold, limit_desc: '以下' },
+                                { method: 'kd_w', label: '週 KD 形成 W 底', limit: 2, limit_desc: '個底以上' }
+                            ],
+                            sell: [
+                                { method: 'kd_dead', label: '週 KD 死亡交叉', limit: kdDead, limit_desc: '以上' },
+                                { method: 'rsi_over_bought', label: '週 RSI 超買', limit: rsiOverBought, limit_desc: '以上' }
+                            ]
+                        };
+                        // 呼叫原本機制計算
+                        await this.$store.commit('SAVE_STOCK_POLICY', { stockId, policyList });
+                        // 取得計算結果
+                        const stock = this.$store.getters.getStock(stockId);
+                        const stats = stock?.policy?.stats;
+                        const unitReturn = stats?.unit_rate_of_return ?? -9999;
+
+                        // 這裡加 log
+                        console.log(
+                            `KD黃金交叉≤${kdGold}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}，單位報酬率: ${unitReturn}，目前最佳: ${bestReturn}（最佳參數: KD黃金交叉≤${bestParams?.kdGold ?? '-'}，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${bestParams?.rsiOverBought ?? '-'})`
+                        );
+
+                        if (unitReturn > bestReturn) {
+                            bestReturn = unitReturn;
+                            bestParams = { kdGold, kdDead, rsiOverBought };
+                            bestPolicy = _.cloneDeep(policyList);
+                        }
+                    }
+                }
+            }
+            // 設定最佳參數到表單
+            if (bestPolicy) {
+                this.form = bestPolicy;
+                this.$message.success(`最佳參數：KD黃金交叉≤${bestParams.kdGold}，KD死亡交叉≥${bestParams.kdDead}，RSI超買≥${bestParams.rsiOverBought}，單位報酬率${bestReturn.toFixed(2)}%`);
+            } else {
+                this.$message.warning('找不到最佳參數組合');
+            }
+        },
+
         onClosed() {
             // 將日期轉成 'MM/DD'，方便顯示及計算
             _.forEach([...this.form.buy, ...this.form.sell], (item) => {
