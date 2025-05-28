@@ -86,6 +86,11 @@ const stock = {
                         // const stockLastUpdateHash = await this.dispatch('CALC_HASH', stcokObj.id);
                         // foundStock.last_update_hash = stockLastUpdateHash;
                     }
+                    else if (stcokObjType === 'btc' && _.has(stockObj, 'data.daily')) {
+                        // 刪除最後一個元素，因為每天最後一個值都在更新，是24小時
+                        stockObj.data.daily.pop();
+                    }
+
                     // let stcokObj.data.daily = _.has(stcokObj, 'data.daily') ? stcokObj.data.daily : []; // 有可能是 null 就變成 []
 
                     // 清除即時股票
@@ -134,7 +139,8 @@ const stock = {
                     let siteExistsLatestDate = moment().format('YYYY-MM-DD');
 
                     if (stcokObjType === 'btc') {
-                        siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
+                        // 比特幣就當天
+                        // siteExistsLatestDate = moment().subtract(1, 'days').format('YYYY-MM-DD');
                     } else {
                         // console.log(currentTime.day());
                         if (currentTime.day() === 6)
