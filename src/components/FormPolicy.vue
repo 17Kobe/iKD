@@ -444,22 +444,32 @@ export default {
                             ]
                         };
                         // 呼叫原本機制計算
-                        await this.$store.commit('SAVE_STOCK_POLICY', { stockId, policyList });
-                        // 取得計算結果
+                        await this.$store.dispatch('APPLY_AND_WAIT_POLICY_RESULT', { stockId, policyList });
+                        // 這裡已經確保 SAVE_STOCK_POLICY → SAVE_STOCK_POLICY_RESULT → SAVE_STOCK_POLICY_RETURN_RESULT → SAVE_STOCK_POLICY_RETURN_STATS 都跑完
                         const stock = this.$store.getters.getStock(stockId);
                         const stats = stock?.policy?.stats;
                         const unitReturn = stats?.unit_rate_of_return ?? -9999;
+                        const numberOfSell = stats?.number_of_sell ?? 0;
+                        const duration = stats?.duration ?? 0; // 天數
+                        const years = duration / 365;
+                        let minSellCount = 0;
 
-                        // 這裡加 log
-                        console.log(
-                            `KD黃金交叉≤${kdGold}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}，單位報酬率: ${unitReturn}，目前最佳: ${bestReturn}（最佳參數: KD黃金交叉≤${bestParams?.kdGold ?? '-'}，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${bestParams?.rsiOverBought ?? '-'})`
-                        );
+                        // 至少2年賣1次，超過2年後，每2年應賣1次，最後再減1次
+                        if (years >= 2) {
+                            minSellCount = Math.floor(years / 2);
+                            if (years % 2 !== 0) minSellCount += 1; // 有餘數就+1
+                            if (minSellCount > 1) minSellCount -= 1; // 最終再減1
+                        }
 
-                        if (unitReturn > bestReturn) {
+                        if (unitReturn > bestReturn && numberOfSell >= minSellCount) {
                             bestReturn = unitReturn;
                             bestParams = { kdGold, kdDead, rsiOverBought };
                             bestPolicy = _.cloneDeep(policyList);
                         }
+                        // 這裡加 log
+                        console.log(
+                            `KD黃金交叉≤${kdGold}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}，單位報酬率: ${unitReturn}，目前最佳: ${bestReturn}（最佳參數: KD黃金交叉≤${bestParams?.kdGold ?? '-'}，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${bestParams?.rsiOverBought ?? '-'})，賣出次數: ${numberOfSell}，應賣出次數: ${minSellCount}`
+                        );
                     }
                 }
             }

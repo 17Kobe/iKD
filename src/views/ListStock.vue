@@ -953,9 +953,7 @@
                                             ><span>&nbsp;計算期間</span></el-col
                                         >
                                         <el-col :span="5" style="padding-right: 16px; text-align: right"
-                                            ><span style="color: #4386f5; font-size: 14px">{{
-                                                scope.row.policy.stats.duration ? scope.row.policy.stats.duration : ''
-                                            }}</span>
+                                            ><span style="color: #4386f5; font-size: 14px">{{ getDurationText(scope.row.policy.stats.duration) }}</span>
                                         </el-col>
                                     </el-row>
                                 </div>
@@ -1226,6 +1224,15 @@ export default {
         }
     },
     methods: {
+        getDurationText(days) {
+            if (!days || days <= 0) return '';
+            const years = Math.floor(days / 365);
+            const months = Math.floor((days % 365) / 30);
+            let text = '';
+            if (years > 0) text += `${years}年`;
+            if (months > 0) text += `${months}月`;
+            return text || `${days}天`;
+        },
         observeChart(el, rowIndex, chartType) {
             if (!el) return;
             const key = `${rowIndex}-${chartType}`;

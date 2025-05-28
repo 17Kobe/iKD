@@ -8,6 +8,8 @@ const defaultState = {
     // usdExchange: 30,
     stockList: [], // 目前知道 ios 在 19支股票，>=19會不能儲存localstorage
     tempStockList: [], // 暫存股票data變一年以內
+    pendingPolicyResolve: {},
+    skipTempStockListRemove: false,
 };
 
 const stock = {
@@ -1340,6 +1342,13 @@ const stock = {
 
             return Math.abs(hash);
         },
+        async APPLY_AND_WAIT_POLICY_RESULT({ state, commit }, { stockId, policyList }) {
+            state.skipTempStockListRemove = true;
+            return new Promise((resolve) => {
+                state.pendingPolicyResolve[stockId] = resolve;
+                commit('SAVE_STOCK_POLICY', { stockId, policyList });
+            });
+        },
     },
     mutations: {
         SAVE_GLOBAL_SETTINGS(state, data) {
@@ -2107,8 +2116,10 @@ const stock = {
                 }
 
                 // 算完就清除，如此不占用記憶體
-                _.remove(state.tempStockList, (obj) => obj.id === stockId);
-
+                // 只在沒有 pendingPolicyResolve 時才移除 tempStockList，公式最佳化不要刪
+                if (!state.skipTempStockListRemove) {
+                    _.remove(state.tempStockList, (obj) => obj.id === stockId);
+                }
                 // 刪除台達電
                 // _.remove(state.stockList, (obj) => obj.id === '2886');
                 // localStorage.setItem('stockList', JSON.stringify(state.stockList));
@@ -2553,16 +2564,24 @@ const stock = {
                 // 計算期間
                 if (earliestBuyDate !== '' && lastSellDate !== '') {
                     const duration = moment.duration(moment(lastSellDate).diff(moment(earliestBuyDate)));
-                    const years = duration.years();
-                    const months = duration.months();
-                    foundStock.policy.stats.duration = years ? `${years}年` : '';
-                    foundStock.policy.stats.duration += months ? `${months}月` : '';
+                    // const years = duration.years();
+                    // const months = duration.months();
+                    // foundStock.policy.stats.duration = years ? `${years}年` : '';
+                    // foundStock.policy.stats.duration += months ? `${months}月` : '';
+                    const days = Math.floor(duration.asDays()); // 取得天數（整數）
+                    foundStock.policy.stats.duration = days;
                 } else {
                     foundStock.policy.stats.duration = '';
                 }
             } else if (_.has(foundStock, 'policy.stats')) {
                 delete foundStock.policy.stats;
             }
+            // === 在這裡 resolve ===
+            if (state.pendingPolicyResolve && typeof state.pendingPolicyResolve[stockId] === 'function') {
+                state.pendingPolicyResolve[stockId]();
+                delete state.pendingPolicyResolve[stockId];
+            }
+
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             this.commit('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE', stockId);
         },
