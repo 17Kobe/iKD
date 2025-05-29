@@ -587,7 +587,7 @@ export default {
 
             // log
             console.log(
-                `KD黃金交叉≤${kdGold}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}，單位報酬率: ${unitReturn}，買入次數: ${numberOfBuy}，賣出次數: ${numberOfSell}，應買次數: ${minBuyCount}，應賣次數: ${minSellCount}`
+                `KD黃金交叉≤${kdGold}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}，單位報酬率: ${unitReturn}，買入次數: ${numberOfBuy} (min: ${minBuyCount})，賣出次數: ${numberOfSell} (min: ${minSellCount})`
             );
 
             await cb(
