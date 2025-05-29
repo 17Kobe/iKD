@@ -87,8 +87,7 @@ const stock = {
                         // 應該不用算 hash 因為有加時間跟沒加時間是不同
                         // const stockLastUpdateHash = await this.dispatch('CALC_HASH', stcokObj.id);
                         // foundStock.last_update_hash = stockLastUpdateHash;
-                    }
-                    else if (stcokObjType === 'btc' && _.has(stockObj, 'data.daily')) {
+                    } else if (stcokObjType === 'btc' && _.has(stockObj, 'data.daily')) {
                         // 刪除最後一個元素，因為每天最後一個值都在更新，是24小時
                         stockObj.data.daily.pop();
                     }
@@ -2232,11 +2231,16 @@ const stock = {
                         const dropPercent = ((obj.price - previousBuyPrice) / previousBuyPrice) * 100;
                         const daysDiff = moment(obj.date).diff(moment(previousBuyDate), 'days');
                         console.log(
-                            'previousBuyPrice', previousBuyPrice,
-                            'obj.price', obj.price,
-                            'dropPercent', dropPercent,
-                            'limit', foundLastBuyDown.limit,
-                            'daysDiff', daysDiff
+                            'previousBuyPrice',
+                            previousBuyPrice,
+                            'obj.price',
+                            obj.price,
+                            'dropPercent',
+                            dropPercent,
+                            'limit',
+                            foundLastBuyDown.limit,
+                            'daysDiff',
+                            daysDiff
                         );
 
                         if (
@@ -2251,7 +2255,7 @@ const stock = {
                             obj.reason.push('previous_buy_price');
                         }
                     }
-                                        // 去累加買入訊號單位
+                    // 去累加買入訊號單位
                     // console.log(obj);
                     // console.log(isCancelToBuy);
                     if (!isCancelToBuy) {
@@ -2571,7 +2575,7 @@ const stock = {
                         lastSellDate = obj.date;
                     }
                     // 統計買進次數
-                    else if (['買'].obj.buy_or_sell) {
+                    else if (['買'].includes(obj.buy_or_sell)) {
                         numberOfBuy += 1;
                     }
                 });
@@ -2619,7 +2623,7 @@ const stock = {
                     const firstWeeklyDate = moment(foundStock.data.daily[0][0]);
                     const today = moment();
                     const durationFromFirstWeekly = today.diff(firstWeeklyDate, 'days');
-                    
+
                     foundStock.policy.stats.duration_from_first_weekly = durationFromFirstWeekly;
                 } else {
                     foundStock.policy.stats.duration_from_first_weekly = '';
