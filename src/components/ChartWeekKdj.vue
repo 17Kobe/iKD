@@ -1369,9 +1369,13 @@ export default {
                                             showSignals.push(
                                                 '<span style="background-color:#999999; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">成本未跌過</span>'
                                             );
-                                        if (foundPolicyResult.reason.includes('previous_buy_price'))
+                                        if (foundPolicyResult.reason.includes('previous_buy_down'))
                                             showSignals.push(
                                                 '<span style="background-color:#999999; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">前買未跌過</span>'
+                                            );
+                                        if (foundPolicyResult.reason.includes('previous_sell_up'))
+                                            showSignals.push(
+                                                '<span style="background-color:#999999; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">前賣未漲過</span>'
                                             );
                                         if (foundPolicyResult.reason.includes('earn'))
                                             showSignals.push(

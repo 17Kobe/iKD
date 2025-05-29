@@ -175,14 +175,14 @@ export default {
                 //     default_limit_desc: '日之上', // 均線之下或均線之上，先做均線之上好了
                 // },
                 {
-                    value: 'cost_down',
-                    label: '搭配 成本價跌超過',
+                    value: 'previous_buy_down',
+                    label: '搭配 前買價跌超過',
                     default_limit: 5,
                     default_limit_desc: '% 以上',
                 },
                 {
-                    value: 'previous_buy_price',
-                    label: '搭配 前買價跌超過',
+                    value: 'cost_down',
+                    label: '搭配 成本價跌超過',
                     default_limit: 5,
                     default_limit_desc: '% 以上',
                 },
@@ -247,6 +247,12 @@ export default {
                     label: '停利',
                     default_limit: '10',
                     default_limit_desc: '%',
+                },
+                {
+                    value: 'previous_sell_up',
+                    label: '搭配 前賣價漲超過',
+                    default_limit: 5,
+                    default_limit_desc: '% 以上',
                 },
                 {
                     value: 'stop_loss',
@@ -540,11 +546,12 @@ export default {
                 buy: [
                     { method: 'kd_gold', label: '週 KD 黃金交叉', limit: kdGold, limit_desc: '以下' },
                     { method: 'kd_w', label: '週 KD 形成 W 底', limit: 2, limit_desc: '個底以上' },
-                    { method: 'previous_buy_price', label: '搭配 前買價跌超過', limit: 5, limit_desc: '% 以上' },
+                    { method: 'previous_buy_down', label: '搭配 前買價跌超過', limit: 5, limit_desc: '% 以上' },
                 ],
                 sell: [
                     { method: 'kd_dead', label: '週 KD 死亡交叉', limit: kdDead, limit_desc: '以上' },
                     { method: 'rsi_over_bought', label: '週 RSI 超買', limit: rsiOverBought, limit_desc: '以上' },
+                    { method: 'previous_sell_up', label: '搭配 前賣價漲超過', limit: 5, limit_desc: '% 以上' },
                 ],
             };
 

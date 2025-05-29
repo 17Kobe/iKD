@@ -830,7 +830,7 @@
                                     <p v-if="item.reason.includes('rsi_turn_up')">RSI 往上轉折</p>
                                     <p v-if="item.reason.includes('annual_fixed_date_buy')">每年固定日買</p>
                                     <p v-if="item.reason.includes('cost_down')">成本價未跌過</p>
-                                    <p v-if="item.reason.includes('previous_buy_price')">前買價未跌過</p>
+                                    <p v-if="item.reason.includes('previous_buy_down')">前買價未跌過</p>
 
                                     <p v-if="item.reason.includes('kd_dead')">KD 死亡交叉</p>
                                     <p v-if="item.reason.includes('kd_turn_down')">KD 往下轉折</p>
@@ -838,6 +838,7 @@
                                     <p v-if="item.reason.includes('rsi_over_bought')">RSI 超買</p>
                                     <p v-if="item.reason.includes('rsi_turn_down')">RSI 往下轉折</p>
                                     <p v-if="item.reason.includes('annual_fixed_date_sell')">每年固定日賣</p>
+                                    <p v-if="item.reason.includes('previous_sell_up')">前賣價未漲過</p>
 
                                     <p v-if="item.reason.includes('latest')">現在</p>
                                 </span>
@@ -954,7 +955,9 @@
                                             ><span>&nbsp;計算期間</span></el-col
                                         >
                                         <el-col :span="5" style="padding-right: 16px; text-align: right"
-                                            ><span style="color: #4386f5; font-size: 14px">{{ getDurationText(scope.row.policy.stats.duration) }}</span>
+                                            ><span style="color: #4386f5; font-size: 14px">{{
+                                                getDurationText(scope.row.policy.stats.duration)
+                                            }}</span>
                                         </el-col>
                                     </el-row>
                                 </div>
@@ -1350,7 +1353,8 @@ export default {
                 rsi_turn_up: 'RSI 往上轉折',
                 annual_fixed_date_buy: '每年固定日買',
                 cost_down: '成本價未跌過',
-                previous_buy_price: '前買價未跌過',
+                previous_buy_down: '前買價未跌過',
+                previous_sell_up: '前賣價未漲過',
                 kd_dead: 'KD 死亡交叉',
                 kd_turn_down: 'KD 往下轉折',
                 kd_m: 'KD M頭',
