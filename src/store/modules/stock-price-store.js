@@ -2339,7 +2339,7 @@ const stock = {
                             thisNumberOfSell = totalNumberOfBuy * 0.35;
                             console.log('RSI，且有 KD');
                             unit = 0.35;
-                        } else {
+                        } else if (star === 2) {
                             thisNumberOfSell = totalNumberOfBuy / 2;
                             console.log('RSI，且有 KD');
                             unit = 0.5;

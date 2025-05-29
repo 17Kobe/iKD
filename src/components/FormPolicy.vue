@@ -583,8 +583,18 @@ export default {
             const numberOfSell = stats?.number_of_sell ?? 0;
             const numberOfBuy = stats?.number_of_buy ?? 0;
             const duration = stats?.duration_from_first_weekly ?? 0; // 天數
-            const minBuyCount = Math.max(0, Math.round(duration / 365) - 1); //1年要買一次，四捨取整數。並給予少一次機會，因為有可能前1年還沒有機會買
-            const minSellCount = Math.max(0, Math.round(duration / 547) - 1); //1年半要賣一次，四捨取整數。並給予少一次機會，因為有可能第沒有買就沒有賣，我是用daily來算
+            const star = stock?.star ?? 3; // 預設3星
+            const name = stock?.name ?? '';
+
+            let buyPeriod = 365;
+            let sellPeriod = 547;
+            // 中華電及卜蜂要特別處理，因為他們是3星要存股，但允許久一點再買
+            if (star <= 2 || (star === 3 && ['中華電', '卜蜂'].includes(name))) {
+                buyPeriod = 365 + 182; // 1.5年
+                sellPeriod = 547 + 182; // 2年
+            }
+            const minBuyCount = Math.max(0, Math.round(duration / buyPeriod) - 1); // //1年要買一次，四捨取整數。並給予少一次機會，因為有可能前1年還沒有機會買
+            const minSellCount = Math.max(0, Math.round(duration / sellPeriod) - 1); //1年半要賣一次，四捨取整數。並給予少一次機會，因為有可能第沒有買就沒有賣，我是用daily來算
 
             // log
             console.log(
