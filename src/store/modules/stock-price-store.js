@@ -2540,6 +2540,7 @@ const stock = {
                 let lastSellDate = '';
                 let totalBuyCost = 0; // 總計買進成本
                 let totalSellCost = 0; // 總計賣出金額
+                let numberOfBuy = 0; // 新增：買進次數
                 // 使用 Array.filter() 過濾只保留 buy_or_sell 為 "現在" 或 "賣" 的元素
 
                 _.eachRight(foundStock.policy.history, (obj, index) => {
@@ -2569,9 +2570,14 @@ const stock = {
                         if (earliestBuyDate === '') earliestBuyDate = obj.date_of_first_buy;
                         lastSellDate = obj.date;
                     }
+                    // 統計買進次數
+                    else if (['買'].obj.buy_or_sell) {
+                        numberOfBuy += 1;
+                    }
                 });
 
                 // 若真的都沒有買賣，則顯示為0
+                foundStock.policy.stats.number_of_buy = numberOfBuy;
                 foundStock.policy.stats.number_of_sell = numberOfSell;
                 foundStock.policy.stats.average_sell_interval = numberOfSell > 0 ? sumOfSellIntervalDays / numberOfSell : 0;
                 foundStock.policy.stats.max_earn = maxEarn === -999999 ? 0 : maxEarn * 100;

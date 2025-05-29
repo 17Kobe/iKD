@@ -438,8 +438,8 @@ export default {
             for (let kdGold = 60; kdGold >= 25; kdGold -= 3) {
                 for (let kdDead = 65; kdDead <= 90; kdDead += 3) {
                     for (let rsiOverBought = 85; rsiOverBought <= 97; rsiOverBought += 3) {
-                        await this.tryPolicy(stockId, kdGold, kdDead, rsiOverBought, async (params, unitReturn, numberOfSell, minSellCount, policyList) => {
-                            if (unitReturn > bestReturn && numberOfSell >= minSellCount) {
+                        await this.tryPolicy(stockId, kdGold, kdDead, rsiOverBought, async (params, unitReturn, numberOfBuy, numberOfSell, minBuySellCount, policyList) => {
+                            if (unitReturn > bestReturn && numberOfBuy >= minBuySellCount && numberOfSell >= minBuySellCount) {
                                 bestReturn = unitReturn;
                                 bestParams = { ...params };
                                 bestPolicy = _.cloneDeep(policyList);
@@ -452,8 +452,8 @@ export default {
                                         for (let rsi2 = Math.max(85, params.rsiOverBought - 2); rsi2 <= Math.min(97, params.rsiOverBought + 2); rsi2++) {
                                             // 跳過自己
                                             if (kdGold2 === params.kdGold && kdDead2 === params.kdDead && rsi2 === params.rsiOverBought) continue;
-                                            await this.tryPolicy(stockId, kdGold2, kdDead2, rsi2, (params2, unitReturn2, numberOfSell2, minSellCount2, policyList2) => {
-                                                if (unitReturn2 > bestReturn && numberOfSell2 >= minSellCount2) {
+                                            await this.tryPolicy(stockId, kdGold2, kdDead2, rsi2, (params2, unitReturn2, numberOfBuy2, numberOfSell2, minBuySellCount2, policyList2) => {
+                                                if (unitReturn2 > bestReturn && numberOfBuy2 >= minBuySellCount2 && numberOfSell2 >= minBuySellCount2) {
                                                     bestReturn = unitReturn2;
                                                     bestParams = { ...params2 };
                                                     bestPolicy = _.cloneDeep(policyList2);
@@ -498,15 +498,16 @@ export default {
             const stats = stock?.policy?.stats;
             const unitReturn = stats?.unit_rate_of_return ?? -9999;
             const numberOfSell = stats?.number_of_sell ?? 0;
+            const numberOfBuy = stats?.number_of_buy ?? 0;
             const duration = stats?.duration_from_first_weekly ?? 0; // 天數
-            const minSellCount = Math.max(0, Math.round(duration / 547) - 1);  //1年半要賣一次，四捨取整數。並給予少一次機會，因為有可能第沒有買就沒有賣，我是用daily來算
+            const minBuySellCount = Math.max(0, Math.round(duration / 547) - 1);  //1年半要賣一次，四捨取整數。並給予少一次機會，因為有可能第沒有買就沒有賣，我是用daily來算
 
             // log
             console.log(
-                `KD黃金交叉≤${kdGold}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}，單位報酬率: ${unitReturn}，賣出次數: ${numberOfSell}，應賣出次數: ${minSellCount}`
+                `KD黃金交叉≤${kdGold}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}，單位報酬率: ${unitReturn}，買入次數: ${numberOfBuy}，賣出次數: ${numberOfSell}，應買及賣次數: ${minBuySellCount}`
             );
 
-            await cb({ kdGold, kdDead, rsiOverBought }, unitReturn, numberOfSell, minSellCount, policyList);
+            await cb({ kdGold, kdDead, rsiOverBought }, unitReturn, numberOfBuy, numberOfSell, minBuySellCount, policyList);
         },
 
 
