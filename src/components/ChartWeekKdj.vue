@@ -1369,6 +1369,10 @@ export default {
                                             showSignals.push(
                                                 '<span style="background-color:#999999; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">成本未跌過</span>'
                                             );
+                                        if (foundPolicyResult.reason.includes('previous_buy_price'))
+                                            showSignals.push(
+                                                '<span style="background-color:#999999; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">前買未跌過</span>'
+                                            );
                                         if (foundPolicyResult.reason.includes('earn'))
                                             showSignals.push(
                                                 '<span style="background-color:#999999; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">絕對正報酬</span>'

@@ -177,7 +177,13 @@ export default {
                 {
                     value: 'cost_down',
                     label: '搭配 成本價跌超過',
-                    default_limit: 10,
+                    default_limit: 5,
+                    default_limit_desc: '% 以上',
+                },
+                {
+                    value: 'previous_buy_price',
+                    label: '搭配 前買價跌超過',
+                    default_limit: 5,
                     default_limit_desc: '% 以上',
                 },
                 {
@@ -422,57 +428,48 @@ export default {
             // this.$refs.cost0[0].focus();
             // });
         },
+
         async onOptimizePolicy() {
             const stockId = this.stockId;
             let bestParams = null;
             let bestReturn = -Infinity;
             let bestPolicy = null;
 
-            // 範圍可依需求調整步進
-            for (let kdGold = 60; kdGold >= 25; kdGold -= 1) { // 先找到的優先，所以由大到小
-                for (let kdDead = 65; kdDead <= 90; kdDead += 1) {
-                    for (let rsiOverBought = 85; rsiOverBought <= 97; rsiOverBought += 1) {
-                        // 固定策略組合
-                        const policyList = {
-                            buy: [
-                                { method: 'kd_gold', label: '週 KD 黃金交叉', limit: kdGold, limit_desc: '以下' },
-                                { method: 'kd_w', label: '週 KD 形成 W 底', limit: 2, limit_desc: '個底以上' }
-                            ],
-                            sell: [
-                                { method: 'kd_dead', label: '週 KD 死亡交叉', limit: kdDead, limit_desc: '以上' },
-                                { method: 'rsi_over_bought', label: '週 RSI 超買', limit: rsiOverBought, limit_desc: '以上' }
-                            ]
-                        };
-                        // 呼叫原本機制計算
-                        await this.$store.dispatch('APPLY_AND_WAIT_POLICY_RESULT', { stockId, policyList });
-                        // 這裡已經確保 SAVE_STOCK_POLICY → SAVE_STOCK_POLICY_RESULT → SAVE_STOCK_POLICY_RETURN_RESULT → SAVE_STOCK_POLICY_RETURN_STATS 都跑完
-                        const stock = this.$store.getters.getStock(stockId);
-                        const stats = stock?.policy?.stats;
-                        const unitReturn = stats?.unit_rate_of_return ?? -9999;
-                        const numberOfSell = stats?.number_of_sell ?? 0;
-                        const duration = stats?.duration ?? 0; // 天數
-                        const years = duration / 365;
-                        let minSellCount = 0;
+            for (let kdGold = 60; kdGold >= 25; kdGold -= 3) {
+                for (let kdDead = 65; kdDead <= 90; kdDead += 3) {
+                    for (let rsiOverBought = 85; rsiOverBought <= 97; rsiOverBought += 3) {
+                        await this.tryPolicy(stockId, kdGold, kdDead, rsiOverBought, async (params, unitReturn, numberOfSell, minSellCount, policyList) => {
+                            if (unitReturn > bestReturn && numberOfSell >= minSellCount) {
+                                bestReturn = unitReturn;
+                                bestParams = { ...params };
+                                bestPolicy = _.cloneDeep(policyList);
+                                // 立即印出
+                                console.log(`目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${bestParams?.kdGold ?? '-'}，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${bestParams?.rsiOverBought ?? '-'})`);
 
-                        // 至少2年賣1次，超過2年後，每2年應賣1次，最後再減1次
-                        if (years >= 2) {
-                            minSellCount = Math.floor(years / 2);
-                            if (years % 2 !== 0) minSellCount += 1; // 有餘數就+1
-                            if (minSellCount > 1) minSellCount -= 1; // 最終再減1
-                        }
-
-                        if (unitReturn > bestReturn && numberOfSell >= minSellCount) {
-                            bestReturn = unitReturn;
-                            bestParams = { kdGold, kdDead, rsiOverBought };
-                            bestPolicy = _.cloneDeep(policyList);
-                        }
-                        // 這裡加 log
-                        console.log(
-                            `KD黃金交叉≤${kdGold}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}，單位報酬率: ${unitReturn}，目前最佳: ${bestReturn}（最佳參數: KD黃金交叉≤${bestParams?.kdGold ?? '-'}，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${bestParams?.rsiOverBought ?? '-'})，賣出次數: ${numberOfSell}，應賣出次數: ${minSellCount}`
-                        );
+                                // 細部搜尋（步進1）只針對這組附近
+                                for (let kdGold2 = Math.max(25, params.kdGold - 2); kdGold2 <= Math.min(60, params.kdGold + 2); kdGold2++) {
+                                    for (let kdDead2 = Math.max(65, params.kdDead - 2); kdDead2 <= Math.min(90, params.kdDead + 2); kdDead2++) {
+                                        for (let rsi2 = Math.max(85, params.rsiOverBought - 2); rsi2 <= Math.min(97, params.rsiOverBought + 2); rsi2++) {
+                                            // 跳過自己
+                                            if (kdGold2 === params.kdGold && kdDead2 === params.kdDead && rsi2 === params.rsiOverBought) continue;
+                                            await this.tryPolicy(stockId, kdGold2, kdDead2, rsi2, (params2, unitReturn2, numberOfSell2, minSellCount2, policyList2) => {
+                                                if (unitReturn2 > bestReturn && numberOfSell2 >= minSellCount2) {
+                                                    bestReturn = unitReturn2;
+                                                    bestParams = { ...params2 };
+                                                    bestPolicy = _.cloneDeep(policyList2);
+                                                    // 細部搜尋也即時印出
+                                                    console.log(`目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${bestParams?.kdGold ?? '-'}，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${bestParams?.rsiOverBought ?? '-'})`);
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        });
                     }
                 }
             }
+
             // 設定最佳參數到表單
             if (bestPolicy) {
                 this.form = bestPolicy;
@@ -481,6 +478,37 @@ export default {
                 this.$message.warning('找不到最佳參數組合');
             }
         },
+
+        // 封裝策略計算與條件判斷
+        async tryPolicy(stockId, kdGold, kdDead, rsiOverBought, cb) {
+            const policyList = {
+                buy: [
+                    { method: 'kd_gold', label: '週 KD 黃金交叉', limit: kdGold, limit_desc: '以下' },
+                    { method: 'kd_w', label: '週 KD 形成 W 底', limit: 2, limit_desc: '個底以上' },
+                    { method: 'previous_buy_price', label:'搭配 前買價跌超過', limit: 5,limit_desc: '% 以上' }
+                ],
+                sell: [
+                    { method: 'kd_dead', label: '週 KD 死亡交叉', limit: kdDead, limit_desc: '以上' },
+                    { method: 'rsi_over_bought', label: '週 RSI 超買', limit: rsiOverBought, limit_desc: '以上' }
+                ]
+            };
+            
+            await this.$store.dispatch('APPLY_AND_WAIT_POLICY_RESULT', { stockId, policyList });
+            const stock = this.$store.getters.getStock(stockId);
+            const stats = stock?.policy?.stats;
+            const unitReturn = stats?.unit_rate_of_return ?? -9999;
+            const numberOfSell = stats?.number_of_sell ?? 0;
+            const duration = stats?.duration_from_first_weekly ?? 0; // 天數
+            const minSellCount = Math.max(0, Math.round(duration / 547) - 1);  //1年半要賣一次，四捨取整數。並給予少一次機會，因為有可能第沒有買就沒有賣，我是用daily來算
+
+            // log
+            console.log(
+                `KD黃金交叉≤${kdGold}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}，單位報酬率: ${unitReturn}，賣出次數: ${numberOfSell}，應賣出次數: ${minSellCount}`
+            );
+
+            await cb({ kdGold, kdDead, rsiOverBought }, unitReturn, numberOfSell, minSellCount, policyList);
+        },
+
 
         onClosed() {
             // 將日期轉成 'MM/DD'，方便顯示及計算

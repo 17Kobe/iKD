@@ -2136,10 +2136,14 @@ const stock = {
             const star = foundStock.star;
 
             let foundCostDown = false;
+            let foundLastBuyDown = false;
             let foundEarn = false;
             let foundRsiOverBought = false;
             if (_.has(foundStock, 'policy.settings.buy')) {
                 foundCostDown = _.find(foundStock.policy.settings.buy, ['method', 'cost_down']);
+            }
+            if (_.has(foundStock, 'policy.settings.buy')) {
+                foundLastBuyDown = _.find(foundStock.policy.settings.buy, ['method', 'previous_buy_price']);
             }
             if (_.has(foundStock, 'policy.settings.sell')) {
                 foundEarn = _.find(foundStock.policy.settings.sell, ['method', 'earn']);
@@ -2217,7 +2221,37 @@ const stock = {
                             obj.reason.push('cost_down');
                         }
                     }
-                    // 去累加買入訊號單位
+
+                    // 新增 foundLastBuyDown 判斷
+                    if (foundLastBuyDown && currBuyList.length > 0) {
+                        // 取得前一次買的價格與日期
+                        const previousBuy = currBuyList[currBuyList.length - 1];
+                        const previousBuyPrice = previousBuy.price;
+                        const previousBuyDate = previousBuy.date;
+                        // 跌超過 limit % 才能買，否則取消
+                        const dropPercent = ((obj.price - previousBuyPrice) / previousBuyPrice) * 100;
+                        const daysDiff = moment(obj.date).diff(moment(previousBuyDate), 'days');
+                        console.log(
+                            'previousBuyPrice', previousBuyPrice,
+                            'obj.price', obj.price,
+                            'dropPercent', dropPercent,
+                            'limit', foundLastBuyDown.limit,
+                            'daysDiff', daysDiff
+                        );
+
+                        if (
+                            dropPercent > -foundLastBuyDown.limit &&
+                            daysDiff < 120 && // 三個月內
+                            !obj.reason.includes('kd_w') &&
+                            !obj.reason.includes('annual_fixed_date_buy')
+                        ) {
+                            console.log('取消買入，因為價格沒有跌超過設定的 limit % 且三個月內');
+                            isCancelToBuy = true;
+                            obj.is_buy_cancel = true;
+                            obj.reason.push('previous_buy_price');
+                        }
+                    }
+                                        // 去累加買入訊號單位
                     // console.log(obj);
                     // console.log(isCancelToBuy);
                     if (!isCancelToBuy) {
@@ -2573,6 +2607,17 @@ const stock = {
                 } else {
                     foundStock.policy.stats.duration = '';
                 }
+
+                // 新增：從 daily 第一筆日期到今天的期間(weekly 換為會被刪)
+                if (foundStock.data && foundStock.data.daily && foundStock.data.daily.length > 0) {
+                    const firstWeeklyDate = moment(foundStock.data.daily[0][0]);
+                    const today = moment();
+                    const durationFromFirstWeekly = today.diff(firstWeeklyDate, 'days');
+                    
+                    foundStock.policy.stats.duration_from_first_weekly = durationFromFirstWeekly;
+                } else {
+                    foundStock.policy.stats.duration_from_first_weekly = '';
+                }
             } else if (_.has(foundStock, 'policy.stats')) {
                 delete foundStock.policy.stats;
             }
@@ -2816,6 +2861,7 @@ const stock = {
                 if (foundStock.badge_reason.includes('kd_turn_down')) kdStatus.push('KD 往下轉折');
                 if (foundStock.badge_reason.includes('kd_m')) kdStatus.push('KD M頭');
                 if (foundStock.badge_reason.includes('cost_down')) kdStatus.push('成本價未跌過');
+                if (foundStock.badge_reason.includes('previous_buy_price')) kdStatus.push('前買價未跌過');
                 if (foundStock.badge_reason.includes('annual_fixed_date_buy')) kdStatus.push('每年固定日買');
                 if (foundStock.badge_reason.includes('annual_fixed_date_sell')) kdStatus.push('每年固定日賣');
             }

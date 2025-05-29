@@ -573,6 +573,7 @@ export default {
                 rsi_turn_up: 'RSI 往上轉折',
                 annual_fixed_date_buy: '每年固定日買',
                 cost_down: '成本價未跌過',
+                previous_buy_price: '前買價未跌過',
                 kd_dead: 'KD 死亡交叉',
                 kd_turn_down: 'KD 往下轉折',
                 kd_m: 'KD M頭',
