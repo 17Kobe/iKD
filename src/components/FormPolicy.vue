@@ -444,88 +444,106 @@ export default {
             for (let kdGold = 60; kdGold >= 25; kdGold -= 3) {
                 for (let kdDead = 65; kdDead <= 90; kdDead += 3) {
                     for (let rsiOverBought = 85; rsiOverBought <= 97; rsiOverBought += 3) {
-                        await this.tryPolicy(
-                            stockId,
-                            kdGold,
-                            kdDead,
-                            rsiOverBought,
-                            async (params, unitReturn, numberOfBuy, numberOfSell, minBuyCount, minSellCount, policyList) => {
-                                if (unitReturn > bestReturn && numberOfBuy >= minBuyCount && numberOfSell >= minSellCount) {
-                                    bestReturn = unitReturn;
-                                    bestParams = { ...params };
-                                    bestPolicy = _.cloneDeep(policyList);
-                                    // 立即印出
-                                    console.log(
-                                        `目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${
-                                            bestParams?.kdGold ?? '-'
-                                        }，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${bestParams?.rsiOverBought ?? '-'})`
-                                    );
+                        try {
+                            await this.tryPolicy(
+                                stockId,
+                                kdGold,
+                                kdDead,
+                                rsiOverBought,
+                                async (params, unitReturn, numberOfBuy, numberOfSell, minBuyCount, minSellCount, policyList) => {
+                                    if (unitReturn > bestReturn && numberOfBuy >= minBuyCount && numberOfSell >= minSellCount) {
+                                        bestReturn = unitReturn;
+                                        bestParams = { ...params };
+                                        bestPolicy = _.cloneDeep(policyList);
+                                        // 立即印出
+                                        console.log(
+                                            `目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${
+                                                bestParams?.kdGold ?? '-'
+                                            }，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${
+                                                bestParams?.rsiOverBought ?? '-'
+                                            })`
+                                        );
 
-                                    // 細部搜尋（步進1）只針對這組附近
-                                    for (
-                                        let kdGold2 = Math.max(25, params.kdGold - 2);
-                                        kdGold2 <= Math.min(60, params.kdGold + 2);
-                                        kdGold2++
-                                    ) {
+                                        // 細部搜尋（步進1）只針對這組附近
                                         for (
-                                            let kdDead2 = Math.max(65, params.kdDead - 2);
-                                            kdDead2 <= Math.min(90, params.kdDead + 2);
-                                            kdDead2++
+                                            let kdGold2 = Math.max(25, params.kdGold - 2);
+                                            kdGold2 <= Math.min(60, params.kdGold + 2);
+                                            kdGold2++
                                         ) {
                                             for (
-                                                let rsi2 = Math.max(85, params.rsiOverBought - 2);
-                                                rsi2 <= Math.min(97, params.rsiOverBought + 2);
-                                                rsi2++
+                                                let kdDead2 = Math.max(65, params.kdDead - 2);
+                                                kdDead2 <= Math.min(90, params.kdDead + 2);
+                                                kdDead2++
                                             ) {
-                                                // 跳過自己
-                                                if (
-                                                    kdGold2 === params.kdGold &&
-                                                    kdDead2 === params.kdDead &&
-                                                    rsi2 === params.rsiOverBought
-                                                )
-                                                    continue;
-                                                await this.tryPolicy(
-                                                    stockId,
-                                                    kdGold2,
-                                                    kdDead2,
-                                                    rsi2,
-                                                    (
-                                                        params2,
-                                                        unitReturn2,
-                                                        numberOfBuy2,
-                                                        numberOfSell2,
-                                                        minBuyCount2,
-                                                        minSellCount2,
-                                                        policyList2
-                                                    ) => {
-                                                        if (
-                                                            unitReturn2 > bestReturn &&
-                                                            numberOfBuy2 >= minBuyCount2 &&
-                                                            numberOfSell2 >= minSellCount2
-                                                        ) {
-                                                            bestReturn = unitReturn2;
-                                                            bestParams = { ...params2 };
-                                                            bestPolicy = _.cloneDeep(policyList2);
-                                                            // 細部搜尋也即時印出
-                                                            console.log(
-                                                                `目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${
-                                                                    bestParams?.kdGold ?? '-'
-                                                                }，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${
-                                                                    bestParams?.rsiOverBought ?? '-'
-                                                                })`
-                                                            );
-                                                        }
+                                                for (
+                                                    let rsi2 = Math.max(85, params.rsiOverBought - 2);
+                                                    rsi2 <= Math.min(97, params.rsiOverBought + 2);
+                                                    rsi2++
+                                                ) {
+                                                    // 跳過自己
+                                                    if (
+                                                        kdGold2 === params.kdGold &&
+                                                        kdDead2 === params.kdDead &&
+                                                        rsi2 === params.rsiOverBought
+                                                    )
+                                                        continue;
+                                                    try {
+                                                        await this.tryPolicy(
+                                                            stockId,
+                                                            kdGold2,
+                                                            kdDead2,
+                                                            rsi2,
+                                                            (
+                                                                params2,
+                                                                unitReturn2,
+                                                                numberOfBuy2,
+                                                                numberOfSell2,
+                                                                minBuyCount2,
+                                                                minSellCount2,
+                                                                policyList2
+                                                            ) => {
+                                                                if (
+                                                                    unitReturn2 > bestReturn &&
+                                                                    numberOfBuy2 >= minBuyCount2 &&
+                                                                    numberOfSell2 >= minSellCount2
+                                                                ) {
+                                                                    bestReturn = unitReturn2;
+                                                                    bestParams = { ...params2 };
+                                                                    bestPolicy = _.cloneDeep(policyList2);
+                                                                    // 細部搜尋也即時印出
+                                                                    console.log(
+                                                                        `目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${
+                                                                            bestParams?.kdGold ?? '-'
+                                                                        }，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${
+                                                                            bestParams?.rsiOverBought ?? '-'
+                                                                        })`
+                                                                    );
+                                                                }
+                                                            }
+                                                        );
+                                                    } catch (e) {
+                                                        console.error(
+                                                            `細部搜尋錯誤: KD黃金交叉≤${kdGold2}，KD死亡交叉≥${kdDead2}，RSI超買≥${rsi2}`,
+                                                            e
+                                                        );
                                                     }
-                                                );
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        );
+                            );
+                        } catch (e) {
+                            console.error(
+                                `tryPolicy 發生錯誤: KD黃金交叉≤${kdGold}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}`,
+                                e
+                            );
+                        }
                     }
                 }
             }
+
+            console.log('算完囉');
 
             // 設定最佳參數到表單
             if (bestPolicy) {
@@ -535,6 +553,8 @@ export default {
                         bestParams.rsiOverBought
                     }，單位報酬率${bestReturn.toFixed(2)}%`
                 );
+                console.log('※最佳參數', bestParams);
+                console.log('※最佳單位報酬率', bestReturn);
             } else {
                 this.$message.warning('找不到最佳參數組合');
             }
