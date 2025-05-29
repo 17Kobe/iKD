@@ -2411,28 +2411,8 @@ const stock = {
 
                     let isCancelToSell = false;
 
-                    if (foundEarn && obj.is_sell && rateOfReturn * 100 <= foundEarn.limit) {
-                        // 絕對正報酬
-                        isCancelToSell = true;
-                        obj.is_sell_cancel = true;
-                        obj.reason.push('earn');
-                        buyList = _.concat(currBuyList, buyList);
-                    } else if (
-                        star === 3 &&
-                        continuouSalesCount >= 1 &&
-                        rateOfReturn < preSellObj.rate_of_return + 0.03 &&
-                        (obj.price - preSellObj.price) / preSellObj.price < 0.03
-                    ) {
-                        // 沒有取消賣時；且為3顆星；進入第三次賣以上時
-                        isCancelToSell = true;
-                        obj.is_sell_cancel = true;
-                        obj.reason.push('star3');
-                        buyList = _.concat(currBuyList, buyList);
-                        // } else if (star === 3 && continuouSalesCount === 0) {
-                        //     // 沒有取消賣時；且為3顆星；進入第一次賣時，這裡用K賣來算未來
-                    }
-
                     // 新增 foundPreviousBuyDown 判斷
+                    // 要用 else if 不則 buyList = _.concat(currBuyList, buyList); //恢復買的數量可能會出錯
                     if (foundPreviousSellUp && obj.is_sell && continuouSalesCount > 1) {
                         // 取得前一次買的價格與日期
                         const previousSellPrice = preSellObj.price;
@@ -2461,8 +2441,27 @@ const stock = {
                             isCancelToSell = true;
                             obj.is_sell_cancel = true;
                             obj.reason.push('previous_sell_up');
-                            buyList = _.concat(currBuyList, buyList);
+                            buyList = _.concat(currBuyList, buyList); //恢復買的數量
                         }
+                    } else if (foundEarn && obj.is_sell && rateOfReturn * 100 <= foundEarn.limit) {
+                        // 絕對正報酬
+                        isCancelToSell = true;
+                        obj.is_sell_cancel = true;
+                        obj.reason.push('earn');
+                        buyList = _.concat(currBuyList, buyList);
+                    } else if (
+                        star === 3 &&
+                        continuouSalesCount >= 1 &&
+                        rateOfReturn < preSellObj.rate_of_return + 0.03 &&
+                        (obj.price - preSellObj.price) / preSellObj.price < 0.03
+                    ) {
+                        // 沒有取消賣時；且為3顆星；進入第三次賣以上時
+                        isCancelToSell = true;
+                        obj.is_sell_cancel = true;
+                        obj.reason.push('star3');
+                        buyList = _.concat(currBuyList, buyList);
+                        // } else if (star === 3 && continuouSalesCount === 0) {
+                        //     // 沒有取消賣時；且為3顆星；進入第一次賣時，這裡用K賣來算未來
                     }
 
                     if (!isCancelToSell || obj.is_latest) {

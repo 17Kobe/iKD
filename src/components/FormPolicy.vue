@@ -572,6 +572,7 @@ export default {
                     { method: 'kd_dead', label: '週 KD 死亡交叉', limit: kdDead, limit_desc: '以上' },
                     { method: 'rsi_over_bought', label: '週 RSI 超買', limit: rsiOverBought, limit_desc: '以上' },
                     { method: 'previous_sell_up', label: '搭配 前賣價漲超過', limit: 5, limit_desc: '% 以上' },
+                    { method: 'earn', label: '搭配 絕對正報酬', limit: 0, limit_desc: '% 以上' },
                 ],
             };
 
