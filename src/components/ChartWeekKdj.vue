@@ -548,7 +548,7 @@ export default {
         return {
             isMobile: true,
 
-            _cachedStockData: null,
+            // _cachedStockData: null,
 
             popoverTrigger: 'hover', // 預設為 hover
             // chartOptions: {
@@ -949,26 +949,8 @@ export default {
 
         stockData() {
             console.log('stockData');
-            // parentData 尚未準備好時，直接回傳空物件，避免 undefined
-            if (!this.parentData) return {};
-            // 若快取已存在且 id 相同且有 data，直接回傳快取
-            // console.log('this._cachedStockData', this._cachedStockData);
-            // console.log('this.parentData', this.parentData);
-            if (this._cachedStockData && this._cachedStockData.data) {
-                // console.log('this._cachedStockData.data', this._cachedStockData.data);
-                return this._cachedStockData;
-            }
-            // 重新取得資料
-            // console.log('getStock5yearDaily');
-            const stock = this.$store.getters.getStock5yearDaily(this.parentData);
-            // console.log("stock", stock);
-
-            if (stock && stock.data) {
-                this._cachedStockData = stock;
-                return stock;
-            }
-            // 沒有資料時，回傳空物件
-            return {};
+            // 一開始時this.parentData會是null，所以要給[]來避免出錯
+            return this.$store.getters.getStock(this.parentData);
         },
 
         formattedEps() {

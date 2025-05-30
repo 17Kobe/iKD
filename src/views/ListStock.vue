@@ -107,8 +107,24 @@
                             @click="goToStockAnalysis(scope.row.id, scope.row.url)"
                             >{{ scope.row.id }}</span
                         >
-                        <el-rate v-model="scope.row.star" size="small" :max="3" @change="onChangeStar($event, scope.row.id)">
-                        </el-rate>
+                        <el-tooltip
+                            effect="dark"
+                            placement="top"
+                            :content="
+                                scope.row.star === 3
+                                    ? '3顆星：存股，有賣時先賣1/3，再有賣時再賣1/2'
+                                    : scope.row.star === 2
+                                    ? '2顆星：半存股，有賣時先賣1/2，再有賣時再賣1/2'
+                                    : '1顆星：不存股，有賣時全賣'
+                            "
+                        >
+                            <el-rate
+                                v-model="scope.row.star"
+                                size="small"
+                                :max="3"
+                                @change="onChangeStar($event, scope.row.id)"
+                            />
+                        </el-tooltip>
                     </div>
                     <div style="width: 62px; display: inline-block; text-align: right">
                         <span v-if="scope.row.last_price">
