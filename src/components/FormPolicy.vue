@@ -441,8 +441,8 @@ export default {
             let bestReturn = -Infinity;
             let bestPolicy = null;
 
-            for (let kdGold = 60; kdGold >= 25; kdGold -= 3) {
-                for (let kdDead = 65; kdDead <= 90; kdDead += 3) {
+            for (let kdGold = 60; kdGold >= 24; kdGold -= 3) {
+                for (let kdDead = 65; kdDead <= 92; kdDead += 3) {
                     for (let rsiOverBought = 85; rsiOverBought <= 97; rsiOverBought += 3) {
                         try {
                             await this.tryPolicy(
