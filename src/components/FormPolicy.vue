@@ -590,8 +590,8 @@ export default {
             let sellPeriod = 547;
             // 中華電及卜蜂要特別處理，因為他們是3星要存股，但允許久一點再買， || (star === 3 && ['中華電', '卜蜂'].includes(name))
             if (star <= 2) {
-                buyPeriod = 365 + 182; // 1.5年
-                sellPeriod = 547 + 182; // 2年
+                buyPeriod = 365 + 90; // 1.25年，可多3個月
+                sellPeriod = 547; // 1.5年，2顆星不再延長因為會太久沒賣了
             }
             const minBuyCount = Math.max(0, Math.round(duration / buyPeriod) - 1); // //1年要買一次，四捨取整數。並給予少一次機會，因為有可能前1年還沒有機會買
             const minSellCount = Math.max(0, Math.round(duration / sellPeriod) - 1); //1年半要賣一次，四捨取整數。並給予少一次機會，因為有可能第沒有買就沒有賣，我是用daily來算
