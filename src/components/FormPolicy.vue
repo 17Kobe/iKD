@@ -588,8 +588,8 @@ export default {
 
             let buyPeriod = 365;
             let sellPeriod = 547;
-            // 中華電及卜蜂要特別處理，因為他們是3星要存股，但允許久一點再買
-            if (star <= 2 || (star === 3 && ['中華電', '卜蜂'].includes(name))) {
+            // 中華電及卜蜂要特別處理，因為他們是3星要存股，但允許久一點再買， || (star === 3 && ['中華電', '卜蜂'].includes(name))
+            if (star <= 2) {
                 buyPeriod = 365 + 182; // 1.5年
                 sellPeriod = 547 + 182; // 2年
             }
