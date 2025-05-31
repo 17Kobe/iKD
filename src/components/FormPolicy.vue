@@ -4,6 +4,11 @@
             <el-button type="success" size="small" @click="onOptimizePolicy" style="margin-left: 10px">
                 <i class="el-icon-magic-stick"></i>&nbsp;最佳參數
             </el-button>
+
+            <el-button type="primary" size="small" @click="onExportFeature" style="margin-left: 5px">
+                <i class="el-icon-download"></i>&nbsp;匯出訓練特徵檔
+            </el-button>
+
             <div style="font-size: 24px; margin: 0px 10px 10px">買進策略</div>
 
             <el-row v-for="(item, index) in form.buy" :key="index">
@@ -628,6 +633,86 @@ export default {
                 stockId: this.stockId,
                 policyList: this.form,
             });
+        },
+        // ...existing code...
+        async onExportFeature() {
+            // 先套用目前策略並等待計算完成
+            console.log('onExportFeature1');
+            try {
+                const policyList = {
+                    buy: [{ method: 'kd_gold', label: '週 KD 黃金交叉', limit: 50, limit_desc: '以下' }],
+                    sell: [{ method: 'kd_dead', label: '週 KD 死亡交叉', limit: 50, limit_desc: '以上' }],
+                };
+
+                // 為了hash 有不同，所以多算這個
+                await this.$store.dispatch('APPLY_AND_WAIT_POLICY_RESULT', {
+                    stockId: this.stockId,
+                    policyList: policyList,
+                });
+
+                await this.$store.dispatch('APPLY_AND_WAIT_POLICY_RESULT', {
+                    stockId: this.stockId,
+                    policyList: this.form,
+                });
+            } catch (e) {
+                console.error('APPLY_AND_WAIT_POLICY_RESULT error', e);
+            }
+            console.log('onExportFeature2');
+
+            // 重新取得最新 stockData
+            this.stockData = this.$store.getters.getStock(this.stockId);
+
+            // 反轉歷史
+            const history = _.cloneDeep(this.stockData.policy.history).reverse();
+
+            // 取得 tempStockList 中對應的 stock
+            const tempStock = this.$store.getters.getTempStock(this.stockId);
+            if (!tempStock) {
+                this.$message.error('找不到 tempStock 資料');
+                return;
+            }
+
+            // 轉成日期對應表
+            const weeklyMap = Object.fromEntries(tempStock.data.weekly.map((arr) => [arr[0], arr]));
+            const kdjMap = Object.fromEntries(tempStock.data.weekly_kdj.map((arr) => [arr[0], arr]));
+            const maMap = Object.fromEntries(tempStock.data.weekly_ma.map((arr) => [arr[0], arr]));
+            const rsiMap = Object.fromEntries(tempStock.data.weekly_rsi.map((arr) => [arr[0], arr]));
+            // 組合特徵
+            const features = history.map((item) => {
+                const date = item.date;
+                const weekly = weeklyMap[date] || [];
+                const kdj = kdjMap[date] || [];
+                const ma = maMap[date] || [];
+                const rsi = rsiMap[date] || [];
+
+                return {
+                    date,
+                    buy_or_sell: item.buy_or_sell,
+                    reason: item.reason,
+                    price: item.price,
+                    open: weekly[1] ?? null,
+                    high: weekly[2] ?? null,
+                    low: weekly[3] ?? null,
+                    close: weekly[4] ?? null,
+                    volume: weekly[5] ?? null,
+                    k: kdj[1] ?? null,
+                    d: kdj[2] ?? null,
+                    j: kdj[3] ?? null,
+                    ma5: ma[1] ?? null,
+                    ma10: ma[2] ?? null,
+                    ma20: ma[3] ?? null,
+                    rsi: rsi[1] ?? null,
+                };
+            });
+
+            // 匯出成 JSON 檔案
+            const blob = new Blob([JSON.stringify(features, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${this.stockData.id}_features.json`;
+            a.click();
+            URL.revokeObjectURL(url);
         },
     },
 };

@@ -3169,6 +3169,11 @@ const stock = {
             // return _.find(state.stockList, ['id', id]);
             return state.stockList.find((stock) => stock.id === id);
         },
+        getTempStock: (state) => (id) => {
+            // console.log('getStock');
+            // return _.find(state.stockList, ['id', id]);
+            return state.tempStockList.find((stock) => stock.id === id);
+        },
         getStock5yearDaily: (state) => (id) => {
             // 取得指定股票，並只回傳近5年daily，其它資料不變，eps只取近6年
             const stock = _.find(state.stockList, { id });
