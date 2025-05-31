@@ -462,7 +462,7 @@
                             stockData.policy.settings.sell &&
                             (stockData.policy.settings.buy.length >= 1 || stockData.policy.settings.sell.length >= 1)
                         "
-                        style="font-size: 13px; max-width: 300px"
+                        style="font-size: 13px; min-width: 402px"
                     >
                         <div v-for="(item, index) in stockData.policy.settings.buy" :key="'buy-' + index">
                             <div style="line-height: 18px">
@@ -512,6 +512,237 @@
                                     &nbsp;{{ item.label.replace('賣', '') }}&nbsp;
                                     <span style="color: #4386f5; font-size: 14px">{{ item.limit }}</span
                                     >&nbsp;{{ item.limit_desc }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 分隔線 -->
+                        <span style="display: block; border-top: 1px solid #ccc; margin: 10px 0"></span>
+
+                        <div v-if="stockData.policy && stockData.policy.stats" style="font-size: 13px">
+                            <el-row>
+                                <el-col :span="6" style="padding: 0 0 0 15px; text-align: left"><span>賣出次數</span></el-col>
+                                <el-col :span="6" style="padding: 0; text-align: right"
+                                    ><el-tag type="info" class="ml-2" size="small" style="margin: 1px 0px"
+                                        ><span style="font-size: 14px; font-weight: bold">{{
+                                            stockData.policy.stats.number_of_sell ? stockData.policy.stats.number_of_sell : ''
+                                        }}</span
+                                        >次<span style="font-size: 14px; font-weight: bold">{{
+                                            stockData.policy.stats.sum_of_sell_number
+                                                ? Number(stockData.policy.stats.sum_of_sell_number.toFixed(1)) // 因為沒有賣出 現在，所以有可能有小數點，如23.1單位，所以先取到小數第一位
+                                                : ''
+                                        }}</span
+                                        >單位</el-tag
+                                    ></el-col
+                                >
+                                <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
+                                    ><span>&nbsp;累積報酬率</span></el-col
+                                >
+                                <el-col :span="5" style="padding-right: 10px; text-align: right"
+                                    ><el-tag class="ml-2" size="small" style="margin: 1px 0px"
+                                        ><span style="font-size: 14px; font-weight: bold">{{
+                                            stockData.policy.stats.acc_rate_of_return
+                                                ? Number(stockData.policy.stats.acc_rate_of_return.toFixed(1))
+                                                : ''
+                                        }}</span
+                                        >%</el-tag
+                                    >
+                                </el-col>
+                            </el-row>
+                            <el-row>
+                                <el-col :span="6" style="padding: 0 0 0 15px; text-align: left"><span>每回天數</span></el-col>
+                                <el-col :span="6" style="padding: 0; text-align: right"
+                                    ><el-tag type="warning" class="ml-2" size="small" style="margin: 1px 0px"
+                                        ><span style="font-size: 14px; font-weight: bold">{{
+                                            stockData.policy.stats.average_sell_interval
+                                                ? Math.round(stockData.policy.stats.average_sell_interval)
+                                                : ''
+                                        }}</span
+                                        >天</el-tag
+                                    >
+                                </el-col>
+
+                                <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
+                                    ><span>&nbsp;單位報酬率</span></el-col
+                                >
+                                <el-col :span="5" style="padding-right: 10px; text-align: right"
+                                    ><span style="color: #4386f5; font-size: 14px">
+                                        {{
+                                            stockData.policy.stats.unit_rate_of_return
+                                                ? Number(stockData.policy.stats.unit_rate_of_return.toFixed(1))
+                                                : ''
+                                        }} </span
+                                    >%</el-col
+                                >
+                                <!-- <el-col :span="6" style="padding: 0"><span>年均報酬率</span></el-col>
+                                        <el-col :span="4" style="padding: 0; text-align: right"
+                                            ><span style="color: #4386f5">{{
+                                                Number((stockData.policy.stats.average_annual_return * 100).toFixed(1))
+                                            }}</span>
+                                            %</el-col
+                                        > -->
+                            </el-row>
+                            <el-row>
+                                <el-col :span="6" style="padding: 0 0 0 15px; text-align: left"><span>最好</span></el-col>
+                                <el-col :span="6" style="padding: 0; text-align: right"
+                                    ><el-tag type="danger" class="ml-2" size="small" style="margin: 1px 0px"
+                                        ><span style="font-size: 14px; font-weight: bold">{{
+                                            stockData.policy.stats.max_earn
+                                                ? Number(stockData.policy.stats.max_earn.toFixed(1))
+                                                : ''
+                                        }}</span
+                                        >%</el-tag
+                                    >
+                                </el-col>
+                                <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
+                                    ><span>&nbsp;平均報酬率</span></el-col
+                                >
+                                <el-col :span="5" style="padding-right: 10px; text-align: right"
+                                    ><span style="color: #4386f5; font-size: 14px; font-weight: bold">{{
+                                        stockData.policy.stats.average_rate_of_return
+                                            ? Number(stockData.policy.stats.average_rate_of_return.toFixed(1))
+                                            : ''
+                                    }}</span
+                                    >%</el-col
+                                >
+                            </el-row>
+                            <el-row>
+                                <el-col :span="6" style="padding: 0 0 0 15px; text-align: left"><span>最差</span></el-col>
+                                <el-col :span="6" style="padding: 0; text-align: right"
+                                    ><el-tag type="success" class="ml-2" size="small" style="margin: 1px 0px"
+                                        ><span style="font-size: 14px; font-weight: bold">{{
+                                            stockData.policy.stats.max_lose
+                                                ? Number(stockData.policy.stats.max_lose.toFixed(1))
+                                                : ''
+                                        }}</span
+                                        >%</el-tag
+                                    ></el-col
+                                >
+                                <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
+                                    ><span>&nbsp;計算期間</span></el-col
+                                >
+                                <el-col :span="5" style="padding-right: 10px; text-align: right"
+                                    ><span style="color: #4386f5; font-size: 14px">{{
+                                        getDurationText(stockData.policy.stats.duration)
+                                    }}</span>
+                                </el-col>
+                            </el-row>
+                        </div>
+
+                        <!-- 分隔線 -->
+                        <span style="display: block; border-top: 1px solid #ccc; margin: 10px 0"></span>
+
+                        <div v-if="stockData.policy && stockData.policy.history && stockData.policy.history.length >= 1">
+                            <div v-for="(item, index) in stockData.policy.history" :key="index">
+                                <span
+                                    :style="[
+                                        index % 2 === 0 ? { color: '#eeeeee' } : { color: '#ffffff' },
+                                        {
+                                            'font-size': '12px',
+                                            display: 'inline-block',
+                                            width: '72px',
+                                            'text-align': 'center',
+                                            'vertical-align': 'top' /* 將文字靠最上方 */,
+                                            'margin-top': '6px',
+                                        },
+                                    ]"
+                                    >{{ item.date }}</span
+                                >&nbsp;&nbsp;
+                                <span
+                                    :style="{
+                                        'font-size': '12px',
+                                        display: 'inline-flex' /* 使用 inline-flex 以允許靠右對齊 */,
+                                        width: '97px',
+                                        'text-align': 'left',
+                                        'justify-content': 'space-between' /* 將子元素靠右對齊 */,
+                                        color: 'white',
+                                        'border-radius': '10px 100px / 120px',
+                                        padding: '3px',
+                                        'vertical-align': 'top' /* 將文字靠最上方 */,
+                                        'background-color':
+                                            item.buy_or_sell === '買'
+                                                ? '#f28b82'
+                                                : item.buy_or_sell === '賣'
+                                                ? '#82d125'
+                                                : '#82e725',
+                                    }"
+                                >
+                                    {{ item.buy_or_sell === '現在' ? '今' : item.buy_or_sell
+                                    }}{{ item.unit && item.unit === 0.5 ? '½' : item.unit && item.unit === 0.35 ? '⅓' : '' }}
+                                    <span>
+                                        ({{
+                                            item.buy_or_sell === '買'
+                                                ? Math.round(item.number_of_buy * 100) / 100
+                                                : Math.round(item.number_of_sell * 100) / 100
+                                        }}
+                                        單位)
+                                    </span>
+                                </span>
+                                &nbsp;&nbsp;<span
+                                    :style="[
+                                        index % 2 === 0 ? { color: '#eeeeee' } : { color: '#ffffff' },
+                                        {
+                                            'font-size': '12px',
+                                            display: 'inline-block',
+                                            width: '62px',
+                                            'text-align': 'center',
+                                            'vertical-align': 'top' /* 將文字靠最上方 */,
+                                            'margin-top': '6px',
+                                        },
+                                    ]"
+                                    >{{ item.price }}</span
+                                >
+                                &nbsp;&nbsp;<span
+                                    :style="[
+                                        item.rate_of_return < 0 ? { color: '#01aa00' } : { color: '#ee3333' },
+                                        {
+                                            'font-size': '12px',
+                                            display: 'inline-block',
+                                            width: '45px',
+                                            'text-align': 'right',
+                                            'vertical-align': 'top' /* 將文字靠最上方 */,
+                                            'margin-top': '6px',
+                                        },
+                                    ]"
+                                    >{{ item.rate_of_return ? Number((item.rate_of_return * 100).toFixed(1)) + '%' : '' }}</span
+                                >
+                                &nbsp;&nbsp;<span
+                                    :style="[
+                                        item.buy_or_sell === '買'
+                                            ? { 'background-color': '#f28b82' }
+                                            : item.buy_or_sell === '賣'
+                                            ? { 'background-color': '#82d125' }
+                                            : { 'background-color': '#82e725' },
+                                        {
+                                            'font-size': '12px',
+                                            display: 'inline-block',
+                                            width: '80px',
+                                            'text-align': 'center',
+                                            color: 'white',
+                                            'border-radius': '15px / 120px',
+                                            padding: '2px',
+                                            margin: '1px',
+                                        },
+                                    ]"
+                                >
+                                    <p v-if="item.reason.includes('kd_gold')">KD 黃金交叉</p>
+                                    <p v-if="item.reason.includes('kd_turn_up')">KD 往上轉折</p>
+                                    <p v-if="item.reason.includes('kd_w')">KD W底</p>
+                                    <p v-if="item.reason.includes('rsi_over_sold')">RSI 超賣</p>
+                                    <p v-if="item.reason.includes('rsi_turn_up')">RSI 往上轉折</p>
+                                    <p v-if="item.reason.includes('annual_fixed_date_buy')">每年固定日買</p>
+                                    <p v-if="item.reason.includes('cost_down')">成本價未跌過</p>
+                                    <p v-if="item.reason.includes('previous_buy_down')">前買價未跌過</p>
+
+                                    <p v-if="item.reason.includes('kd_dead')">KD 死亡交叉</p>
+                                    <p v-if="item.reason.includes('kd_turn_down')">KD 往下轉折</p>
+                                    <p v-if="item.reason.includes('kd_m')">KD M頭</p>
+                                    <p v-if="item.reason.includes('rsi_over_bought')">RSI 超買</p>
+                                    <p v-if="item.reason.includes('rsi_turn_down')">RSI 往下轉折</p>
+                                    <p v-if="item.reason.includes('annual_fixed_date_sell')">每年固定日賣</p>
+                                    <p v-if="item.reason.includes('previous_sell_up')">前賣價未漲過</p>
+
+                                    <p v-if="item.reason.includes('latest')">現在</p>
                                 </span>
                             </div>
                         </div>
@@ -640,6 +871,15 @@ export default {
 
             // 從中心往左右擴展兩格，得到五個區間
             return [center - 2 * step, center - step, center, center + step, center + 2 * step];
+        },
+        getDurationText(days) {
+            if (!days || days <= 0) return '';
+            const years = Math.floor(days / 365);
+            const months = Math.floor((days % 365) / 30);
+            let text = '';
+            if (years > 0) text += `${years}年`;
+            if (months > 0) text += `${months}月`;
+            return text || `${days}天`;
         },
     },
     computed: {

@@ -885,7 +885,7 @@
                                         <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
                                             ><span>&nbsp;累積報酬率</span></el-col
                                         >
-                                        <el-col :span="5" style="padding-right: 16px; text-align: right"
+                                        <el-col :span="5" style="padding-right: 10px; text-align: right"
                                             ><el-tag class="ml-2" size="small" style="margin: 1px 0px"
                                                 ><span style="font-size: 14px; font-weight: bold">{{
                                                     scope.row.policy.stats.acc_rate_of_return
@@ -914,7 +914,7 @@
                                         <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
                                             ><span>&nbsp;單位報酬率</span></el-col
                                         >
-                                        <el-col :span="5" style="padding-right: 16px; text-align: right"
+                                        <el-col :span="5" style="padding-right: 10px; text-align: right"
                                             ><span style="color: #4386f5; font-size: 14px">
                                                 {{
                                                     scope.row.policy.stats.unit_rate_of_return
@@ -946,7 +946,7 @@
                                         <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
                                             ><span>&nbsp;平均報酬率</span></el-col
                                         >
-                                        <el-col :span="5" style="padding-right: 16px; text-align: right"
+                                        <el-col :span="5" style="padding-right: 10px; text-align: right"
                                             ><span style="color: #4386f5; font-size: 14px; font-weight: bold">{{
                                                 scope.row.policy.stats.average_rate_of_return
                                                     ? Number(scope.row.policy.stats.average_rate_of_return.toFixed(1))
@@ -970,7 +970,7 @@
                                         <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
                                             ><span>&nbsp;計算期間</span></el-col
                                         >
-                                        <el-col :span="5" style="padding-right: 16px; text-align: right"
+                                        <el-col :span="5" style="padding-right: 10px; text-align: right"
                                             ><span style="color: #4386f5; font-size: 14px">{{
                                                 getDurationText(scope.row.policy.stats.duration)
                                             }}</span>
