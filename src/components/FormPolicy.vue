@@ -679,6 +679,10 @@ export default {
             const rsiMap = Object.fromEntries(tempStock.data.weekly_rsi.map((arr) => [arr[0], arr]));
 
             const reasonPriority = ['kd_w', 'kd_gold', 'kd_dead', 'rsi_over_bought'];
+
+            const dailyArr = this.stockData.data.daily; // [[date, open, high, low, close, volume], ...]
+            const dailyMap = Object.fromEntries(dailyArr.map((arr) => [arr[0], arr]));
+
             // 組合特徵
             const features = history
                 .map((item) => {
@@ -703,6 +707,32 @@ export default {
                     const ma = maMap[date] || [];
                     const rsi = rsiMap[date] || [];
 
+                    // 目標日期 = 當前日期 + 56天
+                    const targetDate = moment(date, 'YYYY-MM-DD').add(56, 'days');
+
+                    // 找到 dailyArr 中最接近 targetDate 的 index
+                    let minDiff = Infinity;
+                    let targetIdx = -1;
+                    for (let i = 0; i < dailyArr.length; i++) {
+                        const d = moment(dailyArr[i][0], 'YYYY-MM-DD');
+                        const diff = Math.abs(d.diff(targetDate, 'days'));
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            targetIdx = i;
+                        }
+                    }
+                    if (targetIdx === -1) return null; // 找不到
+
+                    const targetClose = dailyArr[targetIdx][4]; // close
+                    const nowPrice = item.price;
+
+                    let success = null;
+                    if (item.buy_or_sell === '買') {
+                        success = targetClose > nowPrice ? 1 : 0;
+                    } else if (item.buy_or_sell === '賣') {
+                        success = targetClose < nowPrice ? 1 : 0;
+                    }
+
                     return {
                         date,
                         buy_or_sell: item.buy_or_sell,
@@ -720,9 +750,10 @@ export default {
                         ma10: ma[2] ?? null,
                         ma20: ma[3] ?? null,
                         rsi: rsi[1] ?? null,
+                        success,
                     };
                 })
-                .filter(Boolean); // 濾除 reason 為 latest 的
+                .filter(Boolean);
 
             // 匯出成 JSON 檔案
             const blob = new Blob([JSON.stringify(features, null, 2)], { type: 'application/json' });
