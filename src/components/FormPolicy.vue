@@ -677,33 +677,52 @@ export default {
             const kdjMap = Object.fromEntries(tempStock.data.weekly_kdj.map((arr) => [arr[0], arr]));
             const maMap = Object.fromEntries(tempStock.data.weekly_ma.map((arr) => [arr[0], arr]));
             const rsiMap = Object.fromEntries(tempStock.data.weekly_rsi.map((arr) => [arr[0], arr]));
-            // 組合特徵
-            const features = history.map((item) => {
-                const date = item.date;
-                const weekly = weeklyMap[date] || [];
-                const kdj = kdjMap[date] || [];
-                const ma = maMap[date] || [];
-                const rsi = rsiMap[date] || [];
 
-                return {
-                    date,
-                    buy_or_sell: item.buy_or_sell,
-                    reason: item.reason,
-                    price: item.price,
-                    open: weekly[1] ?? null,
-                    high: weekly[2] ?? null,
-                    low: weekly[3] ?? null,
-                    close: weekly[4] ?? null,
-                    volume: weekly[5] ?? null,
-                    k: kdj[1] ?? null,
-                    d: kdj[2] ?? null,
-                    j: kdj[3] ?? null,
-                    ma5: ma[1] ?? null,
-                    ma10: ma[2] ?? null,
-                    ma20: ma[3] ?? null,
-                    rsi: rsi[1] ?? null,
-                };
-            });
+            const reasonPriority = ['kd_w', 'kd_gold', 'kd_dead', 'rsi_over_bought'];
+            // 組合特徵
+            const features = history
+                .map((item) => {
+                    // reason處理
+                    let reasonStr = '';
+                    if (Array.isArray(item.reason)) {
+                        if (item.reason.length === 1) {
+                            if (item.reason[0] === 'latest') return null; // 濾除
+                            reasonStr = item.reason[0];
+                        } else if (item.reason.length > 1) {
+                            // 依優先權取
+                            const found = reasonPriority.find((r) => item.reason.includes(r));
+                            reasonStr = found || item.reason[0];
+                        }
+                    } else {
+                        reasonStr = item.reason || '';
+                    }
+
+                    const date = item.date;
+                    const weekly = weeklyMap[date] || [];
+                    const kdj = kdjMap[date] || [];
+                    const ma = maMap[date] || [];
+                    const rsi = rsiMap[date] || [];
+
+                    return {
+                        date,
+                        buy_or_sell: item.buy_or_sell,
+                        reason: reasonStr,
+                        price: item.price,
+                        open: weekly[1] ?? null,
+                        high: weekly[2] ?? null,
+                        low: weekly[3] ?? null,
+                        close: weekly[4] ?? null,
+                        volume: weekly[5] ?? null,
+                        k: kdj[1] ?? null,
+                        d: kdj[2] ?? null,
+                        j: kdj[3] ?? null,
+                        ma5: ma[1] ?? null,
+                        ma10: ma[2] ?? null,
+                        ma20: ma[3] ?? null,
+                        rsi: rsi[1] ?? null,
+                    };
+                })
+                .filter(Boolean); // 濾除 reason 為 latest 的
 
             // 匯出成 JSON 檔案
             const blob = new Blob([JSON.stringify(features, null, 2)], { type: 'application/json' });
