@@ -1,14 +1,20 @@
 <template>
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="85%">
         <el-form ref="formPolicyBuyRef" :model="form.buy">
-            <el-button type="success" size="small" @click="onOptimizePolicy" style="margin-left: 10px">
-                <i class="el-icon-magic-stick"></i>&nbsp;最佳參數
-            </el-button>
+            <div style="margin-bottom: 10px">
+                <el-button type="success" size="small" @click="onOptimizePolicy" style="margin-left: 10px">
+                    <i class="el-icon-magic-stick"></i>&nbsp;相對佳參數(快速)
+                </el-button>
 
-            <el-button type="primary" size="small" @click="onExportFeature" style="margin-left: 5px">
-                <i class="el-icon-download"></i>&nbsp;匯出訓練特徵檔
-            </el-button>
-
+                <el-button type="success" size="small" @click="onFullOptimizePolicy" style="margin-left: 10px">
+                    <i class="el-icon-cpu"></i>&nbsp;最佳參數(完整窮舉)
+                </el-button>
+            </div>
+            <div style="margin-bottom: 10px">
+                <el-button type="warning" size="small" @click="onExportFeature" style="margin-left: 10px">
+                    <i class="el-icon-download"></i>&nbsp;匯出訓練特徵檔
+                </el-button>
+            </div>
             <div style="font-size: 24px; margin: 0px 10px 10px">買進策略</div>
 
             <el-row v-for="(item, index) in form.buy" :key="index">
@@ -440,6 +446,65 @@ export default {
             // });
         },
 
+        async onFullOptimizePolicy() {
+            const stockId = this.stockId;
+            let bestParams = null;
+            let bestReturn = -Infinity;
+            let bestPolicy = null;
+
+            // 每層都+1，不跳步
+            for (let kdGold = 60; kdGold >= 30; kdGold--) {
+                for (let kdDead = 63; kdDead <= 90; kdDead++) {
+                    for (let rsiOverBought = 85; rsiOverBought <= 97; rsiOverBought++) {
+                        try {
+                            await this.tryPolicy(
+                                stockId,
+                                kdGold,
+                                kdDead,
+                                rsiOverBought,
+                                (params, unitReturn, numberOfBuy, numberOfSell, minBuyCount, minSellCount, policyList) => {
+                                    if (unitReturn > bestReturn && numberOfBuy >= minBuyCount && numberOfSell >= minSellCount) {
+                                        bestReturn = unitReturn;
+                                        bestParams = { ...params };
+                                        bestPolicy = _.cloneDeep(policyList);
+                                        // 立即印出
+                                        console.log(
+                                            `目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${
+                                                bestParams?.kdGold ?? '-'
+                                            }，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${
+                                                bestParams?.rsiOverBought ?? '-'
+                                            })`
+                                        );
+                                    }
+                                }
+                            );
+                        } catch (e) {
+                            console.error(
+                                `tryPolicy 發生錯誤: KD黃金交叉≤${kdGold}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}`,
+                                e
+                            );
+                        }
+                    }
+                }
+            }
+
+            console.log('完整窮舉算完囉');
+
+            // 設定最佳參數到表單
+            if (bestPolicy) {
+                this.form = bestPolicy;
+                this.$message.success(
+                    `最佳參數：KD黃金交叉≤${bestParams.kdGold}，KD死亡交叉≥${bestParams.kdDead}，RSI超買≥${
+                        bestParams.rsiOverBought
+                    }，單位報酬率${bestReturn.toFixed(2)}%`
+                );
+                console.log('※最佳參數', bestParams);
+                console.log('※最佳單位報酬率', bestReturn);
+            } else {
+                this.$message.warning('找不到最佳參數組合');
+            }
+        },
+
         async onOptimizePolicy() {
             const stockId = this.stockId;
             let bestParams = null;
@@ -589,7 +654,7 @@ export default {
             const numberOfBuy = stats?.number_of_buy ?? 0;
             const duration = stats?.duration_from_first_weekly ?? 0; // 天數
             const star = stock?.star ?? 3; // 預設3星
-            const name = stock?.name ?? '';
+            // const name = stock?.name ?? '';
 
             let buyPeriod = 365;
             let sellPeriod = 547;
