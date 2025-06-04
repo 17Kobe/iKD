@@ -701,20 +701,16 @@ export default {
         },
         // ...existing code...
         async onExportFeature() {
-            // 先套用目前策略並等待計算完成
             console.log('onExportFeature1');
             try {
                 const policyList = {
                     buy: [{ method: 'kd_gold', label: '週 KD 黃金交叉', limit: 50, limit_desc: '以下' }],
                     sell: [{ method: 'kd_dead', label: '週 KD 死亡交叉', limit: 50, limit_desc: '以上' }],
                 };
-
-                // 為了hash 有不同，所以多算這個
                 await this.$store.dispatch('APPLY_AND_WAIT_POLICY_RESULT', {
                     stockId: this.stockId,
-                    policyList: policyList,
+                    policyList,
                 });
-
                 await this.$store.dispatch('APPLY_AND_WAIT_POLICY_RESULT', {
                     stockId: this.stockId,
                     policyList: this.form,
@@ -723,112 +719,127 @@ export default {
                 console.error('APPLY_AND_WAIT_POLICY_RESULT error', e);
             }
             console.log('onExportFeature2');
-
-            // 重新取得最新 stockData
+        
+            // 取得最新 stockData 與 tempStock
             this.stockData = this.$store.getters.getStock(this.stockId);
-
-            // 反轉歷史
-            const history = _.cloneDeep(this.stockData.policy.history).reverse();
-
-            // 取得 tempStockList 中對應的 stock
             const tempStock = this.$store.getters.getTempStock(this.stockId);
             if (!tempStock) {
                 this.$message.error('找不到 tempStock 資料');
                 return;
             }
-
-            // 轉成日期對應表
-            const weeklyMap = Object.fromEntries(tempStock.data.weekly.map((arr) => [arr[0], arr]));
-            const kdjMap = Object.fromEntries(tempStock.data.weekly_kdj.map((arr) => [arr[0], arr]));
-            const maMap = Object.fromEntries(tempStock.data.weekly_ma.map((arr) => [arr[0], arr]));
-            const rsiMap = Object.fromEntries(tempStock.data.weekly_rsi.map((arr) => [arr[0], arr]));
-
+        
+            // 反轉歷史
+            const history = _.cloneDeep(this.stockData.policy.history).reverse();
+        
+            // 日期對應表
+            const toMap = arr => Object.fromEntries(arr.map(a => [a[0], a]));
+            const weeklyMap = toMap(tempStock.data.weekly);
+            const kdjMap = toMap(tempStock.data.weekly_kdj);
+            const maMap = toMap(tempStock.data.weekly_ma);
+            const rsiMap = toMap(tempStock.data.weekly_rsi);
+        
             const reasonPriority = ['kd_w', 'kd_gold', 'kd_dead', 'rsi_over_bought'];
-
-            const dailyArr = this.stockData.data.daily; // [[date, open, high, low, close, volume], ...]
-            const dailyMap = Object.fromEntries(dailyArr.map((arr) => [arr[0], arr]));
-
+            const dailyArr = this.stockData.data.daily;
+        
+            // 數值對照表
+            const reasonMap = {
+                'kd_w': 1, 'kd_gold': 2, 'kd_dead': 3, 'rsi_over_bought': 4,
+                'rsi_over_sold': 5, 'kd_turn_up': 6, 'kd_turn_down': 7,
+                'rsi_turn_up': 8, 'rsi_turn_down': 9, 'previous_buy_down': 10,
+                'cost_down': 11, 'annual_fixed_date_buy': 12, 'earn': 13,
+                'take_profit': 14, 'previous_sell_up': 15, 'stop_loss': 16,
+                'annual_fixed_date_sell': 17,
+            };
+            const buyOrSellMap = { '買': 1, '賣': -1, '現在': 0 };
+        
             // 組合特徵
-            const features = history
-                .map((item) => {
-                    // reason處理
-                    let reasonStr = '';
-                    if (Array.isArray(item.reason)) {
-                        if (item.reason.length === 1) {
-                            if (item.reason[0] === 'latest') return null; // 濾除
-                            reasonStr = item.reason[0];
-                        } else if (item.reason.length > 1) {
-                            // 依優先權取
-                            const found = reasonPriority.find((r) => item.reason.includes(r));
-                            reasonStr = found || item.reason[0];
-                        }
-                    } else {
-                        reasonStr = item.reason || '';
+            const features = history.map(item => {
+                // reason 處理
+                let reasonStr = '';
+                if (Array.isArray(item.reason)) {
+                    if (item.reason.length === 1) {
+                        if (item.reason[0] === 'latest') return null;
+                        reasonStr = item.reason[0];
+                    } else if (item.reason.length > 1) {
+                        reasonStr = reasonPriority.find(r => item.reason.includes(r)) || item.reason[0];
                     }
-
-                    const date = item.date;
-                    const weekly = weeklyMap[date] || [];
-                    const kdj = kdjMap[date] || [];
-                    const ma = maMap[date] || [];
-                    const rsi = rsiMap[date] || [];
-
-                    // 目標日期 = 當前日期 + 56天
-                    const targetDate = moment(date, 'YYYY-MM-DD').add(56, 'days');
-
-                    // 找到 dailyArr 中最接近 targetDate 的 index
-                    let minDiff = Infinity;
-                    let targetIdx = -1;
-                    for (let i = 0; i < dailyArr.length; i++) {
-                        const d = moment(dailyArr[i][0], 'YYYY-MM-DD');
-                        const diff = Math.abs(d.diff(targetDate, 'days'));
-                        if (diff < minDiff) {
-                            minDiff = diff;
-                            targetIdx = i;
-                        }
+                } else {
+                    reasonStr = item.reason || '';
+                }
+        
+                const date = item.date;
+                const weekly = weeklyMap[date] || [];
+                const kdj = kdjMap[date] || [];
+                const ma = maMap[date] || [];
+                const rsi = rsiMap[date] || [];
+        
+                // 目標日期 = 當前日期 + 56天
+                const targetDate = moment(date, 'YYYY-MM-DD').add(56, 'days');
+                // 找到 dailyArr 中最接近 targetDate 的 index
+                let minDiff = Infinity, targetIdx = -1;
+                for (let i = 0; i < dailyArr.length; i++) {
+                    const d = moment(dailyArr[i][0], 'YYYY-MM-DD');
+                    const diff = Math.abs(d.diff(targetDate, 'days'));
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        targetIdx = i;
                     }
-                    if (targetIdx === -1) return null; // 找不到
-
-                    const targetClose = dailyArr[targetIdx][4]; // close
-                    const nowPrice = item.price;
-
-                    let success = null;
-                    if (item.buy_or_sell === '買') {
-                        success = targetClose > nowPrice ? 1 : 0;
-                    } else if (item.buy_or_sell === '賣') {
-                        success = targetClose < nowPrice ? 1 : 0;
-                    }
-
-                    return {
-                        date,
-                        buy_or_sell: item.buy_or_sell,
-                        reason: reasonStr,
-                        price: item.price,
-                        open: weekly[1] ?? null,
-                        high: weekly[2] ?? null,
-                        low: weekly[3] ?? null,
-                        close: weekly[4] ?? null,
-                        volume: weekly[5] ?? null,
-                        k: kdj[1] ?? null,
-                        d: kdj[2] ?? null,
-                        j: kdj[3] ?? null,
-                        ma5: ma[1] ?? null,
-                        ma10: ma[2] ?? null,
-                        ma20: ma[3] ?? null,
-                        rsi: rsi[1] ?? null,
-                        success,
-                    };
-                })
-                .filter(Boolean);
-
-            // 匯出成 JSON 檔案
-            const blob = new Blob([JSON.stringify(features, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `${this.stockData.id}_features.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        },
+                }
+                if (targetIdx === -1) return null;
+        
+                const targetClose = dailyArr[targetIdx][4]; // close
+                const nowPrice = item.price;
+                let success = null;
+                if (item.buy_or_sell === '買') success = targetClose > nowPrice ? 1 : 0;
+                else if (item.buy_or_sell === '賣') success = targetClose < nowPrice ? 1 : 0;
+        
+                // 數值化
+                const reasonNum = reasonMap[reasonStr] ?? 0;
+                const buyOrSellNum = buyOrSellMap[item.buy_or_sell] ?? 0;
+        
+                return {
+                    date,
+                    buy_or_sell_num: buyOrSellNum,
+                    reason_num: reasonNum,
+                    price: item.price,
+                    open: weekly[1] ?? '',
+                    high: weekly[2] ?? '',
+                    low: weekly[3] ?? '',
+                    close: weekly[4] ?? '',
+                    volume: weekly[5] ?? '',
+                    k: kdj[1] ?? '',
+                    d: kdj[2] ?? '',
+                    j: kdj[3] ?? '',
+                    ma5: ma[1] ?? '',
+                    ma10: ma[2] ?? '',
+                    ma20: ma[3] ?? '',
+                    rsi: rsi[1] ?? '',
+                    success,
+                };
+            }).filter(Boolean);
+        
+            // 匯出成 CSV 檔案（只輸出數值特徵）
+            if (features.length > 0) {
+                const csvFields = [
+                    'date','buy_or_sell_num','reason_num','price','open','high','low','close','volume',
+                    'k','d','j','ma5','ma10','ma20','rsi','success'
+                ];
+                const csvRows = [
+                    csvFields.join(','), // 標題
+                    ...features.map(obj => csvFields.map(k => obj[k] ?? '').join(','))
+                ];
+                const csv = csvRows.join('\n');
+                const csvBlob = new Blob([csv], { type: 'text/csv' });
+                const csvUrl = URL.createObjectURL(csvBlob);
+                const csvA = document.createElement('a');
+                csvA.href = csvUrl;
+                csvA.download = `${this.stockData.id}_features.csv`;
+                csvA.click();
+                URL.revokeObjectURL(csvUrl);
+            } else {
+                this.$message.warning('沒有可匯出的特徵資料');
+            }
+        }
     },
 };
 // 父傳子參考 https://its201.com/article/weixin_49035434/119852222 方法1，的emit似乎 vue 3有改語法而不行了。但方法2沒用 emit仍正常
