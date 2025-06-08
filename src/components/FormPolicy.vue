@@ -503,21 +503,30 @@ export default {
                                         );
 
                                         // 回頭補算：只補主迴圈沒算過的鄰近點（±1）
-                                        for (let g = kdGold - 1; g <= kdGold + 1; g++) {
-                                            if (g < kdGoldEnd || g > kdGoldStart) continue;
-                                            for (let d = kdDead - 1; d <= kdDead + 1; d++) {
-                                                if (d < kdDeadStart || d > kdDeadEnd) continue;
-                                                for (let r = rsiOverBought - 1; r <= rsiOverBought + 1; r++) {
-                                                    if (r < rsiStart || r > rsiEnd) continue;
+                                        for (let g = kdGold + 1; g >= kdGold; g--) {
+                                            // console.log(
+                                            //     `細部搜尋1：KD黃金交叉≤${g}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}`
+                                            // );
+                                            // if (g < kdGoldEnd || g > kdGoldStart) continue;
+                                            for (let d = kdDead - 1; d <= kdDead; d++) {
+                                                // console.log(
+                                                //     `細部搜尋2：KD黃金交叉≤${g}，KD死亡交叉≥${d}，RSI超買≥${rsiOverBought}`
+                                                // );
+                                                // if (d < kdDeadStart || d > kdDeadEnd) continue;
+                                                for (let r = rsiOverBought - 1; r <= rsiOverBought; r++) {
+                                                    // console.log(`細部搜尋3：KD黃金交叉≤${g}，KD死亡交叉≥${d}，RSI超買≥${r}`);
+                                                    // if (r < rsiStart || r > rsiEnd) continue;
                                                     // 跳過主迴圈本身
                                                     if (g === kdGold && d === kdDead && r === rsiOverBought) continue;
+
                                                     // 跳過主迴圈已算過的（每2步一格）
-                                                    if (
-                                                        (g - kdGoldEnd) % 2 === 0 &&
-                                                        (d - kdDeadStart) % 2 === 0 &&
-                                                        (r - rsiStart) % 2 === 0
-                                                    )
-                                                        continue;
+                                                    // if (
+                                                    //     (g - kdGoldEnd) % 2 === 0 &&
+                                                    //     (d - kdDeadStart) % 2 === 0 &&
+                                                    //     (r - rsiStart) % 2 === 0
+                                                    // )
+                                                    //     continue;
+                                                    // console.log(`細部搜尋4：KD黃金交叉≤${g}，KD死亡交叉≥${d}，RSI超買≥${r}`);
 
                                                     await this.tryPolicy(
                                                         stockId,
@@ -534,9 +543,10 @@ export default {
                                                             policyList2
                                                         ) => {
                                                             // 進入細部搜尋就印出
-                                                            console.log(
-                                                                `【細部搜尋】KD黃金交叉≤${g}，KD死亡交叉≥${d}，RSI超買≥${r}，單位報酬率: ${unitReturn2}，買入次數: ${numberOfBuy2} (min: ${minBuyCount2})，賣出次數: ${numberOfSell2} (min: ${minSellCount2})`
-                                                            );
+                                                            // console.log(
+                                                            //     `【細部搜尋】KD黃金交叉≤${g}，KD死亡交叉≥${d}，RSI超買≥${r}，單位報酬率: ${unitReturn2}，買入次數: ${numberOfBuy2} (min: ${minBuyCount2})，賣出次數: ${numberOfSell2} (min: ${minSellCount2})`
+                                                            // );
+                                                            console.log(`【細部搜尋比較】`);
                                                             if (
                                                                 unitReturn2 > bestReturn &&
                                                                 numberOfBuy2 >= minBuyCount2 &&
