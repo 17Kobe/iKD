@@ -2,12 +2,12 @@
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="85%">
         <el-form ref="formPolicyBuyRef" :model="form.buy">
             <div style="margin-bottom: 10px">
-                <el-button type="success" size="small" @click="onOptimizePolicy" style="margin-left: 10px">
-                    <i class="el-icon-magic-stick"></i>&nbsp;相對佳參數(快速)
-                </el-button>
-
                 <el-button type="success" size="small" @click="onFullOptimizePolicy" style="margin-left: 10px">
                     <i class="el-icon-cpu"></i>&nbsp;最佳參數(完整窮舉)
+                </el-button>
+
+                <el-button type="success" size="small" @click="onOptimizePolicy" style="margin-left: 10px">
+                    <i class="el-icon-magic-stick"></i>&nbsp;相對佳參數(快速)
                 </el-button>
             </div>
             <div style="margin-bottom: 10px">
@@ -452,29 +452,194 @@ export default {
             let bestReturn = -Infinity;
             let bestPolicy = null;
 
-            // 每層都+1，不跳步
-            for (let kdGold = 60; kdGold >= 30; kdGold--) {
-                for (let kdDead = 63; kdDead <= 90; kdDead++) {
-                    for (let rsiOverBought = 85; rsiOverBought <= 97; rsiOverBought++) {
+            // 參數範圍
+            const kdGoldStart = 60,
+                kdGoldEnd = 30;
+            const kdDeadStart = 63,
+                kdDeadEnd = 90;
+            const rsiStart = 85,
+                rsiEnd = 97;
+
+            // 計算總組合數（每2步一格）
+            const total =
+                (Math.floor((kdGoldStart - kdGoldEnd) / 2) + 1) *
+                (Math.floor((kdDeadEnd - kdDeadStart) / 2) + 1) *
+                (Math.floor((rsiEnd - rsiStart) / 2) + 1);
+            let count = 0;
+
+            for (let kdGold = kdGoldStart; kdGold >= kdGoldEnd; kdGold -= 2) {
+                for (let kdDead = kdDeadStart; kdDead <= kdDeadEnd; kdDead += 2) {
+                    for (let rsiOverBought = rsiStart; rsiOverBought <= rsiEnd; rsiOverBought += 2) {
+                        count++;
+                        const percent = ((count / total) * 100).toFixed(2);
+
                         try {
                             await this.tryPolicy(
                                 stockId,
                                 kdGold,
                                 kdDead,
                                 rsiOverBought,
-                                (params, unitReturn, numberOfBuy, numberOfSell, minBuyCount, minSellCount, policyList) => {
+                                async (params, unitReturn, numberOfBuy, numberOfSell, minBuyCount, minSellCount, policyList) => {
                                     if (unitReturn > bestReturn && numberOfBuy >= minBuyCount && numberOfSell >= minSellCount) {
                                         bestReturn = unitReturn;
                                         bestParams = { ...params };
                                         bestPolicy = _.cloneDeep(policyList);
-                                        // 立即印出
+
+                                        // 只存最佳解
+                                        const best = {
+                                            percent,
+                                            params: bestParams,
+                                            bestReturn,
+                                        };
+                                        localStorage.setItem('ikd_optimize_best', JSON.stringify(best));
+
+                                        // console.log 顯示 percent
                                         console.log(
-                                            `目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${
+                                            `進度: ${percent}%｜目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${
                                                 bestParams?.kdGold ?? '-'
                                             }，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${
                                                 bestParams?.rsiOverBought ?? '-'
-                                            })`
+                                            }）`
                                         );
+
+                                        // 回頭補算：只補主迴圈沒算過的鄰近點（±1）
+                                        const neighbors = [];
+                                        // kdGold+1/-1
+                                        [-1, 1].forEach((dk) => {
+                                            const g = kdGold + dk;
+                                            if (g <= kdGoldStart && g >= kdGoldEnd && (g - kdGoldEnd) % 2 !== 0) {
+                                                neighbors.push([g, kdDead, rsiOverBought]);
+                                            }
+                                        });
+                                        // kdDead+1/-1
+                                        [-1, 1].forEach((dd) => {
+                                            const d = kdDead + dd;
+                                            if (d >= kdDeadStart && d <= kdDeadEnd && (d - kdDeadStart) % 2 !== 0) {
+                                                neighbors.push([kdGold, d, rsiOverBought]);
+                                            }
+                                        });
+                                        // rsiOverBought+1/-1
+                                        [-1, 1].forEach((dr) => {
+                                            const r = rsiOverBought + dr;
+                                            if (r >= rsiStart && r <= rsiEnd && (r - rsiStart) % 2 !== 0) {
+                                                neighbors.push([kdGold, kdDead, r]);
+                                            }
+                                        });
+                                        // kdGold+1/-1 & kdDead+1/-1
+                                        [-1, 1].forEach((dk) => {
+                                            const g = kdGold + dk;
+                                            if (g <= kdGoldStart && g >= kdGoldEnd && (g - kdGoldEnd) % 2 !== 0) {
+                                                [-1, 1].forEach((dd) => {
+                                                    const d = kdDead + dd;
+                                                    if (d >= kdDeadStart && d <= kdDeadEnd && (d - kdDeadStart) % 2 !== 0) {
+                                                        neighbors.push([g, d, rsiOverBought]);
+                                                    }
+                                                });
+                                            }
+                                        });
+                                        // kdGold+1/-1 & rsiOverBought+1/-1
+                                        [-1, 1].forEach((dk) => {
+                                            const g = kdGold + dk;
+                                            if (g <= kdGoldStart && g >= kdGoldEnd && (g - kdGoldEnd) % 2 !== 0) {
+                                                [-1, 1].forEach((dr) => {
+                                                    const r = rsiOverBought + dr;
+                                                    if (r >= rsiStart && r <= rsiEnd && (r - rsiStart) % 2 !== 0) {
+                                                        neighbors.push([g, kdDead, r]);
+                                                    }
+                                                });
+                                            }
+                                        });
+                                        // kdDead+1/-1 & rsiOverBought+1/-1
+                                        [-1, 1].forEach((dd) => {
+                                            const d = kdDead + dd;
+                                            if (d >= kdDeadStart && d <= kdDeadEnd && (d - kdDeadStart) % 2 !== 0) {
+                                                [-1, 1].forEach((dr) => {
+                                                    const r = rsiOverBought + dr;
+                                                    if (r >= rsiStart && r <= rsiEnd && (r - rsiStart) % 2 !== 0) {
+                                                        neighbors.push([kdGold, d, r]);
+                                                    }
+                                                });
+                                            }
+                                        });
+                                        // kdGold+1/-1 & kdDead+1/-1 & rsiOverBought+1/-1
+                                        [-1, 1].forEach((dk) => {
+                                            const g = kdGold + dk;
+                                            if (g <= kdGoldStart && g >= kdGoldEnd && (g - kdGoldEnd) % 2 !== 0) {
+                                                [-1, 1].forEach((dd) => {
+                                                    const d = kdDead + dd;
+                                                    if (d >= kdDeadStart && d <= kdDeadEnd && (d - kdDeadStart) % 2 !== 0) {
+                                                        [-1, 1].forEach((dr) => {
+                                                            const r = rsiOverBought + dr;
+                                                            if (r >= rsiStart && r <= rsiEnd && (r - rsiStart) % 2 !== 0) {
+                                                                neighbors.push([g, d, r]);
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        });
+
+                                        // 避免重複
+                                        const checked = new Set();
+                                        neighbors.forEach(([g, d, r]) => {
+                                            const key = `${g}_${d}_${r}`;
+                                            if (checked.has(key)) return;
+                                            checked.add(key);
+                                            // 跳過主迴圈已算過的
+                                            if (
+                                                (g - kdGoldEnd) % 2 === 0 &&
+                                                (d - kdDeadStart) % 2 === 0 &&
+                                                (r - rsiStart) % 2 === 0
+                                            )
+                                                return;
+                                            // 補算
+                                            this.tryPolicy(
+                                                stockId,
+                                                g,
+                                                d,
+                                                r,
+                                                (
+                                                    params2,
+                                                    unitReturn2,
+                                                    numberOfBuy2,
+                                                    numberOfSell2,
+                                                    minBuyCount2,
+                                                    minSellCount2,
+                                                    policyList2
+                                                ) => {
+                                                    // 進入細部搜尋就印出
+                                                    console.log(
+                                                        `【細部搜尋】KD黃金交叉≤${g}，KD死亡交叉≥${d}，RSI超買≥${r}，單位報酬率: ${unitReturn2}，買入次數: ${numberOfBuy2} (min: ${minBuyCount2})，賣出次數: ${numberOfSell2} (min: ${minSellCount2})`
+                                                    );
+
+                                                    if (
+                                                        unitReturn2 > bestReturn &&
+                                                        numberOfBuy2 >= minBuyCount2 &&
+                                                        numberOfSell2 >= minSellCount2
+                                                    ) {
+                                                        bestReturn = unitReturn2;
+                                                        bestParams = { ...params2 };
+                                                        bestPolicy = _.cloneDeep(policyList2);
+                                                        // 細部搜尋也即時印出
+                                                        console.log(
+                                                            `【細部搜尋】進度: ${percent}%｜目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${
+                                                                bestParams?.kdGold ?? '-'
+                                                            }，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${
+                                                                bestParams?.rsiOverBought ?? '-'
+                                                            }）`
+                                                        );
+                                                        localStorage.setItem(
+                                                            'ikd_optimize_best',
+                                                            JSON.stringify({
+                                                                percent,
+                                                                params: bestParams,
+                                                                bestReturn,
+                                                            })
+                                                        );
+                                                    }
+                                                }
+                                            );
+                                        });
                                     }
                                 }
                             );
@@ -500,6 +665,15 @@ export default {
                 );
                 console.log('※最佳參數', bestParams);
                 console.log('※最佳單位報酬率', bestReturn);
+                // 最終最佳也存一次
+                localStorage.setItem(
+                    'ikd_optimize_best',
+                    JSON.stringify({
+                        percent: 100,
+                        params: bestParams,
+                        bestReturn,
+                    })
+                );
             } else {
                 this.$message.warning('找不到最佳參數組合');
             }
@@ -719,7 +893,7 @@ export default {
                 console.error('APPLY_AND_WAIT_POLICY_RESULT error', e);
             }
             console.log('onExportFeature2');
-        
+
             // 取得最新 stockData 與 tempStock
             this.stockData = this.$store.getters.getStock(this.stockId);
             const tempStock = this.$store.getters.getTempStock(this.stockId);
@@ -727,106 +901,135 @@ export default {
                 this.$message.error('找不到 tempStock 資料');
                 return;
             }
-        
+
             // 反轉歷史
             const history = _.cloneDeep(this.stockData.policy.history).reverse();
-        
+
             // 日期對應表
-            const toMap = arr => Object.fromEntries(arr.map(a => [a[0], a]));
+            const toMap = (arr) => Object.fromEntries(arr.map((a) => [a[0], a]));
             const weeklyMap = toMap(tempStock.data.weekly);
             const kdjMap = toMap(tempStock.data.weekly_kdj);
             const maMap = toMap(tempStock.data.weekly_ma);
             const rsiMap = toMap(tempStock.data.weekly_rsi);
-        
+
             const reasonPriority = ['kd_w', 'kd_gold', 'kd_dead', 'rsi_over_bought'];
             const dailyArr = this.stockData.data.daily;
-        
+
             // 數值對照表
             const reasonMap = {
-                'kd_w': 1, 'kd_gold': 2, 'kd_dead': 3, 'rsi_over_bought': 4,
-                'rsi_over_sold': 5, 'kd_turn_up': 6, 'kd_turn_down': 7,
-                'rsi_turn_up': 8, 'rsi_turn_down': 9, 'previous_buy_down': 10,
-                'cost_down': 11, 'annual_fixed_date_buy': 12, 'earn': 13,
-                'take_profit': 14, 'previous_sell_up': 15, 'stop_loss': 16,
-                'annual_fixed_date_sell': 17,
+                kd_w: 1,
+                kd_gold: 2,
+                kd_dead: 3,
+                rsi_over_bought: 4,
+                rsi_over_sold: 5,
+                kd_turn_up: 6,
+                kd_turn_down: 7,
+                rsi_turn_up: 8,
+                rsi_turn_down: 9,
+                previous_buy_down: 10,
+                cost_down: 11,
+                annual_fixed_date_buy: 12,
+                earn: 13,
+                take_profit: 14,
+                previous_sell_up: 15,
+                stop_loss: 16,
+                annual_fixed_date_sell: 17,
             };
-            const buyOrSellMap = { '買': 1, '賣': -1, '現在': 0 };
-        
+            const buyOrSellMap = { 買: 1, 賣: -1, 現在: 0 };
+
             // 組合特徵
-            const features = history.map(item => {
-                // reason 處理
-                let reasonStr = '';
-                if (Array.isArray(item.reason)) {
-                    if (item.reason.length === 1) {
-                        if (item.reason[0] === 'latest') return null;
-                        reasonStr = item.reason[0];
-                    } else if (item.reason.length > 1) {
-                        reasonStr = reasonPriority.find(r => item.reason.includes(r)) || item.reason[0];
+            const features = history
+                .map((item) => {
+                    // reason 處理
+                    let reasonStr = '';
+                    if (Array.isArray(item.reason)) {
+                        if (item.reason.length === 1) {
+                            if (item.reason[0] === 'latest') return null;
+                            reasonStr = item.reason[0];
+                        } else if (item.reason.length > 1) {
+                            reasonStr = reasonPriority.find((r) => item.reason.includes(r)) || item.reason[0];
+                        }
+                    } else {
+                        reasonStr = item.reason || '';
                     }
-                } else {
-                    reasonStr = item.reason || '';
-                }
-        
-                const date = item.date;
-                const weekly = weeklyMap[date] || [];
-                const kdj = kdjMap[date] || [];
-                const ma = maMap[date] || [];
-                const rsi = rsiMap[date] || [];
-        
-                // 目標日期 = 當前日期 + 56天
-                const targetDate = moment(date, 'YYYY-MM-DD').add(56, 'days');
-                // 找到 dailyArr 中最接近 targetDate 的 index
-                let minDiff = Infinity, targetIdx = -1;
-                for (let i = 0; i < dailyArr.length; i++) {
-                    const d = moment(dailyArr[i][0], 'YYYY-MM-DD');
-                    const diff = Math.abs(d.diff(targetDate, 'days'));
-                    if (diff < minDiff) {
-                        minDiff = diff;
-                        targetIdx = i;
+
+                    const date = item.date;
+                    const weekly = weeklyMap[date] || [];
+                    const kdj = kdjMap[date] || [];
+                    const ma = maMap[date] || [];
+                    const rsi = rsiMap[date] || [];
+
+                    // 目標日期 = 當前日期 + 56天
+                    const targetDate = moment(date, 'YYYY-MM-DD').add(56, 'days');
+                    // 找到 dailyArr 中最接近 targetDate 的 index
+                    let minDiff = Infinity,
+                        targetIdx = -1;
+                    for (let i = 0; i < dailyArr.length; i++) {
+                        const d = moment(dailyArr[i][0], 'YYYY-MM-DD');
+                        const diff = Math.abs(d.diff(targetDate, 'days'));
+                        if (diff < minDiff) {
+                            minDiff = diff;
+                            targetIdx = i;
+                        }
                     }
-                }
-                if (targetIdx === -1) return null;
-        
-                const targetClose = dailyArr[targetIdx][4]; // close
-                const nowPrice = item.price;
-                let success = null;
-                if (item.buy_or_sell === '買') success = targetClose > nowPrice ? 1 : 0;
-                else if (item.buy_or_sell === '賣') success = targetClose < nowPrice ? 1 : 0;
-        
-                // 數值化
-                const reasonNum = reasonMap[reasonStr] ?? 0;
-                const buyOrSellNum = buyOrSellMap[item.buy_or_sell] ?? 0;
-        
-                return {
-                    date,
-                    buy_or_sell_num: buyOrSellNum,
-                    reason_num: reasonNum,
-                    price: item.price,
-                    open: weekly[1] ?? '',
-                    high: weekly[2] ?? '',
-                    low: weekly[3] ?? '',
-                    close: weekly[4] ?? '',
-                    volume: weekly[5] ?? '',
-                    k: kdj[1] ?? '',
-                    d: kdj[2] ?? '',
-                    j: kdj[3] ?? '',
-                    ma5: ma[1] ?? '',
-                    ma10: ma[2] ?? '',
-                    ma20: ma[3] ?? '',
-                    rsi: rsi[1] ?? '',
-                    success,
-                };
-            }).filter(Boolean);
-        
+                    if (targetIdx === -1) return null;
+
+                    const targetClose = dailyArr[targetIdx][4]; // close
+                    const nowPrice = item.price;
+                    let success = null;
+                    if (item.buy_or_sell === '買') success = targetClose > nowPrice ? 1 : 0;
+                    else if (item.buy_or_sell === '賣') success = targetClose < nowPrice ? 1 : 0;
+
+                    // 數值化
+                    const reasonNum = reasonMap[reasonStr] ?? 0;
+                    const buyOrSellNum = buyOrSellMap[item.buy_or_sell] ?? 0;
+
+                    return {
+                        date,
+                        buy_or_sell_num: buyOrSellNum,
+                        reason_num: reasonNum,
+                        price: item.price,
+                        open: weekly[1] ?? '',
+                        high: weekly[2] ?? '',
+                        low: weekly[3] ?? '',
+                        close: weekly[4] ?? '',
+                        volume: weekly[5] ?? '',
+                        k: kdj[1] ?? '',
+                        d: kdj[2] ?? '',
+                        j: kdj[3] ?? '',
+                        ma5: ma[1] ?? '',
+                        ma10: ma[2] ?? '',
+                        ma20: ma[3] ?? '',
+                        rsi: rsi[1] ?? '',
+                        success,
+                    };
+                })
+                .filter(Boolean);
+
             // 匯出成 CSV 檔案（只輸出數值特徵）
             if (features.length > 0) {
                 const csvFields = [
-                    'date','buy_or_sell_num','reason_num','price','open','high','low','close','volume',
-                    'k','d','j','ma5','ma10','ma20','rsi','success'
+                    'date',
+                    'buy_or_sell_num',
+                    'reason_num',
+                    'price',
+                    'open',
+                    'high',
+                    'low',
+                    'close',
+                    'volume',
+                    'k',
+                    'd',
+                    'j',
+                    'ma5',
+                    'ma10',
+                    'ma20',
+                    'rsi',
+                    'success',
                 ];
                 const csvRows = [
                     csvFields.join(','), // 標題
-                    ...features.map(obj => csvFields.map(k => obj[k] ?? '').join(','))
+                    ...features.map((obj) => csvFields.map((k) => obj[k] ?? '').join(',')),
                 ];
                 const csv = csvRows.join('\n');
                 const csvBlob = new Blob([csv], { type: 'text/csv' });
@@ -839,7 +1042,7 @@ export default {
             } else {
                 this.$message.warning('沒有可匯出的特徵資料');
             }
-        }
+        },
     },
 };
 // 父傳子參考 https://its201.com/article/weixin_49035434/119852222 方法1，的emit似乎 vue 3有改語法而不行了。但方法2沒用 emit仍正常
