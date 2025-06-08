@@ -503,143 +503,70 @@ export default {
                                         );
 
                                         // 回頭補算：只補主迴圈沒算過的鄰近點（±1）
-                                        const neighbors = [];
-                                        // kdGold+1/-1
-                                        [-1, 1].forEach((dk) => {
-                                            const g = kdGold + dk;
-                                            if (g <= kdGoldStart && g >= kdGoldEnd && (g - kdGoldEnd) % 2 !== 0) {
-                                                neighbors.push([g, kdDead, rsiOverBought]);
-                                            }
-                                        });
-                                        // kdDead+1/-1
-                                        [-1, 1].forEach((dd) => {
-                                            const d = kdDead + dd;
-                                            if (d >= kdDeadStart && d <= kdDeadEnd && (d - kdDeadStart) % 2 !== 0) {
-                                                neighbors.push([kdGold, d, rsiOverBought]);
-                                            }
-                                        });
-                                        // rsiOverBought+1/-1
-                                        [-1, 1].forEach((dr) => {
-                                            const r = rsiOverBought + dr;
-                                            if (r >= rsiStart && r <= rsiEnd && (r - rsiStart) % 2 !== 0) {
-                                                neighbors.push([kdGold, kdDead, r]);
-                                            }
-                                        });
-                                        // kdGold+1/-1 & kdDead+1/-1
-                                        [-1, 1].forEach((dk) => {
-                                            const g = kdGold + dk;
-                                            if (g <= kdGoldStart && g >= kdGoldEnd && (g - kdGoldEnd) % 2 !== 0) {
-                                                [-1, 1].forEach((dd) => {
-                                                    const d = kdDead + dd;
-                                                    if (d >= kdDeadStart && d <= kdDeadEnd && (d - kdDeadStart) % 2 !== 0) {
-                                                        neighbors.push([g, d, rsiOverBought]);
-                                                    }
-                                                });
-                                            }
-                                        });
-                                        // kdGold+1/-1 & rsiOverBought+1/-1
-                                        [-1, 1].forEach((dk) => {
-                                            const g = kdGold + dk;
-                                            if (g <= kdGoldStart && g >= kdGoldEnd && (g - kdGoldEnd) % 2 !== 0) {
-                                                [-1, 1].forEach((dr) => {
-                                                    const r = rsiOverBought + dr;
-                                                    if (r >= rsiStart && r <= rsiEnd && (r - rsiStart) % 2 !== 0) {
-                                                        neighbors.push([g, kdDead, r]);
-                                                    }
-                                                });
-                                            }
-                                        });
-                                        // kdDead+1/-1 & rsiOverBought+1/-1
-                                        [-1, 1].forEach((dd) => {
-                                            const d = kdDead + dd;
-                                            if (d >= kdDeadStart && d <= kdDeadEnd && (d - kdDeadStart) % 2 !== 0) {
-                                                [-1, 1].forEach((dr) => {
-                                                    const r = rsiOverBought + dr;
-                                                    if (r >= rsiStart && r <= rsiEnd && (r - rsiStart) % 2 !== 0) {
-                                                        neighbors.push([kdGold, d, r]);
-                                                    }
-                                                });
-                                            }
-                                        });
-                                        // kdGold+1/-1 & kdDead+1/-1 & rsiOverBought+1/-1
-                                        [-1, 1].forEach((dk) => {
-                                            const g = kdGold + dk;
-                                            if (g <= kdGoldStart && g >= kdGoldEnd && (g - kdGoldEnd) % 2 !== 0) {
-                                                [-1, 1].forEach((dd) => {
-                                                    const d = kdDead + dd;
-                                                    if (d >= kdDeadStart && d <= kdDeadEnd && (d - kdDeadStart) % 2 !== 0) {
-                                                        [-1, 1].forEach((dr) => {
-                                                            const r = rsiOverBought + dr;
-                                                            if (r >= rsiStart && r <= rsiEnd && (r - rsiStart) % 2 !== 0) {
-                                                                neighbors.push([g, d, r]);
-                                                            }
-                                                        });
-                                                    }
-                                                });
-                                            }
-                                        });
-
-                                        // 避免重複
-                                        const checked = new Set();
-                                        neighbors.forEach(([g, d, r]) => {
-                                            const key = `${g}_${d}_${r}`;
-                                            if (checked.has(key)) return;
-                                            checked.add(key);
-                                            // 跳過主迴圈已算過的
-                                            if (
-                                                (g - kdGoldEnd) % 2 === 0 &&
-                                                (d - kdDeadStart) % 2 === 0 &&
-                                                (r - rsiStart) % 2 === 0
-                                            )
-                                                return;
-                                            // 補算
-                                            this.tryPolicy(
-                                                stockId,
-                                                g,
-                                                d,
-                                                r,
-                                                (
-                                                    params2,
-                                                    unitReturn2,
-                                                    numberOfBuy2,
-                                                    numberOfSell2,
-                                                    minBuyCount2,
-                                                    minSellCount2,
-                                                    policyList2
-                                                ) => {
-                                                    // 進入細部搜尋就印出
-                                                    console.log(
-                                                        `【細部搜尋】KD黃金交叉≤${g}，KD死亡交叉≥${d}，RSI超買≥${r}，單位報酬率: ${unitReturn2}，買入次數: ${numberOfBuy2} (min: ${minBuyCount2})，賣出次數: ${numberOfSell2} (min: ${minSellCount2})`
-                                                    );
-
+                                        for (let g = kdGold - 1; g <= kdGold + 1; g++) {
+                                            if (g < kdGoldEnd || g > kdGoldStart) continue;
+                                            for (let d = kdDead - 1; d <= kdDead + 1; d++) {
+                                                if (d < kdDeadStart || d > kdDeadEnd) continue;
+                                                for (let r = rsiOverBought - 1; r <= rsiOverBought + 1; r++) {
+                                                    if (r < rsiStart || r > rsiEnd) continue;
+                                                    // 跳過主迴圈本身
+                                                    if (g === kdGold && d === kdDead && r === rsiOverBought) continue;
+                                                    // 跳過主迴圈已算過的（每2步一格）
                                                     if (
-                                                        unitReturn2 > bestReturn &&
-                                                        numberOfBuy2 >= minBuyCount2 &&
-                                                        numberOfSell2 >= minSellCount2
-                                                    ) {
-                                                        bestReturn = unitReturn2;
-                                                        bestParams = { ...params2 };
-                                                        bestPolicy = _.cloneDeep(policyList2);
-                                                        // 細部搜尋也即時印出
-                                                        console.log(
-                                                            `【細部搜尋】進度: ${percent}%｜目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${
-                                                                bestParams?.kdGold ?? '-'
-                                                            }，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${
-                                                                bestParams?.rsiOverBought ?? '-'
-                                                            }）`
-                                                        );
-                                                        localStorage.setItem(
-                                                            'ikd_optimize_best',
-                                                            JSON.stringify({
-                                                                percent,
-                                                                params: bestParams,
-                                                                bestReturn,
-                                                            })
-                                                        );
-                                                    }
+                                                        (g - kdGoldEnd) % 2 === 0 &&
+                                                        (d - kdDeadStart) % 2 === 0 &&
+                                                        (r - rsiStart) % 2 === 0
+                                                    )
+                                                        continue;
+
+                                                    await this.tryPolicy(
+                                                        stockId,
+                                                        g,
+                                                        d,
+                                                        r,
+                                                        (
+                                                            params2,
+                                                            unitReturn2,
+                                                            numberOfBuy2,
+                                                            numberOfSell2,
+                                                            minBuyCount2,
+                                                            minSellCount2,
+                                                            policyList2
+                                                        ) => {
+                                                            // 進入細部搜尋就印出
+                                                            console.log(
+                                                                `【細部搜尋】KD黃金交叉≤${g}，KD死亡交叉≥${d}，RSI超買≥${r}，單位報酬率: ${unitReturn2}，買入次數: ${numberOfBuy2} (min: ${minBuyCount2})，賣出次數: ${numberOfSell2} (min: ${minSellCount2})`
+                                                            );
+                                                            if (
+                                                                unitReturn2 > bestReturn &&
+                                                                numberOfBuy2 >= minBuyCount2 &&
+                                                                numberOfSell2 >= minSellCount2
+                                                            ) {
+                                                                bestReturn = unitReturn2;
+                                                                bestParams = { ...params2 };
+                                                                bestPolicy = _.cloneDeep(policyList2);
+                                                                // 細部搜尋也即時印出
+                                                                console.log(
+                                                                    `【細部搜尋最佳】進度: ${percent}%｜目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${
+                                                                        bestParams?.kdGold ?? '-'
+                                                                    }，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${
+                                                                        bestParams?.rsiOverBought ?? '-'
+                                                                    }）`
+                                                                );
+                                                                localStorage.setItem(
+                                                                    'ikd_optimize_best',
+                                                                    JSON.stringify({
+                                                                        percent,
+                                                                        params: bestParams,
+                                                                        bestReturn,
+                                                                    })
+                                                                );
+                                                            }
+                                                        }
+                                                    );
                                                 }
-                                            );
-                                        });
+                                            }
+                                        }
                                     }
                                 }
                             );
