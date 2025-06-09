@@ -3,7 +3,7 @@
         <el-form ref="formPolicyBuyRef" :model="form.buy">
             <div style="margin-bottom: 10px">
                 <el-button type="success" size="small" @click="onOptimizePolicyStep1" style="margin-left: 10px">
-                    <i class="el-icon-cpu"></i>&nbsp;參數+1(範圍是目前策略的±2)
+                    <i class="el-icon-cpu"></i>&nbsp;參數+1(範圍是目前策略的±3)
                 </el-button>
 
                 <el-button type="success" size="small" @click="onOptimizePolicyStep2" style="margin-left: 10px">
@@ -467,6 +467,7 @@ export default {
             for (let kdGold = kdGoldBase + 3; kdGold >= kdGoldBase - 3; kdGold--) {
                 for (let kdDead = kdDeadBase - 6; kdDead <= kdDeadBase + 6; kdDead++) {
                     for (let rsiOverBought = rsiOverBoughtBase - 6; rsiOverBought <= rsiOverBoughtBase + 6; rsiOverBought++) {
+                        if (rsiOverBought > 97) break;
                         try {
                             await this.tryPolicy(
                                 stockId,
