@@ -2,12 +2,16 @@
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="85%">
         <el-form ref="formPolicyBuyRef" :model="form.buy">
             <div style="margin-bottom: 10px">
-                <el-button type="success" size="small" @click="onFullOptimizePolicy" style="margin-left: 10px">
-                    <i class="el-icon-cpu"></i>&nbsp;最佳參數(完整窮舉)
+                <el-button type="success" size="small" @click="onOptimizePolicyStep1" style="margin-left: 10px">
+                    <i class="el-icon-cpu"></i>&nbsp;參數+1(範圍是目前策略的±2)
                 </el-button>
 
-                <el-button type="success" size="small" @click="onOptimizePolicy" style="margin-left: 10px">
-                    <i class="el-icon-magic-stick"></i>&nbsp;相對佳參數(快速)
+                <el-button type="success" size="small" @click="onOptimizePolicyStep2" style="margin-left: 10px">
+                    <i class="el-icon-cpu"></i>&nbsp;參數+2
+                </el-button>
+
+                <el-button type="success" size="small" @click="onOptimizePolicyStep3" style="margin-left: 10px">
+                    <i class="el-icon-magic-stick"></i>&nbsp;參數+3(快速掃描)
                 </el-button>
             </div>
             <div style="margin-bottom: 10px">
@@ -446,7 +450,65 @@ export default {
             // });
         },
 
-        async onFullOptimizePolicy() {
+        async onOptimizePolicyStep1() {
+            const stockId = this.stockId;
+            let bestParams = null;
+            let bestReturn = -Infinity;
+            let bestPolicy = null;
+
+            // 取得目前設定
+            const buy = this.form.buy.find(item => item.method === 'kd_gold');
+            const sellKD = this.form.sell.find(item => item.method === 'kd_dead');
+            const sellRSI = this.form.sell.find(item => item.method === 'rsi_over_bought');
+            const kdGoldBase = buy ? Number(buy.limit) : 50;
+            const kdDeadBase = sellKD ? Number(sellKD.limit) : 80;
+            const rsiOverBoughtBase = sellRSI ? Number(sellRSI.limit) : 95;
+
+            for (let kdGold = kdGoldBase + 3; kdGold >= kdGoldBase - 3; kdGold--) {
+                for (let kdDead = kdDeadBase - 6; kdDead <= kdDeadBase + 6; kdDead++) {
+                    for (let rsiOverBought = rsiOverBoughtBase - 6; rsiOverBought <= rsiOverBoughtBase + 6; rsiOverBought++) {
+                        try {
+                            await this.tryPolicy(
+                                stockId,
+                                kdGold,
+                                kdDead,
+                                rsiOverBought,
+                                async (params, unitReturn, numberOfBuy, numberOfSell, minBuyCount, minSellCount, policyList) => {
+                                    if (unitReturn > bestReturn && numberOfBuy >= minBuyCount && numberOfSell >= minSellCount) {
+                                        bestReturn = unitReturn;
+                                        bestParams = { ...params };
+                                        bestPolicy = _.cloneDeep(policyList);
+                                        // 立即印出
+                                        console.log(
+                                            `目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${bestParams?.kdGold ?? '-'}，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${bestParams?.rsiOverBought ?? '-'})`
+                                        );
+                                    }
+                                }
+                            );
+                        } catch (e) {
+                            console.error(
+                                `tryPolicy 發生錯誤: KD黃金交叉≤${kdGold}，KD死亡交叉≥${kdDead}，RSI超買≥${rsiOverBought}`,
+                                e
+                            );
+                        }
+                    }
+                }
+            }
+
+            // 設定最佳參數到表單
+            if (bestPolicy) {
+                this.form = bestPolicy;
+                this.$message.success(
+                    `最佳參數：KD黃金交叉≤${bestParams.kdGold}，KD死亡交叉≥${bestParams.kdDead}，RSI超買≥${bestParams.rsiOverBought}，單位報酬率${bestReturn.toFixed(2)}%`
+                );
+                console.log('※最佳參數', bestParams);
+                console.log('※最佳單位報酬率', bestReturn);
+            } else {
+                this.$message.warning('找不到最佳參數組合');
+            }
+        },
+
+        async onOptimizePolicyStep2() {
             const stockId = this.stockId;
             let bestParams = null;
             let bestReturn = -Infinity;
@@ -616,7 +678,7 @@ export default {
             }
         },
 
-        async onOptimizePolicy() {
+        async onOptimizePolicyStep3() {
             const stockId = this.stockId;
             let bestParams = null;
             let bestReturn = -Infinity;
