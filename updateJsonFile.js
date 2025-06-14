@@ -92,7 +92,7 @@ const funds = [
         type: 'stock_dividend',
     },
     {
-        name: 'JNK',
+        name: '彭博高收益債',
         url:
             'https://query1.finance.yahoo.com/v8/finance/chart/JNK?period1=1325376000&period2=' +
             moment().unix() +
