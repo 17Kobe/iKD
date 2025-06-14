@@ -91,6 +91,14 @@ const funds = [
         url: 'https://www.cmoney.tw/forum/stock/0056?s=dividend',
         type: 'stock_dividend',
     },
+    {
+        name: 'JNK',
+        url:
+            'https://query1.finance.yahoo.com/v8/finance/chart/JNK?period1=1325376000&period2=' +
+            moment().unix() +
+            '&interval=1d&events=history',
+        type: 'stock',
+    },
 ];
 
 function getPromise(fund) {
@@ -283,6 +291,27 @@ function getPromise(fund) {
                     }
                 }
             );
+        } else if (fund.type === 'stock') {
+            axios
+                .get(fund.url)
+                .then((response) => {
+                    let values = [];
+                    const data = response.data.chart.result[0];
+                    const timestamps = data.timestamp;
+                    const closes = data.indicators.quote[0].close;
+                    for (let i = 0; i < timestamps.length; i++) {
+                        const date = moment.unix(timestamps[i]).format('YYYY-MM-DD');
+                        const close = closes[i];
+                        if (close !== null) {
+                            values.push([date, close]);
+                        }
+                    }
+                    resolve({ name: fund.name, values: values, type: fund.type });
+                })
+                .catch((error) => {
+                    console.error('JNK 抓取失敗:', error);
+                    resolve({ name: fund.name, values: [], type: fund.type });
+                });
         } else {
             // 如果不是 'price' 類型，直接返回空值
             resolve({ name: fund.name, values: [], type: fund.type });

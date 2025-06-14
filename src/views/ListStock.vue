@@ -66,6 +66,7 @@
                                     v-html="
                                         [
                                             '元大美債20年',
+                                            '彭博高收益債',
                                             '群益台灣精選高息',
                                             '國泰永續高股息',
                                             '安聯台灣智慧基金',
@@ -81,6 +82,7 @@
                                         ].includes(scope.row.name)
                                             ? scope.row.name
                                                   .replace('美債20年', '<br />美債20年')
+                                                  .replace('高收益債', '<br />高收益債')
                                                   .replace('精選高息', '<br />精選高息')
                                                   .replace('高股息', '<br />高股息')
                                                   .replace('智慧基金', '<br />智慧基金')
