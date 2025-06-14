@@ -166,8 +166,8 @@
                         size="mini"
                         style="position: absolute; left: 17px; top: 6px; padding: 0px 8px"
                         v-if="
-                            (stockData.type !== 'exchange' && stockData.type !== 'fund' && stockData.is_dividend !== false) ||
-                            stockData.name.includes('債')
+                            (['exchange', 'fund', 'usStock'].indexOf(stockData.type) === -1 && stockData.is_dividend !== false) ||
+                            stockData.name.includes('元大2至10年債券基金')
                         "
                         @click="getDividend"
                         >息</el-button

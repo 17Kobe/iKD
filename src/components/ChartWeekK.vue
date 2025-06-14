@@ -167,7 +167,7 @@
             :plain="!stockData.show_trading_volume"
             size="mini"
             style="position: absolute; left: 17px; top: 6px; padding: 0px 8px"
-            v-if="stockData.type !== 'exchange' && stockData.type !== 'fund'"
+            v-if="['exchange', 'fund', 'usStock'].indexOf(stockData.type) === -1"
             @click="toggleTradingVolume"
             >量</el-button
         >
