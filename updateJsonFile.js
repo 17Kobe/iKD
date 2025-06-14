@@ -97,7 +97,7 @@ const funds = [
             'https://query1.finance.yahoo.com/v8/finance/chart/JNK?period1=1325376000&period2=' +
             moment().unix() +
             '&interval=1d&events=history',
-        type: 'stock',
+        type: 'us_stock',
     },
 ];
 
@@ -291,7 +291,7 @@ function getPromise(fund) {
                     }
                 }
             );
-        } else if (fund.type === 'stock') {
+        } else if (fund.type === 'us_stock') {
             axios
                 .get(fund.url)
                 .then((response) => {
@@ -306,6 +306,7 @@ function getPromise(fund) {
                             values.push([date, close]);
                         }
                     }
+                    // console.log(`處理 ${fund.name} 的股價數據`, values);
                     resolve({ name: fund.name, values: values, type: fund.type });
                 })
                 .catch((error) => {
@@ -325,6 +326,7 @@ Promise.all(funds.map(getPromise)).then(function (results) {
     const myLocalstorageFile = JSON.parse(fs.readFileSync('./dist/assets/data/my_localstorage1.json'));
     let myLocalstorageStockList = myLocalstorageFile.stockList;
 
+    // console.log('抓取到的結果:', results);
     results.forEach((result) => {
         const foundStock = myLocalstorageStockList.find((obj) => obj.name === result.name);
         if (!foundStock) {
@@ -333,7 +335,10 @@ Promise.all(funds.map(getPromise)).then(function (results) {
         }
 
         // 只有在 type 為 'price' 時才更新資料
-        if (result.type === 'price') {
+        if (result.type === 'price' || result.type === 'us_stock') {
+            if (result.type === 'us_stock') {
+                console.log(`抓取到 ${result.name} 的股價數據`);
+            }
             foundStock.data = foundStock.data || {};
             foundStock.data.daily = foundStock.data.daily || [];
             foundStock.data.daily = result.values;
@@ -345,7 +350,7 @@ Promise.all(funds.map(getPromise)).then(function (results) {
     });
 
     const defaultStockList = _.map(myLocalstorageStockList, (item) => {
-        if (_.includes(item.name, '基金')) {
+        if (_.includes(item.name, '基金') || item.name === '彭博高收益債') {
             item.data.daily = _.map(item.data.daily, ([date, value]) => [date, value]); // 移掉open close high low 節省空間
             return item;
         } else if (item.name === '元大美債20年' || item.name === '元大高股息') {
