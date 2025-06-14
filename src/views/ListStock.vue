@@ -55,6 +55,8 @@
                                             ? '#f3c60d'
                                             : scope.row.type === 'fund'
                                             ? '#e6a23c'
+                                            : scope.row.type === 'usStock'
+                                            ? '#919191'
                                             : scope.row.type === 'exchange'
                                             ? '#f56c6c'
                                             : '#409eff',
@@ -148,7 +150,12 @@
                                         }}
                                     </template>
                                     <template v-else>
-                                        {{ scope.row.last_price }}
+                                        <span v-if="Number(scope.row.last_price) % 1 === 0">
+                                            {{ Number(scope.row.last_price) }}
+                                        </span>
+                                        <span v-else>
+                                            {{ Number(scope.row.last_price).toFixed(2) }}
+                                        </span>
                                     </template>
                                 </div>
                                 <!-- 依漲跌幅來顯示上下箭頭的圖示，下箭頭需要下移1px，上箭頭需要上移2px -->
@@ -1141,10 +1148,15 @@ export default {
                 // 若已有資料時則先去除 data, policy(因為policy也會畫KD圖訊號)資料，用 setInterval來載入資料比較好
                 localStockList = _.orderBy(localStockList, ['order'], ['asc']).reduce((acc, obj) => {
                     acc.push(_.omit(obj, ['data']));
+                    // console.log('obj', obj);
+
                     if (obj.data) {
                         let tempStockObj = _.pick(obj, ['id', 'data']);
                         // 若是基金時，在這裡是塞JSON的data.daily資料，因為是可能最新的。但不修改data.weekly資料喔，這部份還是由vuex去算
                         if (obj.type === 'fund' || obj.type === 'usStock') {
+                            if (obj.type === 'usStock') {
+                                console.log(`抓取到 ${obj.name} 的股價數據`);
+                            }
                             // 基金是從 defaultStockList 去拿 data.daily 及 data.dividend
                             const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
                             // tempStockObj.data.daily = _.cloneDeep(foundStock.data.daily);

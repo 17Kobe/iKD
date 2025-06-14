@@ -128,6 +128,8 @@
                                             ? '#f3c60d'
                                             : scope.row.type === 'fund'
                                             ? '#e6a23c'
+                                            : scope.row.type === 'usStock'
+                                            ? '#919191'
                                             : scope.row.type === 'exchange'
                                             ? '#f56c6c'
                                             : '#409eff',
@@ -275,6 +277,16 @@
             </el-table-column>
 
             <el-table-column :label="modeSpread === '目前' ? '現價' : '賣價'" prop="last_price" width="70" align="center">
+                <template #default="scope">
+                    <span v-if="scope.row.last_price !== undefined && scope.row.last_price !== null">
+                        <span v-if="Number(scope.row.last_price) % 1 === 0">
+                            {{ Number(scope.row.last_price) }}
+                        </span>
+                        <span v-else>
+                            {{ Number(scope.row.last_price).toFixed(2) }}
+                        </span>
+                    </span>
+                </template>
             </el-table-column>
             <el-table-column label="成本價" width="70" align="center">
                 <template #default="scope">

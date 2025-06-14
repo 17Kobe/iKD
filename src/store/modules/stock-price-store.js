@@ -217,7 +217,7 @@ const stock = {
                                     console.log(err);
                                 });
                             // 基金
-                        } else if (stcokObjType === 'fund') {
+                        } else if (stcokObjType === 'fund' || stcokObjType === 'usStock') {
                             // console.log('GET_STOCK_PRICE 32');
                             // 基金
                             commit('SAVE_STOCK_PRICE', { stockId: stockObj.id, data: { data: [] } });
@@ -272,7 +272,7 @@ const stock = {
                         // 股票
                         if (stcokObjType === 'stock' || stcokObjType === 'exchange') {
                             // commit('SAVE_STOCK_POLICY_RESULT', stcokObj.id); // 跑此是為了有可能上回淨值新增了(這回沒要新增)，但是報酬率沒算完
-                        } else if (stcokObjType === 'fund') {
+                        } else if (stcokObjType === 'fund' || stcokObjType === 'usStock') {
                             // 基金
                             commit('SAVE_STOCK_PRICE', { stockId: stockObj.id, data: { data: [] } });
                         }
@@ -1831,7 +1831,7 @@ const stock = {
                             // element.Trading_Volume,
                         ]);
                     });
-                } else if (stcokObjType === 'fund') {
+                } else if (stcokObjType === 'fund' || stcokObjType === 'usStock') {
                     //基金
                     data.datas.forEach((date, index) => {
                         const closePrice = data.closePrices[index];
