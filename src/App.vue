@@ -22,9 +22,9 @@
                 <el-menu-item index="add" @click="doShowSearch()" style="padding: 0 6px">
                     <i class="el-icon-circle-plus-outline" style="position: relative; top: -2px"></i>
                 </el-menu-item>
-                <el-menu-item index="link" @click="doShowLink()" style="padding: 0 6px">
+                <!-- <el-menu-item index="link" @click="doShowLink()" style="padding: 0 6px">
                     <i class="el-icon-link" style="position: relative; top: -2px"></i>
-                </el-menu-item>
+                </el-menu-item> -->
             </el-menu>
         </footer>
         <el-backtop :right="10" :bottom="68" :visibility-height="30" />
