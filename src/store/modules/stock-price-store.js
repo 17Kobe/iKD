@@ -3405,8 +3405,8 @@ const stock = {
                     // 無恐慌時不顯示穩/慌
                     return { fearLevel, fearReasons };
                 } else {
-                    // 其它等級時，JNK >=0 顯示 O，否則 X
-                    jnkMark = jnkChange >= 0 ? 'O' : 'X';
+                    // 其它等級時，JNK >=0 顯示 X，否則 O
+                    jnkMark = jnkChange >= 0 ? 'X' : 'O';
                     fearLevel = `${fearLevel}(${jnkMark})`;
                     return { fearLevel, fearReasons };
                 }
