@@ -3383,21 +3383,28 @@ const stock = {
             function detectFearLevel(sp500Change, jnkChange) {
                 let fearLevel = '';
                 const fearReasons = [];
+                // 幫助格式化百分比
+                const percent = (v) => (v >= 0 ? '+' : '') + (v * 100).toFixed(2) + '%';
+
                 if (sp500Change <= -0.05) {
                     fearLevel = '極度恐慌';
-                    fearReasons.push('S&P500 跌超過 5% → 極度恐慌');
+                    fearReasons.push(`【S&P500】下跌 (${percent(sp500Change)}) → 極度恐慌`);
                 } else if (sp500Change <= -0.03) {
                     fearLevel = '很恐慌';
-                    fearReasons.push('S&P500 跌超過 3% → 很恐慌');
+                    fearReasons.push(`【S&P500】下跌 (${percent(sp500Change)}) → 很恐慌`);
                 } else if (sp500Change <= -0.02) {
                     fearLevel = '輕微恐慌';
-                    fearReasons.push('S&P500 跌超過 2% → 輕微恐慌');
+                    fearReasons.push(`【S&P500】下跌 (${percent(sp500Change)}) → 輕微恐慌`);
                 } else {
                     fearLevel = '無恐慌';
-                    fearReasons.push('S&P500 未明顯下跌 → 無恐慌');
+                    fearReasons.push(`【S&P500】未明顯下跌 (${percent(sp500Change)}) → 無恐慌`);
                 }
                 const jnkComment = jnkChange >= 0 ? '穩' : '慌';
-                fearReasons.push(`JNK ${jnkChange >= 0 ? '未下跌' : '下跌'} → ${jnkChange >= 0 ? '市場尚穩' : '債市恐慌'}`);
+                fearReasons.push(
+                    `【JNK】${jnkChange >= 0 ? '未下跌' : '下跌'} (${percent(jnkChange)}) → ${
+                        jnkChange >= 0 ? '市場尚穩' : '債市恐慌'
+                    }`
+                );
                 return { fearLevel: `${fearLevel}(${jnkComment})`, fearReasons };
             }
 
@@ -3407,43 +3414,46 @@ const stock = {
                 let score = 0;
                 let reasons = [];
 
+                // 幫助格式化百分比
+                const percent = (v) => (v >= 0 ? '+' : '') + (v * 100).toFixed(2) + '%';
+
                 if (sp500 > 0) {
                     score += 2;
-                    reasons.push('S&P500 上漲 → 資金進入股市');
+                    reasons.push(`【S&P500】上漲 (${percent(sp500)}) → 資金進入股市`);
                 } else if (sp500 < 0) {
-                    reasons.push('S&P500 下跌 → 股市承壓');
+                    reasons.push(`【S&P500】下跌 (${percent(sp500)}) → 股市承壓`);
                 }
 
                 if (jnk > 0) {
                     score += 2;
-                    reasons.push('JNK 上漲 → 市場信心強');
+                    reasons.push(`【JNK】上漲 (${percent(jnk)}) → 市場信心強`);
                 } else if (jnk < 0) {
-                    reasons.push('JNK 下跌 → 資金避險');
+                    reasons.push(`【JNK】下跌 (${percent(jnk)}) → 資金避險`);
                 }
 
                 if (btc > 0) {
                     score += 1;
-                    reasons.push('比特幣上漲 → 投機資金活躍');
+                    reasons.push(`【比特幣】上漲 (${percent(btc)}) → 投機資金活躍`);
                 } else if (btc < 0) {
-                    reasons.push('比特幣下跌 → 投機情緒減弱');
+                    reasons.push(`【比特幣】下跌 (${percent(btc)}) → 投機情緒減弱`);
                 }
 
                 if (gold > 0) {
                     score -= 1;
-                    reasons.push('黃金上漲 → 資金尋求避險');
+                    reasons.push(`【黃金】上漲 (${percent(gold)}) → 資金尋求避險`);
                 }
 
                 if (usBond > 0) {
                     score -= 1;
-                    reasons.push('美債上漲 → 資金轉向保守');
+                    reasons.push(`【美債】上漲 (${percent(usBond)}) → 資金轉向保守`);
                 }
 
                 if (usdTwd > 0) {
                     score -= 1;
-                    reasons.push('美元走強 → 熱錢撤離台幣');
+                    reasons.push(`【美元】走強 (${percent(usdTwd)}) → 熱錢撤離台幣`);
                 } else if (usdTwd < 0) {
                     score += 1;
-                    reasons.push('美元走弱 → 熱錢回流新興市場');
+                    reasons.push(`【美元】走弱 (${percent(usdTwd)}) → 熱錢回流新興市場`);
                 }
 
                 let sentiment;
@@ -3462,7 +3472,6 @@ const stock = {
                     reasons,
                 };
             }
-
             // 取得理由
             const capitalFlow = inferCapitalFlowWithReasons({
                 sp500: sp500Change,
@@ -3477,7 +3486,7 @@ const stock = {
             const { fearLevel, fearReasons } = detectFearLevel(sp500Change, jnkChange);
 
             // 合併理由，fearReasons 在前，中間加分隔線，再接資金流理由
-            const reasons = [...fearReasons, '—————————————', ...capitalFlow.reasons];
+            const reasons = [...fearReasons, '———————————————————', ...capitalFlow.reasons];
 
             return {
                 fear: fearLevel,
