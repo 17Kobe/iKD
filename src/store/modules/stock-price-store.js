@@ -3345,6 +3345,135 @@ const stock = {
                 ['asc', 'asc']
             );
         },
+        getFearLevel: (state) => () => {
+            // 取得 S&P500、JNK、BTC、黃金、美債、美元指數
+            const sp500 = state.stockList.find((s) => s.name.includes('S&P'));
+            const jnk = state.stockList.find((s) => s.name.includes('彭博高收益債'));
+            const btc = state.stockList.find((s) => s.name.includes('比特幣'));
+            const gold = state.stockList.find((s) => s.name.includes('黃金'));
+            const usBond = state.stockList.find((s) => s.name.includes('美債'));
+            const usdTwd = state.stockList.find((s) => s.name.includes('美金匯率'));
+
+            // 若資料不足
+            if (!sp500 || !jnk || !sp500.data?.weekly?.length || !jnk.data?.weekly?.length) {
+                return {
+                    fear: '資料不足',
+                    sentiment: '',
+                    reasons: [],
+                };
+            }
+
+            // 取得週線最後一筆與前一筆
+            const getChange = (arr) => {
+                if (!arr || arr.length < 2) return 0;
+                const last = arr[arr.length - 1][4];
+                const prev = arr[arr.length - 2][4];
+                return (last - prev) / prev;
+            };
+
+            const sp500Change = getChange(sp500.data.weekly);
+            const jnkChange = getChange(jnk.data.weekly);
+            const btcChange = btc && btc.data?.weekly?.length >= 2 ? getChange(btc.data.weekly) : 0;
+            const goldChange = gold && gold.data?.weekly?.length >= 2 ? getChange(gold.data.weekly) : 0;
+            const usBondChange = usBond && usBond.data?.weekly?.length >= 2 ? getChange(usBond.data.weekly) : 0;
+            // 美金匯率用收盤價
+            const usdTwdChange = usdTwd && usdTwd.data?.weekly?.length >= 2 ? getChange(usdTwd.data.weekly) : 0;
+
+            // 恐慌偵測
+            function detectFearLevel(sp500Change, jnkChange) {
+                let fearLevel = '';
+                if (sp500Change <= -0.05) {
+                    fearLevel = '極度恐慌';
+                } else if (sp500Change <= -0.03) {
+                    fearLevel = '很恐慌';
+                } else if (sp500Change <= -0.02) {
+                    fearLevel = '輕微恐慌';
+                } else {
+                    return '無恐慌';
+                }
+                const jnkComment = jnkChange >= 0 ? '緩' : '慌';
+                return `${fearLevel}(${jnkComment})`;
+            }
+
+            // 資金流推論
+            function inferCapitalFlowWithReasons(data) {
+                const { sp500, gold, usBond, jnk, usdTwd, btc } = data;
+                let score = 0;
+                let reasons = [];
+
+                if (sp500 > 0) {
+                    score += 2;
+                    reasons.push('S&P500 上漲 → 資金進入股市');
+                } else if (sp500 < 0) {
+                    reasons.push('S&P500 下跌 → 股市承壓');
+                }
+
+                if (jnk > 0) {
+                    score += 2;
+                    reasons.push('高收益債上漲 → 市場信心強');
+                } else if (jnk < 0) {
+                    reasons.push('高收益債下跌 → 資金避險');
+                }
+
+                if (btc > 0) {
+                    score += 1;
+                    reasons.push('比特幣上漲 → 投機資金活躍');
+                } else if (btc < 0) {
+                    reasons.push('比特幣下跌 → 投機情緒減弱');
+                }
+
+                if (gold > 0) {
+                    score -= 1;
+                    reasons.push('黃金上漲 → 資金尋求避險');
+                }
+
+                if (usBond > 0) {
+                    score -= 1;
+                    reasons.push('美債上漲 → 資金轉向保守');
+                }
+
+                if (usdTwd > 0) {
+                    score -= 1;
+                    reasons.push('美元走強 → 熱錢撤離台幣');
+                } else if (usdTwd < 0) {
+                    score += 1;
+                    reasons.push('美元走弱 → 熱錢回流新興市場');
+                }
+
+                let sentiment;
+                if (score >= 4) {
+                    sentiment = '資金進攻';
+                } else if (score >= 2) {
+                    sentiment = '偏多';
+                } else if (score >= 0) {
+                    sentiment = '中性';
+                } else {
+                    sentiment = '資金避險';
+                }
+
+                return {
+                    sentiment,
+                    reasons,
+                };
+            }
+
+            const fear = detectFearLevel(sp500Change, jnkChange);
+            const { sentiment, reasons } = inferCapitalFlowWithReasons({
+                sp500: sp500Change,
+                gold: goldChange,
+                usBond: usBondChange,
+                jnk: jnkChange,
+                usdTwd: usdTwdChange,
+                btc: btcChange,
+            });
+
+            // 回傳物件，方便 template 使用 fearLevel.fear, fearLevel.sentiment, fearLevel.reasons
+            return {
+                fear,
+                sentiment,
+                reasons,
+            };
+        },
     },
 };
 

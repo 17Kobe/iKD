@@ -22,6 +22,22 @@
                 <el-menu-item index="add" @click="doShowSearch()" style="padding: 0 6px">
                     <i class="el-icon-circle-plus-outline" style="position: relative; top: -2px"></i>
                 </el-menu-item>
+                <el-menu-item index="index" style="padding: 0 6px">
+                    <el-tooltip
+                        effect="dark"
+                        placement="top"
+                        :content="fearLevel.reasons && fearLevel.reasons.length ? fearLevel.reasons.join('\n') : ''"
+                        :disabled="!fearLevel.reasons || !fearLevel.reasons.length"
+                        popper-class="tooltip-pre-line"
+                    >
+                        <span style="display: block; line-height: 1.2; position: relative; top: 10px">
+                            <span :style="fearColorStyle">{{ fearLevel.fear }}</span
+                            ><br />
+                            <span :style="sentimentColorStyle">{{ fearLevel.sentiment }}</span>
+                        </span>
+                    </el-tooltip>
+                </el-menu-item>
+
                 <!-- <el-menu-item index="link" @click="doShowLink()" style="padding: 0 6px">
                     <i class="el-icon-link" style="position: relative; top: -2px"></i>
                 </el-menu-item> -->
@@ -46,7 +62,41 @@ export default {
             // menuWav,
         };
     },
-
+    computed: {
+        fearLevel() {
+            return this.$store.getters.getFearLevel();
+        },
+        fearColorStyle() {
+            switch (this.fearLevel.fear) {
+                case '無恐慌':
+                    return { color: '#888', 'font-weight': 'bold', 'font-size': '16px' };
+                case '輕微恐慌':
+                    return { color: '#b39ddb', 'font-weight': 'bold', 'font-size': '16px' }; // 淺紫
+                case '很恐慌':
+                    return { color: '#7e57c2', 'font-weight': 'bold', 'font-size': '16px' }; // 紫
+                case '極度恐慌':
+                    return { color: '#512da8', 'font-weight': 'bold', 'font-size': '16px' }; // 深紫
+                default:
+                    return { color: '#888', 'font-weight': 'bold', 'font-size': '16px' };
+            }
+        },
+        sentimentColorStyle() {
+            if (!this.fearLevel.sentiment) return { color: '#888', 'font-weight': 'bold', 'font-size': '16px' };
+            if (this.fearLevel.sentiment.includes('資金進攻')) {
+                return { color: '#ee3333', 'font-weight': 'bold', 'font-size': '16px' }; // 深紅
+            }
+            if (this.fearLevel.sentiment.includes('偏多')) {
+                return { color: '#b13935', 'font-weight': 'bold', 'font-size': '16px' }; // 紅
+            }
+            if (this.fearLevel.sentiment.includes('中性')) {
+                return { color: '#888', 'font-weight': 'bold', 'font-size': '16px' }; // 灰
+            }
+            if (this.fearLevel.sentiment.includes('資金避險')) {
+                return { color: '#01aa00', 'font-weight': 'bold', 'font-size': '16px' }; // 綠
+            }
+            return { color: '#888', 'font-weight': 'bold', 'font-size': '16px' };
+        },
+    },
     methods: {
         onMenuItemClick(page) {
             // const { audio } = this.$refs;
