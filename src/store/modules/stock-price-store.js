@@ -3399,13 +3399,17 @@ const stock = {
                     fearLevel = '無恐慌';
                     fearReasons.push(`【S&P500】未明顯下跌 (${percent(sp500Change)}) → 無恐慌`);
                 }
-                const jnkComment = jnkChange >= 0 ? '穩' : '慌';
-                fearReasons.push(
-                    `【JNK】${jnkChange >= 0 ? '未下跌' : '下跌'} (${percent(jnkChange)}) → ${
-                        jnkChange >= 0 ? '市場尚穩' : '債市恐慌'
-                    }`
-                );
-                return { fearLevel: `${fearLevel}(${jnkComment})`, fearReasons };
+
+                let jnkMark = '';
+                if (fearLevel === '無恐慌') {
+                    // 無恐慌時不顯示穩/慌
+                    return { fearLevel, fearReasons };
+                } else {
+                    // 其它等級時，JNK >=0 顯示 O，否則 X
+                    jnkMark = jnkChange >= 0 ? 'O' : 'X';
+                    fearLevel = `${fearLevel}(${jnkMark})`;
+                    return { fearLevel, fearReasons };
+                }
             }
 
             // 資金流推論
