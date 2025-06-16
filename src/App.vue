@@ -137,4 +137,9 @@ export default {
 .el-menu--horizontal > .el-menu-item.is-active
     border-bottom: none
     border-top: 2px solid var(--el-color-primary)
+
+.tooltip-pre-line
+    white-space: pre-line
+    font-size: 14px
+    line-height: 1.6
 </style>
