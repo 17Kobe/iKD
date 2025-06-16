@@ -35,6 +35,9 @@
                             ><br />
                             <span :style="sentimentColorStyle">{{ fearLevel.sentiment }}</span>
                         </span>
+                        <template #content>
+                            <div v-for="(r, i) in fearLevelReasonsColored" :key="i" v-html="r"></div>
+                        </template>
                     </el-tooltip>
                 </el-menu-item>
 
@@ -79,6 +82,21 @@ export default {
                 default:
                     return { color: '#888', 'font-weight': 'bold', 'font-size': '16px' };
             }
+        },
+        fearLevelReasonsColored() {
+            // 將百分比數值部分包 span 並加顏色
+            if (!this.fearLevel.reasons) return [];
+            return this.fearLevel.reasons.map((str) => {
+                // 尋找 (±1.23%) 這種格式
+                return str.replace(/([+-]\d+\.\d{2}%)/g, (match) => {
+                    const color = match.startsWith('+')
+                        ? '#e57373' // 淺紅
+                        : match.startsWith('-')
+                        ? '#4caf50' // 淺綠
+                        : '#888';
+                    return `<span style="color:${color};font-weight:bold;">${match}</span>`;
+                });
+            });
         },
         sentimentColorStyle() {
             if (!this.fearLevel.sentiment) return { color: '#888', 'font-weight': 'bold', 'font-size': '16px' };
