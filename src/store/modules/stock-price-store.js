@@ -3445,6 +3445,9 @@ const stock = {
                 if (gold > 0) {
                     score -= 1;
                     reasons.push(`【黃金】上漲 (${percent(gold)}) → 資金尋求避險`);
+                } else if (gold < 0) {
+                    score += 1;
+                    reasons.push(`【黃金】下跌 (${percent(gold)}) → 資金風險偏好提升`);
                 }
 
                 if (usBond > 0) {

@@ -1018,31 +1018,6 @@ export default {
             });
         },
 
-        // 如果您希望最大值和最小值使用天花板和地板的十進位值，而不使用偏移量，您可以將 chartMinMaxValues 函數修改如下：
-        // chartMinMaxValues() {
-        //     const kValues = this.kdj.map((value) => value[1]);
-        //     const dValues = this.kdj.map((value) => value[2]);
-        //     let allValues;
-
-        //     if (this.showJLine) {
-        //         const jValues = this.kdj.map((value) => value[3]);
-
-        //         allValues = [...kValues, ...dValues, ...jValues];
-        //     } else {
-        //         allValues = [...kValues, ...dValues];
-        //     }
-        //     const minValue = Math.min(...allValues);
-        //     const maxValue = Math.max(...allValues);
-
-        //     // 最小值使用地板的十進位值
-        //     const tickMin = Math.floor(minValue / 10) * 10;
-
-        //     // 最大值使用天花板的十進位值
-        //     const tickMax = Math.ceil(maxValue / 10) * 10;
-
-        //     return { tickMin, tickMax };
-        // },
-
         yearlyDividends() {
             if (!this.stockData.data || !this.stockData.data.dividend || this.stockData.data.dividend.length === 0) {
                 return [];
@@ -1265,27 +1240,20 @@ export default {
             return this.$store.getters.getStockDataWeeklyKdj(this.parentData);
         },
 
-        // 合併 policy result filter
-        policyResultFiltered() {
-            if (!this.stockData.data || !this.stockData.policy || !this.stockData.policy.result) return [];
-            return _.filter(
-                this.stockData.policy.result,
-                (o) =>
-                    moment().diff(moment(o.date), 'days') <= 365 &&
-                    _.some(o.reason, (el) => _.includes(el, 'kd') || _.includes(el, 'rsi'))
-            );
+        policyResultFilteredMap() {
+            const result = { buy: [], sell: [], cancel: [] };
+            if (!this.stockData.policy?.result) return result;
+            this.stockData.policy.result.forEach(o => {
+                if (moment().diff(moment(o.date), 'days') > 365) return;
+                if (o.is_sure_buy) result.buy.push([moment(o.date).valueOf(), o.k]);
+                if (o.is_sure_sell) result.sell.push([moment(o.date).valueOf(), o.k]);
+                if (o.is_buy_cancel || o.is_sell_cancel) result.cancel.push([moment(o.date).valueOf(), o.k]);
+            });
+            return result;
         },
-        stockDataOfPolicyResultBuy() {
-            return this.policyResultFiltered.filter((o) => o.is_sure_buy).map((obj) => [moment(obj.date).valueOf(), obj.k]);
-        },
-        stockDataOfPolicyResultSell() {
-            return this.policyResultFiltered.filter((o) => o.is_sure_sell).map((obj) => [moment(obj.date).valueOf(), obj.k]);
-        },
-        stockDataOfPolicyResultBuyOrSellCancel() {
-            return this.policyResultFiltered
-                .filter((o) => o.is_buy_cancel || o.is_sell_cancel)
-                .map((obj) => [moment(obj.date).valueOf(), obj.k]);
-        },
+        stockDataOfPolicyResultBuy() { return this.policyResultFilteredMap.buy; },
+        stockDataOfPolicyResultSell() { return this.policyResultFilteredMap.sell; },
+        stockDataOfPolicyResultBuyOrSellCancel() { return this.policyResultFilteredMap.cancel; },
 
         stockDataDividend() {
             return this.$store.getters.getStockDataDividend(this.parentData);
@@ -1329,54 +1297,24 @@ export default {
             });
         },
 
-        kdGoldLimit() {
-            // 黃金交叉，值要畫橫線
-            console.log('kdGoldLimit');
-            let ret = -999; // 讓他畫線畫在看到到的地方
-            if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.buy) {
-                const found = _.find(this.stockData.policy.settings.buy, ['method', 'kd_gold']);
-                if (found) ret = found.limit; // 若非 nundefined
-            }
-            // console.log(ret);
-            return ret;
+        // 預先整理好設定資料，key 為 `${type}_${method}`
+        policySettingsMap() {
+            const map = {};
+            const buy = this.stockData.policy?.settings?.buy || [];
+            const sell = this.stockData.policy?.settings?.sell || [];
+            [...buy, ...sell].forEach(item => {
+                map[`${item.type || (buy.includes(item) ? 'buy' : 'sell')}_${item.method}`] = item.limit;
+            });
+            return map;
         },
-        kdTurnUpLmit() {
-            // 黃金轉折，值要畫橫線
-            console.log('kdGoldTurn');
-            let ret = -999; // 讓他畫線畫在看到到的地方
-            if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.buy) {
-                const found = _.find(this.stockData.policy.settings.buy, ['method', 'kd_turn_up']);
-                if (found) ret = found.limit; // 若非 nundefined
-            }
-            return ret;
-        },
-        kdDeadLimit() {
-            // 死亡交叉，值要畫橫線
-            console.log('kdDeadLimit');
-            let ret = -999; // 讓他畫線畫在看到到的地方
-            if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.sell) {
-                const found = _.find(this.stockData.policy.settings.sell, ['method', 'kd_dead']);
-                if (found) ret = found.limit; // 若非 nundefined
-            }
-            return ret;
-        },
-        kdTurnDownLmit() {
-            // 死亡交叉，值要畫橫線
-            console.log('kdTurnUpLmit');
-            let ret = -999; // 讓他畫線畫在看到到的地方
-            if (this.stockData.policy && this.stockData.policy.settings && this.stockData.policy.settings.sell) {
-                console.log('this.stockData.policy');
-
-                const found = _.find(this.stockData.policy.settings.sell, ['method', 'kd_turn_down']);
-                if (found) ret = found.limit; // 若非 nundefined
-            }
-            return ret;
-        },
+        kdGoldLimit() { return this.policySettingsMap['buy_kd_gold'] ?? -999; },
+        kdTurnUpLmit() { return this.policySettingsMap['buy_kd_turn_up'] ?? -999; },
+        kdDeadLimit() { return this.policySettingsMap['sell_kd_dead'] ?? -999; },
+        kdTurnDownLmit() { return this.policySettingsMap['sell_kd_turn_down'] ?? -999; },
 
         chartOptions() {
             // component 參考 https://stackoverflow.com/questions/68381856/how-to-access-highcharts-stock-tooltip-data-in-vue
             const component = this;
-            // const { tickMin, tickMax } = this.chartMinMaxValues;
 
             let plotBands = [];
             if (this.kdTurnDownLmit !== -999) {
@@ -1683,18 +1621,6 @@ export default {
                     },
                     // 有參考這個，但是根據資料去畫的 https://jsfiddle.net/BlackLabel/9yxmw7zv/ 應該要固定顯示月份
                     // 改參考這個 http://jsfiddle.net/kka8eyg5/3/
-
-                    // tickPositioner() {
-                    //     const positions = [];
-                    //     let tick = Math.floor(this.dataMin);
-                    //     const increment = 1000 * 3600 * 24 * 91.5; // 3 months
-
-                    //     for (tick; tick <= this.dataMax; tick += increment) {
-                    //         positions.push(tick);
-                    //     }
-                    //     if (positions.indexOf(this.dataMax) === -1) positions.push(this.dataMax);
-                    //     return positions;
-                    // },
                 },
                 yAxis: [
                     {
@@ -1758,29 +1684,6 @@ export default {
                                 },
                             },
                         ],
-                        // 調整 y 軸 tick的間距，運用到高度最大化，不浪費
-                        // tickPositioner() {
-                        //     const positions = [];
-                        //     const tickCount = 4; // 刻度數量
-
-                        //     const tickInterval = Math.ceil((tickMax - tickMin) / (tickCount - 1)); // 計算刻度間隔
-
-                        //     for (let i = 0; i < tickCount; i++) {
-                        //         let tickValue;
-
-                        //         if (i === 1 || i === 2) {
-                        //             tickValue = Math.round(tickMin + i * tickInterval); // 四捨五入到下一個個位數是0十位數是上述的值
-                        //             tickValue = Math.ceil(tickValue / 10) * 10; // 取十位數
-                        //         } else if (i === 3) {
-                        //             tickValue = tickMax;
-                        //         } else {
-                        //             tickValue = tickMin + i * tickInterval;
-                        //         }
-
-                        //         positions.push(tickValue);
-                        //     }
-                        //     return positions;
-                        // },
                     },
                 ],
                 series: [
