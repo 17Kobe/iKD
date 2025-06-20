@@ -3383,9 +3383,9 @@ const stock = {
             function detectFearLevel(sp500Change, jnkChange) {
                 let fearLevel = '';
                 const fearReasons = [];
-                // 幫助格式化百分比
                 const percent = (v) => (v >= 0 ? '+' : '') + (v * 100).toFixed(2) + '%';
 
+                // S&P500 原因
                 if (sp500Change <= -0.05) {
                     fearLevel = '極度恐慌';
                     fearReasons.push(`【S&P500】下跌 (${percent(sp500Change)}) → 極度恐慌`);
@@ -3400,16 +3400,37 @@ const stock = {
                     fearReasons.push(`【S&P500】未明顯下跌 (${percent(sp500Change)}) → 無恐慌`);
                 }
 
-                let jnkMark = '';
-                if (fearLevel === '無恐慌') {
-                    // 無恐慌時不顯示穩/慌
-                    return { fearLevel, fearReasons };
-                } else {
-                    // 其它等級時，JNK >=0 顯示 X，否則 O
-                    jnkMark = jnkChange >= 0 ? 'X' : 'O';
+                // JNK 原因
+                fearReasons.push(
+                    `【JNK】${jnkChange >= 0 ? '未下跌' : '下跌'} (${percent(jnkChange)}) → ${
+                        jnkChange >= 0 ? '市場尚穩' : '債市恐慌'
+                    }`
+                );
+
+                // O/X 標記只在非無恐慌時加在 fearLevel
+                if (fearLevel !== '無恐慌') {
+                    const jnkMark = jnkChange >= 0 ? 'O' : 'X';
                     fearLevel = `${fearLevel}(${jnkMark})`;
-                    return { fearLevel, fearReasons };
                 }
+
+                // 判斷總結文字
+                let summary = '';
+                if (fearLevel === '無恐慌') {
+                    if (jnkChange >= 0) {
+                        summary = '市場無恐慌，JNK也穩定，確認真實無恐慌。';
+                    } else {
+                        summary = '市場無恐慌，但JNK下跌，需留意債市風險。';
+                    }
+                } else {
+                    if (jnkChange < 0) {
+                        summary = `市場${fearLevel.replace(/\(.+\)/, '')}，JNK也下跌，確認真實恐慌。`;
+                    } else {
+                        summary = `市場${fearLevel.replace(/\(.+\)/, '')}，但JNK未下跌，可能為短線過度反應，留意反彈機會。`;
+                    }
+                }
+                fearReasons.push(`總結：${summary}`);
+
+                return { fearLevel, fearReasons };
             }
 
             // 資金流推論
@@ -3463,15 +3484,19 @@ const stock = {
                     reasons.push(`【美元】走弱 (${percent(usdTwd)}) → 熱錢回流新興市場`);
                 }
 
-                let sentiment;
+                let sentiment = '';
                 if (score >= 4) {
                     sentiment = '資金進攻';
+                    reasons.push(`總結：分數 ${score}，市場資金明顯進攻，風險偏好高`);
                 } else if (score >= 2) {
                     sentiment = '偏多';
+                    reasons.push(`總結：分數 ${score}，市場信心溫和偏多`);
                 } else if (score >= 0) {
                     sentiment = '中性';
+                    reasons.push(`總結：分數 ${score}，市場中性或混亂`);
                 } else {
                     sentiment = '資金避險';
+                    reasons.push(`總結：分數 ${score}，市場資金偏向避險`);
                 }
 
                 return {
