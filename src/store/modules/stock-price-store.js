@@ -3444,60 +3444,71 @@ const stock = {
 
                 if (sp500 > 0) {
                     score += 2;
-                    reasons.push(`【S&P500】上漲 (${percent(sp500)}) → 資金進入股市`);
+                    reasons.push(`【S&P500】上漲 (${percent(sp500)}) → 資金進入股市（+2）`);
                 } else if (sp500 < 0) {
-                    reasons.push(`【S&P500】下跌 (${percent(sp500)}) → 股市承壓`);
+                    reasons.push(`【S&P500】下跌 (${percent(sp500)}) → 股市承壓（0）`);
                 }
 
                 if (jnk > 0) {
                     score += 2;
-                    reasons.push(`【JNK】上漲 (${percent(jnk)}) → 市場信心強`);
+                    reasons.push(`【JNK】上漲 (${percent(jnk)}) → 市場信心強（+2）`);
                 } else if (jnk < 0) {
-                    reasons.push(`【JNK】下跌 (${percent(jnk)}) → 資金避險`);
+                    reasons.push(`【JNK】下跌 (${percent(jnk)}) → 資金避險（0）`);
                 }
 
                 if (btc > 0) {
                     score += 1;
-                    reasons.push(`【比特幣】上漲 (${percent(btc)}) → 投機資金活躍`);
+                    reasons.push(`【比特幣】上漲 (${percent(btc)}) → 投機資金活躍（+1）`);
                 } else if (btc < 0) {
-                    reasons.push(`【比特幣】下跌 (${percent(btc)}) → 投機情緒減弱`);
+                    reasons.push(`【比特幣】下跌 (${percent(btc)}) → 投機情緒減弱（0）`);
                 }
 
                 if (gold > 0) {
                     score -= 1;
-                    reasons.push(`【黃金】上漲 (${percent(gold)}) → 資金尋求避險`);
+                    reasons.push(`【黃金】上漲 (${percent(gold)}) → 資金尋求避險（-1）`);
                 } else if (gold < 0) {
                     score += 1;
-                    reasons.push(`【黃金】下跌 (${percent(gold)}) → 資金風險偏好提升`);
+                    reasons.push(`【黃金】下跌 (${percent(gold)}) → 資金風險偏好提升（+1）`);
                 }
 
                 if (usBond > 0) {
                     score -= 1;
-                    reasons.push(`【美債】上漲 (${percent(usBond)}) → 資金轉向保守`);
+                    reasons.push(`【美債】上漲 (${percent(usBond)}) → 資金轉向保守（-1）`);
                 }
 
                 if (usdTwd > 0) {
                     score -= 1;
-                    reasons.push(`【美元】走強 (${percent(usdTwd)}) → 熱錢撤離台幣`);
+                    reasons.push(`【美元】走強 (${percent(usdTwd)}) → 熱錢撤離台幣（-1）`);
                 } else if (usdTwd < 0) {
                     score += 1;
-                    reasons.push(`【美元】走弱 (${percent(usdTwd)}) → 熱錢回流新興市場`);
+                    reasons.push(`【美元】走弱 (${percent(usdTwd)}) → 熱錢回流新興市場（+1）`);
                 }
-
                 let sentiment = '';
                 if (score >= 4) {
                     sentiment = '資金進攻';
-                    reasons.push(`總結：分數 ${score}，市場資金明顯進攻，風險偏好高`);
+                    reasons.push(`總結：分數 ${score} (級距 4↑)，市場資金明顯進攻，風險偏好高`);
                 } else if (score >= 2) {
                     sentiment = '偏多';
-                    reasons.push(`總結：分數 ${score}，市場信心溫和偏多`);
+                    reasons.push(`總結：分數 ${score} (級距 2~3)，市場信心溫和偏多`);
                 } else if (score >= 0) {
                     sentiment = '中性';
-                    reasons.push(`總結：分數 ${score}，市場中性或混亂`);
+                    reasons.push(`總結：分數 ${score} (級距 0~1)，市場中性或混亂`);
                 } else {
                     sentiment = '資金避險';
-                    reasons.push(`總結：分數 ${score}，市場資金偏向避險`);
+                    reasons.push(`總結：分數 ${score} (級距 <0)，市場資金偏向避險`);
                 }
+
+                reasons.push('\n');
+
+                const scoreRangeTable = [
+                    '分數級距說明：',
+                    '4↑　→　資金進攻（市場資金明顯進攻，風險偏好高）',
+                    '2~3　→　偏多（市場信心溫和偏多）',
+                    '0~1　→　中性（市場中性或混亂）',
+                    '<0　→　資金避險（市場資金偏向避險）',
+                ];
+
+                reasons.push(...scoreRangeTable);
 
                 return {
                     sentiment,
