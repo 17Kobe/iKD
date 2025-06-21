@@ -104,7 +104,7 @@ export default {
                 return { color: '#ee3333', 'font-weight': 'bold', 'font-size': '16px' }; // 深紅
             }
             if (this.fearLevel.sentiment.includes('偏多')) {
-                return { color: '#b13935', 'font-weight': 'bold', 'font-size': '16px' }; // 紅
+                return { color: '#ee3333', 'font-weight': 'bold', 'font-size': '16px' }; // 紅
             }
             if (this.fearLevel.sentiment.includes('中性')) {
                 return { color: '#888', 'font-weight': 'bold', 'font-size': '16px' }; // 灰

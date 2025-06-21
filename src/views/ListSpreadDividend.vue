@@ -20,10 +20,12 @@
             </el-col>
             <el-col :span="13" style="margin-right: 4px">
                 <el-tooltip
-                    class="box-item"
                     effect="dark"
-                    :content="`累計本金： ${totalBuySpend.toLocaleString('en-US')}`"
+                    :content="`累計本金：$ ${totalBuySpend.toLocaleString(
+                        'en-US'
+                    )}\n目前市值：$ ${totalMarketValue.toLocaleString('en-US')}`"
                     placement="bottom"
+                    popper-class="tooltip-pre-line"
                 >
                     <el-tag
                         class="ml-2"
@@ -515,6 +517,10 @@ export default {
         },
         totalBuySpend() {
             return this.spreadList.reduce((acc, { cost }) => acc + (cost ? cost.sum : 0), 0);
+        },
+        totalMarketValue() {
+            // 目前市值 = 本金 + 價差總計
+            return this.spreadList.reduce((acc, { cost }) => acc + (cost ? cost.sum + cost.return : 0), 0);
         },
         totalRateOfReturn() {
             return this.totalSpread == 0
