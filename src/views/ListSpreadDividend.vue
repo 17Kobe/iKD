@@ -19,23 +19,27 @@
                 >
             </el-col>
             <el-col :span="13" style="margin-right: 4px">
-                <el-tooltip
-                    effect="dark"
-                    :content="`累計本金：$ ${totalBuySpend.toLocaleString(
-                        'en-US'
-                    )}\n目前市值：$ ${totalMarketValue.toLocaleString('en-US')}`"
-                    placement="bottom"
-                    popper-class="tooltip-pre-line"
-                >
+                <el-tooltip effect="dark" placement="bottom" popper-class="tooltip-pre-line">
+                    <template #content>
+                        <div>
+                            累計本金：<span style="color: rgb(176, 224, 230)">
+                                $ {{ totalBuySpend.toLocaleString('en-US') }} </span
+                            ><br />
+                            目前市值：<span style="color: rgb(255 202 100)">
+                                $ {{ totalMarketValue.toLocaleString('en-US') }}
+                            </span>
+                        </div>
+                    </template>
+
                     <el-tag
                         class="ml-2"
                         size="large"
                         style="margin: 5px 2px; padding: 0 4px; float: right"
                         :type="totalSpread >= 0 ? 'primary' : 'danger'"
-                        >總計
+                    >
+                        總計
                         <span style="font-size: 24px"> $ </span>
                         <span style="font-size: 28px; font-weight: bold">
-                            <!-- <number :from="0" :to="totalSpread" :format="currencyFormat" :duration="1" :delay="0" easing="Power1.easeOut" /> -->
                             <number
                                 :from="0"
                                 :to="totalSpread"
@@ -48,6 +52,7 @@
                         >&nbsp;元
                     </el-tag>
                 </el-tooltip>
+
                 <el-tag
                     size="small"
                     style="float: right; position: relative; left: 7px; top: 2px; padding: 0 2px; border-radius: 10px"
