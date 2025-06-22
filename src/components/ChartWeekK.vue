@@ -182,6 +182,7 @@
 
 <script>
 import { Chart } from 'highcharts-vue';
+import Highcharts from 'highcharts/highstock';
 import moment from 'moment';
 import _ from 'lodash';
 
@@ -234,6 +235,111 @@ export default {
         //     console.log('ma_policy');
         //     return this.$store.getters.getStockPolicyMa(this.parentData);
         // },
+        darvasBoxes() {
+            console.log('darvasBoxes');
+            if (!this.ohlc || this.ohlc.length < 5) return [];
+
+            const boxes = [];
+            const data = this.ohlc;
+            let boxTop = null;
+            let boxBottom = null;
+            let boxStartIndex = null;
+            let boxStartTime = null;
+            let consecutiveDeclines = 0;
+
+            for (let i = 3; i < data.length; i++) {
+                const current = data[i];
+                const prev1 = data[i - 1];
+                const prev2 = data[i - 2];
+                const prev3 = data[i - 3];
+
+                // 尋找箱頂：當前高點是最近3天的最高點
+                if (current[2] >= prev1[2] && current[2] >= prev2[2] && current[2] >= prev3[2]) {
+                    if (boxTop === null || current[2] > boxTop) {
+                        boxTop = current[2];
+                        boxStartIndex = i;
+                        boxStartTime = current[0];
+                        consecutiveDeclines = 0;
+                    }
+                }
+
+                // 尋找箱底：在有箱頂的情況下，找最近的低點
+                if (boxTop !== null && boxBottom === null) {
+                    // 連續3天收盤價下跌確認箱底
+                    if (i >= boxStartIndex + 3) {
+                        let foundBottom = true;
+                        for (let j = boxStartIndex + 1; j <= i; j++) {
+                            if (data[j][3] < boxTop * 0.85) {
+                                // 箱底至少低於箱頂15%
+                                boxBottom = Math.min(...data.slice(boxStartIndex, i + 1).map((item) => item[3]));
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // 當有完整的箱子時，檢查突破
+                if (boxTop !== null && boxBottom !== null) {
+                    const boxHeight = boxTop - boxBottom;
+
+                    // 向上突破：收盤價突破箱頂
+                    if (current[4] > boxTop) {
+                        // 記錄完整的箱子
+                        boxes.push({
+                            start: boxStartTime,
+                            end: current[0],
+                            top: boxTop,
+                            bottom: boxBottom,
+                            breakout: 'up',
+                        });
+
+                        // 重置
+                        boxTop = null;
+                        boxBottom = null;
+                        boxStartIndex = null;
+                        boxStartTime = null;
+                    }
+                    // 向下跌破：收盤價跌破箱底
+                    else if (current[4] < boxBottom) {
+                        // 記錄完整的箱子
+                        boxes.push({
+                            start: boxStartTime,
+                            end: current[0],
+                            top: boxTop,
+                            bottom: boxBottom,
+                            breakout: 'down',
+                        });
+
+                        // 重置
+                        boxTop = null;
+                        boxBottom = null;
+                        boxStartIndex = null;
+                        boxStartTime = null;
+                    }
+                }
+
+                // 如果箱子持續太久沒有突破，重置
+                if (boxStartIndex !== null && i - boxStartIndex > 20) {
+                    boxTop = null;
+                    boxBottom = null;
+                    boxStartIndex = null;
+                    boxStartTime = null;
+                }
+            }
+
+            // 如果有未完成的箱子，也加入（當前進行中的箱子）
+            if (boxTop !== null && boxBottom !== null && data.length > 0) {
+                boxes.push({
+                    start: boxStartTime,
+                    end: data[data.length - 1][0],
+                    top: boxTop,
+                    bottom: boxBottom,
+                    breakout: 'none',
+                });
+            }
+
+            return boxes;
+        },
         chartMinMaxValues() {
             // 用 minValue及 maxValue 來判斷，若maxValue<100，則用小數2位數。minValue>=100則用小數0位數
             const ohlcHighValues = this.ohlc.map((value) => value[2]);
@@ -241,25 +347,34 @@ export default {
             const maValues = this.ma.map((value) => value.slice(1));
             const costValues = this.cost.map((value) => value[1]);
 
-            const allHighValues = [...ohlcHighValues, ...maValues.flat(), ...costValues];
-            const allLowValues = [...ohlcLowValues, ...maValues.flat(), ...costValues];
+            // 包含 Darvas Box 的數值
+            const darvasValues = this.darvasBoxes.flatMap((box) => [box.top, box.bottom]);
+
+            const allHighValues = [...ohlcHighValues, ...maValues.flat(), ...costValues, ...darvasValues];
+            const allLowValues = [...ohlcLowValues, ...maValues.flat(), ...costValues, ...darvasValues];
             const minValue = Math.min(...allLowValues);
             const maxValue = Math.max(...allHighValues);
+
+            // 加入緩衝空間，避免線條被截斷
+            const range = maxValue - minValue;
+            const buffer = range * 0.05; // 5% 緩衝空間
+            const adjustedMinValue = minValue - buffer;
+            const adjustedMaxValue = maxValue + buffer;
 
             let tickMin;
             let tickMax;
 
-            if (maxValue < 100) {
-                tickMin = Math.floor(minValue * 100) / 100;
-                tickMax = Math.ceil(maxValue * 100) / 100;
-            } else if (minValue >= 100) {
-                tickMin = Math.floor(minValue);
-                tickMax = Math.ceil(maxValue);
+            if (adjustedMaxValue < 100) {
+                tickMin = Math.floor(adjustedMinValue * 100) / 100;
+                tickMax = Math.ceil(adjustedMaxValue * 100) / 100;
+            } else if (adjustedMinValue >= 100) {
+                tickMin = Math.floor(adjustedMinValue);
+                tickMax = Math.ceil(adjustedMaxValue);
             } else {
                 const decimalPlaces = 2;
                 const multiplier = Math.pow(10, decimalPlaces);
-                tickMin = Math.floor(minValue * multiplier) / multiplier;
-                tickMax = Math.ceil(maxValue * multiplier) / multiplier;
+                tickMin = Math.floor(adjustedMinValue * multiplier) / multiplier;
+                tickMax = Math.ceil(adjustedMaxValue * multiplier) / multiplier;
             }
 
             return { tickMin, tickMax };
@@ -393,6 +508,24 @@ export default {
                                 }</span>)</div>`;
                                 str += `<div>開：${point.point.open} <span style="color: #3333ee">收</span>：<span style="color: ${fontColor}; font-weight:bold;">${point.y}</span></div>`;
                                 str += `<div>高：${point.point.high} 低：${point.point.low}</div>`;
+                            } else if (point.series.name && point.series.name.includes('Darvas Box')) {
+                                // 只在第一個 Darvas Box 系列時顯示
+                                if (point.series.name === 'Darvas Box Top' || point.series.name === 'Darvas Box Bottom') {
+                                    // 找到對應的箱子資訊
+                                    const boxInfo = this.darvasBoxes.find((box) => point.x >= box.start && point.x <= box.end);
+                                    if (boxInfo) {
+                                        str += `<div><span style="color: rgba(255, 20, 147, 0.9); font-weight: bold;">Darvas Box</span></div>`;
+                                        str += `<div>箱頂: ${boxInfo.top.toFixed(2)}</div>`;
+                                        str += `<div>箱底: ${boxInfo.bottom.toFixed(2)}</div>`;
+                                        str += `<div>狀態: ${
+                                            boxInfo.breakout === 'up'
+                                                ? '向上突破'
+                                                : boxInfo.breakout === 'down'
+                                                ? '向下跌破'
+                                                : '進行中'
+                                        }</div>`;
+                                    }
+                                }
                             } else {
                                 // console.log(component);
                                 // const color = index === 1 ? '#834beb' : '#e6a23c';
@@ -562,6 +695,118 @@ export default {
                             // anchor: 'end',
                             // firstAnchor: 'end',
                             // lastAnchor: 'lastPoint',
+                            lastAnchor: 'lastPoint',
+                            units: [['day', [1]]],
+                        },
+                    },
+                    // Darvas Box 箱型顯示 - 背景填充
+                    {
+                        type: 'area',
+                        name: 'Darvas Box Fill',
+                        data: this.darvasBoxes.flatMap((box) => [
+                            [box.start, box.bottom],
+                            [box.start, box.top],
+                            [box.end, box.top],
+                            [box.end, box.bottom],
+                            [box.start, box.bottom],
+                            [box.start, null], // 分隔符，避免連接不同的箱子
+                        ]),
+                        fillColor: {
+                            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+                            stops: [
+                                [0, 'rgba(255, 215, 0, 0.15)'], // 金色半透明背景
+                                [1, 'rgba(255, 165, 0, 0.1)'], // 橙色半透明背景
+                            ],
+                        },
+                        lineColor: 'transparent', // 隱藏邊界線，只要填充
+                        lineWidth: 0,
+                        enableMouseTracking: false,
+                        showInLegend: false,
+                        zIndex: 0, // 背景層
+                        threshold: null,
+                        dataGrouping: {
+                            lastAnchor: 'lastPoint',
+                            units: [['day', [1]]],
+                        },
+                    },
+                    // Darvas Box 箱型顯示 - 箱頂線
+                    {
+                        type: 'line',
+                        name: 'Darvas Box Top',
+                        data: this.darvasBoxes.flatMap((box) => [
+                            [box.start, box.top],
+                            [box.end, box.top],
+                            [box.end, null],
+                        ]),
+                        color: 'rgba(255, 20, 147, 0.9)', // 桃紅色
+                        lineWidth: 1.5,
+                        enableMouseTracking: true,
+                        showInLegend: false,
+                        zIndex: 1,
+                        step: false,
+                        dataGrouping: {
+                            lastAnchor: 'lastPoint',
+                            units: [['day', [1]]],
+                        },
+                    },
+                    // Darvas Box 箱型顯示 - 箱底線
+                    {
+                        type: 'line',
+                        name: 'Darvas Box Bottom',
+                        data: this.darvasBoxes.flatMap((box) => [
+                            [box.start, box.bottom],
+                            [box.end, box.bottom],
+                            [box.end, null],
+                        ]),
+                        color: 'rgba(255, 20, 147, 0.9)', // 桃紅色
+                        lineWidth: 1.5,
+                        enableMouseTracking: true,
+                        showInLegend: false,
+                        zIndex: 1,
+                        step: false,
+                        dataGrouping: {
+                            lastAnchor: 'lastPoint',
+                            units: [['day', [1]]],
+                        },
+                    },
+                    // Darvas Box 箱型顯示 - 左側線
+                    {
+                        type: 'line',
+                        name: 'Darvas Box Left',
+                        data: this.darvasBoxes.flatMap((box) => [
+                            [box.start, box.bottom],
+                            [box.start, box.top],
+                            [box.start, null],
+                        ]),
+                        color: 'rgba(255, 20, 147, 0.9)', // 桃紅色
+                        lineWidth: 1.5,
+                        dashStyle: 'ShortDash', // 虛線樣式讓側邊更明顯
+                        enableMouseTracking: true,
+                        showInLegend: false,
+                        zIndex: 1,
+                        step: false,
+                        dataGrouping: {
+                            lastAnchor: 'lastPoint',
+                            units: [['day', [1]]],
+                        },
+                    },
+                    // Darvas Box 箱型顯示 - 右側線
+                    {
+                        type: 'line',
+                        name: 'Darvas Box Right',
+                        data: this.darvasBoxes.flatMap((box) => [
+                            [box.end, box.bottom],
+                            [box.end, box.top],
+                            [box.end, null],
+                        ]),
+                        color: 'rgba(255, 20, 147, 0.9)', // 桃紅色
+                        lineWidth: 1.5,
+                        dashStyle: 'ShortDash', // 虛線樣式讓側邊更明顯
+                        enableMouseTracking: true,
+                        showInLegend: false,
+                        zIndex: 1,
+                        step: false,
+                        dataGrouping: {
                             lastAnchor: 'lastPoint',
                             units: [['day', [1]]],
                         },
