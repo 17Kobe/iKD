@@ -9,7 +9,7 @@
             <el-col :xs="12" :sm="10" :md="7" :lg="7" :xl="5" style="display: flex; padding: 4px 4px 0 2px">
                 <el-card shadow="hover" style="flex: 1" id="line-chart-card">
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
-                        資產走勢 (今日: $
+                        資產與負債走勢 (今日資產: $
                         <span :style="[todayAsset >= 0 ? { color: '#409eff' } : { color: '#f56c6c' }]">{{
                             (todayAsset >= 0 ? '+' : '') + todayAsset.toLocaleString('en-US')
                         }}</span
@@ -96,7 +96,9 @@
                         readonly
                         :style="{ 'pointer-events': 'none' }"
                     >
-                        <template #prepend><span>{{ item.name.includes('債') ? '債券' : '股票' }}</span></template>
+                        <template #prepend
+                            ><span>{{ item.name.includes('債') ? '債券' : '股票' }}</span></template
+                        >
                     </el-input>
                 </el-col>
                 <el-col :xs="9" :sm="10" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
@@ -146,7 +148,17 @@
                         ]"
                         @change="onChangeAccount($event, index)"
                     >
-                        <template #prepend><span>{{ item.account.includes('活存')  || item.account.includes('現金') ? '現金' : item.account.includes('定存') ? '定存' : item.account.includes('存股') ? '存股' : '其它' }}</span></template>
+                        <template #prepend
+                            ><span>{{
+                                item.account.includes('活存') || item.account.includes('現金')
+                                    ? '現金'
+                                    : item.account.includes('定存')
+                                    ? '定存'
+                                    : item.account.includes('存股')
+                                    ? '存股'
+                                    : '其它'
+                            }}</span></template
+                        >
                     </el-input>
                 </el-col>
                 <el-col :xs="9" :sm="10" :md="7" :lg="7" :xl="5" style="padding-left: 4px">
@@ -416,20 +428,22 @@ export default {
                                 );
                             },
                             label(context) {
-                                // console.log(context);
-                                return (
-                                    ' $ ' +
-                                    context.parsed.y.toLocaleString('en-US') +
-                                    ' ( ' +
-                                    (context.raw.diff >= 0 ? '+' : '') +
-                                    context.raw.diff.toLocaleString('en-US') +
-                                    ' )'
-                                );
+                                const label = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                const diff = context.raw.diff || 0;
+                                return ` ${label}: $ ${value.toLocaleString('en-US')} ( ${
+                                    diff >= 0 ? '+' : ''
+                                }${diff.toLocaleString('en-US')} )`;
                             },
                         },
                     },
                     legend: {
-                        display: false,
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                        },
                     },
                 },
             },
@@ -438,6 +452,9 @@ export default {
     computed: {
         historyAssetList() {
             return this.$store.getters.getHistoryAssetList();
+        },
+        historyLiabilityList() {
+            return this.$store.getters.getHistoryLiabilityList();
         },
         annualCloseOfHistoryAssetList() {
             // [
@@ -460,10 +477,13 @@ export default {
             const groupedByYear = _.groupBy(this.$store.state.asset.historyAssetList, (item) => item[0].split('-')[0]);
             console.log(groupedByYear);
             // 從每個組中選擇最後一項
-            return _.takeRight(_.map(groupedByYear, (group) => [
-                group[0][0].split('-')[0], // 獲取年份部份
-                _.last(group)[1], // 獲取最後一項的值
-            ]), 6);
+            return _.takeRight(
+                _.map(groupedByYear, (group) => [
+                    group[0][0].split('-')[0], // 獲取年份部份
+                    _.last(group)[1], // 獲取最後一項的值
+                ]),
+                6
+            );
         },
 
         todayAsset() {
@@ -491,9 +511,9 @@ export default {
                 this.stockDeposit +
                 this.bondDeposit +
                 this.assetList.reduce((acc, { account, amount, isPositive }) => {
-                    console.log("amount", amount);
-                    console.log("isPositive", isPositive);
-                    console.log("acc", acc);
+                    console.log('amount', amount);
+                    console.log('isPositive', isPositive);
+                    console.log('acc', acc);
                     if (isPositive && !/存股|股票/.test(account)) return acc + amount;
                     return acc;
                 }, 0);
@@ -509,10 +529,18 @@ export default {
             return tempAssets;
         },
         liabilities() {
-            return this.assetList.reduce((acc, { amount, isPositive }) => {
+            const tempLiabilities = this.assetList.reduce((acc, { amount, isPositive }) => {
                 if (!isPositive) return acc + Math.abs(amount);
                 return acc;
             }, 0);
+
+            // 存到歷史負債去
+            this.$store.commit('ADD_OR_UPDATE_HISTORY_LIABILITY_LIST', [
+                moment().format('YYYY-MM-DD'), // 日期
+                tempLiabilities, // 總負債
+            ]);
+
+            return tempLiabilities;
         },
         netAssets() {
             return this.assets - this.liabilities;
@@ -543,25 +571,29 @@ export default {
             }, 0);
         },
         stockDeposit() {
-            const stockSum = this.$store.state.price.stockList.reduce((acc, { name, cost }) => 
-                (!/債/.test(name) && cost?.sum) ? acc + cost.sum + cost.return : acc
-            , 0);
+            const stockSum = this.$store.state.price.stockList.reduce(
+                (acc, { name, cost }) => (!/債/.test(name) && cost?.sum ? acc + cost.sum + cost.return : acc),
+                0
+            );
 
-            const assetSum = this.assetList.reduce((acc, { account, amount, isPositive }) => 
-                (isPositive && /股票/.test(account)) ? acc + Math.abs(amount) : acc
-            , 0);
+            const assetSum = this.assetList.reduce(
+                (acc, { account, amount, isPositive }) => (isPositive && /股票/.test(account) ? acc + Math.abs(amount) : acc),
+                0
+            );
 
             return stockSum + assetSum;
         },
         chtStockDeposit() {
-            return this.assetList.reduce((acc, { account, amount, isPositive }) => 
-                (isPositive && /存股/.test(account)) ? acc + Math.abs(amount) : acc
-            , 0);
+            return this.assetList.reduce(
+                (acc, { account, amount, isPositive }) => (isPositive && /存股/.test(account) ? acc + Math.abs(amount) : acc),
+                0
+            );
         },
         bondDeposit() {
-            return this.$store.state.price.stockList.reduce((acc, { name, cost }) => 
-                (/債/.test(name) && cost?.sum) ? acc + cost.sum + cost.return : acc
-            , 0);
+            return this.$store.state.price.stockList.reduce(
+                (acc, { name, cost }) => (/債/.test(name) && cost?.sum ? acc + cost.sum + cost.return : acc),
+                0
+            );
         },
         // fundDeposit() {
         //     // 定存 sum
@@ -571,9 +603,11 @@ export default {
         //     }, 0);
         // },
         otherDeposit() {
-            return this.assetList.reduce((acc, { account, amount, isPositive }) => 
-                (isPositive && !/定存|活存|現金|存股|股票/.test(account)) ? acc + Math.abs(amount) : acc
-            , 0);
+            return this.assetList.reduce(
+                (acc, { account, amount, isPositive }) =>
+                    isPositive && !/定存|活存|現金|存股|股票/.test(account) ? acc + Math.abs(amount) : acc,
+                0
+            );
         },
         stockSumOfCostReturn() {
             return _.sumBy(this.spreadList, 'cost.return');
@@ -712,15 +746,15 @@ export default {
                         position: 'bottom',
                         text: [
                             `【現金】${(this.demandDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
-                            `【定存】${(this.fixedDeposit / 10000).toFixed(1).padStart(5)} 萬`,
+                                `【定存】${(this.fixedDeposit / 10000).toFixed(1).padStart(5)} 萬`,
                             `【存股】${(this.chtStockDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
-                            `【股票】${(this.stockDeposit / 10000).toFixed(1).padStart(5)} 萬`,
+                                `【股票】${(this.stockDeposit / 10000).toFixed(1).padStart(5)} 萬`,
                             `【債券】${(this.bondDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
-                            `【其它】${(this.otherDeposit / 10000).toFixed(1).padStart(5)} 萬`,
+                                `【其它】${(this.otherDeposit / 10000).toFixed(1).padStart(5)} 萬`,
                         ],
                         font: {
                             size: 13,
-                            family: '"PingFang TC", monospace'
+                            family: '"PingFang TC", monospace',
                         },
                     },
                     datalabels: {
@@ -878,7 +912,14 @@ export default {
                 labels: ['活存', '定存', '存股', '股票', '債券', '其它'],
                 datasets: [
                     {
-                        data: [this.demandDeposit, this.fixedDeposit, this.chtStockDeposit, this.stockDeposit, this.bondDeposit, this.otherDeposit],
+                        data: [
+                            this.demandDeposit,
+                            this.fixedDeposit,
+                            this.chtStockDeposit,
+                            this.stockDeposit,
+                            this.bondDeposit,
+                            this.otherDeposit,
+                        ],
                         backgroundColor: [
                             // 背景色
                             'rgba(255, 205, 86, 0.5)',
@@ -886,7 +927,7 @@ export default {
                             'rgba(204, 255, 144, 0.5)',
                             'rgba(66, 202, 162, 0.4)',
                             'rgba(200, 160, 255, 0.4)',
-                            'rgba(200, 200, 200, 0.2)',  // 灰色
+                            'rgba(200, 200, 200, 0.2)', // 灰色
                         ],
                         // borderColor: ['rgb(66, 66, 66)'],
                         borderWidth: 2, // 外框寬度
@@ -899,40 +940,18 @@ export default {
                 // labels: ['2022-04-01', '2022-04-02', '2022-04-03'],
                 datasets: [
                     {
-                        // pointRadius: 0,
-                        // data: [
-                        // {
-                        //     x: moment('2021-09-06'),
-                        //     y: 564450,
-                        // },
-                        // {
-                        //     x: moment('2021-10-06'),
-                        //     y: 564450,
-                        // },
-                        // {
-                        //     x: moment('2021-11-06'),
-                        //     y: 564411,
-                        // },
-                        // {
-                        //     x: moment('2021-11-07'),
-                        //     y: 566450,
-                        // },
-                        // {
-                        //     x: moment('2021-11-08'),
-                        //     y: 561350,
-                        // },
-                        //     {
-                        //         x: moment('2022-04-03'),
-                        //         y: 879789,
-                        //     },
-                        //     {
-                        //         x: moment('2022-04-04'),
-                        //         y: 881335,
-                        //     },
-                        // ],
+                        label: '資產',
                         data: this.historyAssetList,
                         borderColor: 'rgb(54, 162, 235)',
                         backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderWidth: 2, // 外框寬度
+                        fill: true /* this option hide background-color */,
+                    },
+                    {
+                        label: '負債',
+                        data: this.historyLiabilityList,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
                         borderWidth: 2, // 外框寬度
                         fill: true /* this option hide background-color */,
                     },
@@ -1118,15 +1137,15 @@ export default {
             };
         },
         bar3Data() {
-            const years = this.annualCloseOfHistoryAssetList.map(item => `${item[0]} 年`);
-            const values = this.annualCloseOfHistoryAssetList.map(item => item[1]);
+            const years = this.annualCloseOfHistoryAssetList.map((item) => `${item[0]} 年`);
+            const values = this.annualCloseOfHistoryAssetList.map((item) => item[1]);
 
             return {
                 labels: years,
                 datasets: [
                     {
                         data: values,
-                        backgroundColor:  'rgba(54, 162, 235, 0.2)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
                         borderColor: 'rgb(54, 162, 235)',
                         borderWidth: 2, // 外框寬度
                         options: {
@@ -1209,6 +1228,10 @@ export default {
         // 歷史存款
         const localHistoryAssetList = JSON.parse(localStorage.getItem('historyAssetList')) || [];
         this.$store.commit('SAVE_HISTORY_ASSET_LIST', localHistoryAssetList);
+
+        // 歷史負債
+        const localHistoryLiabilityList = JSON.parse(localStorage.getItem('historyLiabilityList')) || [];
+        this.$store.commit('SAVE_HISTORY_LIABILITY_LIST', localHistoryLiabilityList);
 
         // 利息清單，這也有點算歷史，因為每年都有
         const localInterestList = JSON.parse(localStorage.getItem('interestList')) || [];
