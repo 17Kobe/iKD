@@ -351,9 +351,15 @@ export default {
             const sell1_symbol = this.getUnitSymbol(1 / sell1_ratio);
             const sell2_symbol = this.getUnitSymbol(1 / sell2_ratio);
 
-            // 判斷是否為存股策略
-            const isStockHolding = sell1_ratio !== 1 || sell2_ratio !== 1;
-            const stockType = isStockHolding ? '存股' : '不存股';
+            // 根據新規則判斷存股類型
+            let stockType;
+            if (sell1_ratio === 1) {
+                stockType = '不存股';
+            } else if (sell1_ratio !== 1 && sell2_ratio === 1) {
+                stockType = '半存股';
+            } else {
+                stockType = '存股';
+            }
 
             if (sell1_ratio === 1 && sell2_ratio === 1) {
                 return `${starText}：${stockType}，有賣時全賣`;

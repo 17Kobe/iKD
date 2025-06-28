@@ -1417,9 +1417,9 @@ export default {
             // 根據 star 和 method 判斷使用哪個比例
             if (stock.star === 3 && stock.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought')) {
                 if (method === 'rsi_over_bought') {
-                    return '賣' + this.getUnitSymbol(1 / sell1_ratio);
-                } else if (method === 'kd_dead' || method === 'kd_turn_down') {
                     return '賣' + this.getUnitSymbol(1 / sell2_ratio);
+                } else if (method === 'kd_dead' || method === 'kd_turn_down') {
+                    return '賣' + this.getUnitSymbol(1 / sell1_ratio);
                 }
             }
             return '賣';
@@ -1442,9 +1442,15 @@ export default {
             const sell1_symbol = this.getUnitSymbol(1 / sell1_ratio);
             const sell2_symbol = this.getUnitSymbol(1 / sell2_ratio);
 
-            // 判斷是否為存股策略（只要有一個比例不是全賣就是存股）
-            const isStockHolding = sell1_ratio !== 1 || sell2_ratio !== 1;
-            const stockType = isStockHolding ? '存股' : '不存股';
+            // 根據新規則判斷存股類型
+            let stockType;
+            if (sell1_ratio === 1) {
+                stockType = '不存股';
+            } else if (sell1_ratio !== 1 && sell2_ratio === 1) {
+                stockType = '半存股';
+            } else {
+                stockType = '存股';
+            }
 
             if (sell1_ratio === 1 && sell2_ratio === 1) {
                 return `${starText}：${stockType}，有賣時全賣`;
