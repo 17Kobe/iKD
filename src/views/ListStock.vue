@@ -1415,12 +1415,10 @@ export default {
             const sell2_ratio = stock.policy?.settings?.sell2_ratio || 3; // 預設1/3
 
             // 根據 star 和 method 判斷使用哪個比例
-            if (stock.star === 3 && stock.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought')) {
-                if (method === 'rsi_over_bought') {
-                    return '賣' + this.getUnitSymbol(1 / sell2_ratio);
-                } else if (method === 'kd_dead' || method === 'kd_turn_down') {
-                    return '賣' + this.getUnitSymbol(1 / sell1_ratio);
-                }
+            if (method === 'rsi_over_bought') {
+                return '賣' + this.getUnitSymbol(1 / sell2_ratio);
+            } else if (method === 'kd_dead' || method === 'kd_turn_down') {
+                return '賣' + this.getUnitSymbol(1 / sell1_ratio);
             }
             return '賣';
         },
