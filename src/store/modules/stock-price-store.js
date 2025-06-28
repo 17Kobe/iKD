@@ -2134,6 +2134,10 @@ const stock = {
 
             const star = foundStock.star;
 
+            // 取得分批賣出設定
+            const sell1_ratio = foundStock.policy?.settings?.sell1_ratio || 1; // 預設全賣
+            const sell2_ratio = foundStock.policy?.settings?.sell2_ratio || 1; // 預設全賣
+
             let foundCostDown = false;
             let foundPreviousBuyDown = false;
             let foundPreviousSellUp = false;
@@ -2330,28 +2334,24 @@ const stock = {
                         !obj.reason.includes('kd_m')
                     ) {
                         // KD 死亡、KD 下折、沒有RSI、也沒有KD M頭
-                        if (star === 3 && continuouSalesCount >= 1) {
-                            // 3顆星時要存股
-                            thisNumberOfSell = totalNumberOfBuy * 0.35;
-                            unit = 0.5;
-                        } else if (star === 3) {
-                            // 3顆星時要存股
-                            thisNumberOfSell = totalNumberOfBuy * 0.35;
+                        if (continuouSalesCount >= 1) {
+                            // 第二次以後的賣出，使用 sell2_ratio
+                            thisNumberOfSell = totalNumberOfBuy / sell2_ratio;
+                            unit = 1 / sell2_ratio;
+                        } else {
+                            // 第一次賣出，使用 sell1_ratio
+                            thisNumberOfSell = totalNumberOfBuy / sell1_ratio;
                             console.log('RSI，且有 KD');
-                            unit = 0.35;
-                        } else if (star === 2) {
-                            thisNumberOfSell = totalNumberOfBuy / 2;
-                            console.log('RSI，且有 KD');
-                            unit = 0.5;
+                            unit = 1 / sell1_ratio;
                         }
-                    } else if (star === 3 && continuouSalesCount === 0) {
-                        // 其它若是3星，若是第1次賣
-                        thisNumberOfSell = totalNumberOfBuy * 0.35;
-                        unit = 0.35;
-                    } else if (star === 3) {
-                        // 其它若是3星，則賣一半，如 RSI、KD M頭
-                        thisNumberOfSell = totalNumberOfBuy / 2;
-                        unit = 0.5;
+                    } else if (continuouSalesCount === 0) {
+                        // 其他情況，第一次賣出，使用 sell1_ratio
+                        thisNumberOfSell = totalNumberOfBuy / sell1_ratio;
+                        unit = 1 / sell1_ratio;
+                    } else {
+                        // 其他情況，第二次以後賣出，使用 sell2_ratio
+                        thisNumberOfSell = totalNumberOfBuy / sell2_ratio;
+                        unit = 1 / sell2_ratio;
                     }
                     // console.log('currBuyList=', currBuyList);
                     // console.log('thisNumberOfSell=', thisNumberOfSell);
@@ -2498,9 +2498,27 @@ const stock = {
                             obj.is_sure_sell &&
                             (dataDailyLastDate.isSame(moment(obj.date)) || moment().diff(moment(obj.date), 'days') <= 4)
                         ) {
-                            if (!isCancelToSell) foundStock.badge = unit === 0.5 ? '賣½' : unit === 0.35 ? '賣⅓' : '賣';
-                            // 必定賣
-                            else foundStock.badge = unit === 0.5 ? '取消賣½' : unit === 0.35 ? '取消賣⅓' : '取消賣'; // 取消
+                            if (!isCancelToSell) {
+                                // 根據 unit 值顯示對應的賣出比例
+                                if (unit === 1) foundStock.badge = '賣';
+                                else if (unit === 0.5) foundStock.badge = '賣½';
+                                else if (unit === 1 / 3) foundStock.badge = '賣⅓';
+                                else if (unit === 0.25) foundStock.badge = '賣¼';
+                                else if (unit === 0.2) foundStock.badge = '賣⅕';
+                                else if (unit === 1 / 6) foundStock.badge = '賣⅙';
+                                else if (unit === 1 / 7) foundStock.badge = '賣⅐';
+                                else foundStock.badge = `賣${Math.round(unit * 100)}%`;
+                            } else {
+                                // 取消賣出的顯示
+                                if (unit === 1) foundStock.badge = '取消賣';
+                                else if (unit === 0.5) foundStock.badge = '取消賣½';
+                                else if (unit === 1 / 3) foundStock.badge = '取消賣⅓';
+                                else if (unit === 0.25) foundStock.badge = '取消賣¼';
+                                else if (unit === 0.2) foundStock.badge = '取消賣⅕';
+                                else if (unit === 1 / 6) foundStock.badge = '取消賣⅙';
+                                else if (unit === 1 / 7) foundStock.badge = '取消賣⅐';
+                                else foundStock.badge = `取消賣${Math.round(unit * 100)}%`;
+                            }
                             foundStock.badge_reason = obj.reason;
                         }
 

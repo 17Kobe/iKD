@@ -512,7 +512,9 @@ export default {
                                 // 只在第一個 Darvas Box 系列時顯示
                                 if (point.series.name === 'Darvas Box Top' || point.series.name === 'Darvas Box Bottom') {
                                     // 找到對應的箱子資訊
-                                    const boxInfo = this.darvasBoxes.find((box) => point.x >= box.start && point.x <= box.end);
+                                    const boxInfo = component.darvasBoxes.find(
+                                        (box) => point.x >= box.start && point.x <= box.end
+                                    );
                                     if (boxInfo) {
                                         str += `<div><span style="color: rgba(255, 20, 147, 0.9); font-weight: bold;">Darvas Box</span></div>`;
                                         str += `<div>箱頂: ${boxInfo.top.toFixed(2)}</div>`;

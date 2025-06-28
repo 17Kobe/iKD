@@ -497,16 +497,7 @@
                                         padding: 2px 4px;
                                         border-radius: 10px 100px / 120px;
                                     "
-                                    >{{
-                                        stockData.star === 3 &&
-                                        stockData.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought')
-                                            ? item.method === 'rsi_over_bought'
-                                                ? '賣½'
-                                                : item.method === 'kd_dead' || item.method === 'kd_turn_down'
-                                                ? '賣⅓'
-                                                : '賣'
-                                            : '賣'
-                                    }}</span
+                                    >{{ getSellLabel(item.method) }}</span
                                 >
                                 <span>
                                     &nbsp;{{ item.label.replace('賣', '') }}&nbsp;
@@ -667,8 +658,7 @@
                                                 : '#82e725',
                                     }"
                                 >
-                                    {{ item.buy_or_sell === '現在' ? '今' : item.buy_or_sell
-                                    }}{{ item.unit && item.unit === 0.5 ? '½' : item.unit && item.unit === 0.35 ? '⅓' : '' }}
+                                    {{ item.buy_or_sell === '現在' ? '今' : item.buy_or_sell }}{{ getUnitSymbol(item.unit) }}
                                     <span>
                                         ({{
                                             item.buy_or_sell === '買'
@@ -881,8 +871,44 @@ export default {
             if (months > 0) text += `${months}月`;
             return text || `${days}天`;
         },
+        // 將 unit 值轉換為分數符號
+        getUnitSymbol(unit) {
+            if (!unit || unit === 1) return '';
+
+            // 處理常見的分數值，考慮浮點數精度問題
+            if (Math.abs(unit - 0.5) < 0.01) return '½';
+            if (Math.abs(unit - 1 / 3) < 0.01) return '⅓';
+            if (Math.abs(unit - 0.25) < 0.01) return '¼';
+            if (Math.abs(unit - 0.2) < 0.01) return '⅕';
+            if (Math.abs(unit - 1 / 6) < 0.01) return '⅙';
+            if (Math.abs(unit - 1 / 7) < 0.01) return '⅐';
+
+            // 對於其他值，顯示百分比
+            return `${Math.round(unit * 100)}%`;
+        },
     },
     computed: {
+        // 獲取賣出策略的顯示標籤
+        getSellLabel() {
+            return (sellMethod) => {
+                if (!this.stockData?.policy?.settings) return '賣';
+
+                const sell1_ratio = this.stockData.policy.settings.sell1_ratio || 1;
+                const sell2_ratio = this.stockData.policy.settings.sell2_ratio || 1;
+                const hasRsiOverBought = this.stockData.policy.settings.sell?.some((obj) => obj.method === 'rsi_over_bought');
+
+                if (!hasRsiOverBought) return '賣';
+
+                // 根據不同的賣出方法和設定顯示不同的比例
+                if (sellMethod === 'rsi_over_bought') {
+                    return '賣' + this.getUnitSymbol(1 / sell2_ratio);
+                } else if (sellMethod === 'kd_dead' || sellMethod === 'kd_turn_down') {
+                    return '賣' + this.getUnitSymbol(1 / sell1_ratio);
+                }
+
+                return '賣';
+            };
+        },
         peZones() {
             if (!this.stockData || !this.stockData.data || !this.stockData.data.per) return [];
 
@@ -1243,7 +1269,7 @@ export default {
         policyResultFilteredMap() {
             const result = { buy: [], sell: [], cancel: [] };
             if (!this.stockData.policy?.result) return result;
-            this.stockData.policy.result.forEach(o => {
+            this.stockData.policy.result.forEach((o) => {
                 if (moment().diff(moment(o.date), 'days') > 365) return;
                 if (o.is_sure_buy) result.buy.push([moment(o.date).valueOf(), o.k]);
                 if (o.is_sure_sell) result.sell.push([moment(o.date).valueOf(), o.k]);
@@ -1251,9 +1277,15 @@ export default {
             });
             return result;
         },
-        stockDataOfPolicyResultBuy() { return this.policyResultFilteredMap.buy; },
-        stockDataOfPolicyResultSell() { return this.policyResultFilteredMap.sell; },
-        stockDataOfPolicyResultBuyOrSellCancel() { return this.policyResultFilteredMap.cancel; },
+        stockDataOfPolicyResultBuy() {
+            return this.policyResultFilteredMap.buy;
+        },
+        stockDataOfPolicyResultSell() {
+            return this.policyResultFilteredMap.sell;
+        },
+        stockDataOfPolicyResultBuyOrSellCancel() {
+            return this.policyResultFilteredMap.cancel;
+        },
 
         stockDataDividend() {
             return this.$store.getters.getStockDataDividend(this.parentData);
@@ -1302,15 +1334,23 @@ export default {
             const map = {};
             const buy = this.stockData.policy?.settings?.buy || [];
             const sell = this.stockData.policy?.settings?.sell || [];
-            [...buy, ...sell].forEach(item => {
+            [...buy, ...sell].forEach((item) => {
                 map[`${item.type || (buy.includes(item) ? 'buy' : 'sell')}_${item.method}`] = item.limit;
             });
             return map;
         },
-        kdGoldLimit() { return this.policySettingsMap['buy_kd_gold'] ?? -999; },
-        kdTurnUpLmit() { return this.policySettingsMap['buy_kd_turn_up'] ?? -999; },
-        kdDeadLimit() { return this.policySettingsMap['sell_kd_dead'] ?? -999; },
-        kdTurnDownLmit() { return this.policySettingsMap['sell_kd_turn_down'] ?? -999; },
+        kdGoldLimit() {
+            return this.policySettingsMap['buy_kd_gold'] ?? -999;
+        },
+        kdTurnUpLmit() {
+            return this.policySettingsMap['buy_kd_turn_up'] ?? -999;
+        },
+        kdDeadLimit() {
+            return this.policySettingsMap['sell_kd_dead'] ?? -999;
+        },
+        kdTurnDownLmit() {
+            return this.policySettingsMap['sell_kd_turn_down'] ?? -999;
+        },
 
         chartOptions() {
             // component 參考 https://stackoverflow.com/questions/68381856/how-to-access-highcharts-stock-tooltip-data-in-vue

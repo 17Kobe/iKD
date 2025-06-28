@@ -111,17 +111,7 @@
                             @click="goToStockAnalysis(scope.row.id, scope.row.url)"
                             >{{ scope.row.id }}</span
                         >
-                        <el-tooltip
-                            effect="dark"
-                            placement="top"
-                            :content="
-                                scope.row.star === 3
-                                    ? '3顆星：存股，有賣時先賣1/3，再有賣時再賣1/2'
-                                    : scope.row.star === 2
-                                    ? '2顆星：半存股，有賣時先賣1/2，再有賣時再賣1/2'
-                                    : '1顆星：不存股，有賣時全賣'
-                            "
-                        >
+                        <el-tooltip effect="dark" placement="top" :content="getStarDescription(scope.row)">
                             <el-rate
                                 v-model="scope.row.star"
                                 size="small"
@@ -676,16 +666,7 @@
                                             padding: 2px 4px;
                                             border-radius: 10px 100px / 120px;
                                         "
-                                        >{{
-                                            scope.row.star === 3 &&
-                                            scope.row.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought')
-                                                ? item.method === 'rsi_over_bought'
-                                                    ? '賣½'
-                                                    : item.method === 'kd_dead' || item.method === 'kd_turn_down'
-                                                    ? '賣⅓'
-                                                    : '賣'
-                                                : '賣'
-                                        }}</span
+                                        >{{ getSellLabel(scope.row, item.method) }}</span
                                     >
                                     <!-- : scope.row.policy.settings.sell.some(
                                                       (obj) => obj.method === 'kd_dead' || obj.method === 'kd_turn_down'
@@ -790,8 +771,7 @@
                                                 : '#82e725',
                                     }"
                                 >
-                                    {{ item.buy_or_sell === '現在' ? '今' : item.buy_or_sell
-                                    }}{{ item.unit && item.unit === 0.5 ? '½' : item.unit && item.unit === 0.35 ? '⅓' : '' }}
+                                    {{ item.buy_or_sell === '現在' ? '今' : item.buy_or_sell }}{{ getUnitSymbol(item.unit) }}
                                     <span>
                                         ({{
                                             item.buy_or_sell === '買'
@@ -1415,6 +1395,62 @@ export default {
         },
         handleMouseLeave(id) {
             _.pull(this.showMoreButton, id);
+        },
+        getUnitSymbol(unit) {
+            if (!unit || unit === 1) return '';
+
+            // 處理常見的分數值，考慮浮點數精度問題
+            if (Math.abs(unit - 0.5) < 0.01) return '½';
+            if (Math.abs(unit - 1 / 3) < 0.01) return '⅓';
+            if (Math.abs(unit - 0.25) < 0.01) return '¼';
+            if (Math.abs(unit - 0.2) < 0.01) return '⅕';
+            if (Math.abs(unit - 1 / 6) < 0.01) return '⅙';
+            if (Math.abs(unit - 1 / 7) < 0.01) return '⅐';
+
+            // 對於其他值，顯示百分比
+            return `${Math.round(unit * 100)}%`;
+        },
+        getSellLabel(stock, method) {
+            const sell1_ratio = stock.policy?.settings?.sell1_ratio || 2; // 預設1/2
+            const sell2_ratio = stock.policy?.settings?.sell2_ratio || 3; // 預設1/3
+
+            // 根據 star 和 method 判斷使用哪個比例
+            if (stock.star === 3 && stock.policy.settings.sell.some((obj) => obj.method === 'rsi_over_bought')) {
+                if (method === 'rsi_over_bought') {
+                    return '賣' + this.getUnitSymbol(1 / sell1_ratio);
+                } else if (method === 'kd_dead' || method === 'kd_turn_down') {
+                    return '賣' + this.getUnitSymbol(1 / sell2_ratio);
+                }
+            }
+            return '賣';
+        },
+        getStarDescription(stock) {
+            if (!stock) {
+                return '載入中...';
+            }
+
+            const starText = stock.star === 3 ? '3顆星' : stock.star === 2 ? '2顆星' : '1顆星';
+
+            if (!stock.policy || !stock.policy.settings) {
+                // 如果沒有政策設定，使用預設值描述
+                return `${starText}：尚未設定分批賣出策略`;
+            }
+
+            const sell1_ratio = stock.policy.settings.sell1_ratio || 2; // 預設1/2
+            const sell2_ratio = stock.policy.settings.sell2_ratio || 3; // 預設1/3
+
+            const sell1_symbol = this.getUnitSymbol(1 / sell1_ratio);
+            const sell2_symbol = this.getUnitSymbol(1 / sell2_ratio);
+
+            // 判斷是否為存股策略（只要有一個比例不是全賣就是存股）
+            const isStockHolding = sell1_ratio !== 1 || sell2_ratio !== 1;
+            const stockType = isStockHolding ? '存股' : '不存股';
+
+            if (sell1_ratio === 1 && sell2_ratio === 1) {
+                return `${starText}：${stockType}，有賣時全賣`;
+            } else {
+                return `${starText}：${stockType}，有賣時先賣${sell1_symbol}，再有賣時再賣${sell2_symbol}`;
+            }
         },
     },
 };

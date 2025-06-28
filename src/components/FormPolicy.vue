@@ -2,22 +2,70 @@
     <el-drawer :title="title" @closed="onClosed()" v-model="isShow" :show-close="true" direction="rtl" size="85%">
         <el-form ref="formPolicyBuyRef" :model="form.buy">
             <div style="margin-bottom: 10px">
-                <el-button type="success" size="small" @click="onOptimizePolicyStep1" style="margin-left: 10px">
-                    <i class="el-icon-cpu"></i>&nbsp;參數+1(範圍是目前策略的±4)
-                </el-button>
-
-                <el-button type="success" size="small" @click="onOptimizePolicyStep2" style="margin-left: 10px">
-                    <i class="el-icon-cpu"></i>&nbsp;參數+2
-                </el-button>
-
                 <el-button type="success" size="small" @click="onOptimizePolicyStep3" style="margin-left: 10px">
                     <i class="el-icon-magic-stick"></i>&nbsp;參數+3(快速掃描)
                 </el-button>
+
+                <el-button type="success" size="small" @click="onOptimizePolicyStep1" style="margin-left: 10px">
+                    <i class="el-icon-cpu"></i>&nbsp;參數+1(完美掃描；範圍是目前策略的±4)
+                </el-button>
+
+                <!-- <el-button type="success" size="small" @click="onOptimizePolicyStep2" style="margin-left: 10px">
+                    <i class="el-icon-cpu"></i>&nbsp;參數+2
+                </el-button> -->
             </div>
             <div style="margin-bottom: 10px">
                 <el-button type="warning" size="small" @click="onExportFeature" style="margin-left: 10px">
                     <i class="el-icon-download"></i>&nbsp;匯出訓練特徵檔
                 </el-button>
+            </div>
+
+            <!-- 星星評級顯示 -->
+            <div style="margin-bottom: 20px; margin-left: 10px">
+                <span style="font-size: 16px; margin-right: 10px">星級評等：</span>
+                <el-rate
+                    :model-value="stockStar"
+                    size="small"
+                    :max="3"
+                    disabled
+                    style="display: inline-block; margin-right: 15px"
+                />
+                <span style="font-size: 14px; color: #666">
+                    {{ starDescription }}
+                </span>
+            </div>
+
+            <!-- 分批賣出設定 -->
+            <div v-if="stockStar >= 1" style="margin-bottom: 20px; margin-left: 10px">
+                <div style="font-size: 16px; margin-bottom: 10px">分批賣出設定：</div>
+                <el-row :gutter="10">
+                    <el-col :xs="12" :sm="8" :md="6" :lg="5" :xl="3" style="padding-left: 3px">
+                        <el-form-item label="首次賣出比例">
+                            <el-select v-model="form.sell1_ratio" size="small" style="width: 100%">
+                                <el-option label="全部 (100%)" :value="1"></el-option>
+                                <el-option label="1/2 (50%)" :value="2"></el-option>
+                                <el-option label="1/3 (33%)" :value="3"></el-option>
+                                <el-option label="1/4 (25%)" :value="4"></el-option>
+                                <el-option label="1/5 (20%)" :value="5"></el-option>
+                                <el-option label="1/6 (17%)" :value="6"></el-option>
+                                <el-option label="1/7 (14%)" :value="7"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                    <el-col :xs="12" :sm="8" :md="6" :lg="5" :xl="3" style="padding-left: 3px">
+                        <el-form-item label="再次賣出比例">
+                            <el-select v-model="form.sell2_ratio" size="small" style="width: 100%">
+                                <el-option label="全部 (100%)" :value="1"></el-option>
+                                <el-option label="1/2 (50%)" :value="2"></el-option>
+                                <el-option label="1/3 (33%)" :value="3"></el-option>
+                                <el-option label="1/4 (25%)" :value="4"></el-option>
+                                <el-option label="1/5 (20%)" :value="5"></el-option>
+                                <el-option label="1/6 (17%)" :value="6"></el-option>
+                                <el-option label="1/7 (14%)" :value="7"></el-option>
+                            </el-select>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
             </div>
             <div style="font-size: 24px; margin: 0px 10px 10px">買進策略</div>
 
@@ -150,8 +198,9 @@ export default {
             title: '設定成本',
             stockData: {},
             costList: [],
+            saveTimeout: null,
             // totalNumber: 0,
-            form: { buy: [], sell: [] },
+            form: { buy: [], sell: [], sell1_ratio: 3, sell2_ratio: 2 },
             buyOptions: [
                 {
                     value: 'kd_gold',
@@ -284,9 +333,73 @@ export default {
             ],
         };
     },
-    computed: {},
+    computed: {
+        currentStock() {
+            return this.stockData || {};
+        },
+        stockStar() {
+            return this.stockData && 'star' in this.stockData ? this.stockData.star : 3;
+        },
+        starDescription() {
+            const star = this.stockStar;
+            const starText = star === 3 ? '3顆星' : star === 2 ? '2顆星' : '1顆星';
+
+            // 獲取當前的分批賣出設定
+            const sell1_ratio = this.form.sell1_ratio || (star === 3 ? 3 : star === 2 ? 2 : 1);
+            const sell2_ratio = this.form.sell2_ratio || (star === 3 ? 2 : star === 2 ? 1 : 1);
+
+            const sell1_symbol = this.getUnitSymbol(1 / sell1_ratio);
+            const sell2_symbol = this.getUnitSymbol(1 / sell2_ratio);
+
+            // 判斷是否為存股策略
+            const isStockHolding = sell1_ratio !== 1 || sell2_ratio !== 1;
+            const stockType = isStockHolding ? '存股' : '不存股';
+
+            if (sell1_ratio === 1 && sell2_ratio === 1) {
+                return `${starText}：${stockType}，有賣時全賣`;
+            } else {
+                return `${starText}：${stockType}，有賣時先賣${sell1_symbol}，再有賣時再賣${sell2_symbol}`;
+            }
+        },
+        // 根據星級獲取預設的分批賣出比例
+        getDefaultSellRatios() {
+            const star = this.stockStar;
+            switch (star) {
+                case 1:
+                    return { sell1_ratio: 1, sell2_ratio: 1 }; // 1星：全部,全部
+                case 2:
+                    return { sell1_ratio: 2, sell2_ratio: 1 }; // 2星：1/2,全部
+                case 3:
+                    return { sell1_ratio: 3, sell2_ratio: 2 }; // 3星：1/3,1/2
+                default:
+                    return { sell1_ratio: 1, sell2_ratio: 1 };
+            }
+        },
+    },
+    watch: {
+        // 已移除 selection 變更時的自動儲存，改為在 onClosed 統一儲存
+    },
     mounted() {},
+    beforeUnmount() {
+        if (this.saveTimeout) {
+            clearTimeout(this.saveTimeout);
+        }
+    },
     methods: {
+        getUnitSymbol(unit) {
+            if (!unit || unit === 1) return '';
+
+            // 處理常見的分數值，考慮浮點數精度問題
+            if (Math.abs(unit - 0.5) < 0.01) return '½';
+            if (Math.abs(unit - 1 / 3) < 0.01) return '⅓';
+            if (Math.abs(unit - 0.25) < 0.01) return '¼';
+            if (Math.abs(unit - 0.2) < 0.01) return '⅕';
+            if (Math.abs(unit - 1 / 6) < 0.01) return '⅙';
+            if (Math.abs(unit - 1 / 7) < 0.01) return '⅐';
+
+            // 對於其他值，顯示百分比
+            return `${Math.round(unit * 100)}%`;
+        },
         onAddBuy() {
             console.log('onAddBuy');
 
@@ -433,6 +546,9 @@ export default {
             // eslint-disable-next-line prefer-destructuring
             this.title = `${this.stockData.name}(${this.stockData.id}) 設定買賣策略`;
 
+            // 取得預設比例
+            const defaultRatios = this.getDefaultSellRatios;
+
             // 深拷貝，不然一直畫KD的橫線
             if (_.has(this.stockData, 'policy.settings')) {
                 this.form = _.cloneDeep(this.stockData.policy.settings);
@@ -443,7 +559,36 @@ export default {
                         item.limit = moment(newDateString, 'YYYY/MM/DD');
                     }
                 });
-            } else this.form = { buy: [], sell: [] };
+
+                // 從資料庫讀取分批賣出設定，若無則使用預設值並保存
+                let needSave = false;
+                if (this.form.sell1_ratio === undefined || this.form.sell1_ratio === null) {
+                    this.form.sell1_ratio = defaultRatios.sell1_ratio;
+                    needSave = true;
+                }
+                if (this.form.sell2_ratio === undefined || this.form.sell2_ratio === null) {
+                    this.form.sell2_ratio = defaultRatios.sell2_ratio;
+                    needSave = true;
+                }
+
+                // 如果設定了新的預設值，立即保存到資料庫
+                if (needSave) {
+                    this.$nextTick(() => {
+                        this.saveSellRatios();
+                    });
+                }
+            } else {
+                this.form = {
+                    buy: [],
+                    sell: [],
+                    sell1_ratio: defaultRatios.sell1_ratio,
+                    sell2_ratio: defaultRatios.sell2_ratio,
+                };
+                // 新建的策略設定，立即保存預設值到資料庫
+                this.$nextTick(() => {
+                    this.saveSellRatios();
+                });
+            }
 
             // this.$nextTick(() => {
             // this.$refs.cost0[0].focus();
@@ -457,9 +602,9 @@ export default {
             let bestPolicy = null;
 
             // 取得目前設定
-            const buy = this.form.buy.find(item => item.method === 'kd_gold');
-            const sellKD = this.form.sell.find(item => item.method === 'kd_dead');
-            const sellRSI = this.form.sell.find(item => item.method === 'rsi_over_bought');
+            const buy = this.form.buy.find((item) => item.method === 'kd_gold');
+            const sellKD = this.form.sell.find((item) => item.method === 'kd_dead');
+            const sellRSI = this.form.sell.find((item) => item.method === 'rsi_over_bought');
             const kdGoldBase = buy ? Number(buy.limit) : 50;
             const kdDeadBase = sellKD ? Number(sellKD.limit) : 80;
             const rsiOverBoughtBase = sellRSI ? Number(sellRSI.limit) : 95;
@@ -481,7 +626,11 @@ export default {
                                         bestPolicy = _.cloneDeep(policyList);
                                         // 立即印出
                                         console.log(
-                                            `目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${bestParams?.kdGold ?? '-'}，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${bestParams?.rsiOverBought ?? '-'})`
+                                            `目前最佳報酬率: ${bestReturn}（最佳參數: KD黃金交叉≤${
+                                                bestParams?.kdGold ?? '-'
+                                            }，KD死亡交叉≥${bestParams?.kdDead ?? '-'}，RSI超買≥${
+                                                bestParams?.rsiOverBought ?? '-'
+                                            })`
                                         );
                                     }
                                 }
@@ -500,7 +649,9 @@ export default {
             if (bestPolicy) {
                 this.form = bestPolicy;
                 this.$message.success(
-                    `最佳參數：KD黃金交叉≤${bestParams.kdGold}，KD死亡交叉≥${bestParams.kdDead}，RSI超買≥${bestParams.rsiOverBought}，單位報酬率${bestReturn.toFixed(2)}%`
+                    `最佳參數：KD黃金交叉≤${bestParams.kdGold}，KD死亡交叉≥${bestParams.kdDead}，RSI超買≥${
+                        bestParams.rsiOverBought
+                    }，單位報酬率${bestReturn.toFixed(2)}%`
                 );
                 console.log('※最佳參數', bestParams);
                 console.log('※最佳單位報酬率', bestReturn);
@@ -856,7 +1007,38 @@ export default {
             );
         },
 
+        // 保存分批賣出比例設定
+        saveSellRatios() {
+            if (!this.stockId) return;
+
+            // 使用 debounce 避免頻繁保存
+            if (this.saveTimeout) {
+                clearTimeout(this.saveTimeout);
+            }
+
+            this.saveTimeout = setTimeout(() => {
+                // 直接使用 this.form，因為它已經包含完整的設定
+                this.$store.commit('SAVE_STOCK_POLICY', {
+                    stockId: this.stockId,
+                    policyList: this.form,
+                });
+                console.log(`已保存 ${this.stockData.name}(${this.stockId}) 分批賣出設定:`, {
+                    星級: this.stockData.star,
+                    sell1_ratio: this.form.sell1_ratio,
+                    sell2_ratio: this.form.sell2_ratio,
+                });
+            }, 500); // 延遲 500ms 保存
+        },
+
         onClosed() {
+            console.log('FormPolicy onClosed - 開始儲存', {
+                stockId: this.stockId,
+                formBuy: this.form.buy.length,
+                formSell: this.form.sell.length,
+                sell1Ratio: this.form.sell1_ratio,
+                sell2Ratio: this.form.sell2_ratio,
+            });
+
             // 將日期轉成 'MM/DD'，方便顯示及計算
             _.forEach([...this.form.buy, ...this.form.sell], (item) => {
                 if (
@@ -868,6 +1050,9 @@ export default {
                 }
             });
 
+            console.log('FormPolicy onClosed - 即將儲存的設定', this.form);
+
+            // 直接使用 this.form，因為它已經包含完整的設定
             this.$store.commit('SAVE_STOCK_POLICY', {
                 stockId: this.stockId,
                 policyList: this.form,
