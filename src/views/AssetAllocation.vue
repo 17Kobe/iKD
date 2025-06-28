@@ -266,6 +266,18 @@
             </el-col> -->
         </el-row>
 
+        <!-- 還原功能區域 -->
+        <el-row style="margin-bottom: 8px; padding: 0 4px">
+            <el-col :span="24" style="text-align: left">
+                <el-button type="warning" size="small" @click="onUndo" :disabled="!canUndo" round plain>
+                    <i class="el-icon-refresh-left"></i> 還原 ({{ assetListHistory.length }}/20)
+                </el-button>
+                <el-button type="info" size="small" @click="onRedo" :disabled="!canRedo" round plain>
+                    <i class="el-icon-refresh-right"></i> 重做
+                </el-button>
+            </el-col>
+        </el-row>
+
         <div style="font-size: 14px; color: #999; margin: 20px">
             <div>
                 【帳戶】請輸入帳戶名稱，輸入若包括關鍵字(活存|現金、
@@ -325,6 +337,8 @@ export default {
     data() {
         return {
             assetList: [],
+            assetListHistory: [], // 資產列表歷史記錄，最多保存20次
+            currentHistoryIndex: -1, // 當前歷史記錄索引
             lineOptions: {
                 // 隱藏點
                 elements: {
@@ -455,6 +469,12 @@ export default {
         };
     },
     computed: {
+        canUndo() {
+            return this.currentHistoryIndex > 0;
+        },
+        canRedo() {
+            return this.currentHistoryIndex < this.assetListHistory.length - 1;
+        },
         historyAssetList() {
             return this.$store.getters.getHistoryAssetList();
         },
@@ -1241,8 +1261,86 @@ export default {
         // 利息清單，這也有點算歷史，因為每年都有
         const localInterestList = JSON.parse(localStorage.getItem('interestList')) || [];
         this.$store.commit('SAVE_INTEREST', localInterestList);
+
+        // 初始化歷史記錄
+        this.initializeHistory();
+
+        // 初始化 debounced 保存歷史記錄的方法
+        this.debouncedSaveHistory = _.debounce(this.saveToHistory, 1000);
     },
     methods: {
+        // 初始化歷史記錄
+        initializeHistory() {
+            // 從 localStorage 載入歷史記錄
+            const savedHistory = JSON.parse(localStorage.getItem('assetListHistory')) || [];
+            this.assetListHistory = savedHistory;
+            this.currentHistoryIndex = savedHistory.length - 1;
+
+            // 如果沒有歷史記錄，保存當前狀態作為第一個記錄
+            if (this.assetListHistory.length === 0) {
+                this.saveToHistory();
+            }
+        },
+
+        // 保存當前狀態到歷史記錄
+        saveToHistory() {
+            // 深拷貝當前 assetList
+            const currentState = JSON.parse(JSON.stringify(this.assetList));
+
+            // 如果當前不是最新狀態（即用戶執行了 undo），則刪除後面的記錄
+            if (this.currentHistoryIndex < this.assetListHistory.length - 1) {
+                this.assetListHistory.splice(this.currentHistoryIndex + 1);
+            }
+
+            // 添加新的狀態
+            this.assetListHistory.push(currentState);
+
+            // 保持最多20個記錄
+            if (this.assetListHistory.length > 20) {
+                this.assetListHistory.shift();
+            } else {
+                this.currentHistoryIndex++;
+            }
+
+            // 保存到 localStorage
+            localStorage.setItem('assetListHistory', JSON.stringify(this.assetListHistory));
+        },
+
+        // 還原上一個狀態
+        onUndo() {
+            if (this.canUndo) {
+                this.currentHistoryIndex--;
+                this.restoreFromHistory();
+                ElMessage({
+                    type: 'success',
+                    message: `已還原到第 ${this.currentHistoryIndex + 1} 個狀態`,
+                });
+            }
+        },
+
+        // 重做下一個狀態
+        onRedo() {
+            if (this.canRedo) {
+                this.currentHistoryIndex++;
+                this.restoreFromHistory();
+                ElMessage({
+                    type: 'success',
+                    message: `已重做到第 ${this.currentHistoryIndex + 1} 個狀態`,
+                });
+            }
+        },
+
+        // 從歷史記錄恢復狀態
+        restoreFromHistory() {
+            if (this.currentHistoryIndex >= 0 && this.currentHistoryIndex < this.assetListHistory.length) {
+                // 深拷貝歷史狀態
+                this.assetList = JSON.parse(JSON.stringify(this.assetListHistory[this.currentHistoryIndex]));
+
+                // 更新 store 和 localStorage
+                this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
+            }
+        },
+
         onAddDeposit() {
             console.log('onAddDeposit');
 
@@ -1251,6 +1349,9 @@ export default {
                 amount: 0,
                 isPositive: true,
             });
+
+            // 保存到歷史記錄
+            this.saveToHistory();
 
             this.$nextTick(() => {
                 this.$refs[`deposit${index - 1}`][0].focus();
@@ -1264,6 +1365,9 @@ export default {
                 amount: 0,
                 isPositive: false,
             });
+
+            // 保存到歷史記錄
+            this.saveToHistory();
 
             this.$nextTick(() => {
                 this.$refs[`debt${index - 1}`][0].focus();
@@ -1280,6 +1384,10 @@ export default {
                     .then(() => {
                         this.assetList.splice(index, 1);
                         this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
+
+                        // 保存到歷史記錄
+                        this.saveToHistory();
+
                         ElMessage({
                             type: 'success',
                             message: '完成刪除!',
@@ -1295,6 +1403,9 @@ export default {
                 // 沒有名稱，可能剛新增就想刪，就直接刪
                 this.assetList.splice(index, 1);
                 this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
+
+                // 保存到歷史記錄
+                this.saveToHistory();
             }
         },
         onAddInterest() {
@@ -1304,6 +1415,11 @@ export default {
             localStorage.removeItem('assetList');
             localStorage.removeItem('dividendList');
             localStorage.removeItem('crawlerDividendLastDate');
+
+            // 清除歷史記錄
+            localStorage.removeItem('assetListHistory');
+            this.assetListHistory = [];
+            this.currentHistoryIndex = -1;
         },
         onChangeAccount(e, index) {
             // console.log('onChangeAccount');
@@ -1312,6 +1428,9 @@ export default {
             // console.log(e.target.value);
             this.assetList[index].account = e;
             this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
+
+            // 使用 debounce 延遲保存歷史記錄，避免每次輸入都保存
+            this.debouncedSaveHistory();
         },
         onChangeAmount(e, index) {
             // console.log('onChangeAmount');
@@ -1319,6 +1438,9 @@ export default {
             // console.log(e.target.value);
             this.assetList[index].amount = e.target.value ? parseInt(e.target.value, 10) : 0;
             this.$store.commit('SAVE_ASSET', this.chgAssetListBrief(this.assetList));
+
+            // 使用 debounce 延遲保存歷史記錄，避免每次輸入都保存
+            this.debouncedSaveHistory();
         },
         // onChangeDepositAmount(e, index) {
         //     console.log('onChangeAmount');
