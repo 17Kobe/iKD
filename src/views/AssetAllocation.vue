@@ -438,17 +438,17 @@ export default {
                         },
                     },
                     legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 6,
-                            boxWidth: 10,
-                            boxHeight: 10,
-                            font: {
-                                size: 11,
-                            },
-                        },
+                        display: false,
+                        // position: 'top',
+                        // labels: {
+                        //     usePointStyle: true,
+                        //     padding: 6,
+                        //     boxWidth: 10,
+                        //     boxHeight: 10,
+                        //     font: {
+                        //         size: 11,
+                        //     },
+                        // },
                     },
                 },
             },
