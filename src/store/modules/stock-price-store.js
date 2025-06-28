@@ -4,6 +4,22 @@ import _ from 'lodash';
 import { saveStockToDb, delStockToDb, delStockListToDb, saveStockListToDb } from '@/shared/idbUtils.js';
 import GlobalSettings from '@/store/data/global-settings.json';
 
+// Helper function for unit symbol conversion
+function getUnitSymbol(unit) {
+    if (!unit || unit === 1) return '';
+
+    // 處理常見的分數值，考慮浮點數精度問題
+    if (Math.abs(unit - 0.5) < 0.01) return '½';
+    if (Math.abs(unit - 1 / 3) < 0.01) return '⅓';
+    if (Math.abs(unit - 0.25) < 0.01) return '¼';
+    if (Math.abs(unit - 0.2) < 0.01) return '⅕';
+    if (Math.abs(unit - 1 / 6) < 0.01) return '⅙';
+    if (Math.abs(unit - 1 / 7) < 0.01) return '⅐';
+
+    // 對於其他值，顯示百分比
+    return `${Math.round(unit * 100)}%`;
+}
+
 const defaultState = {
     // usdExchange: 30,
     stockList: [], // 目前知道 ios 在 19支股票，>=19會不能儲存localstorage
@@ -2500,24 +2516,12 @@ const stock = {
                         ) {
                             if (!isCancelToSell) {
                                 // 根據 unit 值顯示對應的賣出比例
-                                if (unit === 1) foundStock.badge = '賣';
-                                else if (unit === 0.5) foundStock.badge = '賣½';
-                                else if (unit === 1 / 3) foundStock.badge = '賣⅓';
-                                else if (unit === 0.25) foundStock.badge = '賣¼';
-                                else if (unit === 0.2) foundStock.badge = '賣⅕';
-                                else if (unit === 1 / 6) foundStock.badge = '賣⅙';
-                                else if (unit === 1 / 7) foundStock.badge = '賣⅐';
-                                else foundStock.badge = `賣${Math.round(unit * 100)}%`;
+                                const unitSymbol = getUnitSymbol(unit);
+                                foundStock.badge = unitSymbol ? `賣${unitSymbol}` : '賣';
                             } else {
                                 // 取消賣出的顯示
-                                if (unit === 1) foundStock.badge = '取消賣';
-                                else if (unit === 0.5) foundStock.badge = '取消賣½';
-                                else if (unit === 1 / 3) foundStock.badge = '取消賣⅓';
-                                else if (unit === 0.25) foundStock.badge = '取消賣¼';
-                                else if (unit === 0.2) foundStock.badge = '取消賣⅕';
-                                else if (unit === 1 / 6) foundStock.badge = '取消賣⅙';
-                                else if (unit === 1 / 7) foundStock.badge = '取消賣⅐';
-                                else foundStock.badge = `取消賣${Math.round(unit * 100)}%`;
+                                const unitSymbol = getUnitSymbol(unit);
+                                foundStock.badge = unitSymbol ? `取消賣${unitSymbol}` : '取消賣';
                             }
                             foundStock.badge_reason = obj.reason;
                         }
@@ -2820,7 +2824,10 @@ const stock = {
                             const lastK = lastArray[1];
                             const lastD = lastArray[2];
                             if (lastK >= foundKdDead.limit && lastK > lastD) {
-                                foundStock.badge = foundRsiOverBought ? '準賣½' : '準賣'; // K要大於D，才是訊號前的準備
+                                // 根據分批賣出設定顯示適當的 badge
+                                const sell1_ratio = foundStock.policy?.settings?.sell1_ratio || 1;
+                                const sell1_symbol = getUnitSymbol(1 / sell1_ratio);
+                                foundStock.badge = foundRsiOverBought ? `準賣${sell1_symbol}` : '準賣'; // K要大於D，才是訊號前的準備
                                 foundStock.badge_reason.push('kd_dead');
                             }
                         }
@@ -2828,7 +2835,10 @@ const stock = {
                             const lastestK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 1][1];
                             const lastSecondK = foundTempStock.data.weekly_kdj[foundTempStock.data.weekly_kdj.length - 2][1];
                             if (lastestK >= foundKdTurnDown.limit && lastestK > lastSecondK) {
-                                foundStock.badge = foundRsiOverBought ? '準賣½' : '準賣';
+                                // 根據分批賣出設定顯示適當的 badge
+                                const sell1_ratio = foundStock.policy?.settings?.sell1_ratio || 1;
+                                const sell1_symbol = getUnitSymbol(1 / sell1_ratio);
+                                foundStock.badge = foundRsiOverBought ? `準賣${sell1_symbol}` : '準賣';
                                 foundStock.badge_reason.push('kd_turn_down');
                             }
                         }
@@ -2882,8 +2892,11 @@ const stock = {
                                             kdMGoldTimes >= foundKdM.limit - 1 &&
                                             moment(item[0]).diff(moment(preKdWTurnUpDate), 'days') <= 330
                                         ) {
-                                            foundStock.badge = '準賣x2';
-                                            foundStock.badge_reason.push('kd_w');
+                                            // 根據分批賣出設定顯示適當的 badge
+                                            const sell1_ratio = foundStock.policy?.settings?.sell1_ratio || 1;
+                                            const sell1_symbol = getUnitSymbol(1 / sell1_ratio);
+                                            foundStock.badge = sell1_ratio !== 1 ? `準賣x2${sell1_symbol}` : '準賣x2';
+                                            foundStock.badge_reason.push('kd_m');
                                         }
                                     }
 
@@ -2894,7 +2907,10 @@ const stock = {
                             const lastArray = foundTempStock.data.weekly_rsi[foundTempStock.data.weekly_rsi.length - 1];
                             const lastRsi = lastArray[1];
                             if (lastRsi >= foundRsiOverBought.limit - 3) {
-                                foundStock.badge = '準賣'; // K要大於D，才是訊號前的準備
+                                // 根據分批賣出設定顯示適當的 badge
+                                const sell1_ratio = foundStock.policy?.settings?.sell1_ratio || 1;
+                                const sell1_symbol = getUnitSymbol(1 / sell1_ratio);
+                                foundStock.badge = sell1_ratio !== 1 ? `準賣${sell1_symbol}` : '準賣'; // K要大於D，才是訊號前的準備
                                 foundStock.badge_reason.push('rsi_over_bought');
                             }
                         }
@@ -2902,7 +2918,10 @@ const stock = {
                             const today = moment().startOf('day');
                             const limit = moment(foundAnnualFixedDateSell.limit, 'MM/DD').year(today.year());
                             if (limit.diff(today, 'days') <= 3 && limit.diff(today, 'days') >= 0) {
-                                foundStock.badge = '準賣';
+                                // 根據分批賣出設定顯示適當的 badge
+                                const sell1_ratio = foundStock.policy?.settings?.sell1_ratio || 1;
+                                const sell1_symbol = getUnitSymbol(1 / sell1_ratio);
+                                foundStock.badge = sell1_ratio !== 1 ? `準賣${sell1_symbol}` : '準賣';
                                 foundStock.badge_reason.push('annual_fixed_date_sell');
                             }
                         }
@@ -2917,7 +2936,16 @@ const stock = {
             // if (foundFairValueStock) {
             //     kdStatus.push('合理價 ' + foundFairValueStock.fair_value);
             // }
-            if (['買', '賣', '取消買', '取消買x2', '取消賣', '取消賣½'].includes(foundStock.badge)) {
+            // 檢查 badge 是否為買賣相關
+            const isTradingBadgeKd =
+                foundStock.badge &&
+                (foundStock.badge === '買' ||
+                    foundStock.badge.startsWith('賣') ||
+                    foundStock.badge === '取消買' ||
+                    foundStock.badge === '取消買x2' ||
+                    foundStock.badge.startsWith('取消賣'));
+
+            if (isTradingBadgeKd) {
                 if (foundStock.badge_reason.includes('kd_gold')) kdStatus.push('KD 黃金交叉');
                 if (foundStock.badge_reason.includes('kd_turn_up')) kdStatus.push('KD 往上轉折');
                 if (foundStock.badge_reason.includes('kd_w')) kdStatus.push('KD W底');
@@ -2944,7 +2972,16 @@ const stock = {
 
             // 算 rsi線圖的 badge
             let rsiStatus = [];
-            if (['買', '賣', '取消買', '取消買x2', '取消賣', '取消賣½'].includes(foundStock.badge)) {
+            // 檢查 badge 是否為買賣相關
+            const isTradingBadgeRsi =
+                foundStock.badge &&
+                (foundStock.badge === '買' ||
+                    foundStock.badge.startsWith('賣') ||
+                    foundStock.badge === '取消買' ||
+                    foundStock.badge === '取消買x2' ||
+                    foundStock.badge.startsWith('取消賣'));
+
+            if (isTradingBadgeRsi) {
                 if (foundStock.badge_reason.includes('rsi_over_bought')) rsiStatus.push('RSI 超買');
                 if (foundStock.badge_reason.includes('rsi_over_sold')) rsiStatus.push('RSI 超賣');
                 if (foundStock.badge_reason.includes('rsi_turn_down')) rsiStatus.push('RSI 往下轉折');
@@ -3156,13 +3193,16 @@ const stock = {
     },
     getters: {
         // http://localhost:3300/#/?export=true
+        // 我猜是LINE用的
         // 增加 query 判斷，query有可能是 {} 或 {export:true}，若 export =true 時才要 filter，否則不要filter
         getStockNoDataSortedList: (state) => (query) => {
             // 產生不含 .data 的股票清單
             let filteredList = state.stockList;
             if (query && query.export) {
                 filteredList = _.filter(filteredList, (stock) => {
-                    return stock.badge === '買' || stock.badge === '賣';
+                    return (
+                        stock.badge === '買' || (stock.badge && stock.badge.startsWith('賣') && !stock.badge.startsWith('準賣'))
+                    );
                 });
             }
             // 用 _.map 複製每個物件並移除 .data
@@ -3347,11 +3387,11 @@ const stock = {
                     (obj) => {
                         if (obj.badge === '買') {
                             return 0;
-                        } else if (obj.badge === '準買') {
+                        } else if (obj.badge === '準買' || obj.badge === '準買x2') {
                             return 2;
-                        } else if (obj.badge === '賣') {
+                        } else if (obj.badge && obj.badge.startsWith('賣') && !obj.badge.startsWith('準賣')) {
                             return 3;
-                        } else if (obj.badge === '準賣') {
+                        } else if (obj.badge && obj.badge.startsWith('準賣')) {
                             return 4;
                         } else {
                             return 5;
