@@ -9,7 +9,7 @@
             <el-col :xs="12" :sm="10" :md="7" :lg="7" :xl="5" style="display: flex; padding: 4px 4px 0 2px">
                 <el-card shadow="hover" style="flex: 1" id="line-chart-card">
                     <div style="font-size: 12px; text-align: center; font-weight: bold; margin-top: 2px; color: #6c6c6c">
-                        資產與負債走勢 (今日資產: $
+                        財務走勢 (今日增減: $
                         <span :style="[todayAsset >= 0 ? { color: '#409eff' } : { color: '#f56c6c' }]">{{
                             (todayAsset >= 0 ? '+' : '') + todayAsset.toLocaleString('en-US')
                         }}</span
@@ -442,7 +442,12 @@ export default {
                         position: 'top',
                         labels: {
                             usePointStyle: true,
-                            padding: 20,
+                            padding: 6,
+                            boxWidth: 10,
+                            boxHeight: 10,
+                            font: {
+                                size: 11,
+                            },
                         },
                     },
                 },
