@@ -1471,6 +1471,23 @@ const stock = {
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             await saveStockListToDb('stockList', state.stockList);
         },
+        
+        // 批量更新股票順序 - 用於優化移動操作性能
+        async BATCH_UPDATE_STOCK_ORDER(state, orderedStockList) {
+            console.log('BATCH_UPDATE_STOCK_ORDER');
+            
+            // 根據暫存列表的順序更新 store 中的股票 order 屬性
+            orderedStockList.forEach((localStock, index) => {
+                const storeStock = state.stockList.find(v => v.id === localStock.id);
+                if (storeStock) {
+                    storeStock.order = index + 1;
+                }
+            });
+            
+            // 一次性保存到 IndexedDB
+            await saveStockListToDb('stockList', state.stockList);
+        },
+        
         async DEL_A_STOCK(state, data) {
             // data 是 object {name: XXX, id: XXX}
             console.log('DEL_A_STOCK');

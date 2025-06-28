@@ -67,6 +67,9 @@
             </el-table-column>
         </el-table>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;總數量：{{ customStockList.length }}
+        <span v-if="hasLocalChanges" style="color: #e6a23c; margin-left: 10px;">
+            <i class="el-icon-warning"></i> 有未保存的順序變更，關閉視窗時將自動保存
+        </span>
         <br />
         <br />
         <el-row>
@@ -138,7 +141,7 @@ export default {
         const validateDuplcate = (rule, value, callback) => {
             // console.log(value);
 
-            if (_.some(this.customStockList, { id: value })) {
+            if (_.some(this.localCustomStockList, { id: value })) {
                 const selected = _.find(this.stockOptions, ['value', this.form.stockId]);
                 callback(new Error(`${selected.label}(${value}) 已存在!`));
             } else {
@@ -149,6 +152,10 @@ export default {
             isShow: false,
             title: '新增股票',
             realtimeStock: false,
+
+            // 暫存的股票列表，用於快速移動操作
+            localCustomStockList: [],
+            hasLocalChanges: false, // 標記是否有未保存的變更
 
             activeNames: ['1'],
 
@@ -278,8 +285,8 @@ export default {
             return this.$store.state.taiwan.taiwanStockList;
         },
         customStockList() {
-            // return this.$store.state.price.stockList;
-            return this.$store.getters.getStockNoDataSortedList();
+            // 如果有本地變更，使用暫存列表；否則使用 store 中的資料
+            return this.hasLocalChanges ? this.localCustomStockList : this.$store.getters.getStockNoDataSortedList();
         },
         // stockList() {
         //     return this.$store.state.price.stockList;
@@ -334,6 +341,13 @@ export default {
                     // 選到的
                     const selected = _.find(this.stockOptions, ['value', this.form.stockId]);
                     this.$store.commit('SAVE_A_STOCK', { name: selected.label, id: selected.value, type: selected.type });
+                    
+                    // 如果有暫存變更，重置暫存狀態以重新從 store 獲取最新資料
+                    if (this.hasLocalChanges) {
+                        this.hasLocalChanges = false;
+                        this.localCustomStockList = [];
+                    }
+                    
                     return true;
                 }
                 console.log('error submit!!');
@@ -349,6 +363,16 @@ export default {
                 .then(() => {
                     // console.log(stockId);
                     this.$store.commit('DEL_A_STOCK', stockId);
+                    
+                    // 如果有暫存變更，也從暫存列表中移除該項目
+                    if (this.hasLocalChanges) {
+                        _.remove(this.localCustomStockList, (item) => item.id === stockId);
+                        // 重新調整順序
+                        this.localCustomStockList.forEach((item, index) => {
+                            item.order = index + 1;
+                        });
+                    }
+                    
                     // this.$store.commit('DEL_A_STOCK_DIVIDENDLIST', stockId);
                     ElMessage({
                         type: 'success',
@@ -363,7 +387,35 @@ export default {
                 });
         },
         onMove(stockId, direction) {
-            this.$store.commit('MOVE_A_STOCK', { stockId, direction });
+            // 使用暫存列表進行快速移動操作
+            if (!this.hasLocalChanges) {
+                // 首次移動時，初始化暫存列表
+                this.localCustomStockList = JSON.parse(JSON.stringify(this.$store.getters.getStockNoDataSortedList()));
+                this.hasLocalChanges = true;
+            }
+
+            // 在暫存列表中執行移動操作
+            const currentIndex = this.localCustomStockList.findIndex(item => item.id === stockId);
+            if (currentIndex === -1) return;
+
+            let targetIndex;
+            if (direction === 'top' && currentIndex > 0) {
+                targetIndex = currentIndex - 1;
+            } else if (direction === 'bottom' && currentIndex < this.localCustomStockList.length - 1) {
+                targetIndex = currentIndex + 1;
+            } else {
+                return; // 無法移動
+            }
+
+            // 交換位置
+            const temp = this.localCustomStockList[currentIndex];
+            this.localCustomStockList[currentIndex] = this.localCustomStockList[targetIndex];
+            this.localCustomStockList[targetIndex] = temp;
+
+            // 更新 order 屬性
+            this.localCustomStockList.forEach((item, index) => {
+                item.order = index + 1;
+            });
         },
         onChangeBackgroundColor(stockId) {
             this.$store.commit('SAVE_STOCK_BACKGROUND_COLOR', stockId);
@@ -371,6 +423,11 @@ export default {
         onInit() {
             console.log('onInit');
             this.isShow = true;
+            
+            // 重置暫存狀態
+            this.hasLocalChanges = false;
+            this.localCustomStockList = [];
+            
             // 讀取 localStorage 中的 'realtimeStock' 數據
             const realtimeStockValue = localStorage.getItem('realtimeStock');
 
@@ -389,14 +446,34 @@ export default {
         },
         onClosed() {
             localStorage.setItem('realtimeStock', this.realtimeStock);
-            // console.log(this.form);
-            // this.$store.commit('SAVE_STOCK_COST', {
-            //     stockId: this.stockId,
-            //     costList: this.form,
-            //     totalOfShares: this.totalOfShares,
-            //     averageCost: this.averageCost,
-            //     sumCost: this.sumCost,
-            // });
+            
+            // 如果有未保存的變更，批量保存到 store
+            if (this.hasLocalChanges) {
+                this.saveLocalChangesToStore();
+            }
+        },
+        
+        // 將暫存的變更批量保存到 store
+        async saveLocalChangesToStore() {
+            try {
+                // 批量更新 store 中的股票順序
+                this.$store.commit('BATCH_UPDATE_STOCK_ORDER', this.localCustomStockList);
+                
+                // 重置暫存狀態
+                this.hasLocalChanges = false;
+                this.localCustomStockList = [];
+                
+                ElMessage({
+                    type: 'success',
+                    message: '順序已保存！',
+                });
+            } catch (error) {
+                console.error('保存順序失敗:', error);
+                ElMessage({
+                    type: 'error',
+                    message: '保存順序失敗！',
+                });
+            }
         },
         cancelReadOnly(value) {
             this.$nextTick(() => {
