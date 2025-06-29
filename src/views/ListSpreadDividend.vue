@@ -490,12 +490,26 @@
             </el-table-column>
         </el-table>
 
+        <!-- ================================ 價差走勢圖 -->
+        <el-row style="margin-top: 20px">
+            <el-col :xs="24" :sm="22" :md="18" :lg="16" :xl="14" style="padding: 4px 2px 0 4px">
+                <el-card shadow="hover" style="height: 450px">
+                    <div style="font-size: 14px; text-align: center; font-weight: bold; margin-bottom: 8px; color: #6c6c6c">
+                        價差走勢圖 (近6個月)
+                    </div>
+                    <div style="height: 380px; position: relative">
+                        <LineChart :chartData="spreadTrendData" :options="spreadTrendOptions" style="height: 100%; width: 100%" />
+                    </div>
+                </el-card>
+            </el-col>
+        </el-row>
+
         <!-- ================================ 股利走勢圖 -->
         <el-row style="margin-top: 20px">
             <el-col :xs="24" :sm="22" :md="18" :lg="16" :xl="14" style="padding: 4px 2px 0 4px">
                 <el-card shadow="hover" style="height: 450px">
                     <div style="font-size: 14px; text-align: center; font-weight: bold; margin-bottom: 8px; color: #6c6c6c">
-                        股利走勢圖
+                        股利走勢圖 (近2年)
                     </div>
                     <div style="height: 380px; position: relative">
                         <LineChart
@@ -579,6 +593,182 @@ export default {
                 (acc, { number_of_shares, earnings_distribution }) => acc + Math.round(number_of_shares * earnings_distribution),
                 0
             );
+        },
+
+        // 價差走勢圖相關計算屬性
+        spreadTrendData() {
+            const sixMonthsAgo = moment().subtract(6, 'months');
+            const now = moment();
+
+            // 收集所有有持倉的股票
+            const stocksWithCost = this.$store.getters.getSpreadList('目前').filter((stock) => stock.cost);
+
+            // 創建日期範圍內的每日價差數據
+            const dailySpreadData = {};
+
+            stocksWithCost.forEach((stock) => {
+                if (!stock.data || !stock.data.daily || !stock.cost.settings) return;
+
+                // 遍歷每日股價數據
+                stock.data.daily.forEach((dailyPrice) => {
+                    const dateStr = dailyPrice[0];
+                    const dateMoment = moment(dateStr);
+
+                    // 只處理最近6個月的數據
+                    if (!dateMoment.isBetween(sixMonthsAgo, now, 'day', '[]')) return;
+
+                    // 獲取該日期的股價 (收盤價)
+                    const closePrice = dailyPrice.length === 2 ? dailyPrice[1] : dailyPrice[4];
+
+                    // 計算該日期該股票的持有股數和成本
+                    let totalShares = 0;
+                    let totalCost = 0;
+
+                    stock.cost.settings.forEach((purchase) => {
+                        const buyDate = moment(purchase.buy_date);
+                        // 只計算在該日期前購買的股票
+                        if (buyDate.isSameOrBefore(dateMoment)) {
+                            totalShares += purchase.number;
+                            totalCost += purchase.number * purchase.cost;
+                        }
+                    });
+
+                    if (totalShares > 0) {
+                        const avgCost = totalCost / totalShares;
+                        const marketValue = totalShares * closePrice;
+                        const spread = marketValue - totalCost;
+
+                        // 累加到該日期的總價差
+                        if (!dailySpreadData[dateStr]) {
+                            dailySpreadData[dateStr] = 0;
+                        }
+                        dailySpreadData[dateStr] += spread;
+                    }
+                });
+            });
+
+            // 轉換為圖表數據格式
+            const dataPoints = Object.keys(dailySpreadData)
+                .sort()
+                .map((dateStr) => ({
+                    x: moment(dateStr).toDate(),
+                    y: Math.round(dailySpreadData[dateStr]),
+                }));
+
+            return {
+                datasets: [
+                    {
+                        label: '價差走勢',
+                        data: dataPoints,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        pointRadius: 0, // 隱藏所有數據點，避免密密麻麻的效果
+                        pointHoverRadius: 6,
+                        tension: 0, // 直線連接，不平滑
+                    },
+                ],
+            };
+        },
+
+        spreadTrendOptions() {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 15,
+                        bottom: 5,
+                        left: 5,
+                        right: 15,
+                    },
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'month',
+                            displayFormats: {
+                                month: 'M',
+                            },
+                            tooltipFormat: 'YYYY/MM/DD',
+                        },
+                        ticks: {
+                            maxTicksLimit: 6,
+                            padding: 5,
+                            callback: function (value, index, ticks) {
+                                // 從 ticks 陣列中取得實際的時間戳
+                                const tickItem = ticks[index];
+                                if (!tickItem || !tickItem.value) return '';
+
+                                const date = moment(tickItem.value);
+
+                                // 確保日期有效
+                                if (!date.isValid()) return '';
+
+                                const month = date.month() + 1;
+                                const year = date.year();
+
+                                // 強制顯示每年的1月
+                                if (month === 1) {
+                                    return `${year}/${month}`;
+                                }
+                                return month.toString();
+                            },
+                            maxRotation: 0,
+                            minRotation: 0,
+                        },
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.1)',
+                        },
+                    },
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            maxTicksLimit: 6,
+                            padding: 8,
+                            callback(value) {
+                                if (value.toString().includes('.')) return '';
+                                if (Math.abs(value) >= 10000) {
+                                    const sign = value < 0 ? '-' : '';
+                                    return `${sign}$ ${Math.abs(value / 10000).toFixed(1)} 萬`;
+                                } else if (value === 0) {
+                                    return '$ 0';
+                                } else {
+                                    return `$ ${value.toLocaleString('en-US')}`;
+                                }
+                            },
+                        },
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.1)',
+                            // 在0線處添加特殊顯示
+                            zeroLineColor: 'rgba(0, 0, 0, 0.3)',
+                            zeroLineWidth: 2,
+                        },
+                    },
+                },
+                plugins: {
+                    title: {
+                        display: false,
+                    },
+                    legend: {
+                        display: false,
+                    },
+                    datalabels: {
+                        display: false, // 確保不顯示數據標籤
+                    },
+                    tooltip: {
+                        enabled: false, // 完全禁用 tooltip
+                    },
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index', // 改為 index 模式，讓滑鼠靠近時更容易觸發 tooltip
+                },
+            };
         },
 
         // 股利走勢圖相關計算屬性
