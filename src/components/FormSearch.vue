@@ -67,7 +67,7 @@
             </el-table-column>
         </el-table>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;總數量：{{ customStockList.length }}
-        <span v-if="hasLocalChanges" style="color: #e6a23c; margin-left: 10px;">
+        <span v-if="hasLocalChanges" style="color: #e6a23c; margin-left: 10px">
             <i class="el-icon-warning"></i> 有未保存的順序變更，關閉視窗時將自動保存
         </span>
         <br />
@@ -341,13 +341,13 @@ export default {
                     // 選到的
                     const selected = _.find(this.stockOptions, ['value', this.form.stockId]);
                     this.$store.commit('SAVE_A_STOCK', { name: selected.label, id: selected.value, type: selected.type });
-                    
+
                     // 如果有暫存變更，重置暫存狀態以重新從 store 獲取最新資料
                     if (this.hasLocalChanges) {
                         this.hasLocalChanges = false;
                         this.localCustomStockList = [];
                     }
-                    
+
                     return true;
                 }
                 console.log('error submit!!');
@@ -363,7 +363,7 @@ export default {
                 .then(() => {
                     // console.log(stockId);
                     this.$store.commit('DEL_A_STOCK', stockId);
-                    
+
                     // 如果有暫存變更，也從暫存列表中移除該項目
                     if (this.hasLocalChanges) {
                         _.remove(this.localCustomStockList, (item) => item.id === stockId);
@@ -372,7 +372,7 @@ export default {
                             item.order = index + 1;
                         });
                     }
-                    
+
                     // this.$store.commit('DEL_A_STOCK_DIVIDENDLIST', stockId);
                     ElMessage({
                         type: 'success',
@@ -395,7 +395,7 @@ export default {
             }
 
             // 在暫存列表中執行移動操作
-            const currentIndex = this.localCustomStockList.findIndex(item => item.id === stockId);
+            const currentIndex = this.localCustomStockList.findIndex((item) => item.id === stockId);
             if (currentIndex === -1) return;
 
             let targetIndex;
@@ -423,11 +423,11 @@ export default {
         onInit() {
             console.log('onInit');
             this.isShow = true;
-            
+
             // 重置暫存狀態
             this.hasLocalChanges = false;
             this.localCustomStockList = [];
-            
+
             // 讀取 localStorage 中的 'realtimeStock' 數據
             const realtimeStockValue = localStorage.getItem('realtimeStock');
 
@@ -446,23 +446,23 @@ export default {
         },
         onClosed() {
             localStorage.setItem('realtimeStock', this.realtimeStock);
-            
+
             // 如果有未保存的變更，批量保存到 store
             if (this.hasLocalChanges) {
                 this.saveLocalChangesToStore();
             }
         },
-        
+
         // 將暫存的變更批量保存到 store
         async saveLocalChangesToStore() {
             try {
                 // 批量更新 store 中的股票順序
                 this.$store.commit('BATCH_UPDATE_STOCK_ORDER', this.localCustomStockList);
-                
+
                 // 重置暫存狀態
                 this.hasLocalChanges = false;
                 this.localCustomStockList = [];
-                
+
                 ElMessage({
                     type: 'success',
                     message: '順序已保存！',

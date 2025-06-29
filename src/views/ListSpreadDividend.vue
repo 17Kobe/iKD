@@ -490,6 +490,24 @@
             </el-table-column>
         </el-table>
 
+        <!-- ================================ 股利走勢圖 -->
+        <el-row style="margin-top: 20px">
+            <el-col :xs="24" :sm="22" :md="18" :lg="16" :xl="14" style="padding: 4px 2px 0 4px">
+                <el-card shadow="hover" style="height: 450px">
+                    <div style="font-size: 14px; text-align: center; font-weight: bold; margin-bottom: 8px; color: #6c6c6c">
+                        股利走勢圖
+                    </div>
+                    <div style="height: 380px; position: relative">
+                        <LineChart
+                            :chartData="dividendTrendData"
+                            :options="dividendTrendOptions"
+                            style="height: 100%; width: 100%"
+                        />
+                    </div>
+                </el-card>
+            </el-col>
+        </el-row>
+
         <br /><br />
         <br /><br />
     </div>
@@ -497,13 +515,19 @@
 
 <script>
 import moment from 'moment';
-// import _ from 'lodash';
+import _ from 'lodash';
+import { Chart, registerables } from 'chart.js';
+import 'chartjs-adapter-moment';
+import { LineChart } from 'vue-chart-3';
+
+Chart.register(...registerables);
 //
 // This starter template is using Vue 3 experimental <script setup> SFCs
 // Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
 
 export default {
     name: 'component-dividend',
+    components: { LineChart },
     data() {
         return {
             modeSpread: '目前',
@@ -555,6 +579,296 @@ export default {
                 (acc, { number_of_shares, earnings_distribution }) => acc + Math.round(number_of_shares * earnings_distribution),
                 0
             );
+        },
+
+        // 股利走勢圖相關計算屬性
+        dividendTrendData() {
+            const twoYearsAgo = moment().subtract(2, 'years');
+            const oneYearFromNow = moment().add(1, 'year');
+
+            // 取得歷史配息資料（近2年）
+            const historyDividends = this.$store.state.dividend.historyDividendList
+                .filter((item) => moment(item.payment_date).isAfter(twoYearsAgo))
+                .map((item) => ({
+                    x: moment(item.payment_date).toDate(), // 轉換為 JavaScript Date 對象
+                    y: Math.round(item.number_of_shares * item.earnings_distribution),
+                    stockName: item.name,
+                    stockId: item.id,
+                    type: 'history',
+                }));
+
+            // 取得未來配息資料（1年內）
+            const futureDividends = this.$store.getters
+                .getDividendList('未來')
+                .filter((item) => {
+                    const paymentDate = moment(item.payment_date);
+                    return paymentDate.isBefore(oneYearFromNow);
+                })
+                .map((item) => ({
+                    x: moment(item.payment_date).toDate(), // 轉換為 JavaScript Date 對象
+                    y: Math.round(item.number_of_shares * item.earnings_distribution),
+                    stockName: item.name,
+                    stockId: item.id,
+                    type: 'future',
+                }));
+
+            // 合併所有配息資料並按日期分組
+            const allDividends = [...historyDividends, ...futureDividends];
+            const groupedByDate = _.groupBy(allDividends, (item) => moment(item.x).format('YYYY-MM-DD'));
+
+            // 創建歷史和未來的資料集，包含0值點來實現"線條突起"效果
+            const historyDataPoints = [];
+            const futureDataPoints = [];
+
+            // 處理分組後的資料
+            Object.keys(groupedByDate).forEach((dateString) => {
+                const dayDividends = groupedByDate[dateString];
+                const totalAmount = _.sumBy(dayDividends, 'y');
+                const stockNames = dayDividends.map((d) => d.stockName).join(', ');
+
+                if (dayDividends.some((d) => d.type === 'history')) {
+                    // 在配息日前後各添加一個0值點，實現"突起"效果
+                    const dateMoment = moment(dateString);
+                    const dayBefore = dateMoment.clone().subtract(1, 'day').toDate();
+                    const dayAfter = dateMoment.clone().add(1, 'day').toDate();
+
+                    historyDataPoints.push(
+                        { x: dayBefore, y: 0 },
+                        {
+                            x: dateMoment.toDate(),
+                            y: totalAmount,
+                            stockNames: stockNames,
+                            dividends: dayDividends,
+                        },
+                        { x: dayAfter, y: 0 }
+                    );
+                }
+
+                if (dayDividends.some((d) => d.type === 'future')) {
+                    // 在配息日前後各添加一個0值點，實現"突起"效果
+                    const dateMoment = moment(dateString);
+                    const dayBefore = dateMoment.clone().subtract(1, 'day').toDate();
+                    const dayAfter = dateMoment.clone().add(1, 'day').toDate();
+
+                    futureDataPoints.push(
+                        { x: dayBefore, y: 0 },
+                        {
+                            x: dateMoment.toDate(),
+                            y: totalAmount,
+                            stockNames: stockNames,
+                            dividends: dayDividends,
+                        },
+                        { x: dayAfter, y: 0 }
+                    );
+                }
+            });
+
+            return {
+                datasets: [
+                    {
+                        label: '歷史配息',
+                        data: _.orderBy(historyDataPoints, ['x'], ['asc']),
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: (context) => {
+                            // 只在有配息的點顯示圓點，0值點不顯示
+                            return context.parsed && context.parsed.y > 0 ? 5 : 0;
+                        },
+                        pointHoverRadius: 8,
+                        stepped: false,
+                        tension: 0, // 不平滑，直線連接
+                        showLine: true, // 顯示連線
+                    },
+                    {
+                        label: '未來配息',
+                        data: _.orderBy(futureDataPoints, ['x'], ['asc']),
+                        borderColor: 'rgb(255, 159, 64)',
+                        backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: (context) => {
+                            // 只在有配息的點顯示圓點，0值點不顯示
+                            return context.parsed && context.parsed.y > 0 ? 5 : 0;
+                        },
+                        pointHoverRadius: 8,
+                        stepped: false,
+                        tension: 0, // 不平滑，直線連接
+                        showLine: true, // 顯示連線
+                    },
+                ],
+            };
+        },
+
+        dividendTrendOptions() {
+            return {
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 15,
+                        bottom: 5,
+                        left: 5,
+                        right: 15,
+                    },
+                },
+                elements: {
+                    point: {
+                        radius: 5,
+                        hitRadius: 12,
+                        hoverRadius: 8,
+                    },
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'month',
+                            displayFormats: {
+                                month: 'M',
+                            },
+                            tooltipFormat: 'YYYY/MM/DD',
+                            parser: 'YYYY-MM-DD',
+                        },
+                        ticks: {
+                            maxTicksLimit: 36,
+                            padding: 5,
+                            source: 'data',
+                            callback: function (value, index, ticks) {
+                                // Chart.js 在月份模式下傳遞的 value 是月份數字 (1-12)
+
+                                // 從 ticks 陣列中取得實際的時間戳
+                                const tickItem = ticks[index];
+                                if (!tickItem || !tickItem.value) return '';
+
+                                const date = moment(tickItem.value);
+                                console.log('date from tick', date);
+
+                                // 確保日期有效
+                                if (!date.isValid()) {
+                                    return '';
+                                }
+
+                                const month = date.month() + 1; // moment的月份從0開始，所以+1
+                                const year = date.year();
+
+                                // 強制顯示每年的1月，格式為 YYYY/1
+                                if (month === 1) {
+                                    return `${year}/${month}`;
+                                }
+
+                                // 檢查是否應該顯示其他月份（避免過度擁擠）
+                                const totalTicks = ticks.length;
+                                if (totalTicks > 24) {
+                                    // 如果刻度太多，只顯示季度月份
+                                    if ([1, 4, 7, 10].includes(month)) {
+                                        return month.toString();
+                                    }
+                                    return '';
+                                } else if (totalTicks > 12) {
+                                    // 中等密度，顯示雙月
+                                    if (month % 2 === 1) {
+                                        return month.toString();
+                                    }
+                                    return '';
+                                } else {
+                                    // 低密度，顯示所有月份
+                                    return month.toString();
+                                }
+                            },
+                            // 強制包含每年1月的刻度
+                            autoSkip: false,
+                            maxRotation: 0,
+                            minRotation: 0,
+                        },
+                        adapters: {
+                            date: {
+                                zone: 'UTC+8',
+                            },
+                        },
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.1)',
+                        },
+                    },
+                    y: {
+                        beginAtZero: true,
+                        min: 0, // 強制從 0 開始
+                        grace: 0, // 移除額外的留白
+                        ticks: {
+                            maxTicksLimit: 6,
+                            padding: 8,
+                            callback(value, index, ticks) {
+                                if (value < 0) return ''; // 不顯示負數
+                                if (value.toString().includes('.')) return '';
+                                if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
+                                else if (value === 0) return '$ 0';
+                                else return `$ ${value.toLocaleString('en-US')}`;
+                            },
+                        },
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.1)',
+                        },
+                    },
+                },
+                plugins: {
+                    title: {
+                        display: false,
+                    },
+                    legend: {
+                        display: false, // 隱藏 legend 標籤
+                    },
+                    datalabels: {
+                        display: false, // 確保不顯示數據標籤
+                    },
+                    tooltip: {
+                        filter: function (tooltipItem) {
+                            // 只在配息金額大於0的點上顯示tooltip
+                            return tooltipItem.parsed && tooltipItem.parsed.y > 0;
+                        },
+                        callbacks: {
+                            title(context) {
+                                if (!context || !context[0] || !context[0].parsed) return '';
+                                const dayOfWeek = ['日', '一', '二', '三', '四', '五', '六'];
+                                return (
+                                    moment(context[0].parsed.x).format('YYYY/MM/DD') +
+                                    '(' +
+                                    dayOfWeek[moment(context[0].parsed.x).day()] +
+                                    ')'
+                                );
+                            },
+                            label(context) {
+                                if (!context || !context.parsed) return '';
+
+                                const dataPoint = context.raw;
+                                const value = context.parsed.y;
+
+                                // 只對有配息的點顯示詳細資訊
+                                if (value === 0 || !dataPoint || !dataPoint.dividends) return '';
+
+                                // 返回每個股票的股利明細
+                                return dataPoint.dividends.map((d) => `${d.stockName} $${d.y.toLocaleString('en-US')}`);
+                            },
+                            afterLabel(context) {
+                                // 不再需要 afterLabel，因為所有資訊都在 label 中顯示
+                                return '';
+                            },
+                        },
+                        displayColors: false,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                    },
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'nearest',
+                },
+            };
         },
     },
     watch: {
