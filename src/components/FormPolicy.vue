@@ -975,6 +975,8 @@ export default {
                     { method: 'previous_sell_up', label: '搭配 前賣價漲超過', limit: 5, limit_desc: '% 以上' },
                     { method: 'earn', label: '搭配 絕對正報酬', limit: 0, limit_desc: '% 以上' },
                 ],
+                sell1_ratio: this.form.sell1_ratio,
+                sell2_ratio: this.form.sell2_ratio,
             };
 
             await this.$store.dispatch('APPLY_AND_WAIT_POLICY_RESULT', { stockId, policyList });
@@ -1071,6 +1073,8 @@ export default {
                 const policyList = {
                     buy: [{ method: 'kd_gold', label: '週 KD 黃金交叉', limit: 50, limit_desc: '以下' }],
                     sell: [{ method: 'kd_dead', label: '週 KD 死亡交叉', limit: 50, limit_desc: '以上' }],
+                    sell1_ratio: this.form.sell1_ratio,
+                    sell2_ratio: this.form.sell2_ratio,
                 };
                 await this.$store.dispatch('APPLY_AND_WAIT_POLICY_RESULT', {
                     stockId: this.stockId,

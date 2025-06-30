@@ -1646,6 +1646,7 @@ const stock = {
             // console.log(policyList);
             // console.log(policyList.buy.length);
             // console.log(policyList.sell.length);
+            // 要同時沒有 buy 及 sell 就會刪除
             if (
                 (!_.has(policyList, 'buy') || (_.has(policyList, 'buy') && policyList.buy.length === 0)) &&
                 (!_.has(policyList, 'sell') || (_.has(policyList, 'sell') && policyList.sell.length === 0))
