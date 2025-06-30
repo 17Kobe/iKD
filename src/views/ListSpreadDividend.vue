@@ -603,40 +603,167 @@ export default {
             // 收集所有有持倉的股票
             const stocksWithCost = this.$store.getters.getSpreadList('目前').filter((stock) => stock.cost);
 
+            // 獲取美金匯率資料
+            const exchangeStock = this.$store.state.price.stockList.find((v) => v.name === '美金匯率');
+            
+            // 如果沒有持倉股票，返回空數據
+            if (stocksWithCost.length === 0) {
+                console.log('價差走勢圖: 無持倉股票資料');
+                return { datasets: [] };
+            }
+
             // 創建日期範圍內的每日價差數據
             const dailySpreadData = {};
 
-            stocksWithCost.forEach((stock) => {
-                if (!stock.data || !stock.data.daily || !stock.cost.settings) return;
+            // 預建美金匯率索引以提高查找效率
+            const exchangeRateIndex = {};
+            if (exchangeStock && exchangeStock.data && exchangeStock.data.daily) {
+                exchangeStock.data.daily.forEach(ex => {
+                    if (ex[0] && ex[1] && ex[1] > 0) {
+                        exchangeRateIndex[ex[0]] = ex[1];
+                    }
+                });
+            }
 
-                // 遍歷每日股價數據
-                stock.data.daily.forEach((dailyPrice) => {
-                    const dateStr = dailyPrice[0];
+            stocksWithCost.forEach((stock) => {
+                if (!stock.data || !stock.data.daily || !stock.cost.settings || stock.cost.settings.length === 0) {
+                    console.warn(`跳過股票 ${stock.name} (${stock.id}): 缺少必要資料`);
+                    return;
+                }
+
+                // 預建該股票的價格索引以提高查找效率
+                const priceIndex = {};
+                const sortedPrices = stock.data.daily
+                    .filter(dp => dp[0] && moment(dp[0]).isValid())
+                    .sort((a, b) => moment(a[0]).diff(moment(b[0])));
+
+                // 建立直接索引
+                sortedPrices.forEach(dp => {
+                    priceIndex[dp[0]] = dp;
+                });
+
+                // 建立"最後可用價格"的快速查找索引
+                const lastAvailablePriceIndex = {};
+                let lastPrice = null;
+                
+                // 為每個目標日期預建最後可用價格
+                const targetDates = [];
+                let currentDate = sixMonthsAgo.clone();
+                while (currentDate.isSameOrBefore(now, 'day')) {
+                    const dateStr = currentDate.format('YYYY-MM-DD');
+                    targetDates.push(dateStr);
+                    
+                    // 如果當天有價格，更新最後可用價格
+                    if (priceIndex[dateStr]) {
+                        lastPrice = priceIndex[dateStr];
+                    }
+                    
+                    // 為該日期設定最後可用價格
+                    if (lastPrice) {
+                        lastAvailablePriceIndex[dateStr] = lastPrice;
+                    }
+                    
+                    currentDate.add(1, 'day');
+                }
+
+                // 預計算該股票每個購買記錄在美金的成本（使用買入匯率）
+                const processedPurchases = stock.cost.settings.map(purchase => {
+                    if (!purchase.buy_date || !purchase.number || !purchase.cost) {
+                        return null;
+                    }
+
+                    let costInTWD = purchase.number * purchase.cost;
+                    
+                    // 如果是美金商品，需要用買入匯率轉換成本
+                    if (stock.currency === 'USD') {
+                        const buyDate = purchase.buy_date;
+                        let buyExchangeRate = 30; // 預設匯率
+                        
+                        // 查找買入日期的匯率
+                        if (exchangeRateIndex[buyDate]) {
+                            buyExchangeRate = exchangeRateIndex[buyDate] + 0.075; // 買入匯率：匯率 + 0.075
+                        } else {
+                            // 找最近的匯率
+                            const nearestRate = Object.keys(exchangeRateIndex)
+                                .filter(date => moment(date).isSameOrBefore(moment(buyDate)))
+                                .sort((a, b) => moment(b).diff(moment(a)))[0];
+                            if (nearestRate) {
+                                buyExchangeRate = exchangeRateIndex[nearestRate] + 0.075;
+                            }
+                        }
+                        
+                        costInTWD = purchase.number * purchase.cost * buyExchangeRate;
+                    }
+
+                    return {
+                        ...purchase,
+                        buyDate: moment(purchase.buy_date),
+                        costInTWD: costInTWD
+                    };
+                }).filter(p => p && p.buyDate.isValid());
+
+                targetDates.forEach((dateStr) => {
                     const dateMoment = moment(dateStr);
 
-                    // 只處理最近6個月的數據
-                    if (!dateMoment.isBetween(sixMonthsAgo, now, 'day', '[]')) return;
+                    // 快速查找該日期的股價：先查直接索引，再查最後可用價格索引
+                    let dailyPrice = priceIndex[dateStr] || lastAvailablePriceIndex[dateStr];
 
-                    // 獲取該日期的股價 (收盤價)
+                    if (!dailyPrice) {
+                        return; // 跳過無價格資料的日期
+                    }
+
+                    // 獲取股價 (收盤價)
                     const closePrice = dailyPrice.length === 2 ? dailyPrice[1] : dailyPrice[4];
+                    
+                    // 檢查股價是否有效
+                    if (!closePrice || closePrice <= 0) {
+                        return; // 跳過無效股價
+                    }
 
-                    // 計算該日期該股票的持有股數和成本
+                    // 計算該日期該股票的持有股數和總成本（台幣）
                     let totalShares = 0;
-                    let totalCost = 0;
+                    let totalCostTWD = 0;
 
-                    stock.cost.settings.forEach((purchase) => {
-                        const buyDate = moment(purchase.buy_date);
+                    processedPurchases.forEach((purchase) => {
                         // 只計算在該日期前購買的股票
-                        if (buyDate.isSameOrBefore(dateMoment)) {
+                        if (purchase.buyDate.isSameOrBefore(dateMoment)) {
                             totalShares += purchase.number;
-                            totalCost += purchase.number * purchase.cost;
+                            totalCostTWD += purchase.costInTWD;
                         }
                     });
 
-                    if (totalShares > 0) {
-                        const avgCost = totalCost / totalShares;
-                        const marketValue = totalShares * closePrice;
-                        const spread = marketValue - totalCost;
+                    if (totalShares > 0 && totalCostTWD > 0) {
+                        let marketValueTWD;
+                        
+                        if (stock.currency === 'USD') {
+                            // 美金商品：市值 = 股數 * 美金價格 * 賣出匯率
+                            let sellExchangeRate = 30; // 預設匯率
+                            
+                            // 查找該日期的賣出匯率
+                            if (exchangeRateIndex[dateStr]) {
+                                sellExchangeRate = exchangeRateIndex[dateStr] - 0.075; // 賣出匯率：匯率 - 0.075
+                            } else {
+                                // 找最近的匯率
+                                const nearestRate = Object.keys(exchangeRateIndex)
+                                    .filter(date => moment(date).isSameOrBefore(dateMoment))
+                                    .sort((a, b) => moment(b).diff(moment(a)))[0];
+                                if (nearestRate) {
+                                    sellExchangeRate = exchangeRateIndex[nearestRate] - 0.075;
+                                }
+                            }
+                            
+                            // 確保賣出匯率合理
+                            if (sellExchangeRate <= 0) {
+                                sellExchangeRate = 30;
+                            }
+                            
+                            marketValueTWD = totalShares * closePrice * sellExchangeRate;
+                        } else {
+                            // 台幣商品：市值 = 股數 * 台幣價格
+                            marketValueTWD = totalShares * closePrice;
+                        }
+                        
+                        const spread = marketValueTWD - totalCostTWD;
 
                         // 累加到該日期的總價差
                         if (!dailySpreadData[dateStr]) {
@@ -648,12 +775,185 @@ export default {
             });
 
             // 轉換為圖表數據格式
-            const dataPoints = Object.keys(dailySpreadData)
-                .sort()
-                .map((dateStr) => ({
-                    x: moment(dateStr).toDate(),
-                    y: Math.round(dailySpreadData[dateStr]),
-                }));
+            const sortedDates = Object.keys(dailySpreadData).sort();
+            
+            // 如果沒有有效的價差數據，返回空數據集
+            if (sortedDates.length === 0) {
+                console.log('價差走勢圖: 無有效的價差數據');
+                return {
+                    datasets: [{
+                        label: '價差走勢',
+                        data: [],
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        tension: 0,
+                    }]
+                };
+            }
+            
+            const dataPoints = sortedDates.map((dateStr) => ({
+                x: moment(dateStr).toDate(),
+                y: Math.round(dailySpreadData[dateStr]),
+            }));
+
+            // 為最新一天輸出詳細的計算資訊
+            if (sortedDates.length > 0) {
+                const latestDate = sortedDates[sortedDates.length - 1];
+                console.log('┌─────────────────────────────────────────────────────┐');
+                console.log('│              價差走勢圖 - 最新一天計算詳情            │');
+                console.log('├─────────────────────────────────────────────────────┤');
+                console.log(`│ 日期: ${latestDate.padEnd(44)} │`);
+                console.log(`│ 當天總價差: $${Math.round(dailySpreadData[latestDate]).toLocaleString('en-US').padEnd(35)} │`);
+                console.log('├─────────────────────────────────────────────────────┤');
+                
+                // 重新計算最新一天的詳細資訊
+                const latestDateMoment = moment(latestDate);
+                let totalDaySpread = 0;
+                let stockCount = 0;
+                
+                stocksWithCost.forEach((stock) => {
+                    if (!stock.data || !stock.data.daily || !stock.cost.settings) {
+                        console.warn(`跳過股票 ${stock.name} (${stock.id}): 缺少必要資料`);
+                        return;
+                    }
+                    
+                    // 快速查找該日期的股價：建立簡單索引
+                    const stockPriceIndex = {};
+                    stock.data.daily.forEach(dp => {
+                        if (dp[0]) stockPriceIndex[dp[0]] = dp;
+                    });
+                    
+                    // 找最後可用價格
+                    let dailyPrice = stockPriceIndex[latestDate];
+                    if (!dailyPrice) {
+                        // 找最後一筆小於等於該日的價格
+                        const availableDates = Object.keys(stockPriceIndex)
+                            .filter(date => moment(date).isSameOrBefore(latestDateMoment))
+                            .sort((a, b) => moment(b).diff(moment(a)));
+                        
+                        if (availableDates.length > 0) {
+                            dailyPrice = stockPriceIndex[availableDates[0]];
+                        }
+                    }
+                    
+                    if (!dailyPrice) {
+                        console.warn(`跳過股票 ${stock.name} (${stock.id}): 找不到 ${latestDate} 的股價資料`);
+                        return;
+                    }
+                    
+                    const closePrice = dailyPrice.length === 2 ? dailyPrice[1] : dailyPrice[4];
+                    
+                    // 檢查股價是否有效
+                    if (!closePrice || closePrice <= 0) {
+                        console.warn(`跳過股票 ${stock.name} (${stock.id}): 無效股價 ${closePrice}`);
+                        return;
+                    }
+                    
+                    // 計算該股票的持有股數和總成本（台幣）
+                    let totalShares = 0;
+                    let totalCostTWD = 0;
+                    let buyRateInfo = '';
+                    let sellRateInfo = '';
+                    
+                    // 處理每筆購買記錄的成本（使用買入匯率）
+                    stock.cost.settings.forEach((purchase) => {
+                        if (!purchase.buy_date || !purchase.number || !purchase.cost) {
+                            return; // 跳過無效的購買記錄
+                        }
+                        
+                        const buyDate = moment(purchase.buy_date);
+                        if (buyDate.isValid() && buyDate.isSameOrBefore(latestDateMoment)) {
+                            totalShares += purchase.number;
+                            
+                            let purchaseCostTWD = purchase.number * purchase.cost;
+                            
+                            // 如果是美金商品，用買入匯率計算成本
+                            if (stock.currency === 'USD') {
+                                let buyExchangeRate = 30; // 預設匯率
+                                
+                                if (exchangeRateIndex[purchase.buy_date]) {
+                                    buyExchangeRate = exchangeRateIndex[purchase.buy_date] + 0.075; // 買入匯率
+                                } else {
+                                    // 找最近的匯率
+                                    const nearestRate = Object.keys(exchangeRateIndex)
+                                        .filter(date => moment(date).isSameOrBefore(buyDate))
+                                        .sort((a, b) => moment(b).diff(moment(a)))[0];
+                                    if (nearestRate) {
+                                        buyExchangeRate = exchangeRateIndex[nearestRate] + 0.075;
+                                    }
+                                }
+                                
+                                purchaseCostTWD = purchase.number * purchase.cost * buyExchangeRate;
+                                if (!buyRateInfo) {
+                                    buyRateInfo = ` (買入匯率 ${buyExchangeRate.toFixed(3)})`;
+                                }
+                            }
+                            
+                            totalCostTWD += purchaseCostTWD;
+                        }
+                    });
+                    
+                    if (totalShares > 0 && totalCostTWD > 0) {
+                        let marketValueTWD;
+                        
+                        if (stock.currency === 'USD') {
+                            // 美金商品：市值 = 股數 * 美金價格 * 賣出匯率
+                            let sellExchangeRate = 30; // 預設匯率
+                            
+                            if (exchangeRateIndex[latestDate]) {
+                                sellExchangeRate = exchangeRateIndex[latestDate] - 0.075; // 賣出匯率
+                            } else {
+                                // 找最近的匯率
+                                const nearestRate = Object.keys(exchangeRateIndex)
+                                    .filter(date => moment(date).isSameOrBefore(latestDateMoment))
+                                    .sort((a, b) => moment(b).diff(moment(a)))[0];
+                                if (nearestRate) {
+                                    sellExchangeRate = exchangeRateIndex[nearestRate] - 0.075;
+                                }
+                            }
+                            
+                            // 確保賣出匯率合理
+                            if (sellExchangeRate <= 0) {
+                                sellExchangeRate = 30;
+                            }
+                            
+                            marketValueTWD = totalShares * closePrice * sellExchangeRate;
+                            sellRateInfo = ` @ ${sellExchangeRate.toFixed(3)} (賣出匯率)`;
+                        } else {
+                            // 台幣商品：市值 = 股數 * 台幣價格
+                            marketValueTWD = totalShares * closePrice;
+                        }
+                        
+                        const spread = marketValueTWD - totalCostTWD;
+                        totalDaySpread += spread;
+                        stockCount++;
+                        
+                        const stockInfo = `${stock.name} (${stock.id})`;
+                        const currency = stock.currency || 'TWD';
+                        const shares = `${totalShares.toLocaleString('en-US')} 股`;
+                        const cost = `成本: $${Math.round(totalCostTWD).toLocaleString('en-US')}${buyRateInfo}`;
+                        const price = `收盤: ${closePrice}${sellRateInfo}`;
+                        const value = `市值: $${Math.round(marketValueTWD).toLocaleString('en-US')}`;
+                        const profit = `價差: ${spread >= 0 ? '+' : ''}$${Math.round(spread).toLocaleString('en-US')}`;
+                        
+                        console.log(`│ ${stockCount.toString().padStart(2)}. ${stockInfo.padEnd(28)} │`);
+                        console.log(`│     持股: ${shares.padEnd(15)} ${currency.padEnd(8)} ${cost.padEnd(35)} │`);
+                        console.log(`│     ${price.padEnd(35)} ${value.padEnd(15)} │`);
+                        console.log(`│     ${profit.padEnd(48)} │`);
+                        if (stockCount < stocksWithCost.filter(s => s.data && s.data.daily && s.cost.settings).length) {
+                            console.log('│                                                     │');
+                        }
+                    }
+                });
+                
+                console.log('├─────────────────────────────────────────────────────┤');
+                console.log(`│ 總計 ${stockCount} 檔股票價差: $${Math.round(totalDaySpread).toLocaleString('en-US').padEnd(28)} │`);
+                console.log('└─────────────────────────────────────────────────────┘');
+            }
 
             return {
                 datasets: [
@@ -761,7 +1061,27 @@ export default {
                         display: false, // 確保不顯示數據標籤
                     },
                     tooltip: {
-                        enabled: false, // 完全禁用 tooltip
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                if (tooltipItems && tooltipItems.length > 0) {
+                                    return moment(tooltipItems[0].parsed.x).format('YYYY/MM/DD');
+                                }
+                                return '';
+                            },
+                            label: function(context) {
+                                const value = context.parsed.y;
+                                const formattedValue = value.toLocaleString('en-US');
+                                return `價差: $${formattedValue}`;
+                            }
+                        }
                     },
                 },
                 interaction: {
