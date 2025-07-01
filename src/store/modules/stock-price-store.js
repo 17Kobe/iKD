@@ -26,6 +26,7 @@ const defaultState = {
     tempStockList: [], // 暫存股票data變一年以內
     pendingPolicyResolve: {},
     skipTempStockListRemove: false,
+    spreadTrendCache: {}, // 緩存價差走勢計算結果
 };
 
 const stock = {
@@ -1411,6 +1412,10 @@ const stock = {
             // console.log(state.currStockDayData);
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             await saveStockToDb('stockList', data);
+            
+            // 清空價差走勢緩存，因為股票列表已變更
+            state.spreadTrendCache = {};
+            
             this.dispatch('GET_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
         async SAVE_ALL_STOCK(state, data) {
@@ -1496,6 +1501,9 @@ const stock = {
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             console.log(state.stockList);
             await delStockToDb('stockList', data);
+            
+            // 清空價差走勢緩存，因為股票列表已變更
+            state.spreadTrendCache = {};
         },
         async DEL_10_YEARS_OLD(state, data) {
             // data 是 object {name: XXX, id: XXX}
@@ -3208,8 +3216,73 @@ const stock = {
             await saveStockToDb('stockList', foundStock);
             console.log('SAVE_STOCK_POLICY_RETURN_FUTURE_BADGE OK');
         },
+
+        // 緩存價差走勢計算結果
+        SAVE_SPREAD_TREND_CACHE(state, { dateStr, value }) {
+            console.log('SAVE_SPREAD_TREND_CACHE', dateStr, value);
+            state.spreadTrendCache[dateStr] = value;
+        },
+
+        // 清除過期的緩存（保留最近30天）
+        CLEANUP_SPREAD_TREND_CACHE(state) {
+            console.log('CLEANUP_SPREAD_TREND_CACHE');
+            const sixMonthsAgo = moment().subtract(6, 'months').format('YYYY-MM-DD');
+            Object.keys(state.spreadTrendCache).forEach(dateStr => {
+                if (dateStr < sixMonthsAgo) {
+                    delete state.spreadTrendCache[dateStr];
+                }
+            });
+        },
+
+        // 清空所有緩存（當持倉變更時使用）
+        CLEAR_SPREAD_TREND_CACHE(state) {
+            console.log('CLEAR_SPREAD_TREND_CACHE');
+            state.spreadTrendCache = {};
+        },
+
+        // 保存股票成本設定並清空緩存
+        SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
+            console.log('SAVE_STOCK_COST', stockId);
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            if (foundStock) {
+                // 保存成本資訊
+                foundStock.cost = {
+                    settings: costList,
+                    total: totalOfShares,
+                    average: averageCost,
+                    sum: sumCost,
+                };
+                
+                console.log('成本設定已更新，清空價差走勢緩存');
+                // 清空價差走勢緩存，因為持倉已變更
+                state.spreadTrendCache = {};
+                
+                // 保存到 localStorage 或 IndexedDB
+                // 這裡可能需要根據現有的保存機制調整
+                // localStorage.setItem('stockList', JSON.stringify(state.stockList));
+            }
+        },
     },
     getters: {
+        // 獲取價差走勢緩存
+        getSpreadTrendCache: (state) => (dateStr) => {
+            return state.spreadTrendCache[dateStr];
+        },
+
+        // 獲取緩存的最新日期
+        getSpreadTrendCacheLatestDate: (state) => {
+            const dates = Object.keys(state.spreadTrendCache);
+            if (dates.length === 0) return null;
+            return dates.sort().pop();
+        },
+
+        // 檢查是否需要重新計算緩存（持倉或成本設定變更時）
+        shouldRecalculateSpreadCache: (state) => {
+            // 可以根據 stockList 的變更時間戳或其他標識來判斷
+            // 這裡先簡單返回 false，實際可根據需求完善
+            return false;
+        },
+
         // http://localhost:3300/#/?export=true
         // 我猜是LINE用的
         // 增加 query 判斷，query有可能是 {} 或 {export:true}，若 export =true 時才要 filter，否則不要filter
