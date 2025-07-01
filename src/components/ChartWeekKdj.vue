@@ -446,7 +446,15 @@
                             </div>
                         </template>
                         <div>
-                            {{ status }}
+                            {{
+                                status === '前買價未跌過'
+                                    ? '前買未跌過'
+                                    : status === '成本價未跌過'
+                                    ? '成本未跌過'
+                                    : status === '前賣價未漲過'
+                                    ? '前賣未漲過'
+                                    : status
+                            }}
                         </div>
                     </el-tooltip>
                 </span>

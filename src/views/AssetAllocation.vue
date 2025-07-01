@@ -74,7 +74,19 @@
         </el-row>
         <el-row style="margin-bottom: 4px">
             <el-col :xs="12" :sm="10" :md="7" :lg="7" :xl="5" style="padding: 4px 2px 0 4px">
-                <el-card shadow="hover" class="horizontal-bar">
+                <el-card shadow="hover" class="horizontal-bar pie-chart-container">
+                    <!-- 浮動按鈕 -->
+                    <el-button
+                        :type="excludeStockSavings ? 'primary' : 'info'"
+                        size="small"
+                        @click="toggleStockSavings"
+                        plain
+                        class="floating-toggle-button"
+                        circle
+                        :title="excludeStockSavings ? '已排除存股，點擊包含存股' : '包含存股，點擊排除存股'"
+                    >
+                        <i :class="excludeStockSavings ? 'el-icon-view' : 'el-icon-remove-outline'"></i>
+                    </el-button>
                     <PieChart :chartData="pieData" :options="pieOptions" />
                 </el-card>
             </el-col>
@@ -339,6 +351,7 @@ export default {
             assetList: [],
             assetListHistory: [], // 資產列表歷史記錄，最多保存20次
             currentHistoryIndex: -1, // 當前歷史記錄索引
+            excludeStockSavings: true, // 是否排除存股
             lineOptions: {
                 // 隱藏點
                 elements: {
@@ -769,14 +782,23 @@ export default {
                         display: true,
                         align: 'end',
                         position: 'bottom',
-                        text: [
-                            `【現金】${(this.demandDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
-                                `【定存】${(this.fixedDeposit / 10000).toFixed(1).padStart(5)} 萬`,
-                            `【存股】${(this.chtStockDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
-                                `【股票】${(this.stockDeposit / 10000).toFixed(1).padStart(5)} 萬`,
-                            `【債券】${(this.bondDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
-                                `【其它】${(this.otherDeposit / 10000).toFixed(1).padStart(5)} 萬`,
-                        ],
+                        text: this.excludeStockSavings
+                            ? [
+                                  `【現金】${(this.demandDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
+                                      `【定存】${(this.fixedDeposit / 10000).toFixed(1).padStart(5)} 萬`,
+                                  `【股票】${(this.stockDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
+                                      `【債券】${(this.bondDeposit / 10000).toFixed(1).padStart(5)} 萬`,
+                                  `【其它】${(this.otherDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
+                                      `(已排除存股 ${(this.chtStockDeposit / 10000).toFixed(1)} 萬)`,
+                              ]
+                            : [
+                                  `【現金】${(this.demandDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
+                                      `【定存】${(this.fixedDeposit / 10000).toFixed(1).padStart(5)} 萬`,
+                                  `【存股】${(this.chtStockDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
+                                      `【股票】${(this.stockDeposit / 10000).toFixed(1).padStart(5)} 萬`,
+                                  `【債券】${(this.bondDeposit / 10000).toFixed(1).padStart(5)} 萬  ` +
+                                      `【其它】${(this.otherDeposit / 10000).toFixed(1).padStart(5)} 萬`,
+                              ],
                         font: {
                             size: 13,
                             family: '"PingFang TC", monospace',
@@ -791,7 +813,9 @@ export default {
                             dataArr.map((data) => {
                                 sum += data;
                             });
-                            const itemName = ['現金', '定存', '存股', '股票', '債券', '其它'];
+                            const itemName = this.excludeStockSavings
+                                ? ['現金', '定存', '股票', '債券', '其它']
+                                : ['現金', '定存', '存股', '股票', '債券', '其它'];
                             // console.log(value);
                             if (value === 0) return '';
                             const percentage = `  ${itemName[ctx.dataIndex]}\n${((value * 100) / sum).toFixed(2)} %`;
@@ -933,32 +957,55 @@ export default {
             };
         },
         pieData() {
-            return {
-                labels: ['活存', '定存', '存股', '股票', '債券', '其它'],
-                datasets: [
-                    {
-                        data: [
-                            this.demandDeposit,
-                            this.fixedDeposit,
-                            this.chtStockDeposit,
-                            this.stockDeposit,
-                            this.bondDeposit,
-                            this.otherDeposit,
-                        ],
-                        backgroundColor: [
-                            // 背景色
-                            'rgba(255, 205, 86, 0.5)',
-                            'rgba(255, 159, 64, 0.5)',
-                            'rgba(204, 255, 144, 0.5)',
-                            'rgba(66, 202, 162, 0.4)',
-                            'rgba(200, 160, 255, 0.4)',
-                            'rgba(200, 200, 200, 0.2)', // 灰色
-                        ],
-                        // borderColor: ['rgb(66, 66, 66)'],
-                        borderWidth: 2, // 外框寬度
-                    },
-                ],
-            };
+            if (this.excludeStockSavings) {
+                // 排除存股的版本
+                return {
+                    labels: ['活存', '定存', '股票', '債券', '其它'],
+                    datasets: [
+                        {
+                            data: [this.demandDeposit, this.fixedDeposit, this.stockDeposit, this.bondDeposit, this.otherDeposit],
+                            backgroundColor: [
+                                // 背景色
+                                'rgba(255, 205, 86, 0.5)',
+                                'rgba(255, 159, 64, 0.5)',
+                                'rgba(66, 202, 162, 0.4)',
+                                'rgba(200, 160, 255, 0.4)',
+                                'rgba(200, 200, 200, 0.2)', // 灰色
+                            ],
+                            // borderColor: ['rgb(66, 66, 66)'],
+                            borderWidth: 2, // 外框寬度
+                        },
+                    ],
+                };
+            } else {
+                // 包含存股的版本（原版本）
+                return {
+                    labels: ['活存', '定存', '存股', '股票', '債券', '其它'],
+                    datasets: [
+                        {
+                            data: [
+                                this.demandDeposit,
+                                this.fixedDeposit,
+                                this.chtStockDeposit,
+                                this.stockDeposit,
+                                this.bondDeposit,
+                                this.otherDeposit,
+                            ],
+                            backgroundColor: [
+                                // 背景色
+                                'rgba(255, 205, 86, 0.5)',
+                                'rgba(255, 159, 64, 0.5)',
+                                'rgba(204, 255, 144, 0.5)',
+                                'rgba(66, 202, 162, 0.4)',
+                                'rgba(200, 160, 255, 0.4)',
+                                'rgba(200, 200, 200, 0.2)', // 灰色
+                            ],
+                            // borderColor: ['rgb(66, 66, 66)'],
+                            borderWidth: 2, // 外框寬度
+                        },
+                    ],
+                };
+            }
         },
         lineData() {
             return {
@@ -1442,6 +1489,10 @@ export default {
             // 使用 debounce 延遲保存歷史記錄，避免每次輸入都保存
             this.debouncedSaveHistory();
         },
+        // 切換是否排除存股
+        toggleStockSavings() {
+            this.excludeStockSavings = !this.excludeStockSavings;
+        },
         // onChangeDepositAmount(e, index) {
         //     console.log('onChangeAmount');
         //     console.log(index);
@@ -1501,4 +1552,17 @@ export default {
     background: rgba(255, 99, 132, 0.2)
 #line-chart-card > .el-card__body
     height: calc(100% - 61px)
+
+// 圓餅圖容器樣式
+.pie-chart-container
+    position: relative
+
+// 浮動切換按鈕樣式
+.floating-toggle-button
+    position: absolute !important
+    top: 23px
+    right: 4px
+    z-index: 10
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15)
+    border-radius: 4px
 </style>
