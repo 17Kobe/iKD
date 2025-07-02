@@ -158,6 +158,6 @@ export default {
 
 .tooltip-pre-line
     white-space: pre-line
-    font-size: 14px
+    font-size: 15px
     line-height: 1.6
 </style>
