@@ -18,16 +18,57 @@
                     <el-tooltip class="box-item" effect="dark" placement="bottom">
                         <template #content>
                             <div>
-                                <div style="font-size: 14px;">
+                                <div style="font-size: 14px">
+                                    存股金額：
+                                    <span
+                                        style="
+                                            color: rgb(176, 224, 230);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
+                                        >$ {{ stockSavingsAmount.toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
+                                <div style="font-size: 14px">
                                     排除存股後總資產：
-                                    <span style="color: rgb(176, 224, 230); padding: 2px 4px; border-radius: 3px; font-size: 15px; font-weight: bold;"
+                                    <span
+                                        style="
+                                            color: rgb(255, 202, 100);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
                                         >$ {{ assetsExcludingStockSavings.toLocaleString('en-US') }} 元</span
                                     >
                                 </div>
-                                <div style="font-size: 14px;">
-                                    存股金額：
-                                    <span style="color: rgb(255, 202, 100); padding: 2px 4px; border-radius: 3px; font-size: 15px; font-weight: bold;"
-                                        >$ {{ stockSavingsAmount.toLocaleString('en-US') }} 元</span
+                                <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0" />
+                                <div style="font-size: 14px">
+                                    現金：
+                                    <span
+                                        style="
+                                            color: rgb(176, 224, 230);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
+                                        >$ {{ demandDeposit.toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
+                                <div style="font-size: 14px">
+                                    可投資金額：
+                                    <span
+                                        style="
+                                            color: rgb(144, 238, 144);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
+                                        >$ {{ availableInvestmentAmount.toLocaleString('en-US') }} 元</span
                                     >
                                 </div>
                             </div>
@@ -591,6 +632,10 @@ export default {
         // 新增：計算存股金額
         stockSavingsAmount() {
             return this.chtStockDeposit;
+        },
+        // 新增：計算可投資金額（現金-20萬）
+        availableInvestmentAmount() {
+            return Math.max(0, this.demandDeposit - 200000);
         },
         liabilities() {
             const tempLiabilities = this.assetList.reduce((acc, { amount, isPositive }) => {
