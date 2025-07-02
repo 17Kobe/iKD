@@ -15,12 +15,13 @@
                         }}</span
                         >)
                     </div>
-                    <el-tooltip
-                        class="box-item"
-                        effect="dark"
-                        :content="`今日增減： ${todayAsset.toLocaleString('en-US')}`"
-                        placement="bottom"
-                    >
+                    <el-tooltip class="box-item" effect="dark" placement="bottom">
+                        <template #content>
+                            <div>
+                                <div>排除存股後總資產： $ {{ assetsExcludingStockSavings.toLocaleString('en-US') }} 元</div>
+                                <div>存股金額： $ {{ stockSavingsAmount.toLocaleString('en-US') }} 元</div>
+                            </div>
+                        </template>
                         <el-tag class="my-1" size="large" style="width: 100%; text-align: right"
                             >總計
                             <span style="font-size: 20px"> $ </span>
@@ -566,6 +567,21 @@ export default {
 
             return tempAssets;
         },
+        // 排除存股後的總資產
+        assetsExcludingStockSavings() {
+            return (
+                this.stockDeposit +
+                this.bondDeposit +
+                this.assetList.reduce((acc, { account, amount, isPositive }) => {
+                    if (isPositive && !/存股|股票/.test(account)) return acc + amount;
+                    return acc;
+                }, 0)
+            );
+        },
+        // 新增：計算存股金額
+        stockSavingsAmount() {
+            return this.chtStockDeposit;
+        },
         liabilities() {
             const tempLiabilities = this.assetList.reduce((acc, { amount, isPositive }) => {
                 if (!isPositive) return acc + Math.abs(amount);
@@ -663,7 +679,7 @@ export default {
             // 存在 cost 設定的股票名稱
             return this.stockCostExistAndTop5List.reduce((acc, { name }) => {
                 let tempName = name;
-                tempName = tempName.replace('基金', '').replace('A2', '');
+                tempName = tempName.replace('基金', '').replace('A2', '').replace('精選', '').replace('投資級企業債券', '債');
                 acc.push(tempName);
                 return acc;
             }, []);
