@@ -18,8 +18,18 @@
                     <el-tooltip class="box-item" effect="dark" placement="bottom">
                         <template #content>
                             <div>
-                                <div>排除存股後總資產： $ {{ assetsExcludingStockSavings.toLocaleString('en-US') }} 元</div>
-                                <div>存股金額： $ {{ stockSavingsAmount.toLocaleString('en-US') }} 元</div>
+                                <div style="font-size: 14px;">
+                                    排除存股後總資產：
+                                    <span style="color: rgb(176, 224, 230); padding: 2px 4px; border-radius: 3px; font-size: 15px; font-weight: bold;"
+                                        >$ {{ assetsExcludingStockSavings.toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
+                                <div style="font-size: 14px;">
+                                    存股金額：
+                                    <span style="color: rgb(255, 202, 100); padding: 2px 4px; border-radius: 3px; font-size: 15px; font-weight: bold;"
+                                        >$ {{ stockSavingsAmount.toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
                             </div>
                         </template>
                         <el-tag class="my-1" size="large" style="width: 100%; text-align: right"
