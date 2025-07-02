@@ -32,7 +32,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    排除存股後總資產：
+                                    排除存股的資產：
                                     <span
                                         style="
                                             color: rgb(255, 202, 100);
