@@ -98,6 +98,85 @@
                                         >$ {{ annualSalary.toLocaleString('en-US') }} 元</span
                                     >
                                 </div>
+                                <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0" />
+                                <div style="font-size: 14px">
+                                    現金：
+                                    <span
+                                        style="
+                                            color: rgb(255, 205, 86);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
+                                        >$ {{ demandDeposit.toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
+                                <div style="font-size: 14px">
+                                    定存：
+                                    <span
+                                        style="
+                                            color: rgb(255, 159, 64);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
+                                        >$ {{ fixedDeposit.toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
+                                <div style="font-size: 14px">
+                                    存股：
+                                    <span
+                                        style="
+                                            color: rgb(255, 99, 132);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
+                                        >$ {{ chtStockDeposit.toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
+                                <div style="font-size: 14px">
+                                    股票：
+                                    <span
+                                        style="
+                                            color: rgb(66, 202, 162);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
+                                        >$ {{ stockDeposit.toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
+                                <div style="font-size: 14px">
+                                    債券：
+                                    <span
+                                        style="
+                                            color: rgb(153, 102, 255);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
+                                        >$ {{ bondDeposit.toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
+                                <div style="font-size: 14px">
+                                    其它：
+                                    <span
+                                        style="
+                                            color: rgb(200, 200, 200);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
+                                        >$ {{ otherDeposit.toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
                             </div>
                         </template>
                         <el-tag class="my-1" size="large" style="width: 100%; text-align: right"
@@ -412,7 +491,7 @@
                 </el-button>
             </el-col>
         </el-row>
-        <br /><br /><br /><br /><br />
+        <br /><br /><br />
 
         <FormInterest ref="childFormInterest" />
     </div>
