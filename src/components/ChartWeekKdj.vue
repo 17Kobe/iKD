@@ -142,7 +142,14 @@
                                 <br />
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
                                 &nbsp;<span style="color: #bbb">最新</span> 本益比:
-                                <span style="color: rgb(255 105 105)"> {{ stockData.data.per.last.toFixed(2) }} </span>
+                                <span 
+                                    :style="{
+                                        color: 'rgb(255 105 105)',
+                                        textDecoration: stockData.data.per.last < stockData.data.per.median ? 'underline' : 'none'
+                                    }"
+                                > 
+                                    {{ stockData.data.per.last.toFixed(2) }} 
+                                </span>
                                 <br />
                                 <span v-for="(zone, index) in peZones" :key="index">
                                     &nbsp;近 4 季 EPS 估算 <span style="color: #bbb">{{ zone }} 倍</span> 本益比的股價:
@@ -174,7 +181,13 @@
                         </template>
                         <div>
                             <span style="color: rgb(34, 35, 38); font-size: 9px; margin-right: 4px">本益比</span>
-                            <b>{{ stockData.data.per.last.toFixed(1) }}</b>
+                            <b 
+                                :style="{
+                                    textDecoration: stockData.data.per.last < stockData.data.per.median ? 'underline' : 'none'
+                                }"
+                            >
+                                {{ stockData.data.per.last.toFixed(1) }}
+                            </b>
                         </div>
                     </el-tooltip>
                 </span>
