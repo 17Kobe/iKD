@@ -71,6 +71,33 @@
                                         >$ {{ availableInvestmentAmount.toLocaleString('en-US') }} 元</span
                                     >
                                 </div>
+                                <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0" />
+                                <div style="font-size: 14px">
+                                    月薪：
+                                    <span
+                                        style="
+                                            color: rgb(176, 224, 230);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
+                                        >$ {{ monthlySalary.toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
+                                <div style="font-size: 14px">
+                                    年薪：
+                                    <span
+                                        style="
+                                            color: rgb(144, 238, 144);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
+                                        >$ {{ annualSalary.toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
                             </div>
                         </template>
                         <el-tag class="my-1" size="large" style="width: 100%; text-align: right"
@@ -372,8 +399,21 @@
                 </el-card>
             </el-col>
         </el-row>
-        <br /><br />
-        <br /><br />
+        <br />
+
+        <!-- 月薪輸入區域 -->
+        <el-row>
+            <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="5" style="padding: 2px 4px 5px 4px">
+                <el-button type="primary" size="small" @click="onSetMonthlySalary" round plain>
+                    <i class="el-icon-money"></i> 設定月薪
+                    <span v-if="monthlySalary > 0" style="margin-left: 8px; font-weight: bold">
+                        ($ {{ monthlySalary.toLocaleString('en-US') }} 元)
+                    </span>
+                </el-button>
+            </el-col>
+        </el-row>
+        <br /><br /><br /><br /><br />
+
         <FormInterest ref="childFormInterest" />
     </div>
 </template>
@@ -404,6 +444,7 @@ export default {
             assetListHistory: [], // 資產列表歷史記錄，最多保存20次
             currentHistoryIndex: -1, // 當前歷史記錄索引
             excludeStockSavings: true, // 是否排除存股
+            monthlySalary: 0, // 月薪
             lineOptions: {
                 // 隱藏點
                 elements: {
@@ -636,6 +677,10 @@ export default {
         // 新增：計算可投資金額（現金-20萬）
         availableInvestmentAmount() {
             return Math.max(0, this.demandDeposit - 200000);
+        },
+        // 新增：計算年薪（月薪*19.7+4.8萬）
+        annualSalary() {
+            return Math.round(this.monthlySalary * 19.7 + 48000);
         },
         liabilities() {
             const tempLiabilities = this.assetList.reduce((acc, { amount, isPositive }) => {
@@ -1380,6 +1425,12 @@ export default {
         const localInterestList = JSON.parse(localStorage.getItem('interestList')) || [];
         this.$store.commit('SAVE_INTEREST', localInterestList);
 
+        // 載入月薪
+        const savedMonthlySalary = localStorage.getItem('monthlySalary');
+        if (savedMonthlySalary) {
+            this.monthlySalary = parseFloat(savedMonthlySalary) || 0;
+        }
+
         // 初始化歷史記錄
         this.initializeHistory();
 
@@ -1559,6 +1610,40 @@ export default {
 
             // 使用 debounce 延遲保存歷史記錄，避免每次輸入都保存
             this.debouncedSaveHistory();
+        },
+        // 月薪變更處理
+        onMonthlySalaryChange() {
+            localStorage.setItem('monthlySalary', this.monthlySalary.toString());
+        },
+        // 設定月薪（彈出輸入框）
+        async onSetMonthlySalary() {
+            try {
+                const { value } = await ElMessageBox.prompt('請輸入月薪金額', '設定月薪', {
+                    confirmButtonText: '確定',
+                    cancelButtonText: '取消',
+                    inputPattern: /^\d+$/,
+                    inputErrorMessage: '請輸入有效的數字',
+                    inputValue: this.monthlySalary > 0 ? this.monthlySalary.toString() : '',
+                    inputPlaceholder: '請輸入月薪（僅數字）',
+                });
+
+                const newSalary = parseInt(value, 10);
+                if (newSalary >= 0) {
+                    this.monthlySalary = newSalary;
+                    localStorage.setItem('monthlySalary', this.monthlySalary.toString());
+
+                    ElMessage({
+                        type: 'success',
+                        message: `月薪已設定為 $ ${this.monthlySalary.toLocaleString('en-US')} 元`,
+                    });
+                }
+            } catch (error) {
+                // 使用者取消操作
+                ElMessage({
+                    type: 'info',
+                    message: '已取消設定',
+                });
+            }
         },
         // 切換是否排除存股
         toggleStockSavings() {
