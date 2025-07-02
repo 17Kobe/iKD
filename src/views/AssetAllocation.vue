@@ -62,7 +62,7 @@
                                     可投資金額：
                                     <span
                                         style="
-                                            color: rgb(144, 238, 144);
+                                            color: rgb(255, 202, 100);
                                             padding: 2px 4px;
                                             border-radius: 3px;
                                             font-size: 15px;
