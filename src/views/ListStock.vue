@@ -23,9 +23,14 @@
             >
                 <template #default="scope">
                     <div style="width: 95px; display: inline-block">
-                        <el-tooltip :trigger="popoverTrigger" effect="dark" placement="right">
+                        <el-tooltip
+                            :trigger="popoverTrigger"
+                            effect="dark"
+                            placement="bottom"
+                            popper-class="custom-badge-tooltip"
+                        >
                             <template #content>
-                                {{ getBadgeTitle(scope.row.badge_reason) }}
+                                <div v-html="getBadgeTooltipHtml(scope.row)"></div>
                             </template>
                             <el-badge
                                 :value="scope.row.badge"
@@ -1370,6 +1375,40 @@ export default {
         getNumberSum(array) {
             return _.sumBy(array, 'number');
         },
+        getBadgeTooltipHtml(row) {
+            // 第一行：股票名稱（黃色）
+            let result = `<div style="line-height: 1.5; color: rgb(255, 202, 100);">${row.name}</div>`;
+
+            // 如果有 badge，第二行顯示訊號（根據類型顯示不同顏色）
+            if (row.badge) {
+                let badgeColor = '#fff'; // 預設白色
+
+                if (row.badge.includes('取消')) {
+                    badgeColor = '#cbcbcd'; // 灰色
+                } else if (row.badge.includes('買')) {
+                    badgeColor = '#ff6666'; // 紅色
+                } else if (row.badge.includes('賣')) {
+                    badgeColor = '#53ed52'; // 綠色
+                }
+
+                result += `<div style="line-height: 1.5;">訊號：<span style="color: ${badgeColor}; font-weight: bold;">${row.badge}</span></div>`;
+            }
+
+            // 如果有理由，第三行顯示理由
+            const reasonText = this.getBadgeTitle(row.badge_reason);
+            if (reasonText) {
+                // 移除 "原因: " 前綴，只保留實際理由內容
+                const cleanReason = reasonText.replace('原因: ', '');
+                // 將 [KD黃金交叉] 等標籤改為藍色
+                const coloredReason = cleanReason.replace(
+                    /\[([^\]]+)\]/g,
+                    '<span style="color: rgb(176, 224, 230); font-weight: bold;">[$1]</span>'
+                );
+                result += `<div style="line-height: 1.5;">理由：${coloredReason}</div>`;
+            }
+
+            return result;
+        },
         getBadgeTitle(array) {
             const options = {
                 kd_gold: 'KD 黃金交叉',
@@ -1399,7 +1438,7 @@ export default {
                 }
             }
 
-            return '原因: ' + resultArray.join(', ');
+            return resultArray.length > 0 ? '原因: ' + resultArray.join(', ') : '';
         },
         showPolicyMore(id) {
             const alwaysId = 'always-' + id;
@@ -1548,6 +1587,25 @@ input::-webkit-inner-spin-button
 // 進度列中的文字靠左對齊
 .el-progress-bar__inner
     text-align: left
+
+@keyframes shake-base
+    0%, 100%
+        transform: translateX(0)
+    25%
+        transform: translateX(-4px)
+    50%
+        transform: translateX(4px)
+
+// 自訂 badge tooltip 樣式
+.custom-badge-tooltip
+    font-size: 15px !important
+    line-height: 1.5 !important
+    max-width: 320px
+    .el-tooltip__content
+        font-size: 15px !important
+        line-height: 1.5 !important
+        white-space: normal
+        text-align: left
 
 @keyframes shake-base
     0%, 100%

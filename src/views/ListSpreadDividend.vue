@@ -98,10 +98,13 @@
                     <el-tooltip
                         class="box-item"
                         effect="dark"
-                        :content="`${scope.row.name} ${getBadgeTitle(scope.row.badge_reason)}`"
-                        placement="top"
+                        placement="bottom"
+                        popper-class="custom-badge-tooltip"
                         v-if="modeSpread === '目前'"
                     >
+                        <template #content>
+                            <div v-html="getBadgeTooltipHtml(scope.row)"></div>
+                        </template>
                         <el-badge
                             :value="scope.row.badge"
                             :class="[
@@ -1329,6 +1332,59 @@ export default {
             }
             return 'table-custom-row';
         },
+        getBadgeTooltipHtml(row) {
+            // 第一行：股票名稱
+            let result = `<div style="line-height: 1.5; color: rgb(255, 202, 100);">${row.name}</div>`;
+
+            // 如果有 badge，第二行顯示訊號（根據類型顯示不同顏色）
+            if (row.badge) {
+                let badgeColor = '#fff'; // 預設白色
+
+                if (row.badge.includes('取消')) {
+                    badgeColor = '#cbcbcd'; // 黑色
+                } else if (row.badge.includes('買')) {
+                    badgeColor = '#ff6666'; // 紅色
+                } else if (row.badge.includes('賣')) {
+                    badgeColor = '#53ed52'; // 綠色
+                }
+
+                result += `<div style="line-height: 1.5;">訊號：<span style="color: ${badgeColor}; font-weight: bold;">${row.badge}</span></div>`;
+            }
+
+            // 如果有理由，第三行顯示理由
+            const reasonText = this.getBadgeTitle(row.badge_reason);
+            if (reasonText) {
+                // 移除 " --- 理由: " 前綴，只保留實際理由內容
+                const cleanReason = reasonText.replace(' --- 理由: ', '');
+                // 將 [KD黃金交叉] 等標籤改為黃色
+                const coloredReason = cleanReason.replace(
+                    /\[([^\]]+)\]/g,
+                    '<span style="color: rgb(176, 224, 230); font-weight: bold;">[$1]</span>'
+                );
+                result += `<div style="line-height: 1.5;">理由：${coloredReason}</div>`;
+            }
+
+            return result;
+        },
+        getBadgeTooltipContent(row) {
+            // 第一行：股票名稱
+            let result = row.name;
+
+            // 如果有 badge，第二行顯示訊號
+            if (row.badge) {
+                result += `\n訊號：${row.badge}`;
+            }
+
+            // 如果有理由，第三行顯示理由
+            const reasonText = this.getBadgeTitle(row.badge_reason);
+            if (reasonText) {
+                // 移除 " --- 理由: " 前綴，只保留實際理由內容
+                const cleanReason = reasonText.replace(' --- 理由: ', '');
+                result += `\n理由：${cleanReason}`;
+            }
+
+            return result;
+        },
         getBadgeTitle(array) {
             const options = {
                 kd_gold: 'KD 黃金交叉',
@@ -1418,6 +1474,17 @@ export default {
 .el-radio-button__original-radio:not(:checked)+.el-radio-button__inner
     font-weight: unset
     color: #aaaaaa
+
+// 自訂 badge tooltip 樣式
+.custom-badge-tooltip
+    font-size: 15px !important
+    line-height: 1.5 !important
+    max-width: 320px
+    .el-tooltip__content
+        font-size: 15px !important
+        line-height: 1.5 !important
+        white-space: normal
+        text-align: left
 
 // 使用 element plus  beta版在用 table 時 cell 有時最後一列的第一欄會有一半高度的白色區塊會擋住
 .el-table__fixed
