@@ -177,6 +177,70 @@
                                         >$ {{ otherDeposit.toLocaleString('en-US') }} 元</span
                                     >
                                 </div>
+                                
+                                <!-- 年度預算資訊 -->
+                                <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0" />
+                                <div style="font-size: 14px; color: #409EFF; margin-bottom: 8px; font-weight: bold;">
+                                    📊 剩餘 {{ remainingBudget.remainingMonths }} 個月預算 ({{ new Date().getFullYear() }} 年)
+                                </div>
+                                
+                                <div style="font-size: 13px">
+                                    固定收入：
+                                    <span style="color: #afdbfb; font-weight: bold; text-decoration: underline;">
+                                        $ {{ remainingBudget.remainingFixedIncome.toLocaleString('en-US') }} 元
+                                    </span>
+                                </div>
+                                <div style="font-size: 13px">
+                                    固定支出：
+                                    <span style="color: #f3a5b4; font-weight: bold; text-decoration: underline;">
+                                        $ {{ remainingBudget.remainingFixedExpenses.toLocaleString('en-US') }} 元
+                                    </span>
+                                </div>
+                                <div style="font-size: 13px">
+                                    一次性收入：
+                                    <span style="color: #afdbfb; font-weight: bold;">
+                                        $ {{ remainingBudget.remainingOneTimeIncome.toLocaleString('en-US') }} 元
+                                    </span>
+                                </div>
+                                <div style="font-size: 13px">
+                                    一次性支出：
+                                    <span style="color: #f3a5b4; font-weight: bold;">
+                                        $ {{ remainingBudget.remainingOneTimeExpenseAmount.toLocaleString('en-US') }} 元
+                                    </span>
+                                </div>
+                                
+                                <!-- 一次性收入/支出清單 -->
+                                <hr style="margin: 6px 0; border: none; border-top: 1px solid #e0e0e0" />
+                                <div style="font-size: 14px; color: #409EFF; margin-bottom: 4px; font-weight: bold;">
+                                    📋 剩餘一次性收入/支出清單
+                                </div>
+                                <div v-for="item in remainingBudget.oneTimeItemsList" 
+                                     :key="item.name + item.month" 
+                                     style="font-size: 12px; margin-left: 8px; line-height: 1.4;">
+                                    • {{ item.dateStr }} {{ item.name }}: 
+                                    <span v-if="item.type === 'income'" style="color: #afdbfb; font-weight: bold;">
+                                        $ {{ item.amountStr }} 元
+                                    </span>
+                                    <span v-else style="color: #f3a5b4; font-weight: bold;">
+                                        $ {{ item.amountStr }} 元
+                                    </span>
+                                </div>
+                                
+                                <!-- 預算不足警示 -->
+                                <hr style="margin: 6px 0; border: none; border-top: 1px solid #e0e0e0" />
+                                <div v-if="remainingBudget.budgetShortfall > 0" 
+                                     style="font-size: 14px; color: #F56C6C; font-weight: bold; background: #FEF0F0; padding: 6px 8px; border-radius: 4px; border: 1px solid #F56C6C;">
+                                    ⚠️ 預算不足：$ {{ remainingBudget.budgetShortfall.toLocaleString('en-US') }} 元
+                                </div>
+                                <div v-else 
+                                     style="font-size: 14px; color: #67C23A; font-weight: bold; background: #F0F9FF; padding: 6px 8px; border-radius: 4px; border: 1px solid #67C23A;">
+                                    ✅ 預算充足，剩餘：$ {{ (remainingBudget.totalIncome - remainingBudget.totalExpenses).toLocaleString('en-US') }} 元
+                                </div>
+                                
+                                <!-- 預算管理提示 -->
+                                <div style="font-size: 11px; color: #909399; margin-top: 6px; text-align: center; padding: 4px;">
+                                    💡 點擊「設定月薪」按鈕可修改預算資料
+                                </div>
                             </div>
                         </template>
                         <el-tag class="my-1" size="large" style="width: 100%; text-align: right"
@@ -374,9 +438,14 @@
         </template>
         <el-row>
             <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="5" style="padding: 2px 4px 5px 4px">
-                <el-button type="primary" size="small" @click="onAddDeposit" round plain
-                    ><i class="el-icon-plus"></i> 新增資產</el-button
-                >
+                <el-button 
+                    type="primary" 
+                    size="small" 
+                    @click="onAddDeposit" 
+                    round 
+                    plain>
+                    <i class="el-icon-plus" style="font-size: 16px; margin-right: 6px;"></i> 新增資產
+                </el-button>
             </el-col>
             <!-- <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="3" style="padding-left: 4px; padding-top: 4px">
                 <el-button type="primary" size="small" @click="onResetAsset" round><i class="el-icon-minus"></i></el-button>
@@ -480,9 +549,9 @@
         </el-row>
         <br />
 
-        <!-- 月薪輸入區域 -->
+        <!-- 月薪輸入區域 - 長者友善按鈕 -->
         <el-row>
-            <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="5" style="padding: 2px 4px 5px 4px">
+            <el-col :xs="24" :sm="12" :md="10" :lg="8" :xl="6" style="padding: 2px 4px 5px 4px">
                 <el-button type="primary" size="small" @click="onSetMonthlySalary" round plain>
                     <i class="el-icon-money"></i> 設定月薪
                     <span v-if="monthlySalary > 0" style="margin-left: 8px; font-weight: bold">
@@ -523,7 +592,44 @@ export default {
             assetListHistory: [], // 資產列表歷史記錄，最多保存20次
             currentHistoryIndex: -1, // 當前歷史記錄索引
             excludeStockSavings: true, // 是否排除存股
-            monthlySalary: 0, // 月薪
+            monthlySalary: 76975, // 月薪 - 與 budgetData.monthlyIncome 同步
+            
+            // 年度預算相關數據
+            budgetData: {
+                monthlyIncome: 76975, // 每月月薪
+                monthlyExpenses: [
+                    { name: '給老婆', amount: 41000 },
+                    { name: '給爸爸', amount: 3000 },
+                    { name: '房貸', amount: 17500 },
+                    { name: '車貸', amount: 23000 },
+                    { name: '油費', amount: 3500 }
+                ],
+                oneTimeIncome: [
+                    { name: '春節獎金1個月月薪', month: 1, day: 31, multiplier: 1 },
+                    { name: '企業獎金0.5個月月薪', month: 1, day: 31, multiplier: 0.5 },
+                    { name: '績效獎金2個月月薪', month: 1, day: 31, multiplier: 2 },
+                    { name: '酬勞0.6個月月薪', month: 4, day: 30, multiplier: 0.6 },
+                    { name: '企業化獎金1.6個月月薪', month: 5, day: 31, multiplier: 1.6 },
+                    { name: '端午獎金0.3個月月薪', month: 6, day: 5, multiplier: 0.3 },
+                    { name: '酬勞1個月月薪', month: 7, day: 15, multiplier: 1 },
+                    { name: '中秋獎金0.3個月月薪', month: 9, day: 5, multiplier: 0.3 }
+                ],
+                oneTimeExpenses: [
+                    { name: '紅包', month: 1, day: 31, amount: 90200 },
+                    { name: '車子保險費', month: 3, day: 5, amount: 50000 },
+                    { name: '我的實支實附保險費', month: 3, day: 5, amount: 23000 },
+                    { name: '汽車牌照稅', month: 4, day: 5, amount: 11230 },
+                    { name: '恬恬保險費', month: 4, day: 5, amount: 23000 },
+                    { name: '芸芸保險費', month: 4, day: 5, amount: 33000 },
+                    { name: '房屋稅', month: 5, day: 5, amount: 4983 },
+                    { name: '房子火險', month: 5, day: 5, amount: 2000 },
+                    { name: '汽車燃料稅', month: 7, day: 5, amount: 6180 },
+                    { name: '出去玩', month: 8, day: 5, amount: 20000 },
+                    { name: '地價稅', month: 11, day: 5, amount: 140 },
+                    { name: '車保養', month: 12, day: 5, amount: 20000 }
+                ]
+            },
+            
             lineOptions: {
                 // 隱藏點
                 elements: {
@@ -654,6 +760,84 @@ export default {
         };
     },
     computed: {
+        // 計算剩餘月份的預算資訊
+        remainingBudget() {
+            const now = new Date();
+            const currentMonth = now.getMonth() + 1; // 1-12
+            const currentYear = now.getFullYear();
+            const remainingMonths = 12 - currentMonth + 1; // 包含當月
+            
+            // 計算剩餘月份固定收入（四捨五入到整數）
+            const remainingFixedIncome = Math.round(this.budgetData.monthlyIncome * remainingMonths);
+            
+            // 計算剩餘月份固定支出（四捨五入到整數）
+            const monthlyExpenseTotal = this.budgetData.monthlyExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const remainingFixedExpenses = Math.round(monthlyExpenseTotal * remainingMonths);
+            
+            // 計算剩餘月份一次性收入（四捨五入到整數）
+            const remainingOneTimeIncome = Math.round(
+                this.budgetData.oneTimeIncome
+                    .filter(income => income.month >= currentMonth)
+                    .reduce((sum, income) => sum + (this.budgetData.monthlyIncome * income.multiplier), 0)
+            );
+            
+            // 計算剩餘月份一次性支出（含清單）
+            const remainingOneTimeExpenses = this.budgetData.oneTimeExpenses
+                .filter(expense => expense.month >= currentMonth);
+            
+            const remainingOneTimeExpenseAmount = Math.round(
+                remainingOneTimeExpenses.reduce((sum, expense) => sum + expense.amount, 0)
+            );
+            
+            // 格式化一次性支出清單（金額四捨五入到整數）
+            const oneTimeExpensesList = remainingOneTimeExpenses
+                .map(expense => {
+                    const date = new Date(currentYear, expense.month - 1, expense.day);
+                    return {
+                        ...expense,
+                        type: 'expense',
+                        dateStr: `${expense.month}/${expense.day}`,
+                        amountStr: `-${Math.round(expense.amount).toLocaleString('en-US')}`
+                    };
+                });
+                
+            // 格式化一次性收入清單（金額四捨五入到整數）
+            const remainingOneTimeIncomeItems = this.budgetData.oneTimeIncome
+                .filter(income => income.month >= currentMonth);
+            
+            const oneTimeIncomeList = remainingOneTimeIncomeItems
+                .map(income => {
+                    const date = new Date(currentYear, income.month - 1, income.day);
+                    const amount = Math.round(this.budgetData.monthlyIncome * income.multiplier);
+                    return {
+                        ...income,
+                        type: 'income',
+                        dateStr: `${income.month}/${income.day}`,
+                        amountStr: `+${amount.toLocaleString('en-US')}`
+                    };
+                });
+                
+            // 合併收入和支出清單並按日期排序
+            const oneTimeItemsList = [...oneTimeIncomeList, ...oneTimeExpensesList]
+                .sort((a, b) => a.month - b.month || a.day - b.day);
+            
+            // 計算預算不足金額（四捨五入到整數）
+            const totalIncome = remainingFixedIncome + remainingOneTimeIncome;
+            const totalExpenses = remainingFixedExpenses + remainingOneTimeExpenseAmount;
+            const budgetShortfall = Math.max(0, Math.round(totalExpenses - totalIncome));
+            
+            return {
+                remainingMonths,
+                remainingFixedIncome,
+                remainingFixedExpenses,
+                remainingOneTimeIncome,
+                remainingOneTimeExpenseAmount,
+                oneTimeItemsList,
+                budgetShortfall,
+                totalIncome,
+                totalExpenses
+            };
+        },
         canUndo() {
             return this.currentHistoryIndex > 0;
         },
@@ -1490,6 +1674,13 @@ export default {
             acc.push({ account: account, amount: Math.abs(amount), isPositive: amount >= 0 });
             return acc;
         }, []);
+        
+        // 載入月薪設定
+        const savedMonthlySalary = localStorage.getItem('monthlySalary');
+        if (savedMonthlySalary) {
+            this.monthlySalary = parseInt(savedMonthlySalary, 10);
+            this.budgetData.monthlyIncome = this.monthlySalary; // 同步到預算資料
+        }
         // console.log('created asset over!');
 
         // 歷史存款
@@ -1503,12 +1694,6 @@ export default {
         // 利息清單，這也有點算歷史，因為每年都有
         const localInterestList = JSON.parse(localStorage.getItem('interestList')) || [];
         this.$store.commit('SAVE_INTEREST', localInterestList);
-
-        // 載入月薪
-        const savedMonthlySalary = localStorage.getItem('monthlySalary');
-        if (savedMonthlySalary) {
-            this.monthlySalary = parseFloat(savedMonthlySalary) || 0;
-        }
 
         // 初始化歷史記錄
         this.initializeHistory();
@@ -1709,19 +1894,17 @@ export default {
                 const newSalary = parseInt(value, 10);
                 if (newSalary >= 0) {
                     this.monthlySalary = newSalary;
+                    // 同步更新預算資料中的月薪
+                    this.budgetData.monthlyIncome = newSalary;
                     localStorage.setItem('monthlySalary', this.monthlySalary.toString());
 
                     ElMessage({
                         type: 'success',
-                        message: `月薪已設定為 $ ${this.monthlySalary.toLocaleString('en-US')} 元`,
+                        message: `月薪已設定為 $ ${this.monthlySalary.toLocaleString('en-US')} 元，預算計算已同步更新`,
                     });
                 }
             } catch (error) {
-                // 使用者取消操作
-                ElMessage({
-                    type: 'info',
-                    message: '已取消設定',
-                });
+                // 取消或出錯時不做任何操作
             }
         },
         // 切換是否排除存股
