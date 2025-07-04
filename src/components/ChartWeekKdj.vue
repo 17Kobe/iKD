@@ -142,13 +142,14 @@
                                 <br />
                                 <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
                                 &nbsp;<span style="color: #bbb">最新</span> 本益比:
-                                <span 
+                                <span
                                     :style="{
                                         color: 'rgb(255 105 105)',
-                                        textDecoration: stockData.data.per.last < stockData.data.per.median ? 'underline' : 'none'
+                                        textDecoration:
+                                            stockData.data.per.last < stockData.data.per.median ? 'underline' : 'none',
                                     }"
-                                > 
-                                    {{ stockData.data.per.last.toFixed(2) }} 
+                                >
+                                    {{ stockData.data.per.last.toFixed(2) }}
                                 </span>
                                 <br />
                                 <span v-for="(zone, index) in peZones" :key="index">
@@ -181,9 +182,9 @@
                         </template>
                         <div>
                             <span style="color: rgb(34, 35, 38); font-size: 9px; margin-right: 4px">本益比</span>
-                            <b 
+                            <b
                                 :style="{
-                                    textDecoration: stockData.data.per.last < stockData.data.per.median ? 'underline' : 'none'
+                                    textDecoration: stockData.data.per.last < stockData.data.per.median ? 'underline' : 'none',
                                 }"
                             >
                                 {{ stockData.data.per.last.toFixed(1) }}
@@ -243,7 +244,11 @@
                 </span>
 
                 <span
-                    v-if="stockData.data && stockData.data.pbr && stockData.data.dy_per_pbr_date"
+                    v-if="
+                        stockData.data &&
+                        ((['exchange', 'fund', 'usStock'].indexOf(stockData.type) === -1 && stockData.is_dividend !== false) ||
+                            stockData.name.includes('元大2至10年投資級企業債券基金'))
+                    "
                     style="
                         position: absolute;
                         top: 0px;
@@ -266,34 +271,36 @@
                                 DY:
                                 殖利率，該日的年化股息收益率。&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <br />
-                                <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
-                                &nbsp;<span style="color: #bbb">最新</span> 殖利率:
-                                <span style="color: rgb(255 105 105)"
-                                    >{{ stockData.data.dy.last.toFixed(2) }}<span style="margin-left: 2px">%</span></span
-                                >
-                                <br />
-                                &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 殖利率:
-                                <span style="color: rgb(255 202 100)"
-                                    >{{ stockData.data.dy.median.toFixed(2) }}<span style="margin-left: 2px">%</span></span
-                                >
-                                <br />
-                                &nbsp;近 5 年 <span style="color: #bbb">平均</span> 殖利率:
-                                <span style="color: rgb(176, 224, 230)"
-                                    >{{ stockData.data.dy.mean.toFixed(2) }}<span style="margin-left: 2px">%</span></span
-                                >
-                                <br />
-                                &nbsp;近 5 年 <span style="color: #bbb">最高</span> 殖利率:
-                                <span style="color: rgb(255 202 100)"
-                                    >{{ stockData.data.dy.max.toFixed(2) }}<span style="margin-left: 2px">%</span></span
-                                >
-                                <br />
-                                &nbsp;近 5 年 <span style="color: #bbb">最低</span> 殖利率:
-                                <span style="color: rgb(176, 224, 230)"
-                                    >{{ stockData.data.dy.min.toFixed(2) }}<span style="margin-left: 2px">%</span></span
-                                >
-                                <br />
-                                &nbsp;計算日期:
-                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
+                                <div v-if="stockData.data.dy">
+                                    <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
+                                    &nbsp;<span style="color: #bbb">最新</span> 殖利率:
+                                    <span style="color: rgb(255 105 105)"
+                                        >{{ stockData.data.dy.last.toFixed(2) }}<span style="margin-left: 2px">%</span></span
+                                    >
+                                    <br />
+                                    &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 殖利率:
+                                    <span style="color: rgb(255 202 100)"
+                                        >{{ stockData.data.dy.median.toFixed(2) }}<span style="margin-left: 2px">%</span></span
+                                    >
+                                    <br />
+                                    &nbsp;近 5 年 <span style="color: #bbb">平均</span> 殖利率:
+                                    <span style="color: rgb(176, 224, 230)"
+                                        >{{ stockData.data.dy.mean.toFixed(2) }}<span style="margin-left: 2px">%</span></span
+                                    >
+                                    <br />
+                                    &nbsp;近 5 年 <span style="color: #bbb">最高</span> 殖利率:
+                                    <span style="color: rgb(255 202 100)"
+                                        >{{ stockData.data.dy.max.toFixed(2) }}<span style="margin-left: 2px">%</span></span
+                                    >
+                                    <br />
+                                    &nbsp;近 5 年 <span style="color: #bbb">最低</span> 殖利率:
+                                    <span style="color: rgb(176, 224, 230)"
+                                        >{{ stockData.data.dy.min.toFixed(2) }}<span style="margin-left: 2px">%</span></span
+                                    >
+                                    <br />
+                                    &nbsp;計算日期:
+                                    <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
+                                </div>
                                 <BarChart :chartData="dyBarData" :options="dyBarOptions" />
 
                                 <!-- 歷年股利清單 -->
@@ -357,8 +364,22 @@
                         </template>
                         <div>
                             <span style="color: rgb(34, 35, 38); font-size: 9px; margin-right: 2px">殖利率</span>
-                            <b>{{ stockData.data.dy.last.toFixed(1) }}</b
-                            ><span style="font-size: 9px; margin-left: 1px">%</span>
+                            <span v-if="stockData.data.dy">
+                                <b>{{ stockData.data.dy.last.toFixed(1) }}</b>
+                                <span style="font-size: 9px; margin-left: 1px">%</span>
+                            </span>
+                            <span
+                                v-else-if="
+                                    stockData.data.dividend &&
+                                    stockData.data.dividend.length > 0 &&
+                                    stockData.data.dividend[stockData.data.dividend.length - 1].dividendYield !== undefined
+                                "
+                            >
+                                <b>{{
+                                    Number(stockData.data.dividend[stockData.data.dividend.length - 1].dividendYield).toFixed(1)
+                                }}</b>
+                                <span style="font-size: 9px; margin-left: 1px">%</span>
+                            </span>
                         </div>
                     </el-tooltip>
                 </span>
@@ -604,8 +625,8 @@
                                                 : ''
                                         }}</span
                                         >%</el-tag
-                                    >
-                                </el-col>
+                                    ></el-col
+                                >
                                 <el-col :span="7" style="padding: 0 0 0 15px; text-align: left"
                                     ><span>&nbsp;平均報酬率</span></el-col
                                 >
@@ -1072,7 +1093,12 @@ export default {
 
             // 整理每年的現金股利、股票股利及殖利率
             const yearlyData = this.stockData.data.dividend.reduce((acc, curr) => {
-                const year = curr.date.split('-')[0];
+                // 取得年份，優先順序：date > CashExDividendTradingDate > StockExDividendTradingDate
+                let dateStr = curr.date;
+                if (!dateStr) dateStr = curr.CashExDividendTradingDate;
+                if (!dateStr) dateStr = curr.StockExDividendTradingDate;
+                const year = dateStr ? dateStr.split('-')[0] : '未知';
+
                 if (!acc[year]) {
                     acc[year] = {
                         cashDividend: 0,
@@ -1701,45 +1727,45 @@ export default {
                         plotLines: [
                             {
                                 value: 20, // 20 的位置
-                                color: '#e6e6e6', // 线的颜色
-                                width: 1, // 线的宽度
-                                zIndex: 1, // 线的层级
+                                color: '#e6e6e6', // 線的顏色
+                                width: 1, // 線的寬度
+                                zIndex: 1, // 線的層級
                                 label: {
                                     text: '20', // 刻度值
-                                    align: 'right', // 刻度值的对齐方式
+                                    align: 'right', // 刻度值的對齊方式
                                     x: -1, // 刻度值的水平偏移
                                     y: 3,
                                 },
                             },
                             {
                                 value: 50, // 50 的位置
-                                color: '#e6e6e6', // 线的颜色
-                                width: 1, // 线的宽度
-                                zIndex: 1, // 线的层级
+                                color: '#e6e6e6', // 線的顏色
+                                width: 1, // 線的寬度
+                                zIndex: 1, // 線的層級
                                 label: {
                                     text: '50', // 刻度值
-                                    align: 'right', // 刻度值的对齐方式
+                                    align: 'right', // 刻度值的對齊方式
                                     x: -1, // 刻度值的水平偏移
                                     y: 3,
                                 },
                             },
                             {
                                 value: 80, // 80 的位置
-                                color: '#e6e6e6', // 线的颜色
-                                width: 1, // 线的宽度
-                                zIndex: 1, // 线的层级
+                                color: '#e6e6e6', // 線的顏色
+                                width: 1, // 線的寬度
+                                zIndex: 1, // 線的層級
                                 label: {
                                     text: '80', // 刻度值
-                                    align: 'right', // 刻度值的对齐方式
+                                    align: 'right', // 刻度值的對齊方式
                                     x: -1, // 刻度值的水平偏移
                                     y: 3,
                                 },
                             },
                             {
                                 value: this.showJLine ? 115 : 100, // 100 的位置
-                                color: '#e6e6e6', // 线的颜色
-                                width: 1, // 线的宽度
-                                zIndex: 1, // 线的层级
+                                color: '#e6e6e6', // 線的顏色
+                                width: 1, // 線的寬度
+                                zIndex: 1, // 線的層級
                                 label: {
                                     text: '', // 刻度值
                                 },
