@@ -301,7 +301,11 @@
                                     &nbsp;計算日期:
                                     <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
                                 </div>
-                                <BarChart :chartData="dyBarData" :options="dyBarOptions" />
+                                <BarChart
+                                    v-if="yearlyDividends && yearlyDividends.length > 0"
+                                    :chartData="dyBarData"
+                                    :options="dyBarOptions"
+                                />
 
                                 <!-- 歷年股利清單 -->
                                 <!-- 標題列 -->
