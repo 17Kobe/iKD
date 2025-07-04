@@ -1551,6 +1551,7 @@ const stock = {
         },
         async SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
             console.log('SAVE_STOCK_COST');
+
             // object of array 去 find 並 update
             const foundStock = state.stockList.find((v) => v.id === stockId);
 
@@ -1569,7 +1570,7 @@ const stock = {
 
                 // save to localstorage
             }
-
+            state.spreadTrendCache = {};
             let tempStockListStockData = {};
             const weekly_data = await this.dispatch('CALC_STOCK_WEEKLY', stockId);
             tempStockListStockData.weekly = weekly_data;
@@ -3238,29 +3239,6 @@ const stock = {
         CLEAR_SPREAD_TREND_CACHE(state) {
             console.log('CLEAR_SPREAD_TREND_CACHE');
             state.spreadTrendCache = {};
-        },
-
-        // 保存股票成本設定並清空緩存
-        SAVE_STOCK_COST(state, { stockId, costList, totalOfShares, averageCost, sumCost }) {
-            console.log('SAVE_STOCK_COST', stockId);
-            const foundStock = state.stockList.find((v) => v.id === stockId);
-            if (foundStock) {
-                // 保存成本資訊
-                foundStock.cost = {
-                    settings: costList,
-                    total: totalOfShares,
-                    avg: averageCost,
-                    sum: sumCost,
-                };
-                
-                console.log('成本設定已更新，清空價差走勢緩存');
-                // 清空價差走勢緩存，因為持倉已變更
-                state.spreadTrendCache = {};
-                
-                // 保存到 localStorage 或 IndexedDB
-                // 這裡可能需要根據現有的保存機制調整
-                // localStorage.setItem('stockList', JSON.stringify(state.stockList));
-            }
         },
     },
     getters: {
