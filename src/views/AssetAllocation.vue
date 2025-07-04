@@ -71,6 +71,20 @@
                                         >$ {{ availableInvestmentAmount.toLocaleString('en-US') }} 元</span
                                     >
                                 </div>
+                                <!-- 新增每單位投資金額 -->
+                                <div style="font-size: 14px">
+                                    每單位投資金額(/9)：
+                                    <span
+                                        style="
+                                            color: rgb(176, 224, 230);
+                                            padding: 2px 4px;
+                                            border-radius: 3px;
+                                            font-size: 15px;
+                                            font-weight: bold;
+                                        "
+                                        >$ {{ Math.round(availableInvestmentAmount / 9).toLocaleString('en-US') }} 元</span
+                                    >
+                                </div>
                                 <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0" />
                                 <div style="font-size: 14px">
                                     月薪：
