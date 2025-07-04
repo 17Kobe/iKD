@@ -3234,12 +3234,6 @@ const stock = {
                 }
             });
         },
-
-        // 清空所有緩存（當持倉變更時使用）
-        CLEAR_SPREAD_TREND_CACHE(state) {
-            console.log('CLEAR_SPREAD_TREND_CACHE');
-            state.spreadTrendCache = {};
-        },
     },
     getters: {
         // 獲取價差走勢緩存
