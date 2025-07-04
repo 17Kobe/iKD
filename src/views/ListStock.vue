@@ -1391,7 +1391,40 @@ export default {
                     badgeColor = '#53ed52'; // 綠色
                 }
 
-                result += `<div style="line-height: 1.5;">訊號：<span style="color: ${badgeColor}; font-weight: bold;">${row.badge}</span></div>`;
+                // 動態判斷 badge 是否為賣類型（含準賣、賣、賣1/2等）
+                let badgeText = `<span style="color: ${badgeColor}; font-weight: bold;">${row.badge}</span>`;
+                // 僅處理含「賣」的 badge
+                if (/賣/.test(row.badge) && row.cost && row.cost.market_value && row.cost.total) {
+                    // 解析分數（如 1/2、1/3... 或 Unicode 分數符號）
+                    let match = row.badge.match(/([1-9]\d*)\s*\/\s*([1-9]\d*)/); // 例如 1/2、1/3
+                    let ratio = 1;
+                    if (match) {
+                        const numerator = parseInt(match[1], 10);
+                        const denominator = parseInt(match[2], 10);
+                        if (denominator && numerator) {
+                            ratio = numerator / denominator;
+                        }
+                    } else {
+                        // 支援 Unicode 分數符號
+                        const unicodeFractionMap = {
+                            '½': 1 / 2,
+                            '⅓': 1 / 3,
+                            '¼': 1 / 4,
+                            '⅕': 1 / 5,
+                            '⅙': 1 / 6,
+                            '⅐': 1 / 7,
+                        };
+                        const uniMatch = row.badge.match(/[½⅓¼⅕⅙⅐]/);
+                        if (uniMatch && unicodeFractionMap[uniMatch[0]]) {
+                            ratio = unicodeFractionMap[uniMatch[0]];
+                        }
+                    }
+                    // 若無分數，預設賣全部（ratio=1）
+                    const value = Math.round(row.cost.market_value * ratio).toLocaleString('en-US');
+                    const shares = Math.round(row.cost.total * ratio).toLocaleString('en-US');
+                    badgeText += ` ($${value} 元)(${shares} 股)`;
+                }
+                result += `<div style="line-height: 1.5;">訊號：${badgeText}</div>`;
             }
 
             // 如果有理由，第三行顯示理由
