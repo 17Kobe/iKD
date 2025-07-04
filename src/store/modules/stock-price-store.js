@@ -3249,7 +3249,7 @@ const stock = {
                 foundStock.cost = {
                     settings: costList,
                     total: totalOfShares,
-                    average: averageCost,
+                    avg: averageCost,
                     sum: sumCost,
                 };
                 
