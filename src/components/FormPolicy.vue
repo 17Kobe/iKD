@@ -14,6 +14,10 @@
                 <el-button type="primary" size="small" @click="onOptimizeAnnualFixedDate" style="margin-left: 10px">
                     <i class="el-icon-date"></i>&nbsp;每年固定日買最佳化
                 </el-button>
+                <!-- 新增：每年固定日賣最佳化 -->
+                <el-button type="primary" size="small" @click="onOptimizeAnnualFixedDateSell" style="margin-left: 10px">
+                    <i class="el-icon-date"></i>&nbsp;每年固定日賣最佳化
+                </el-button>
             </div>
             <div style="margin-bottom: 10px">
                 <el-button type="warning" size="small" @click="onExportFeature" style="margin-left: 10px">
@@ -1363,6 +1367,126 @@ export default {
                 this.$message.success(`最佳固定日：買進${bestBuyDate}，單位報酬率${bestReturn.toFixed(2)}%`);
                 console.log('※最佳固定日', bestBuyDate);
                 console.log('※最佳單位報酬率', bestReturn);
+            } else {
+                this.$message.warning('找不到最佳固定日組合');
+            }
+        },
+        async onOptimizeAnnualFixedDateSell() {
+            // 掃描每年固定日賣的最佳組合
+            const stockId = this.stockId;
+            let bestReturn = -Infinity;
+            let bestSellDate = '';
+            let bestPolicy = null;
+            const allResults = [];
+
+            // 掃描 1/1 ~ 12/31
+            for (let sellMonth = 1; sellMonth <= 12; sellMonth++) {
+                // 取得該月天數
+                const daysInMonth = moment(`${moment().year()}-${sellMonth}`, 'YYYY-M').daysInMonth();
+                console.log(`掃描 ${moment().year()}/${sellMonth}`);
+
+                for (let sellDay = 1; sellDay <= daysInMonth; sellDay++) {
+                    const sellDate = `${sellMonth}/${sellDay}`;
+                    console.log(`掃描 ${sellDate}`);
+
+                    const policyList = {
+                        buy: _.cloneDeep(this.form.buy), // 用目前設定的 buy
+                        sell: [{ method: 'annual_fixed_date_sell', label: '每年固定日賣', limit: sellDate, limit_desc: '賣' }],
+                        sell1_ratio: this.form.sell1_ratio,
+                        sell2_ratio: this.form.sell2_ratio,
+                    };
+                    await this.$store.dispatch('APPLY_AND_WAIT_POLICY_RESULT', { stockId, policyList });
+                    const stock = this.$store.getters.getStock(stockId);
+                    const stats = stock?.policy?.stats;
+                    const unitReturn = stats?.unit_rate_of_return ?? -9999;
+
+                    // 收集所有日期的報酬率
+                    allResults.push({
+                        sellDate,
+                        unitReturn,
+                        numberOfBuy: stats?.number_of_buy ?? 0,
+                        numberOfSell: stats?.number_of_sell ?? 0,
+                    });
+
+                    if (unitReturn > bestReturn) {
+                        bestReturn = unitReturn;
+                        bestSellDate = sellDate;
+                        bestPolicy = _.cloneDeep(policyList);
+                    }
+                }
+            }
+
+            // 評估固定日期賣出的關聯度
+            if (allResults.length > 0) {
+                const returns = allResults.map((r) => r.unitReturn).filter((r) => r > -9000);
+                const avg = returns.reduce((a, b) => a + b, 0) / returns.length;
+                const max = Math.max(...returns);
+                const min = Math.min(...returns);
+                const std = Math.sqrt(returns.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / returns.length);
+                const range = max - min;
+                const cv = (std / Math.abs(avg)) * 100;
+
+                const topDates = allResults
+                    .slice()
+                    .sort((a, b) => b.unitReturn - a.unitReturn)
+                    .slice(0, 3)
+                    .map((r) => `${r.sellDate}(${r.unitReturn.toFixed(2)}%)`)
+                    .join('，');
+                const worstDates = allResults
+                    .slice()
+                    .sort((a, b) => a.unitReturn - b.unitReturn)
+                    .slice(0, 3)
+                    .map((r) => `${r.sellDate}(${r.unitReturn.toFixed(2)}%)`)
+                    .join('，');
+
+                let relationLevel = '';
+                let relationMsg = '';
+                let recommendMsg = '';
+                if (std > 5 && range > 20) {
+                    relationLevel = '極高';
+                    relationMsg = '不同日期的報酬率差異非常顯著';
+                    recommendMsg = '強烈建議使用固定日期賣出';
+                } else if (std > 3 && range > 10) {
+                    relationLevel = '高';
+                    relationMsg = '不同日期的報酬率有明顯差異';
+                    recommendMsg = '建議使用固定日期賣出';
+                } else if (std > 2 && range > 5) {
+                    relationLevel = '中等';
+                    relationMsg = '不同日期的報酬率有一定差異';
+                    recommendMsg = '可考慮使用固定日期賣出';
+                } else {
+                    relationLevel = '低';
+                    relationMsg = '不同日期的報酬率差異較小';
+                    recommendMsg = '固定日期賣出優勢不明顯，可以考慮其他策略';
+                }
+
+                this.$message.info(
+                    `固定日期賣出關聯度分析：\n
+                    關聯度：${relationLevel} (標準差=${std.toFixed(2)}, 區間=${range.toFixed(2)}%, 變異係數=${cv.toFixed(2)}%)\n
+                    ${relationMsg}，${recommendMsg}\n
+                    平均報酬率：${avg.toFixed(2)}%，最高：${max.toFixed(2)}%，最低：${min.toFixed(2)}%\n
+                    最佳3日：${topDates}\n
+                    最差3日：${worstDates}`
+                );
+                console.log('固定日期賣出關聯度分析', {
+                    relationLevel,
+                    std,
+                    range,
+                    cv,
+                    avg,
+                    max,
+                    min,
+                    topDates,
+                    worstDates,
+                    allResultsCount: allResults.length,
+                });
+            }
+
+            if (bestPolicy) {
+                this.form = bestPolicy;
+                this.$message.success(`最佳固定日：賣出${bestSellDate}，單位報酬率${bestReturn.toFixed(2)}%`);
+                console.log('※最佳固定日(賣)', bestSellDate);
+                console.log('※最佳單位報酬率(賣)', bestReturn);
             } else {
                 this.$message.warning('找不到最佳固定日組合');
             }
