@@ -376,11 +376,18 @@
                                 v-else-if="
                                     stockData.data.dividend &&
                                     stockData.data.dividend.length > 0 &&
-                                    stockData.data.dividend[stockData.data.dividend.length - 1].dividendYield !== undefined
+                                    (
+                                        stockData.data.dividend[stockData.data.dividend.length - 1].dividendYield !== undefined ||
+                                        stockData.data.dividend.length > 1
+                                    )
                                 "
                             >
                                 <b>{{
-                                    Number(stockData.data.dividend[stockData.data.dividend.length - 1].dividendYield).toFixed(1)
+                                    Number(
+                                        stockData.data.dividend[stockData.data.dividend.length - 1].dividendYield !== undefined
+                                            ? stockData.data.dividend[stockData.data.dividend.length - 1].dividendYield
+                                            : stockData.data.dividend[stockData.data.dividend.length - 2].dividendYield
+                                    ).toFixed(1)
                                 }}</b>
                                 <span style="font-size: 9px; margin-left: 1px">%</span>
                             </span>
@@ -1600,17 +1607,10 @@ export default {
                                             showSignals.push(
                                                 '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">KD上折</span>'
                                             );
-                                        if (foundPolicyResult.reason.includes('rsi_over_sold'))
-                                            showSignals.push(
-                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">RSI超賣</span>'
-                                            );
-                                        if (foundPolicyResult.reason.includes('rsi_over_bought'))
-                                            showSignals.push(
-                                                '<span style="background-color:#01aa00; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">RSI超買</span>'
-                                            );
+                                        if (foundPolicyResult.reason.includes('rsi_over_sold')) showSignals.push();
                                         if (foundPolicyResult.reason.includes('rsi_turn_down'))
                                             showSignals.push(
-                                                '<span style="background-color:#ee3333; color:#ffffff; padding: 0 1px; border-radius:5px; font-weight:bold;">RSI下折</span>'
+                                                '<span style="background-color:#ee3333; color:#ffffff; padding:  0 1px; border-radius:5px; font-weight:bold;">RSI下折</span>'
                                             );
                                         if (foundPolicyResult.reason.includes('rsi_turn_up'))
                                             showSignals.push(
