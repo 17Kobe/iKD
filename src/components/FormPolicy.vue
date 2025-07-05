@@ -1244,6 +1244,7 @@ export default {
             let bestReturn = -Infinity;
             let bestBuyDate = '';
             let bestPolicy = null;
+            const allResults = []; // 收集所有日期的報酬率，用於評估關聯度
 
             // 掃描 1/1 ~ 12/31
             for (let buyMonth = 1; buyMonth <= 12; buyMonth++) {
@@ -1265,6 +1266,15 @@ export default {
                     const stock = this.$store.getters.getStock(stockId);
                     const stats = stock?.policy?.stats;
                     const unitReturn = stats?.unit_rate_of_return ?? -9999;
+
+                    // 收集所有日期的報酬率
+                    allResults.push({
+                        buyDate,
+                        unitReturn,
+                        numberOfBuy: stats?.number_of_buy ?? 0,
+                        numberOfSell: stats?.number_of_sell ?? 0,
+                    });
+
                     console.log(`買進日期: ${buyDate}, 單位報酬率: ${unitReturn}`);
                     if (unitReturn > bestReturn) {
                         bestReturn = unitReturn;
@@ -1272,6 +1282,80 @@ export default {
                         bestPolicy = _.cloneDeep(policyList);
                     }
                 }
+            }
+
+            // 評估固定日期買進的關聯度
+            if (allResults.length > 0) {
+                const returns = allResults.map((r) => r.unitReturn).filter((r) => r > -9000); // 過濾無效值
+
+                // 計算統計量
+                const avg = returns.reduce((a, b) => a + b, 0) / returns.length;
+                const max = Math.max(...returns);
+                const min = Math.min(...returns);
+                const std = Math.sqrt(returns.reduce((a, b) => a + Math.pow(b - avg, 2), 0) / returns.length);
+                const range = max - min;
+                const cv = (std / Math.abs(avg)) * 100; // 變異係數 (%)
+
+                // 找出前3名和後3名日期
+                const topDates = allResults
+                    .slice()
+                    .sort((a, b) => b.unitReturn - a.unitReturn)
+                    .slice(0, 3)
+                    .map((r) => `${r.buyDate}(${r.unitReturn.toFixed(2)}%)`)
+                    .join('，');
+
+                const worstDates = allResults
+                    .slice()
+                    .sort((a, b) => a.unitReturn - b.unitReturn)
+                    .slice(0, 3)
+                    .map((r) => `${r.buyDate}(${r.unitReturn.toFixed(2)}%)`)
+                    .join('，');
+
+                // 評估關聯度
+                let relationLevel = '';
+                let relationMsg = '';
+                let recommendMsg = '';
+
+                if (std > 5 && range > 20) {
+                    relationLevel = '極高';
+                    relationMsg = '不同日期的報酬率差異非常顯著';
+                    recommendMsg = '強烈建議使用固定日期買進';
+                } else if (std > 3 && range > 10) {
+                    relationLevel = '高';
+                    relationMsg = '不同日期的報酬率有明顯差異';
+                    recommendMsg = '建議使用固定日期買進';
+                } else if (std > 2 && range > 5) {
+                    relationLevel = '中等';
+                    relationMsg = '不同日期的報酬率有一定差異';
+                    recommendMsg = '可考慮使用固定日期買進';
+                } else {
+                    relationLevel = '低';
+                    relationMsg = '不同日期的報酬率差異較小';
+                    recommendMsg = '固定日期買進優勢不明顯，可以考慮其他策略';
+                }
+
+                // 顯示評估結果
+                this.$message.info(
+                    `固定日期買進關聯度分析：\n
+                    關聯度：${relationLevel} (標準差=${std.toFixed(2)}, 區間=${range.toFixed(2)}%, 變異係數=${cv.toFixed(2)}%)\n
+                    ${relationMsg}，${recommendMsg}\n
+                    平均報酬率：${avg.toFixed(2)}%，最高：${max.toFixed(2)}%，最低：${min.toFixed(2)}%\n
+                    最佳3日：${topDates}\n
+                    最差3日：${worstDates}`
+                );
+
+                console.log('固定日期買進關聯度分析', {
+                    relationLevel,
+                    std,
+                    range,
+                    cv,
+                    avg,
+                    max,
+                    min,
+                    topDates,
+                    worstDates,
+                    allResultsCount: allResults.length,
+                });
             }
 
             if (bestPolicy) {
