@@ -10,9 +10,10 @@
                     <i class="el-icon-cpu"></i>&nbsp;參數+1(完美掃描；範圍是目前策略的±4)
                 </el-button>
 
-                <!-- <el-button type="success" size="small" @click="onOptimizePolicyStep2" style="margin-left: 10px">
-                    <i class="el-icon-cpu"></i>&nbsp;參數+2
-                </el-button> -->
+                <!-- 新增按鈕：每年固定日買賣最佳化 -->
+                <el-button type="primary" size="small" @click="onOptimizeAnnualFixedDate" style="margin-left: 10px">
+                    <i class="el-icon-date"></i>&nbsp;每年固定日最佳化
+                </el-button>
             </div>
             <div style="margin-bottom: 10px">
                 <el-button type="warning" size="small" @click="onExportFeature" style="margin-left: 10px">
@@ -1066,7 +1067,6 @@ export default {
                 policyList: this.form,
             });
         },
-        // ...existing code...
         async onExportFeature() {
             console.log('onExportFeature1');
             try {
@@ -1236,6 +1236,63 @@ export default {
                 URL.revokeObjectURL(csvUrl);
             } else {
                 this.$message.warning('沒有可匯出的特徵資料');
+            }
+        },
+        async onOptimizeAnnualFixedDate() {
+            // 掃描每年固定日買/賣的最佳組合
+            const stockId = this.stockId;
+            let bestReturn = -Infinity;
+            let bestBuyDate = '';
+            let bestSellDate = '';
+            let bestPolicy = null;
+
+            // 掃描 1/1 ~ 12/31
+            for (let buyMonth = 1; buyMonth <= 12; buyMonth++) {
+                for (let buyDay = 1; buyDay <= 28; buyDay++) {
+                    // 避免2月29日
+                    for (let sellMonth = 1; sellMonth <= 12; sellMonth++) {
+                        for (let sellDay = 1; sellDay <= 28; sellDay++) {
+                            if (buyMonth === sellMonth && buyDay === sellDay) continue; // 買賣日不可同天
+                            const buyDate = `${buyMonth}/${buyDay}`;
+                            const sellDate = `${sellMonth}/${sellDay}`;
+                            const policyList = {
+                                buy: [
+                                    { method: 'annual_fixed_date_buy', label: '每年固定日買', limit: buyDate, limit_desc: '買' },
+                                ],
+                                sell: [
+                                    {
+                                        method: 'annual_fixed_date_sell',
+                                        label: '每年固定日賣',
+                                        limit: sellDate,
+                                        limit_desc: '賣',
+                                    },
+                                ],
+                                sell1_ratio: this.form.sell1_ratio,
+                                sell2_ratio: this.form.sell2_ratio,
+                            };
+                            await this.$store.dispatch('APPLY_AND_WAIT_POLICY_RESULT', { stockId, policyList });
+                            const stock = this.$store.getters.getStock(stockId);
+                            const stats = stock?.policy?.stats;
+                            const unitReturn = stats?.unit_rate_of_return ?? -9999;
+                            console.log(`買進日期: ${buyDate}, 賣出日期: ${sellDate}, 單位報酬率: ${unitReturn}`);
+                            if (unitReturn > bestReturn) {
+                                bestReturn = unitReturn;
+                                bestBuyDate = buyDate;
+                                bestSellDate = sellDate;
+                                bestPolicy = _.cloneDeep(policyList);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (bestPolicy) {
+                this.form = bestPolicy;
+                this.$message.success(`最佳固定日：買進${bestBuyDate}，賣出${bestSellDate}，單位報酬率${bestReturn.toFixed(2)}%`);
+                console.log('※最佳固定日', bestBuyDate, bestSellDate);
+                console.log('※最佳單位報酬率', bestReturn);
+            } else {
+                this.$message.warning('找不到最佳固定日組合');
             }
         },
     },
