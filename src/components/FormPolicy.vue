@@ -992,7 +992,7 @@ export default {
 
             let buyPeriod = 365;
             let sellPeriod = 547;
-            // 中華電及卜蜂要特別處理，因為他們是3星要存股，但允許久一點再買， || (star === 3 && ['中華電', '卜蜂'].includes(name))
+            // 中華電及卜蜂要特別處理，因為他們是3星要存股，但允許久一點再買，|| (star === 3 && ['中華電', '卜蜂'].includes(name))
             if (star <= 2) {
                 buyPeriod = 365 + 90; // 1.25年，可多3個月
                 sellPeriod = 547; // 1.5年，2顆星不再延長因為會太久沒賣了
@@ -1246,27 +1246,18 @@ export default {
             let bestPolicy = null;
 
             // 掃描 1/1 ~ 12/31
-            for (let buyMonth = 9; buyMonth <= 11; buyMonth++) {
+            for (let buyMonth = 1; buyMonth <= 12; buyMonth++) {
                 // 取得該月天數
                 const daysInMonth = moment(`${moment().year()}-${buyMonth}`, 'YYYY-M').daysInMonth();
                 console.log(`掃描 ${moment().year()}/${buyMonth}`);
 
                 for (let buyDay = 1; buyDay <= daysInMonth; buyDay++) {
                     const buyDate = `${buyMonth}/${buyDay}`;
+                    console.log(`掃描 ${buyDate}`);
+
                     const policyList = {
                         buy: [{ method: 'annual_fixed_date_buy', label: '每年固定日買', limit: buyDate, limit_desc: '買' }],
-                        sell: [
-                            // {
-                            //     method: 'annual_fixed_date_sell',
-                            //     label: '每年固定日賣',
-                            //     limit: sellDate,
-                            //     limit_desc: '賣',
-                            // },
-                            { method: 'kd_dead', label: '週 KD 死亡交叉', limit: 87, limit_desc: '以上' },
-                            { method: 'rsi_over_bought', label: '週 RSI 超買', limit: 92, limit_desc: '以上' },
-                            { method: 'previous_sell_up', label: '搭配 前賣價漲超過', limit: 5, limit_desc: '% 以上' },
-                            { method: 'earn', label: '搭配 絕對正報酬', limit: 0, limit_desc: '% 以上' },
-                        ],
+                        sell: _.cloneDeep(this.form.sell), // 直接取用目前設定的 sell
                         sell1_ratio: this.form.sell1_ratio,
                         sell2_ratio: this.form.sell2_ratio,
                     };
