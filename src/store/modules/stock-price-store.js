@@ -525,7 +525,11 @@ const stock = {
                             stockId: stcokObj.id,
                         });
                         // 為了只下一次API，但還要抓二年的資料回來算平均
-                        if (stcokObj.name === '元大2至10年投資級企業債券基金' || stcokObj.name === '元大美債20年') {
+                        if (
+                            stcokObj.name === '元大2至10年投資級企業債券基金' ||
+                            stcokObj.name === '元大美債20年' ||
+                            stcokObj.name === '群益ESG投等債20+'
+                        ) {
                             console.log('不能抓，因為有cors問題');
                         } else {
                             axios
@@ -1412,10 +1416,10 @@ const stock = {
             // console.log(state.currStockDayData);
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             await saveStockToDb('stockList', data);
-            
+
             // 清空價差走勢緩存，因為股票列表已變更
             state.spreadTrendCache = {};
-            
+
             this.dispatch('GET_STOCK_PRICE'); // 到時化優化成單1股票，或 SAVE STOCK PRICE有機制判斷是最好的
         },
         async SAVE_ALL_STOCK(state, data) {
@@ -1501,7 +1505,7 @@ const stock = {
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             console.log(state.stockList);
             await delStockToDb('stockList', data);
-            
+
             // 清空價差走勢緩存，因為股票列表已變更
             state.spreadTrendCache = {};
         },
@@ -3228,7 +3232,7 @@ const stock = {
         CLEANUP_SPREAD_TREND_CACHE(state) {
             console.log('CLEANUP_SPREAD_TREND_CACHE');
             const sixMonthsAgo = moment().subtract(6, 'months').format('YYYY-MM-DD');
-            Object.keys(state.spreadTrendCache).forEach(dateStr => {
+            Object.keys(state.spreadTrendCache).forEach((dateStr) => {
                 if (dateStr < sixMonthsAgo) {
                     delete state.spreadTrendCache[dateStr];
                 }
