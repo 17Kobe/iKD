@@ -377,79 +377,9 @@
                             </span>
                             <span
                                 v-else-if="stockData.data.dividend && stockData.data.dividend.length > 0"
-                                :style="{
-                                    marginLeft: (() => {
-                                        // 取得配息資料
-                                        const divs = this.stockData.data.dividend.filter(
-                                            (d) => d.CashEarningsDistribution > 0 && d.CashExDividendTradingDate
-                                        );
-                                        if (divs.length === 0 || !this.stockData.last_price) return '6px';
-                                        const sorted = divs
-                                            .slice()
-                                            .sort(
-                                                (a, b) =>
-                                                    new Date(b.CashExDividendTradingDate) - new Date(a.CashExDividendTradingDate)
-                                            );
-                                        let percent = '';
-                                        if (sorted.length < 2) {
-                                            const totalCash = sorted[0].CashEarningsDistribution;
-                                            percent = (totalCash / this.stockData.last_price) * 100;
-                                        } else {
-                                            const d1 = new Date(sorted[0].CashExDividendTradingDate);
-                                            const d2 = new Date(sorted[1].CashExDividendTradingDate);
-                                            const diffDays = Math.abs((d1 - d2) / (1000 * 60 * 60 * 24));
-                                            if (diffDays > 300) {
-                                                const totalCash = sorted[0].CashEarningsDistribution;
-                                                percent = (totalCash / this.stockData.last_price) * 100;
-                                            } else {
-                                                const totalCash = sorted
-                                                    .slice(0, 4)
-                                                    .reduce((sum, d) => sum + d.CashEarningsDistribution, 0);
-                                                percent = (totalCash / this.stockData.last_price) * 100;
-                                            }
-                                        }
-                                        // 根據 percent 數值決定 margin
-                                        return typeof percent === 'number' && !isNaN(percent) && percent >= 10 ? '0px' : '6px';
-                                    })(),
-                                }"
+                                :style="{ marginLeft: calcDividendYieldPercent().marginLeft }"
                             >
-                                <b>
-                                    {{
-                                        (() => {
-                                            // 這裡內容同上，僅用於顯示數值
-                                            const divs = this.stockData.data.dividend.filter(
-                                                (d) => d.CashEarningsDistribution > 0 && d.CashExDividendTradingDate
-                                            );
-                                            if (divs.length === 0 || !this.stockData.last_price) return '';
-                                            const sorted = divs
-                                                .slice()
-                                                .sort(
-                                                    (a, b) =>
-                                                        new Date(b.CashExDividendTradingDate) -
-                                                        new Date(a.CashExDividendTradingDate)
-                                                );
-                                            let percent = '';
-                                            if (sorted.length < 2) {
-                                                const totalCash = sorted[0].CashEarningsDistribution;
-                                                percent = (totalCash / this.stockData.last_price) * 100;
-                                            } else {
-                                                const d1 = new Date(sorted[0].CashExDividendTradingDate);
-                                                const d2 = new Date(sorted[1].CashExDividendTradingDate);
-                                                const diffDays = Math.abs((d1 - d2) / (1000 * 60 * 60 * 24));
-                                                if (diffDays > 300) {
-                                                    const totalCash = sorted[0].CashEarningsDistribution;
-                                                    percent = (totalCash / this.stockData.last_price) * 100;
-                                                } else {
-                                                    const totalCash = sorted
-                                                        .slice(0, 4)
-                                                        .reduce((sum, d) => sum + d.CashEarningsDistribution, 0);
-                                                    percent = (totalCash / this.stockData.last_price) * 100;
-                                                }
-                                            }
-                                            return typeof percent === 'number' && !isNaN(percent) ? percent.toFixed(1) : '';
-                                        })()
-                                    }}
-                                </b>
+                                <b>{{ calcDividendYieldPercent().percent }}</b>
                                 <span style="font-size: 6px">%</span>
                             </span>
                         </div>
@@ -999,6 +929,37 @@ export default {
 
             // 對於其他值，顯示百分比
             return `${Math.round(unit * 100)}%`;
+        },
+        calcDividendYieldPercent() {
+            // 取得配息資料
+            const divs = this.stockData.data.dividend.filter(
+                (d) => d.CashEarningsDistribution > 0 && d.CashExDividendTradingDate
+            );
+            if (divs.length === 0 || !this.stockData.last_price) return { percent: '', marginLeft: '6px' };
+            const sorted = divs
+                .slice()
+                .sort((a, b) => new Date(b.CashExDividendTradingDate) - new Date(a.CashExDividendTradingDate));
+            let percent = '';
+            if (sorted.length < 2) {
+                const totalCash = sorted[0].CashEarningsDistribution;
+                percent = (totalCash / this.stockData.last_price) * 100;
+            } else {
+                const d1 = new Date(sorted[0].CashExDividendTradingDate);
+                const d2 = new Date(sorted[1].CashExDividendTradingDate);
+                const diffDays = Math.abs((d1 - d2) / (1000 * 60 * 60 * 24));
+                if (diffDays > 300) {
+                    const totalCash = sorted[0].CashEarningsDistribution;
+                    percent = (totalCash / this.stockData.last_price) * 100;
+                } else {
+                    const totalCash = sorted.slice(0, 4).reduce((sum, d) => sum + d.CashEarningsDistribution, 0);
+                    percent = (totalCash / this.stockData.last_price) * 100;
+                }
+            }
+            let marginLeft = typeof percent === 'number' && !isNaN(percent) && percent >= 10 ? '0px' : '6px';
+            return {
+                percent: typeof percent === 'number' && !isNaN(percent) ? percent.toFixed(1) : '',
+                marginLeft,
+            };
         },
     },
     computed: {
