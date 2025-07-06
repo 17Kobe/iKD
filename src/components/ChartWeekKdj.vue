@@ -367,29 +367,87 @@
                             </div>
                         </template>
                         <div>
-                            <span style="color: rgb(34, 35, 38); font-size: 9px; margin-right: 2px">殖利率</span>
-                            <span v-if="stockData.data.dy">
+                            <span style="color: rgb(34, 35, 38); font-size: 9px">殖利率</span>
+                            <span v-if="stockData.data.dy" style="margin-left: 6px">
                                 <b>{{ stockData.data.dy.last.toFixed(1) }}</b>
-                                <span style="font-size: 9px; margin-left: 1px">%</span>
+                                <span style="font-size: 6px">%</span>
                             </span>
                             <span
-                                v-else-if="
-                                    stockData.data.dividend &&
-                                    stockData.data.dividend.length > 0 &&
-                                    (
-                                        stockData.data.dividend[stockData.data.dividend.length - 1].dividendYield !== undefined ||
-                                        stockData.data.dividend.length > 1
-                                    )
-                                "
+                                v-else-if="stockData.data.dividend && stockData.data.dividend.length > 0"
+                                :style="{
+                                    marginLeft: (() => {
+                                        // 取得配息資料
+                                        const divs = this.stockData.data.dividend.filter(
+                                            (d) => d.CashEarningsDistribution > 0 && d.CashExDividendTradingDate
+                                        );
+                                        if (divs.length === 0 || !this.stockData.last_price) return '6px';
+                                        const sorted = divs
+                                            .slice()
+                                            .sort(
+                                                (a, b) =>
+                                                    new Date(b.CashExDividendTradingDate) - new Date(a.CashExDividendTradingDate)
+                                            );
+                                        let percent = '';
+                                        if (sorted.length < 2) {
+                                            const totalCash = sorted[0].CashEarningsDistribution;
+                                            percent = (totalCash / this.stockData.last_price) * 100;
+                                        } else {
+                                            const d1 = new Date(sorted[0].CashExDividendTradingDate);
+                                            const d2 = new Date(sorted[1].CashExDividendTradingDate);
+                                            const diffDays = Math.abs((d1 - d2) / (1000 * 60 * 60 * 24));
+                                            if (diffDays > 300) {
+                                                const totalCash = sorted[0].CashEarningsDistribution;
+                                                percent = (totalCash / this.stockData.last_price) * 100;
+                                            } else {
+                                                const totalCash = sorted
+                                                    .slice(0, 4)
+                                                    .reduce((sum, d) => sum + d.CashEarningsDistribution, 0);
+                                                percent = (totalCash / this.stockData.last_price) * 100;
+                                            }
+                                        }
+                                        // 根據 percent 數值決定 margin
+                                        return typeof percent === 'number' && !isNaN(percent) && percent >= 10 ? '0px' : '6px';
+                                    })(),
+                                }"
                             >
-                                <b>{{
-                                    Number(
-                                        stockData.data.dividend[stockData.data.dividend.length - 1].dividendYield !== undefined
-                                            ? stockData.data.dividend[stockData.data.dividend.length - 1].dividendYield
-                                            : stockData.data.dividend[stockData.data.dividend.length - 2].dividendYield
-                                    ).toFixed(1)
-                                }}</b>
-                                <span style="font-size: 9px; margin-left: 1px">%</span>
+                                <b>
+                                    {{
+                                        (() => {
+                                            // 這裡內容同上，僅用於顯示數值
+                                            const divs = this.stockData.data.dividend.filter(
+                                                (d) => d.CashEarningsDistribution > 0 && d.CashExDividendTradingDate
+                                            );
+                                            if (divs.length === 0 || !this.stockData.last_price) return '';
+                                            const sorted = divs
+                                                .slice()
+                                                .sort(
+                                                    (a, b) =>
+                                                        new Date(b.CashExDividendTradingDate) -
+                                                        new Date(a.CashExDividendTradingDate)
+                                                );
+                                            let percent = '';
+                                            if (sorted.length < 2) {
+                                                const totalCash = sorted[0].CashEarningsDistribution;
+                                                percent = (totalCash / this.stockData.last_price) * 100;
+                                            } else {
+                                                const d1 = new Date(sorted[0].CashExDividendTradingDate);
+                                                const d2 = new Date(sorted[1].CashExDividendTradingDate);
+                                                const diffDays = Math.abs((d1 - d2) / (1000 * 60 * 60 * 24));
+                                                if (diffDays > 300) {
+                                                    const totalCash = sorted[0].CashEarningsDistribution;
+                                                    percent = (totalCash / this.stockData.last_price) * 100;
+                                                } else {
+                                                    const totalCash = sorted
+                                                        .slice(0, 4)
+                                                        .reduce((sum, d) => sum + d.CashEarningsDistribution, 0);
+                                                    percent = (totalCash / this.stockData.last_price) * 100;
+                                                }
+                                            }
+                                            return typeof percent === 'number' && !isNaN(percent) ? percent.toFixed(1) : '';
+                                        })()
+                                    }}
+                                </b>
+                                <span style="font-size: 6px">%</span>
                             </span>
                         </div>
                     </el-tooltip>
@@ -1526,7 +1584,7 @@ export default {
                 // 有可能是答案但好複雜 https://www.twblogs.net/a/5b8ee6ce2b71771883489ae9
                 // 去掉tooltip 直接顯示的範例 https://jsfiddle.net/BlackLabel/a8hjdpcb/1/
                 // 可參考 https://stackoverflow.com/questions/19438942/how-to-auto-format-dates-in-custom-tooltip-formatter
-                // 可參考 https://stackoverflow.com/questions/19932556/highstocks-tooltip-remove-the-phrase-week-from-monday
+                // 可參考 https://stackoverflow.com/questions/19932556/highstocks-tooltip-remove-the-phrase-weekfrom-monday
                 // 無關看看 http://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/tooltip/split/
                 tooltip: {
                     // backgroundColor: 'transparent',
