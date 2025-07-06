@@ -106,7 +106,10 @@
                                     color: 'rgb(34, 35, 38)',
                                     fontSize: '9px',
                                     marginRight: (() => {
-                                        const eps = formattedEps.length > 0 ? formattedEps[formattedEps.length - 1].acc : 0;
+                                        const eps =
+                                            this.formattedEps.length > 0
+                                                ? this.formattedEps[this.formattedEps.length - 1].acc
+                                                : 0;
                                         const base = eps < 10 ? 14 : 7;
                                         return base + (this.isMobile ? 1 : 0) + 'px';
                                     })(),
