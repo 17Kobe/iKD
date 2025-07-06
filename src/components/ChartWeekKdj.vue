@@ -373,14 +373,14 @@
                             <span style="color: rgb(34, 35, 38); font-size: 9px">殖利率</span>
                             <span v-if="stockData.data.dy" style="margin-left: 6px">
                                 <b>{{ stockData.data.dy.last.toFixed(1) }}</b>
-                                <span style="font-size: 6px">%</span>
+                                <span style="font-size: 4px">%</span>
                             </span>
                             <span
                                 v-else-if="stockData.data.dividend && stockData.data.dividend.length > 0"
                                 :style="{ marginLeft: calcDividendYieldPercent().marginLeft }"
                             >
                                 <b>{{ calcDividendYieldPercent().percent }}</b>
-                                <span style="font-size: 6px">%</span>
+                                <span style="font-size: 4px">%</span>
                             </span>
                         </div>
                     </el-tooltip>
