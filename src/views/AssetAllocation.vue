@@ -46,19 +46,6 @@
                                 </div>
                                 <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0" />
                                 <div style="font-size: 14px">
-                                    現金：
-                                    <span
-                                        style="
-                                            color: rgb(176, 224, 230);
-                                            padding: 2px 4px;
-                                            border-radius: 3px;
-                                            font-size: 15px;
-                                            font-weight: bold;
-                                        "
-                                        >$ {{ demandDeposit.toLocaleString('en-US') }} 元</span
-                                    >
-                                </div>
-                                <div style="font-size: 14px">
                                     可投資金額：
                                     <span
                                         style="
@@ -83,33 +70,6 @@
                                             font-weight: bold;
                                         "
                                         >$ {{ Math.round(availableInvestmentAmount / 9).toLocaleString('en-US') }} 元</span
-                                    >
-                                </div>
-                                <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0" />
-                                <div style="font-size: 14px">
-                                    月薪：
-                                    <span
-                                        style="
-                                            color: rgb(176, 224, 230);
-                                            padding: 2px 4px;
-                                            border-radius: 3px;
-                                            font-size: 15px;
-                                            font-weight: bold;
-                                        "
-                                        >$ {{ monthlySalary.toLocaleString('en-US') }} 元</span
-                                    >
-                                </div>
-                                <div style="font-size: 14px">
-                                    年薪：
-                                    <span
-                                        style="
-                                            color: rgb(144, 238, 144);
-                                            padding: 2px 4px;
-                                            border-radius: 3px;
-                                            font-size: 15px;
-                                            font-weight: bold;
-                                        "
-                                        >$ {{ annualSalary.toLocaleString('en-US') }} 元</span
                                     >
                                 </div>
                                 <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0" />
@@ -194,8 +154,21 @@
 
                                 <!-- 年度預算資訊 -->
                                 <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0" />
-                                <div style="font-size: 14px; color: #409eff; margin-bottom: 8px; font-weight: bold">
+                                <div style="font-size: 14px; color: #409eff; margin-bottom: 4px; font-weight: bold">
                                     📊 剩餘 {{ remainingBudget.remainingMonths }} 個月預算 ({{ new Date().getFullYear() }} 年)
+                                </div>
+
+                                <div style="font-size: 13px">
+                                    月薪：
+                                    <span style="color: #afdbfb; font-weight: bold">
+                                        $ {{ monthlySalary.toLocaleString('en-US') }} 元
+                                    </span>
+                                </div>
+                                <div style="font-size: 13px">
+                                    年薪：
+                                    <span style="color: #afdbfb; font-weight: bold">
+                                        $ {{ annualSalary.toLocaleString('en-US') }} 元
+                                    </span>
                                 </div>
 
                                 <div style="font-size: 13px">
