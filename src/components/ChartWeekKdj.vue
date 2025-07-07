@@ -1843,7 +1843,7 @@ export default {
                     {
                         type: 'scatter',
 
-                        color: 'rgba(153, 153, 153, 0.9)',
+                        color: 'rgba(83, 83, 83, 0.9)',
 
                         marker: {
                             symbol: 'circle',
