@@ -35,7 +35,7 @@
                                     排除存股的資產：
                                     <span
                                         style="
-                                            color: rgb(255, 202, 100);
+                                            color: rgb(176, 224, 230);
                                             padding: 2px 4px;
                                             border-radius: 3px;
                                             font-size: 15px;
@@ -63,7 +63,7 @@
                                     每單位投資金額(/9)：
                                     <span
                                         style="
-                                            color: rgb(176, 224, 230);
+                                            color: rgb(66, 202, 162);
                                             padding: 2px 4px;
                                             border-radius: 3px;
                                             font-size: 15px;
