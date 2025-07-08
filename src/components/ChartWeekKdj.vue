@@ -1819,10 +1819,12 @@ export default {
                     {
                         type: 'scatter',
 
-                        color: 'rgba(223, 83, 83, 0.9)',
+                        color: 'rgba(255, 40, 40, 0.9)',
 
                         marker: {
                             symbol: 'circle',
+                            lineWidth: 1,
+                            lineColor: '#222',
                         },
                         // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
@@ -1831,10 +1833,12 @@ export default {
                     {
                         type: 'scatter',
 
-                        color: 'rgba(82, 157, 1, 0.9)',
+                        color: 'rgba(4, 239, 39, 0.9)',
 
                         marker: {
                             symbol: 'circle',
+                            lineWidth: 1,
+                            lineColor: '#222',
                         },
                         // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
@@ -1843,10 +1847,12 @@ export default {
                     {
                         type: 'scatter',
 
-                        color: 'rgba(83, 83, 83, 0.9)',
+                        color: 'rgba(104, 104, 104, 0.9)',
 
                         marker: {
                             symbol: 'circle',
+                            lineWidth: 1,
+                            lineColor: '#222',
                         },
                         // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
@@ -1855,10 +1861,12 @@ export default {
                     {
                         type: 'scatter',
 
-                        color: 'rgba(153, 153, 153, 0.9)',
+                        color: 'rgba(230, 230, 230, 0.9)',
 
                         marker: {
                             symbol: 'triangle-down',
+                            lineWidth: 1,
+                            lineColor: '#222',
                         },
                         // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
