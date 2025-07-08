@@ -625,7 +625,7 @@ export default {
                     {
                         type: 'scatter',
 
-                        color: 'rgba(223, 83, 83, 0.9',
+                        color: 'rgba(223, 83, 83, 0.9)',
 
                         marker: {
                             symbol: 'circle',
@@ -637,7 +637,7 @@ export default {
                     {
                         type: 'scatter',
 
-                        color: 'rgba(82, 157, 1, 0.9',
+                        color: 'rgba(82, 157, 1, 0.9)',
 
                         marker: {
                             symbol: 'circle',
@@ -649,7 +649,7 @@ export default {
                     {
                         type: 'scatter',
 
-                        color: 'rgba(153, 153, 153, 0.9',
+                        color: 'rgba(153, 153, 153, 0.9)',
 
                         marker: {
                             symbol: 'circle',
