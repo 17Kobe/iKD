@@ -74,7 +74,7 @@
                                 </div>
                                 <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0" />
                                 <div style="font-size: 14px">
-                                    現金：
+                                    <span style="color: #ffd700; font-size: 16px; margin-right: 2px;">💰</span>現金：
                                     <span
                                         style="
                                             color: rgb(255, 205, 86);
@@ -87,7 +87,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    定存：
+                                    <span style="color: #ff9800; font-size: 16px; margin-right: 2px;">🏦</span>定存：
                                     <span
                                         style="
                                             color: rgb(255, 159, 64);
@@ -100,7 +100,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    存股：
+                                    <span style="color: #e91e63; font-size: 16px; margin-right: 2px;">📈</span>存股：
                                     <span
                                         style="
                                             color: rgb(255, 99, 132);
@@ -113,7 +113,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    股票：
+                                    <span style="color: #00bfae; font-size: 16px; margin-right: 2px;">📈</span>股票：
                                     <span
                                         style="
                                             color: rgb(66, 202, 162);
@@ -126,7 +126,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    債券：
+                                    <span style="color: #9966ff; font-size: 16px; margin-right: 2px;">💳</span>債券：
                                     <span
                                         style="
                                             color: rgb(153, 102, 255);
@@ -139,7 +139,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    其它：
+                                    <span style="color: #bdbdbd; font-size: 16px; margin-right: 2px;">📦</span>其它：
                                     <span
                                         style="
                                             color: rgb(200, 200, 200);
@@ -1660,6 +1660,7 @@ export default {
     created() {
         // console.log('created asset');
         // 取得 localstorage 自選股，最先開始是 null 時，會給予預設值空矩陣
+
         const localAssetList = JSON.parse(localStorage.getItem('assetList')) || [];
         // console.log(localAssetList);
         if (_.isEmpty(localAssetList)) {
