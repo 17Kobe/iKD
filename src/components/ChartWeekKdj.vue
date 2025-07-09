@@ -940,7 +940,9 @@ export default {
                 .slice()
                 .sort((a, b) => new Date(b.CashExDividendTradingDate) - new Date(a.CashExDividendTradingDate));
             let percent = '';
+            let freq = 1; // 預設年配息
             if (sorted.length < 2) {
+                // 僅有一筆配息紀錄時，直接顯示該次殖利率
                 const totalCash = sorted[0].CashEarningsDistribution;
                 percent = (totalCash / this.stockData.last_price) * 100;
             } else {
@@ -948,12 +950,15 @@ export default {
                 const d2 = new Date(sorted[1].CashExDividendTradingDate);
                 const diffDays = Math.abs((d1 - d2) / (1000 * 60 * 60 * 24));
                 if (diffDays > 300) {
-                    const totalCash = sorted[0].CashEarningsDistribution;
-                    percent = (totalCash / this.stockData.last_price) * 100;
+                    freq = 1; // 年配息
+                } else if (diffDays > 55) {
+                    freq = 4; // 季配息
                 } else {
-                    const totalCash = sorted.slice(0, 4).reduce((sum, d) => sum + d.CashEarningsDistribution, 0);
-                    percent = (totalCash / this.stockData.last_price) * 100;
+                    freq = 12; // 月配息
                 }
+                // 若配息紀錄數量不足 freq，則取現有全部
+                const totalCash = sorted.slice(0, Math.min(freq, sorted.length)).reduce((sum, d) => sum + d.CashEarningsDistribution, 0);
+                percent = (totalCash / this.stockData.last_price) * 100;
             }
             let marginLeft = typeof percent === 'number' && !isNaN(percent) && percent >= 10 ? '0px' : '6px';
             return {
