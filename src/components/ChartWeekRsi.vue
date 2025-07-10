@@ -366,6 +366,10 @@ export default {
                 });
             }
 
+            // 取超買線的動態臨界值，確保為有效數字
+            const overBought = Number(this.rsiOverBoughtLimit);
+            const limit = !isNaN(overBought) && overBought > 30 && overBought < 100 ? overBought : 70;
+
             return {
                 chart: {
                     backgroundColor: 'rgba(0,0,0,0)', // 讓 highcharts的背景變透明後，滑鼠移到chart上時，不會看出它有白的只有下方，上方那個沒有
@@ -533,25 +537,25 @@ export default {
                         },
                         plotLines: [
                             {
-                                value: 30, // 20 的位置
-                                color: '#e6e6e6', // 线的颜色
-                                width: 1, // 线的宽度
-                                zIndex: 1, // 线的层级
+                                value: 30, // 30 的位置
+                                color: '#ededed', // 更淡的灰色
+                                width: 1, // 線的寬度
+                                zIndex: 1, // 線的層級
                                 label: {
                                     text: '30', // 刻度值
-                                    align: 'right', // 刻度值的对齐方式
+                                    align: 'right', // 刻度值的對齊方式
                                     x: -1, // 刻度值的水平偏移
                                     y: 3,
                                 },
                             },
                             {
-                                value: 70, // 80 的位置
-                                color: '#e6e6e6', // 线的颜色
-                                width: 1, // 线的宽度
-                                zIndex: 1, // 线的层级
+                                value: limit, // 超買線位置
+                                color: '#ededed', // 更淡的灰色
+                                width: 1, // 線的寬度
+                                zIndex: 1, // 線的層級
                                 label: {
-                                    text: '70', // 刻度值
-                                    align: 'right', // 刻度值的对齐方式
+                                    text: limit.toString(), // 刻度值
+                                    align: 'right', // 刻度值的對齊方式
                                     x: -1, // 刻度值的水平偏移
                                     y: 3,
                                 },
@@ -595,29 +599,53 @@ export default {
                     },
                 ],
                 series: [
+                    // RSI(5) 主線
                     {
                         name: 'RSI(5)',
-                        // color: '#e65596',
                         data: this.rsi5,
-                        type: 'area',
-                        threshold: 80,
+                        type: 'line',
+                        color: '#4286f5', // 預設藍色
+                        lineWidth: 2,
+                        zIndex: 2,
                         zones: [
                             {
-                                value: 20,
-                                color: '#e65596',
-                                fillColor: 'none',
+                                value: 30,
+                                color: '#e75c9a', // 低於30紅色
                             },
                             {
-                                value: 80.01,
-                                color: '#4286f5',
-                                fillColor: 'none',
+                                value: limit,
+                                color: '#4286f5', // 30~limit藍色
                             },
                             {
-                                value: 100,
-                                color: '#e65596',
-                                fillColor: 'rgba(255, 99, 132, 0.2)',
+                                color: '#e75c9a', // 超過limit紅色
                             },
                         ],
+                    },
+                    // 0~30 區域色（下方區域）
+                    {
+                        type: 'area',
+                        name: 'RSI區域(0-30)',
+                        data: this.rsi5.map(([x, y]) => [x, y < 30 ? y : 30]),
+                        color: 'rgba(253, 207, 232, 0.5)',
+                        fillOpacity: 1,
+                        lineWidth: 0,
+                        enableMouseTracking: false,
+                        showInLegend: false,
+                        zIndex: 1,
+                        threshold: 30,
+                    },
+                    // 超買區間區域色
+                    {
+                        type: 'area',
+                        name: 'RSI區域(超買區間)',
+                        data: this.rsi5.map(([x, y]) => [x, y >= limit ? y : limit]),
+                        color: 'rgba(253, 207, 232, 0.5)',
+                        fillOpacity: 1,
+                        lineWidth: 0,
+                        enableMouseTracking: false,
+                        showInLegend: false,
+                        zIndex: 1,
+                        threshold: limit,
                     },
                     {
                         type: 'scatter',

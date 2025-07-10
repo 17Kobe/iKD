@@ -701,76 +701,31 @@ export default {
                             units: [['day', [1]]],
                         },
                     },
-                    // Darvas Box 箱型顯示 - 背景填充
-                    {
+                    // Darvas Box 箱型顯示 - 背景填充（每個箱子一個 area 填色）
+                    ...this.darvasBoxes.map((box) => ({
                         type: 'area',
                         name: 'Darvas Box Fill',
-                        data: this.darvasBoxes.flatMap((box) => [
-                            [box.start, box.bottom],
-                            [box.start, box.top],
-                            [box.end, box.top],
-                            [box.end, box.bottom],
-                            [box.start, box.bottom],
-                            [box.start, null], // 分隔符，避免連接不同的箱子
-                        ]),
+                        data: this.ohlc
+                            .filter((item) => item[0] >= box.start && item[0] <= box.end)
+                            .map((item) => [item[0], box.top]),
+                        threshold: box.bottom,
                         fillColor: {
                             linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                             stops: [
-                                [0, 'rgba(255, 215, 0, 0.15)'], // 金色半透明背景
-                                [1, 'rgba(255, 165, 0, 0.1)'], // 橙色半透明背景
+                                [0, 'rgba(255, 215, 0, 0.18)'],
+                                [1, 'rgba(255, 165, 0, 0.12)'],
                             ],
                         },
-                        lineColor: 'transparent', // 隱藏邊界線，只要填充
+                        lineColor: 'transparent',
                         lineWidth: 0,
                         enableMouseTracking: false,
                         showInLegend: false,
-                        zIndex: 0, // 背景層
-                        threshold: null,
+                        zIndex: 0,
                         dataGrouping: {
                             lastAnchor: 'lastPoint',
                             units: [['day', [1]]],
                         },
-                    },
-                    // Darvas Box 箱型顯示 - 箱頂線
-                    {
-                        type: 'line',
-                        name: 'Darvas Box Top',
-                        data: this.darvasBoxes.flatMap((box) => [
-                            [box.start, box.top],
-                            [box.end, box.top],
-                            [box.end, null],
-                        ]),
-                        color: 'rgba(255, 20, 147, 0.9)', // 桃紅色
-                        lineWidth: 1.5,
-                        enableMouseTracking: true,
-                        showInLegend: false,
-                        zIndex: 1,
-                        step: false,
-                        dataGrouping: {
-                            lastAnchor: 'lastPoint',
-                            units: [['day', [1]]],
-                        },
-                    },
-                    // Darvas Box 箱型顯示 - 箱底線
-                    {
-                        type: 'line',
-                        name: 'Darvas Box Bottom',
-                        data: this.darvasBoxes.flatMap((box) => [
-                            [box.start, box.bottom],
-                            [box.end, box.bottom],
-                            [box.end, null],
-                        ]),
-                        color: 'rgba(255, 20, 147, 0.9)', // 桃紅色
-                        lineWidth: 1.5,
-                        enableMouseTracking: true,
-                        showInLegend: false,
-                        zIndex: 1,
-                        step: false,
-                        dataGrouping: {
-                            lastAnchor: 'lastPoint',
-                            units: [['day', [1]]],
-                        },
-                    },
+                    })),
                     // Darvas Box 箱型顯示 - 左側線
                     {
                         type: 'line',
