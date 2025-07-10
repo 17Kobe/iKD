@@ -155,17 +155,6 @@
                                     {{ stockData.data.per.last.toFixed(2) }}
                                 </span>
                                 <br />
-                                <span v-for="(zone, index) in peZones" :key="index">
-                                    &nbsp;近 4 季 EPS 估算 <span style="color: #bbb">{{ zone }} 倍</span> 本益比的股價:
-                                    <span
-                                        :style="{
-                                            color: index === 2 ? 'rgb(255, 202, 100)' : 'rgb(176, 224, 230)',
-                                        }"
-                                    >
-                                        {{ lastPERatios[index] }}
-                                    </span>
-                                    <br />
-                                </span>
                                 &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 本益比:
                                 <span style="color: rgb(255 202 100)">{{ stockData.data.per.median.toFixed(2) }}</span>
                                 <br />
@@ -178,6 +167,17 @@
                                 &nbsp;近 5 年 <span style="color: #bbb">最低</span> 本益比:
                                 <span style="color: rgb(255 202 100)">{{ stockData.data.per.min.toFixed(2) }}</span>
                                 <br />
+                                <span v-for="(zone, index) in peZones" :key="index">
+                                    &nbsp;近 4 季 EPS 估算 <span style="color: #bbb">{{ zone }} 倍</span> 本益比的股價:
+                                    <span
+                                        :style="{
+                                            color: index === 2 ? 'rgb(255, 202, 100)' : 'rgb(176, 224, 230)',
+                                        }"
+                                    >
+                                        {{ lastPERatios[index] }}
+                                    </span>
+                                    <br />
+                                </span>
                                 &nbsp;計算日期:
                                 <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
                                 <LineChart :chart-data="combinedChartData" :options="peChartOptions" />
