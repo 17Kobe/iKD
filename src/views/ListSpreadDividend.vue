@@ -370,6 +370,14 @@
             </el-table-column>
             <el-table-column label="賣出日期" prop="sell_date" width="90" align="center" v-if="modeSpread === '歷史'">
             </el-table-column>
+
+            <el-table-column label="EPS" width="60" align="right" v-if="modeSpread === '目前'">
+                <template #default="scope">
+                    <span v-if="scope.row.data && Array.isArray(scope.row.data.eps) && scope.row.data.eps.length > 0">
+                        {{ parseFloat(scope.row.data.eps[scope.row.data.eps.length - 1].value).toFixed(2) }}
+                    </span>
+                </template>
+            </el-table-column>
             <el-table-column label="本益比" width="55" align="right" v-if="modeSpread === '目前'">
                 <template #default="scope">
                     {{
@@ -379,7 +387,7 @@
                     }}
                 </template>
             </el-table-column>
-            <el-table-column label="股價淨值比" width="78" align="right" v-if="modeSpread === '目前'">
+            <el-table-column label="股淨比" width="78" align="right" v-if="modeSpread === '目前'">
                 <template #default="scope">
                     {{
                         scope.row.data && scope.row.data.pbr && scope.row.data.pbr.last !== undefined
