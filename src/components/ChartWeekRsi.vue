@@ -165,10 +165,7 @@
                         :plain="true"
                         size="mini"
                         style="position: absolute; left: 17px; top: 6px; padding: 0px 8px"
-                        v-if="
-                            (['exchange', 'fund', 'usStock'].indexOf(stockData.type) === -1 && stockData.is_dividend !== false) ||
-                            stockData.name.includes('元大2至10年投資級企業債券基金')
-                        "
+                        v-if="['exchange', 'fund', 'usStock'].indexOf(stockData.type) === -1 && stockData.is_dividend !== false"
                         @click="getDividend"
                         >息</el-button
                     >

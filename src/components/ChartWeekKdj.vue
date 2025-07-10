@@ -248,9 +248,7 @@
 
                 <span
                     v-if="
-                        stockData.data &&
-                        ((['exchange', 'fund', 'usStock'].indexOf(stockData.type) === -1 && stockData.is_dividend !== false) ||
-                            stockData.name.includes('元大2至10年投資級企業債券基金'))
+                        stockData.data && ['exchange', 'fund', 'usStock'].indexOf(stockData.type) === -1 && stockData.is_dividend !== false
                     "
                     style="
                         position: absolute;
@@ -274,7 +272,7 @@
                                 DY:
                                 殖利率，該日的年化股息收益率。&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                 <br />
-                                <div v-if="stockData.data.dy">
+                                <div v-if="stockData.data.dy && stockData.data.dy.mean">
                                     <span style="display: block; border-top: 1px solid #ccc; margin: 4px 0"></span>
                                     &nbsp;<span style="color: #bbb">最新</span> 殖利率:
                                     <span style="color: rgb(255 105 105)"
@@ -371,15 +369,8 @@
                         </template>
                         <div>
                             <span style="color: rgb(34, 35, 38); font-size: 9px">殖利率</span>
-                            <span v-if="stockData.data.dy" style="margin-left: 6px">
+                            <span v-if="stockData.data.dy" :style="{ marginLeft: stockData.data.dy.last >= 10 ? '0px' : '6px' }">
                                 <b>{{ stockData.data.dy.last.toFixed(1) }}</b>
-                                <span style="font-size: 4px">%</span>
-                            </span>
-                            <span
-                                v-else-if="stockData.data.dividend && stockData.data.dividend.length > 0"
-                                :style="{ marginLeft: calcDividendYieldPercent().marginLeft }"
-                            >
-                                <b>{{ calcDividendYieldPercent().percent }}</b>
                                 <span style="font-size: 4px">%</span>
                             </span>
                         </div>
@@ -929,42 +920,6 @@ export default {
 
             // 對於其他值，顯示百分比
             return `${Math.round(unit * 100)}%`;
-        },
-        calcDividendYieldPercent() {
-            // 取得配息資料
-            const divs = this.stockData.data.dividend.filter(
-                (d) => d.CashEarningsDistribution > 0 && d.CashExDividendTradingDate
-            );
-            if (divs.length === 0 || !this.stockData.last_price) return { percent: '', marginLeft: '6px' };
-            const sorted = divs
-                .slice()
-                .sort((a, b) => new Date(b.CashExDividendTradingDate) - new Date(a.CashExDividendTradingDate));
-            let percent = '';
-            let freq = 1; // 預設年配息
-            if (sorted.length < 2) {
-                // 僅有一筆配息紀錄時，直接顯示該次殖利率
-                const totalCash = sorted[0].CashEarningsDistribution;
-                percent = (totalCash / this.stockData.last_price) * 100;
-            } else {
-                const d1 = new Date(sorted[0].CashExDividendTradingDate);
-                const d2 = new Date(sorted[1].CashExDividendTradingDate);
-                const diffDays = Math.abs((d1 - d2) / (1000 * 60 * 60 * 24));
-                if (diffDays > 300) {
-                    freq = 1; // 年配息
-                } else if (diffDays > 55) {
-                    freq = 4; // 季配息
-                } else {
-                    freq = 12; // 月配息
-                }
-                // 若配息紀錄數量不足 freq，則取現有全部
-                const totalCash = sorted.slice(0, Math.min(freq, sorted.length)).reduce((sum, d) => sum + d.CashEarningsDistribution, 0);
-                percent = (totalCash / this.stockData.last_price) * 100;
-            }
-            let marginLeft = typeof percent === 'number' && !isNaN(percent) && percent >= 10 ? '0px' : '6px';
-            return {
-                percent: typeof percent === 'number' && !isNaN(percent) ? percent.toFixed(1) : '',
-                marginLeft,
-            };
         },
     },
     computed: {

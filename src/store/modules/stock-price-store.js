@@ -3097,6 +3097,53 @@ const stock = {
             }
             foundStock.k_status = kStatus;
 
+            // === 殖利率先算好 ===
+            if (
+                foundStock.data &&
+                Array.isArray(foundStock.data.dividend) &&
+                foundStock.data.dividend.length > 0 &&
+                (!foundStock.data.dy || !foundStock.data.dy.mean)
+            ) {
+                // 1. 先依日期排序（新到舊）
+                const sorted = [...foundStock.data.dividend].sort((a, b) => {
+                    const d1 = a.date || a.CashExDividendTradingDate || a.StockExDividendTradingDate;
+                    const d2 = b.date || b.CashExDividendTradingDate || b.StockExDividendTradingDate;
+                    return moment(d2).valueOf() - moment(d1).valueOf();
+                });
+
+                // 2. 判斷配息頻率
+                let freq = 'year';
+                if (sorted.length >= 2) {
+                    const d1 = moment(sorted[0].date || sorted[0].CashExDividendTradingDate || sorted[0].StockExDividendTradingDate);
+                    const d2 = moment(sorted[1].date || sorted[1].CashExDividendTradingDate || sorted[1].StockExDividendTradingDate);
+                    const diff = Math.abs(d1.diff(d2, 'days'));
+                    if (diff <= 40) freq = 'month';
+                    else if (diff <= 150) freq = 'quarter';
+                    else if (diff > 300) freq = 'year';
+                }
+
+                let N = 1;
+                if (freq === 'month') N = 12;
+                else if (freq === 'quarter') N = 4;
+                else N = 1;
+                const latestN = sorted.slice(0, N);
+
+                // 3. 累加現金股利
+                let totalCash = 0;
+                latestN.forEach(item => {
+                    totalCash += Number(item.CashEarningsDistribution) || 0;
+                });
+
+                // 4. 用最新股價算殖利率
+                const lastPrice = foundStock.last_price;
+                let yieldValue = 0;
+                if (lastPrice > 0) {
+                    yieldValue = (totalCash / lastPrice) * 100;
+                }
+
+                foundStock.data.dy = { last: Number(yieldValue.toFixed(2)) };
+            }
+
             // // 算箱子 date open high low close
             // let boxStart = false;
             // let boxTop = 0;
