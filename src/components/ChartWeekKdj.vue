@@ -110,12 +110,29 @@
                                             this.formattedEps.length > 0
                                                 ? this.formattedEps[this.formattedEps.length - 1].acc
                                                 : 0;
-                                        const base = eps < 10 ? 14 : 7;
-                                        return base + (this.isMobile ? 1 : 0) + 'px';
+                                        const base = eps < 10 ? 0 : 0;
+                                        return base + (this.isMobile ? 2 : 0) + 'px';
                                     })(),
                                 }"
                                 >EPS</span
-                            ><b>{{ formattedEps.length > 0 ? formattedEps[formattedEps.length - 1].acc : '' }}</b>
+                            ><span v-if="formattedEps.length > 4">
+                                <i
+                                    v-if="Number(formattedEps[formattedEps.length - 1].acc) > Number(formattedEps[formattedEps.length - 5].acc)"
+                                    class="el-icon-caret-top"
+                                    style="color: #ee3333; font-size: 13px;"
+                                ></i>
+                                <i
+                                    v-else-if="Number(formattedEps[formattedEps.length - 1].acc) < Number(formattedEps[formattedEps.length - 5].acc)"
+                                    class="el-icon-caret-bottom"
+                                    style="color: #01aa00; font-size: 13px;"
+                                ></i>
+                                <i
+                                    v-else
+                                    class="el-icon-caret-top"
+                                    style="color: transparent; font-size: 13px;"
+                                ></i>
+                            </span>
+                            <b>{{ formattedEps.length > 0 ? formattedEps[formattedEps.length - 1].acc : '' }}</b>
                         </div>
                     </el-tooltip>
                 </span>

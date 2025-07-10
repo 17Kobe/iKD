@@ -371,11 +371,26 @@
             <el-table-column label="賣出日期" prop="sell_date" width="90" align="center" v-if="modeSpread === '歷史'">
             </el-table-column>
 
-            <el-table-column label="EPS" width="60" align="right" v-if="modeSpread === '目前'">
+            <el-table-column label="EPS" width="80" align="right" v-if="modeSpread === '目前'">
                 <template #default="scope">
                     <span v-if="scope.row.data && Array.isArray(scope.row.data.eps) && scope.row.data.eps.length > 0">
+                        <!-- 箭頭：與去年同季比 -->
+                        <template v-if="scope.row.data.eps.length > 4">
+                            <i
+                                v-if="scope.row.data.eps[scope.row.data.eps.length - 1].value > scope.row.data.eps[scope.row.data.eps.length - 5].value"
+                                class="el-icon-caret-top"
+                                style="color: #ee3333; font-size: 13px; margin-right: 2px"
+                            ></i>
+                            <i
+                                v-else-if="scope.row.data.eps[scope.row.data.eps.length - 1].value < scope.row.data.eps[scope.row.data.eps.length - 5].value"
+                                class="el-icon-caret-bottom"
+                                style="color: #01aa00; font-size: 13px; margin-right: 2px"
+                            ></i>
+                        </template>
+                        <!-- EPS值 -->
                         {{ parseFloat(scope.row.data.eps[scope.row.data.eps.length - 1].value).toFixed(2) }}
                     </span>
+                    <span v-else>-</span>
                 </template>
             </el-table-column>
             <el-table-column label="本益比" width="55" align="right" v-if="modeSpread === '目前'">
