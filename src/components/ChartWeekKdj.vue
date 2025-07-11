@@ -1473,7 +1473,7 @@ export default {
                             type: 'line',
                             name: `K轉折上折-${i}`,
                             color: 'rgba(255, 99, 132, 0.6)',
-                            lineWidth: isLast ? 5 : 2, // 最後一週加粗
+                            lineWidth: isLast ? 15 : 7, // 最後一週加粗
                             enableMouseTracking: false,
                             marker: { enabled: false },
                             data: [
@@ -1507,7 +1507,7 @@ export default {
                             type: 'line',
                             name: `K轉折下折-${i}`,
                             color: 'rgba(130, 209, 37, 0.6)',
-                            lineWidth: isLast ? 5 : 2, // 最後一週加粗
+                            lineWidth: isLast ? 15 : 7, // 最後一週加粗
                             enableMouseTracking: false,
                             marker: { enabled: false },
                             data: [
