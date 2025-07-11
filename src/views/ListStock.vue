@@ -58,18 +58,23 @@
                                     ].includes(scope.row.badge)
                                         ? 'shake-base'
                                         : '',
-                                    ['買', '買x2', '準買', '準買x2', '取消買', '取消買x2'].includes(scope.row.badge) ? 'buy' : '',
+                                    // 準買系列：外框紅、字紅、底白
+                                    ['準買', '準買x2'].includes(scope.row.badge) ? 'pre_buy' : '',
+                                    // 準賣系列：外框綠、字綠、底淡綠
+                                    ['準賣', '準賣½', '準賣⅓', '準賣¼', '準賣⅕', '準賣⅙', '準賣⅐'].includes(scope.row.badge)
+                                        ? 'pre_sell'
+                                        : '',
+                                    // 其它買
+                                    ['買', '買x2', '取消買', '取消買x2'].includes(scope.row.badge) ? 'buy' : '',
+                                    // 其它賣
                                     [
                                         '賣',
                                         '賣½',
                                         '賣⅓',
-                                        '準賣',
-                                        '準賣½',
-                                        '準賣⅓',
-                                        '準賣¼',
-                                        '準賣⅕',
-                                        '準賣⅙',
-                                        '準賣⅐',
+                                        '賣¼',
+                                        '賣⅕',
+                                        '賣⅙',
+                                        '賣⅐',
                                         '取消賣',
                                         '取消賣½',
                                         '取消賣⅓',
@@ -80,7 +85,15 @@
                                     ].includes(scope.row.badge)
                                         ? 'sell'
                                         : '',
+                                    scope.row.name.length >= 6
+                                        ? 'l6'
+                                        : scope.row.name.length >= 5
+                                        ? 'l5'
+                                        : scope.row.name.length >= 4
+                                        ? 'l4'
+                                        : '',
                                     'item',
+                                    'signal',
                                 ]"
                                 :type="
                                     ['買', '買x2', '準買', '準買x2', '取消買', '取消買x2'].includes(scope.row.badge)
@@ -1614,12 +1627,13 @@ input::-webkit-inner-spin-button
     padding: 0 10px
 
 .shake-base > .el-badge__content
-    text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00
+    text-shadow: 0 0 10px #1e1e1e, 0 0 20px #ffcc00, 0 0 30px #ffcc00
     animation: shake-base 2s infinite ease-in-out
     animation-delay: 0s
     right: -20px
     top: -9px
     opacity: unset!important
+    box-shadow: 0 0 3px 1.3px #ffcc00, 0 0 4px -3.3px #fff200
 
 .cell-chart.shake-base
     text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00

@@ -108,6 +108,7 @@
                         <el-badge
                             :value="scope.row.badge"
                             :class="[
+                                ['比特幣'].includes(scope.row.name) ? 'btc' : '',
                                 [
                                     '買',
                                     '買x2',
@@ -130,18 +131,23 @@
                                 ].includes(scope.row.badge)
                                     ? 'shake-base'
                                     : '',
-                                ['買', '買x2', '準買', '準買x2', '取消買', '取消買x2'].includes(scope.row.badge) ? 'buy' : '',
+                                // 準買系列：外框紅、字紅、底白
+                                ['準買', '準買x2'].includes(scope.row.badge) ? 'pre_buy' : '',
+                                // 準賣系列：外框綠、字綠、底淡綠
+                                ['準賣', '準賣½', '準賣⅓', '準賣¼', '準賣⅕', '準賣⅙', '準賣⅐'].includes(scope.row.badge)
+                                    ? 'pre_sell'
+                                    : '',
+                                // 其它買
+                                ['買', '買x2', '取消買', '取消買x2'].includes(scope.row.badge) ? 'buy' : '',
+                                // 其它賣
                                 [
                                     '賣',
                                     '賣½',
                                     '賣⅓',
-                                    '準賣',
-                                    '準賣½',
-                                    '準賣⅓',
-                                    '準賣¼',
-                                    '準賣⅕',
-                                    '準賣⅙',
-                                    '準賣⅐',
+                                    '賣¼',
+                                    '賣⅕',
+                                    '賣⅙',
+                                    '賣⅐',
                                     '取消賣',
                                     '取消賣½',
                                     '取消賣⅓',
@@ -159,7 +165,8 @@
                                     : scope.row.name.length >= 4
                                     ? 'l4'
                                     : '',
-                                ['item', 'signal'],
+                                'item',
+                                'signal',
                             ]"
                             :type="
                                 ['買', '買x2', '準買', '準買x2', '取消買', '取消買x2'].includes(scope.row.badge)
@@ -1591,4 +1598,16 @@ export default {
 
 .cancel .el-badge__content
     background-color: #404059
+
+.pre_buy .el-badge__content
+    background: #fff !important
+    color: #ff2828 !important
+    font-weight: bold
+    border: 1px solid #ff2828 !important
+
+.pre_sell .el-badge__content
+    background: #eaffea !important
+    color: #04ef27 !important
+    font-weight: bold
+    border: 1px solid #04ef27 !important
 </style>
