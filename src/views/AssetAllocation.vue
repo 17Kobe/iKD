@@ -32,7 +32,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    <span style="color: #ff9800; font-size: 16px; margin-right: 2px">🏦</span>排除存股的資產：
+                                    <span style="color: #e91e63; font-size: 16px; margin-right: 2px">💹</span>排除存股的資產：
                                     <span
                                         style="
                                             color: rgb(176, 224, 230);
@@ -100,7 +100,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    <span style="color: #e91e63; font-size: 16px; margin-right: 2px">📈</span>存股：
+                                    <span style="color: #e91e63; font-size: 16px; margin-right: 2px">💹</span>存股：
                                     <span
                                         style="
                                             color: rgb(255, 99, 132);
@@ -1664,7 +1664,7 @@ export default {
         const localAssetList = JSON.parse(localStorage.getItem('assetList')) || [];
         // console.log(localAssetList);
         if (_.isEmpty(localAssetList)) {
-            localAssetList.push(...this.storeAssetList); // 新增 append 預設到 localStockList
+            localAssetList.push;
             localStorage.setItem('assetList', JSON.stringify(localAssetList)); // 將 localStockList 從 object 轉 string 後塞到 localstorage
         }
 
