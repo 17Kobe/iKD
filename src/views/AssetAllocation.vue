@@ -19,10 +19,10 @@
                         <template #content>
                             <div>
                                 <div style="font-size: 14px">
-                                    存股金額：
+                                    <span style="color: #00bfae; font-size: 16px; margin-right: 2px">📈</span>存股金額：
                                     <span
                                         style="
-                                            color: rgb(176, 224, 230);
+                                            color: rgb(255, 99, 132);
                                             padding: 2px 4px;
                                             border-radius: 3px;
                                             font-size: 15px;
@@ -32,7 +32,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    排除存股的資產：
+                                    <span style="color: #ff9800; font-size: 16px; margin-right: 2px">🏦</span>排除存股的資產：
                                     <span
                                         style="
                                             color: rgb(176, 224, 230);
@@ -46,7 +46,7 @@
                                 </div>
                                 <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0" />
                                 <div style="font-size: 14px">
-                                    可投資金額：
+                                    <span style="color: #ffd700; font-size: 16px; margin-right: 2px">💰</span>可投資金額：
                                     <span
                                         style="
                                             color: rgb(255, 202, 100);
@@ -60,7 +60,7 @@
                                 </div>
                                 <!-- 新增每單位投資金額 -->
                                 <div style="font-size: 14px">
-                                    每單位投資金額(/9)：
+                                    <span style="color: #00bfae; font-size: 16px; margin-right: 2px">📈</span>每單位投資金額(/9)：
                                     <span
                                         style="
                                             color: rgb(66, 202, 162);
@@ -74,7 +74,7 @@
                                 </div>
                                 <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0" />
                                 <div style="font-size: 14px">
-                                    <span style="color: #ffd700; font-size: 16px; margin-right: 2px;">💰</span>現金：
+                                    <span style="color: #ffd700; font-size: 16px; margin-right: 2px">💰</span>現金：
                                     <span
                                         style="
                                             color: rgb(255, 205, 86);
@@ -87,7 +87,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    <span style="color: #ff9800; font-size: 16px; margin-right: 2px;">🏦</span>定存：
+                                    <span style="color: #ff9800; font-size: 16px; margin-right: 2px">🏦</span>定存：
                                     <span
                                         style="
                                             color: rgb(255, 159, 64);
@@ -100,7 +100,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    <span style="color: #e91e63; font-size: 16px; margin-right: 2px;">📈</span>存股：
+                                    <span style="color: #e91e63; font-size: 16px; margin-right: 2px">📈</span>存股：
                                     <span
                                         style="
                                             color: rgb(255, 99, 132);
@@ -113,7 +113,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    <span style="color: #00bfae; font-size: 16px; margin-right: 2px;">📈</span>股票：
+                                    <span style="color: #00bfae; font-size: 16px; margin-right: 2px">📈</span>股票：
                                     <span
                                         style="
                                             color: rgb(66, 202, 162);
@@ -126,7 +126,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    <span style="color: #9966ff; font-size: 16px; margin-right: 2px;">💳</span>債券：
+                                    <span style="color: #9966ff; font-size: 16px; margin-right: 2px">💳</span>債券：
                                     <span
                                         style="
                                             color: rgb(153, 102, 255);
@@ -139,7 +139,7 @@
                                     >
                                 </div>
                                 <div style="font-size: 14px">
-                                    <span style="color: #bdbdbd; font-size: 16px; margin-right: 2px;">📦</span>其它：
+                                    <span style="color: #bdbdbd; font-size: 16px; margin-right: 2px">📦</span>其它：
                                     <span
                                         style="
                                             color: rgb(200, 200, 200);
