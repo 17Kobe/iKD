@@ -173,7 +173,7 @@
                                 </span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 本益比:
-                                <span style="color: rgb(255 202 100)">{{ stockData.data.per.median.toFixed(2) }}</span>
+                                <span style="color: rgb(255, 202, 100)">{{ stockData.data.per.median.toFixed(2) }}</span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">平均</span> 本益比:
                                 <span style="color: rgb(176, 224, 230)">{{ stockData.data.per.mean.toFixed(2) }}</span>
@@ -241,7 +241,7 @@
                                 <span style="color: rgb(255 105 105)">{{ stockData.data.pbr.last.toFixed(2) }}</span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 股價淨值比:
-                                <span style="color: rgb(255 202 100)">{{ stockData.data.pbr.median.toFixed(2) }}</span>
+                                <span style="color: rgb(255, 202, 100)">{{ stockData.data.pbr.median.toFixed(2) }}</span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">平均</span> 股價淨值比:
                                 <span style="color: rgb(176, 224, 230)">{{ stockData.data.pbr.mean.toFixed(2) }}</span>
@@ -297,7 +297,7 @@
                                     >
                                     <br />
                                     &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 殖利率:
-                                    <span style="color: rgb(255 202 100)"
+                                    <span style="color: rgb(255, 202, 100)"
                                         >{{ stockData.data.dy.median.toFixed(2) }}<span style="margin-left: 2px">%</span></span
                                     >
                                     <br />
@@ -1409,6 +1409,108 @@ export default {
             return this.policySettingsMap['sell_kd_turn_down'] ?? -999;
         },
 
+        // 找出 K < kdGoldLimit 且本週 K > 上週 K 的週期，只保留每段連續的第一個
+        kdTurnUpPoints() {
+            if (!this.kdj || this.kdj.length < 2 || !this.stockData || this.kdGoldLimit === -999) return [];
+            const points = [];
+            let lastIndex = -2;
+            for (let i = 1; i < this.kdj.length; i++) {
+                const prevK = this.kdj[i - 1][1];
+                const currK = this.kdj[i][1];
+                const currX = this.kdj[i][0];
+                if (currK <= this.kdGoldLimit && currK > prevK) {
+                    // 只保留非連續週的第一個
+                    if (i - lastIndex > 1) {
+                        points.push(currX);
+                    }
+                    lastIndex = i;
+                }
+            }
+            return points;
+        },
+
+        // 找出 K < kdDeadLimit 且本週 K < 上週 K 的週期，只保留每段連續的第一個
+        kdTurnDownPoints() {
+            if (!this.kdj || this.kdj.length < 2 || !this.stockData || this.kdDeadLimit === -999) return [];
+            const points = [];
+            let lastIndex = -2;
+            for (let i = 1; i < this.kdj.length; i++) {
+                const prevK = this.kdj[i - 1][1];
+                const currK = this.kdj[i][1];
+                const currX = this.kdj[i][0];
+                if (currK >= this.kdDeadLimit && currK < prevK) {
+                    // 只保留非連續週的第一個
+                    if (i - lastIndex > 1) {
+                        points.push(currX);
+                    }
+                    lastIndex = i;
+                }
+            }
+            return points;
+        },
+
+        // 產生 K 轉折點垂直線段資料 (從 0 到 K 值) - 每個轉折點獨立線段
+        kdTurnUpSegments() {
+            if (!this.kdj || this.kdj.length < 2 || !this.stockData || this.kdGoldLimit === -999) return [];
+            const segments = [];
+            let lastIndex = -2;
+            for (let i = 1; i < this.kdj.length; i++) {
+                const prevK = this.kdj[i - 1][1];
+                const currK = this.kdj[i][1];
+                const currX = this.kdj[i][0];
+                if (currK <= this.kdGoldLimit && currK > prevK) {
+                    if (i - lastIndex > 1) {
+                        // 每個轉折點創建獨立的線段資料
+                        segments.push({
+                            type: 'line',
+                            name: `K轉折上折-${i}`,
+                            color: 'rgba(255, 99, 132, 0.6)',
+                            lineWidth: 2,
+                            enableMouseTracking: false,
+                            marker: { enabled: false },
+                            data: [[currX, 0], [currX, currK]],
+                            linkedTo: null,
+                            showInLegend: false,
+                            states: { hover: { enabled: false } },
+                            zIndex: 2,
+                        });
+                    }
+                    lastIndex = i;
+                }
+            }
+            return segments;
+        },
+        kdTurnDownSegments() {
+            if (!this.kdj || this.kdj.length < 2 || !this.stockData || this.kdDeadLimit === -999) return [];
+            const segments = [];
+            let lastIndex = -2;
+            for (let i = 1; i < this.kdj.length; i++) {
+                const prevK = this.kdj[i - 1][1];
+                const currK = this.kdj[i][1];
+                const currX = this.kdj[i][0];
+                if (currK >= this.kdDeadLimit && currK < prevK) {
+                    if (i - lastIndex > 1) {
+                        // 每個轉折點創建獨立的線段資料
+                        segments.push({
+                            type: 'line',
+                            name: `K轉折下折-${i}`,
+                            color: 'rgba(130, 209, 37, 0.6)',
+                            lineWidth: 2,
+                            enableMouseTracking: false,
+                            marker: { enabled: false },
+                            data: [[currX, 0], [currX, currK]],
+                            linkedTo: null,
+                            showInLegend: false,
+                            states: { hover: { enabled: false } },
+                            zIndex: 2,
+                        });
+                    }
+                    lastIndex = i;
+                }
+            }
+            return segments;
+        },
+
         chartOptions() {
             // component 參考 https://stackoverflow.com/questions/68381856/how-to-access-highcharts-stock-tooltip-data-in-vue
             const component = this;
@@ -1709,6 +1811,8 @@ export default {
                             return m === '01' ? moment(this.value).format('YYYY/MM') : m;
                         },
                     },
+                    // K 轉折點的垂直線 - 移除整條直線
+                    // plotLines: [],
                     // 有參考這個，但是根據資料去畫的 https://jsfiddle.net/BlackLabel/9yxmw7zv/ 應該要固定顯示月份
                     // 改參考這個 http://jsfiddle.net/kka8eyg5/3/
                 },
@@ -1849,6 +1953,9 @@ export default {
                         enableMouseTracking: false,
                         data: this.stockDataDividendToKdjList,
                     },
+                    // K 轉折點垂直線段 - 動態加入獨立的線段 series
+                    ...this.kdTurnUpSegments,
+                    ...this.kdTurnDownSegments,
                 ],
             };
         },
