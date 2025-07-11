@@ -117,20 +117,22 @@
                                 >EPS</span
                             ><span v-if="formattedEps.length > 4">
                                 <i
-                                    v-if="Number(formattedEps[formattedEps.length - 1].acc) > Number(formattedEps[formattedEps.length - 5].acc)"
+                                    v-if="
+                                        Number(formattedEps[formattedEps.length - 1].acc) >
+                                        Number(formattedEps[formattedEps.length - 5].acc)
+                                    "
                                     class="el-icon-caret-top"
-                                    style="color: #ee3333; font-size: 13px;"
+                                    style="color: #ee3333; font-size: 13px"
                                 ></i>
                                 <i
-                                    v-else-if="Number(formattedEps[formattedEps.length - 1].acc) < Number(formattedEps[formattedEps.length - 5].acc)"
+                                    v-else-if="
+                                        Number(formattedEps[formattedEps.length - 1].acc) <
+                                        Number(formattedEps[formattedEps.length - 5].acc)
+                                    "
                                     class="el-icon-caret-bottom"
-                                    style="color: #01aa00; font-size: 13px;"
+                                    style="color: #01aa00; font-size: 13px"
                                 ></i>
-                                <i
-                                    v-else
-                                    class="el-icon-caret-top"
-                                    style="color: transparent; font-size: 13px;"
-                                ></i>
+                                <i v-else class="el-icon-caret-top" style="color: transparent; font-size: 13px"></i>
                             </span>
                             <b>{{ formattedEps.length > 0 ? formattedEps[formattedEps.length - 1].acc : '' }}</b>
                         </div>
@@ -265,7 +267,9 @@
 
                 <span
                     v-if="
-                        stockData.data && ['exchange', 'fund', 'usStock'].indexOf(stockData.type) === -1 && stockData.is_dividend !== false
+                        stockData.data &&
+                        ['exchange', 'fund', 'usStock'].indexOf(stockData.type) === -1 &&
+                        stockData.is_dividend !== false
                     "
                     style="
                         position: absolute;
@@ -1460,15 +1464,19 @@ export default {
                 const currX = this.kdj[i][0];
                 if (currK <= this.kdGoldLimit && currK > prevK) {
                     if (i - lastIndex > 1) {
-                        // 每個轉折點創建獨立的線段資料
+                        // 判斷是否為最後一週的 segment
+                        const isLast = i === this.kdj.length - 1;
                         segments.push({
                             type: 'line',
                             name: `K轉折上折-${i}`,
                             color: 'rgba(255, 99, 132, 0.6)',
-                            lineWidth: 2,
+                            lineWidth: isLast ? 5 : 2, // 最後一週加粗
                             enableMouseTracking: false,
                             marker: { enabled: false },
-                            data: [[currX, 0], [currX, currK]],
+                            data: [
+                                [currX, 0],
+                                [currX, currK],
+                            ],
                             linkedTo: null,
                             showInLegend: false,
                             states: { hover: { enabled: false } },
@@ -1490,15 +1498,19 @@ export default {
                 const currX = this.kdj[i][0];
                 if (currK >= this.kdDeadLimit && currK < prevK) {
                     if (i - lastIndex > 1) {
-                        // 每個轉折點創建獨立的線段資料
+                        // 判斷是否為最後一週的 segment
+                        const isLast = i === this.kdj.length - 1;
                         segments.push({
                             type: 'line',
                             name: `K轉折下折-${i}`,
                             color: 'rgba(130, 209, 37, 0.6)',
-                            lineWidth: 2,
+                            lineWidth: isLast ? 5 : 2, // 最後一週加粗
                             enableMouseTracking: false,
                             marker: { enabled: false },
-                            data: [[currX, 0], [currX, currK]],
+                            data: [
+                                [currX, 0],
+                                [currX, currK],
+                            ],
                             linkedTo: null,
                             showInLegend: false,
                             states: { hover: { enabled: false } },
