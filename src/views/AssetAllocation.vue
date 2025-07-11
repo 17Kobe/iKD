@@ -869,17 +869,20 @@ export default {
 
             // 將數據按年分組
             const groupedByYear = _.groupBy(this.$store.state.asset.historyAssetList, (item) => item[0].split('-')[0]);
-            console.log(groupedByYear);
-            // 從每個組中選擇最後一項
+            // 從每個組中選擇最後一項，僅取近6年
             return _.takeRight(
-                _.map(groupedByYear, (group) => [
-                    group[0][0].split('-')[0], // 獲取年份部份
-                    _.last(group)[1], // 獲取最後一項的值
-                ]),
-                6
+                _.map(groupedByYear, (group) => [group[0][0].split('-')[0], _.last(group)[1]]),
+                3
             );
         },
-
+        annualCloseOfHistoryLiabilityList() {
+            // 取得每年最後一天的負債，若無則回傳 0，僅取近6年
+            const groupedByYear = _.groupBy(this.$store.state.asset.historyLiabilityList, (item) => item[0].split('-')[0]);
+            return _.takeRight(
+                _.map(groupedByYear, (group) => [group[0][0].split('-')[0], _.last(group)[1]]),
+                3
+            );
+        },
         todayAsset() {
             const historyAssetList = this.historyAssetList;
             if (_.size(historyAssetList) === 1) {
@@ -1588,37 +1591,49 @@ export default {
             };
         },
         bar3Data() {
-            const years = this.annualCloseOfHistoryAssetList.map((item) => `${item[0]} 年`);
-            const values = this.annualCloseOfHistoryAssetList.map((item) => item[1]);
-
+            // 年度資產/負債對比條狀圖
+            const assetList = this.annualCloseOfHistoryAssetList;
+            const liabilityList = this.annualCloseOfHistoryLiabilityList;
+            const years = _.uniq([...assetList.map((a) => a[0]), ...liabilityList.map((l) => l[0])]);
+            const sortedYears = _.sortBy(years);
+            const assetData = sortedYears.map((year) => {
+                const found = assetList.find((a) => a[0] === year);
+                return found && typeof found[1] === 'number' && isFinite(found[1]) ? found[1] : 0;
+            });
+            const liabilityData = sortedYears.map((year) => {
+                const found = liabilityList.find((l) => l[0] === year);
+                return found && typeof found[1] === 'number' && isFinite(found[1]) ? found[1] : 0;
+            });
             return {
-                labels: years,
+                labels: sortedYears.map((y) => y + ' 年'),
                 datasets: [
                     {
-                        data: values,
+                        label: '資產',
+                        data: assetData,
                         backgroundColor: 'rgba(54, 162, 235, 0.2)',
                         borderColor: 'rgb(54, 162, 235)',
-                        borderWidth: 2, // 外框寬度
-                        options: {
-                            legend: {
-                                display: false,
-                            },
-                        },
+                        borderWidth: 2,
+                    },
+                    {
+                        label: '負債',
+                        data: liabilityData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        borderWidth: 2,
                     },
                 ],
             };
         },
         bar3Options() {
-            const { annualPassiveIncome } = this;
             return {
                 scales: {
                     x: {
-                        stacked: true,
+                        stacked: false,
                     },
                     y: {
-                        stacked: true,
+                        stacked: false,
                         ticks: {
-                            callback(value, index, ticks) {
+                            callback(value) {
                                 if (value >= 10000) return `$ ${Number((value / 10000).toFixed(1))} 萬`;
                                 else return `$ ${value}`;
                             },
@@ -1631,13 +1646,11 @@ export default {
                     },
                     title: {
                         display: true,
-                        text: `歷年資產結算`,
-                        // align: 'start',
+                        text: `歷年資產/負債結算`,
                         padding: {
                             top: 5,
                             bottom: 20,
                         },
-                        // color: 'blue',
                     },
                     datalabels: {
                         anchor: 'end', // remove this line to get label in middle of the bar
