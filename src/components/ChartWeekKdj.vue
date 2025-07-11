@@ -1467,18 +1467,20 @@ export default {
                 const currX = this.kdj[i][0];
                 if (currK <= this.kdGoldLimit && currK > prevK) {
                     if (i - lastIndex > 1) {
-                        // 判斷是否為最後一週的 segment
                         const isLast = i === this.kdj.length - 1;
+                        const lineWidth = isLast ? 14 : 7;
+                        // 讓終點略短於 K 線，減去一半線寬
+                        const endY = currK - lineWidth / 2;
                         segments.push({
                             type: 'line',
                             name: `K轉折上折-${i}`,
                             color: 'rgba(255, 99, 132, 0.6)',
-                            lineWidth: isLast ? 15 : 7, // 最後一週加粗
+                            lineWidth,
                             enableMouseTracking: false,
                             marker: { enabled: false },
                             data: [
                                 [currX, 0],
-                                [currX, currK],
+                                [currX, endY > 0 ? endY : 0], // 避免負值
                             ],
                             linkedTo: null,
                             showInLegend: false,
@@ -1501,18 +1503,20 @@ export default {
                 const currX = this.kdj[i][0];
                 if (currK >= this.kdDeadLimit && currK < prevK) {
                     if (i - lastIndex > 1) {
-                        // 判斷是否為最後一週的 segment
                         const isLast = i === this.kdj.length - 1;
+                        const lineWidth = isLast ? 14 : 7;
+                        // 讓終點略短於 K 線，減去一半線寬
+                        const endY = currK - lineWidth / 2;
                         segments.push({
                             type: 'line',
                             name: `K轉折下折-${i}`,
                             color: 'rgba(130, 209, 37, 0.6)',
-                            lineWidth: isLast ? 15 : 7, // 最後一週加粗
+                            lineWidth,
                             enableMouseTracking: false,
                             marker: { enabled: false },
                             data: [
                                 [currX, 0],
-                                [currX, currK],
+                                [currX, endY > 0 ? endY : 0], // 避免負值
                             ],
                             linkedTo: null,
                             showInLegend: false,
