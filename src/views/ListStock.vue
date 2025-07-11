@@ -36,16 +36,16 @@
                                 :value="scope.row.badge"
                                 :class="[
                                     ['比特幣'].includes(scope.row.name) ? 'btc' : '',
-                                    ['買', '買x2', '賣', '賣½', '賣⅓', '賣¼', '賣⅕', '賣⅙', '賣⅐'].includes(scope.row.badge)
-                                        ? 'shake-base'
-                                        : '',
-                                    ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge) ? 'buy' : '',
-                                    ['賣', '賣½', '賣⅓', '準賣', '準賣½', '準賣⅓', '準賣¼', '準賣⅕', '準賣⅙', '準賣⅐'].includes(
-                                        scope.row.badge
-                                    )
-                                        ? 'sell'
-                                        : '',
                                     [
+                                        '買',
+                                        '買x2',
+                                        '賣',
+                                        '賣½',
+                                        '賣⅓',
+                                        '賣¼',
+                                        '賣⅕',
+                                        '賣⅙',
+                                        '賣⅐',
                                         '取消買',
                                         '取消買x2',
                                         '取消賣',
@@ -56,15 +56,35 @@
                                         '取消賣⅙',
                                         '取消賣⅐',
                                     ].includes(scope.row.badge)
-                                        ? 'cancel'
+                                        ? 'shake-base'
+                                        : '',
+                                    ['買', '買x2', '準買', '準買x2', '取消買', '取消買x2'].includes(scope.row.badge) ? 'buy' : '',
+                                    [
+                                        '賣',
+                                        '賣½',
+                                        '賣⅓',
+                                        '準賣',
+                                        '準賣½',
+                                        '準賣⅓',
+                                        '準賣¼',
+                                        '準賣⅕',
+                                        '準賣⅙',
+                                        '準賣⅐',
+                                        '取消賣',
+                                        '取消賣½',
+                                        '取消賣⅓',
+                                        '取消賣¼',
+                                        '取消賣⅕',
+                                        '取消賣⅙',
+                                        '取消賣⅐',
+                                    ].includes(scope.row.badge)
+                                        ? 'sell'
                                         : '',
                                     'item',
                                 ]"
                                 :type="
-                                    ['買', '買x2', '準買', '準買x2'].includes(scope.row.badge)
+                                    ['買', '買x2', '準買', '準買x2', '取消買', '取消買x2'].includes(scope.row.badge)
                                         ? 'danger'
-                                        : ['取消買', '取消買x2', '取消賣', '取消賣½'].includes(scope.row.badge)
-                                        ? 'info'
                                         : 'success'
                                 "
                                 :style="{

@@ -1328,15 +1328,22 @@ export default {
         },
 
         policyResultFilteredMap() {
-            const result = { buy: [], sell: [], cancel: [] };
+            const result = { buy: [], sell: [], cancel_buy: [], cancel_sell: [] };
             if (!this.stockData.policy?.result) return result;
             this.stockData.policy.result.forEach((o) => {
                 if (moment().diff(moment(o.date), 'days') > 365) return;
                 if (o.is_sure_buy) result.buy.push([moment(o.date).valueOf(), o.k]);
                 if (o.is_sure_sell) result.sell.push([moment(o.date).valueOf(), o.k]);
-                if (o.is_buy_cancel || o.is_sell_cancel) result.cancel.push([moment(o.date).valueOf(), o.k]);
+                if (o.is_buy_cancel) result.cancel_buy.push([moment(o.date).valueOf(), o.k]);
+                if (o.is_sell_cancel) result.cancel_sell.push([moment(o.date).valueOf(), o.k]);
             });
             return result;
+        },
+        stockDataOfPolicyResultBuyCancel() {
+            return this.policyResultFilteredMap.cancel_buy;
+        },
+        stockDataOfPolicyResultSellCancel() {
+            return this.policyResultFilteredMap.cancel_sell;
         },
         stockDataOfPolicyResultBuy() {
             return this.policyResultFilteredMap.buy;
@@ -1344,10 +1351,6 @@ export default {
         stockDataOfPolicyResultSell() {
             return this.policyResultFilteredMap.sell;
         },
-        stockDataOfPolicyResultBuyOrSellCancel() {
-            return this.policyResultFilteredMap.cancel;
-        },
-
         stockDataDividend() {
             return this.$store.getters.getStockDataDividend(this.parentData);
         },
@@ -1621,10 +1624,6 @@ export default {
                 title: {
                     text: '',
                 },
-                legend: {
-                    // 該線是什麼線的說明，原本顯示在最下方，現在把它隱藏
-                    enabled: false,
-                },
 
                 // 隱藏最下方的導航日期bar
                 navigator: {
@@ -1635,8 +1634,14 @@ export default {
                     enabled: false,
                 },
 
+                // 這篇中文寫的最清楚 https://ithelp.ith
+                legend: {
+                    // 該線是什麼線的說明，原本顯示在最下方，現在把它隱藏
+                    enabled: false,
+                },
+
                 // 這篇中文寫的最清楚 https://ithelp.ithome.com.tw/articles/10245718?sc=hot
-                // 有可能是答案但好複雜 https://www.twblogs.net/a/5b8ee6ce2b71771883489ae9
+                // 有可能是答案但好複雜 https://www.twblogs.net/a/5b8ee6ce2b71771883489
                 // 去掉tooltip 直接顯示的範例 https://jsfiddle.net/BlackLabel/a8hjdpcb/1/
                 // 可參考 https://stackoverflow.com/questions/19438942/how-to-auto-format-dates-in-custom-tooltip-formatter
                 // 可參考 https://stackoverflow.com/questions/19932556/highstocks-tooltip-remove-the-phrase-weekfrom-monday
@@ -1937,20 +1942,44 @@ export default {
                         enableMouseTracking: false,
                         data: this.stockDataOfPolicyResultSell,
                     },
+                    // 取消買
                     {
                         type: 'scatter',
-
-                        color: 'rgba(104, 104, 104, 0.9)',
-
+                        color: 'rgba(160, 160, 160, 0.9)',
                         marker: {
                             symbol: 'circle',
-                            lineWidth: 1,
-                            lineColor: '#222',
+                            lineWidth: 1.8,
+                            lineColor: 'rgba(255, 40, 40, 0.9)',
                         },
-                        // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
-                        data: this.stockDataOfPolicyResultBuyOrSellCancel,
+                        data: this.stockDataOfPolicyResultBuyCancel,
                     },
+                    // 取消賣
+                    {
+                        type: 'scatter',
+                        color: 'rgba(160, 160, 160, 0.9)',
+                        marker: {
+                            symbol: 'circle',
+                            lineWidth: 1.8,
+                            lineColor: 'rgba(4, 239, 39, 0.9)',
+                        },
+                        enableMouseTracking: false,
+                        data: this.stockDataOfPolicyResultSellCancel,
+                    },
+                    // {
+                    //     type: 'scatter',
+
+                    //     color: 'rgba(104, 104, 104, 0.9)',
+
+                    //     marker: {
+                    //         symbol: 'circle',
+                    //         lineWidth: 1,
+                    //         lineColor: '#222',
+                    //     },
+                    //     // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
+                    //     enableMouseTracking: false,
+                    //     data: this.stockDataOfPolicyResultBuyOrSellCancel,
+                    // },
                     {
                         type: 'scatter',
 
