@@ -1465,7 +1465,7 @@ export default {
                 const prevK = this.kdj[i - 1][1];
                 const currK = this.kdj[i][1];
                 const currX = this.kdj[i][0];
-                if (currK <= this.kdGoldLimit && currK > prevK) {
+                if (prevK <= this.kdGoldLimit && currK > prevK) {
                     if (i - lastIndex > 1) {
                         const isLast = i === this.kdj.length - 1;
                         const lineWidth = isLast ? 14 : 7;
@@ -1501,7 +1501,7 @@ export default {
                 const prevK = this.kdj[i - 1][1];
                 const currK = this.kdj[i][1];
                 const currX = this.kdj[i][0];
-                if (currK >= this.kdDeadLimit && currK < prevK) {
+                if (prevK >= this.kdDeadLimit && currK < prevK) {
                     if (i - lastIndex > 1) {
                         const isLast = i === this.kdj.length - 1;
                         const lineWidth = isLast ? 14 : 7;

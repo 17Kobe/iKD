@@ -200,6 +200,81 @@ export default {
             : 'hover';
     },
     computed: {
+        // RSI 50以下畫TurnUpSegments，50以上畫TurnDownSegments
+        rsiTurnUpSegments() {
+            if (!this.rsi5 || this.rsi5.length < 2) return [];
+            const segments = [];
+            let lastIndex = -2;
+            for (let i = 1; i < this.rsi5.length; i++) {
+                const prev = this.rsi5[i - 1][1];
+                const curr = this.rsi5[i][1];
+                const currX = this.rsi5[i][0];
+                // 50以下且本週>前週，且只畫連續第一根
+                if (prev <= 50 && curr <= 50 && curr > prev) {
+                    if (i - lastIndex > 1) {
+                        // 仿照KDJ，最後一週bar要畫長一點
+                        const isLast = i === this.rsi5.length - 1;
+                        const lineWidth = isLast ? 14 : 7;
+                        const endY = curr - lineWidth / 2;
+                        segments.push({
+                            type: 'line',
+                            name: `RSI轉折上折-${i}`,
+                            color: 'rgba(255, 99, 132, 0.35)',
+                            lineWidth,
+                            enableMouseTracking: false,
+                            marker: { enabled: false },
+                            data: [
+                                [currX, 0],
+                                [currX, endY > 0 ? endY : 0],
+                            ],
+                            linkedTo: null,
+                            showInLegend: false,
+                            states: { hover: { enabled: false } },
+                            zIndex: 2,
+                        });
+                    }
+                    lastIndex = i;
+                }
+            }
+            return segments;
+        },
+        rsiTurnDownSegments() {
+            if (!this.rsi5 || this.rsi5.length < 2) return [];
+            const segments = [];
+            let lastIndex = -2;
+            for (let i = 1; i < this.rsi5.length; i++) {
+                const prev = this.rsi5[i - 1][1];
+                const curr = this.rsi5[i][1];
+                const currX = this.rsi5[i][0];
+                // 50以上且本週<前週，且只畫連續第一根
+                if (prev >= 50 && curr >= 50 && curr < prev) {
+                    if (i - lastIndex > 1) {
+                        // 仿照KDJ，最後一週bar要畫長一點
+                        const isLast = i === this.rsi5.length - 1;
+                        const lineWidth = isLast ? 14 : 7;
+                        const endY = curr - lineWidth / 2;
+                        segments.push({
+                            type: 'line',
+                            name: `RSI轉折下折-${i}`,
+                            color: 'rgba(130, 209, 37, 0.35)',
+                            lineWidth,
+                            enableMouseTracking: false,
+                            marker: { enabled: false },
+                            data: [
+                                [currX, 0],
+                                [currX, endY > 0 ? endY : 0],
+                            ],
+                            linkedTo: null,
+                            showInLegend: false,
+                            states: { hover: { enabled: false } },
+                            zIndex: 2,
+                        });
+                    }
+                    lastIndex = i;
+                }
+            }
+            return segments;
+        },
         // stockData 資料的改變是依賴 點擊 日線、週線、月線後，去取 vuex 資料
         stockData() {
             console.log('stockData');
@@ -683,6 +758,9 @@ export default {
                         enableMouseTracking: false,
                         data: this.stockDataOfPolicyResultBuyOrSellCancel,
                     },
+                    // RSI 轉折點 segments
+                    ...this.rsiTurnUpSegments,
+                    ...this.rsiTurnDownSegments,
                 ],
             };
         },
