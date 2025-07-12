@@ -3710,6 +3710,7 @@ const stock = {
                 return {
                     sentiment,
                     reasons,
+                    score,
                 };
             }
             // 取得理由
@@ -3769,6 +3770,7 @@ const stock = {
                 fear: fearLevel,
                 sentiment: capitalFlow.sentiment,
                 reasons,
+                score: capitalFlow.score,
             };
         },
     },

@@ -44,12 +44,24 @@
                             />
                             <!-- <span :style="fearColorStyle">{{ fearLevel.fear }}</span
                             ><br /> -->
-                            <span
+                            <!-- <span
                                 :style="
                                     Object.assign({}, sentimentColorStyle, { 'margin-top': '-15px', display: 'inline-block' })
                                 "
                                 >{{ fearLevel.sentiment }}</span
-                            >
+                            > -->
+                            <!-- 顯示 score 並用 el-progress 呈現，僅在 sentiment 包含偏多時 -->
+                            <el-progress
+                                id="fear-level-score"
+                                v-if="fearLevel.sentiment && typeof fearLevel.score === 'number'"
+                                :percentage="scoreToProgress(fearLevel.score)"
+                                :stroke-width="10"
+                                :show-text="true"
+                                text-inside
+                                style="width: 85px; margin-top: 2px"
+                                :color="scoreProgressColor(fearLevel.score)"
+                                :format="scoreProgressFormat"
+                            />
                         </div>
                         <template #content>
                             <div v-for="(r, i) in fearLevelReasonsColored" :key="i" v-html="r"></div>
@@ -186,6 +198,28 @@ export default {
             }
             return percentage + '%';
         },
+        // score 轉換成 progress 百分比，範圍 -3~7
+        scoreToProgress(score) {
+            const min = -3,
+                max = 7;
+            return Math.round(((score - min) / (max - min)) * 100);
+        },
+        // score progress 顏色
+        scoreProgressColor(score) {
+            if (score >= 4) return '#ff5858'; // 深綠
+            if (score >= 2) return '#ff7442'; // 淺綠
+            if (score >= 0) return '#ffad90'; // 淺紅
+            return '#01aa00'; // 深紅
+        },
+        // score progress 顯示格式
+        scoreProgressFormat(percentage) {
+            const min = -3,
+                max = 7;
+            const score = Math.round((percentage / 100) * (max - min) + min);
+            // 取 sentiment
+            const sentiment = this.fearLevel?.sentiment || '';
+            return `${score}分 ${sentiment}`;
+        },
     },
 };
 </script>
@@ -214,5 +248,8 @@ export default {
     line-height: 1.6
 
 #cnn-fear-greed-index .el-progress-bar__outer
-    height: 26px!important
+    height: 23px!important
+
+#fear-level-score .el-progress-bar__outer
+    height: 23px!important
 </style>
