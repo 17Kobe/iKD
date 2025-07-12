@@ -1949,10 +1949,10 @@ export default {
                     // 取消買
                     {
                         type: 'scatter',
-                        color: 'rgba(160, 160, 160, 0.9)',
+                        color: 'rgba(80, 80, 80, 0.9)',
                         marker: {
                             symbol: 'circle',
-                            lineWidth: 1.8,
+                            lineWidth: 2,
                             lineColor: 'rgba(255, 40, 40, 0.9)',
                         },
                         enableMouseTracking: false,
@@ -1961,10 +1961,10 @@ export default {
                     // 取消賣
                     {
                         type: 'scatter',
-                        color: 'rgba(160, 160, 160, 0.9)',
+                        color: 'rgba(80, 80, 80, 0.9)',
                         marker: {
                             symbol: 'circle',
-                            lineWidth: 1.8,
+                            lineWidth: 2,
                             lineColor: 'rgba(4, 239, 39, 0.9)',
                         },
                         enableMouseTracking: false,
