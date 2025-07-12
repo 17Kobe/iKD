@@ -53,7 +53,6 @@
                             <!-- 顯示 score 並用 el-progress 呈現，僅在 sentiment 包含偏多時 -->
                             <el-progress
                                 id="fear-level-score"
-                                v-if="fearLevel.sentiment && typeof fearLevel.score === 'number'"
                                 :percentage="scoreToProgress(fearLevel.score)"
                                 :stroke-width="10"
                                 :show-text="true"
@@ -202,6 +201,8 @@ export default {
         scoreToProgress(score) {
             const min = -3,
                 max = 7;
+            // 預設分數為2
+            if (typeof score !== 'number' || isNaN(score)) score = 2;
             return Math.round(((score - min) / (max - min)) * 100);
         },
         // score progress 顏色
@@ -209,7 +210,8 @@ export default {
             if (score >= 4) return '#ff5858'; // 深綠
             if (score >= 2) return '#ff7442'; // 淺綠
             if (score >= 0) return '#ffad90'; // 淺紅
-            return '#01aa00'; // 深紅
+            if (score < 0) return '#01aa00'; // 淺紅
+            return '#ff7442'; // 深紅
         },
         // score progress 顯示格式
         scoreProgressFormat(percentage) {
