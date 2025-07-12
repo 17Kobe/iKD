@@ -1474,7 +1474,7 @@ export default {
                         segments.push({
                             type: 'line',
                             name: `K轉折上折-${i}`,
-                            color: 'rgba(255, 99, 132, 0.6)',
+                            color: 'rgba(255, 99, 132, 0.3)',
                             lineWidth,
                             enableMouseTracking: false,
                             marker: { enabled: false },
@@ -1510,7 +1510,7 @@ export default {
                         segments.push({
                             type: 'line',
                             name: `K轉折下折-${i}`,
-                            color: 'rgba(130, 209, 37, 0.6)',
+                            color: 'rgba(130, 209, 37, 0.3)',
                             lineWidth,
                             enableMouseTracking: false,
                             marker: { enabled: false },
