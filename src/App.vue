@@ -19,9 +19,7 @@
                 <el-menu-item index="asset" @click="onMenuItemClick('asset')" style="padding: 0 6px">
                     <i class="el-icon-pie-chart" style="position: relative; top: -2px"></i>資產表
                 </el-menu-item>
-                <el-menu-item index="add" @click="doShowSearch()" style="padding: 0 6px">
-                    <i class="el-icon-circle-plus-outline" style="position: relative; top: -2px; font-size: 36px"></i>
-                </el-menu-item>
+
                 <el-menu-item index="index" style="padding: 0 6px">
                     <el-tooltip
                         effect="dark"
@@ -66,6 +64,9 @@
                             <div v-for="(r, i) in fearLevelReasonsColored" :key="i" v-html="r"></div>
                         </template>
                     </el-tooltip>
+                </el-menu-item>
+                <el-menu-item index="add" @click="doShowSearch()" style="padding: 0 6px">
+                    <i class="el-icon-circle-plus-outline" style="position: relative; top: -2px; font-size: 36px"></i>
                 </el-menu-item>
 
                 <!-- <el-menu-item index="link" @click="doShowLink()" style="padding: 0 6px">
