@@ -1373,8 +1373,17 @@ const stock = {
     mutations: {
         SAVE_GLOBAL_SETTINGS(state, data) {
             console.log('SAVE_GLOBAL_SETTINGS');
-            // console.log(data);
-            // state.usdExchange = data.usd_exchange;
+            // 儲存 CNN Fear & Greed Index 相關欄位
+            if (data.cnn_fear_greed_index !== undefined) {
+                state.cnn_fear_greed_index = data.cnn_fear_greed_index;
+            }
+            if (data.cnn_fear_greed_status !== undefined) {
+                state.cnn_fear_greed_status = data.cnn_fear_greed_status;
+            }
+            if (data.cnn_fear_greed_update !== undefined) {
+                state.cnn_fear_greed_update = data.cnn_fear_greed_update;
+            }
+            // 你可以依需求加上其他 global-settings 欄位
         },
         // 將該股票的淨值儲存到 state 上
         SAVE_STOCK_LIST(state, data) {
@@ -3114,8 +3123,12 @@ const stock = {
                 // 2. 判斷配息頻率
                 let freq = 'year';
                 if (sorted.length >= 2) {
-                    const d1 = moment(sorted[0].date || sorted[0].CashExDividendTradingDate || sorted[0].StockExDividendTradingDate);
-                    const d2 = moment(sorted[1].date || sorted[1].CashExDividendTradingDate || sorted[1].StockExDividendTradingDate);
+                    const d1 = moment(
+                        sorted[0].date || sorted[0].CashExDividendTradingDate || sorted[0].StockExDividendTradingDate
+                    );
+                    const d2 = moment(
+                        sorted[1].date || sorted[1].CashExDividendTradingDate || sorted[1].StockExDividendTradingDate
+                    );
                     const diff = Math.abs(d1.diff(d2, 'days'));
                     if (diff <= 40) freq = 'month';
                     else if (diff <= 150) freq = 'quarter';
@@ -3130,7 +3143,7 @@ const stock = {
 
                 // 3. 累加現金股利
                 let totalCash = 0;
-                latestN.forEach(item => {
+                latestN.forEach((item) => {
                     totalCash += Number(item.CashEarningsDistribution) || 0;
                 });
 
@@ -3526,8 +3539,11 @@ const stock = {
             const usBond = state.stockList.find((s) => s.name.includes('美債'));
             const usdTwd = state.stockList.find((s) => s.name.includes('美金匯率'));
 
+            // CNN Fear & Greed Index
+            const cnnIndex = state.cnn_fear_greed_index || null;
+
             // 若資料不足
-            if (!sp500 || !jnk || !sp500.data?.weekly?.length || !jnk.data?.weekly?.length) {
+            if (!jnk || !jnk.data?.weekly?.length) {
                 return {
                     fear: '',
                     sentiment: '',
@@ -3543,33 +3559,42 @@ const stock = {
                 return (last - prev) / prev;
             };
 
-            const sp500Change = getChange(sp500.data.weekly);
             const jnkChange = getChange(jnk.data.weekly);
+            const sp500Change = sp500 && sp500.data?.weekly?.length >= 2 ? getChange(sp500.data.weekly) : 0;
             const btcChange = btc && btc.data?.weekly?.length >= 2 ? getChange(btc.data.weekly) : 0;
             const goldChange = gold && gold.data?.weekly?.length >= 2 ? getChange(gold.data.weekly) : 0;
             const usBondChange = usBond && usBond.data?.weekly?.length >= 2 ? getChange(usBond.data.weekly) : 0;
             // 美金匯率用收盤價
             const usdTwdChange = usdTwd && usdTwd.data?.weekly?.length >= 2 ? getChange(usdTwd.data.weekly) : 0;
 
-            // 恐慌偵測
-            function detectFearLevel(sp500Change, jnkChange) {
+            // 恐慌偵測（改用CNN Fear & Greed Index）
+            function detectFearLevel(cnnIndex, jnkChange) {
                 let fearLevel = '';
                 const fearReasons = [];
                 const percent = (v) => (v >= 0 ? '+' : '') + (v * 100).toFixed(2) + '%';
 
-                // S&P500 原因
-                if (sp500Change <= -0.05) {
-                    fearLevel = '極度恐慌';
-                    fearReasons.push(`【S&P500】下跌 (${percent(sp500Change)}) → 極度恐慌`);
-                } else if (sp500Change <= -0.03) {
-                    fearLevel = '很恐慌';
-                    fearReasons.push(`【S&P500】下跌 (${percent(sp500Change)}) → 很恐慌`);
-                } else if (sp500Change <= -0.02) {
-                    fearLevel = '輕微恐慌';
-                    fearReasons.push(`【S&P500】下跌 (${percent(sp500Change)}) → 輕微恐慌`);
+                // CNN Fear & Greed Index 原因
+                if (cnnIndex !== null && cnnIndex !== undefined) {
+                    const cnnStr = Number(cnnIndex).toFixed(2);
+                    if (cnnIndex <= 24) {
+                        fearLevel = '極恐慌';
+                        fearReasons.push(`【CNN】指數（${cnnStr}） → 極恐慌`);
+                    } else if (cnnIndex <= 44) {
+                        fearLevel = '恐懼';
+                        fearReasons.push(`【CNN】指數（${cnnStr}） → 恐懼`);
+                    } else if (cnnIndex <= 54) {
+                        fearLevel = '中性';
+                        fearReasons.push(`【CNN】指數（${cnnStr}） → 中性`);
+                    } else if (cnnIndex <= 74) {
+                        fearLevel = '貪婪';
+                        fearReasons.push(`【CNN】指數（${cnnStr}） → 貪婪`);
+                    } else {
+                        fearLevel = '極貪婪';
+                        fearReasons.push(`【CNN】指數（${cnnStr}） → 極貪婪`);
+                    }
                 } else {
-                    fearLevel = '無恐慌';
-                    fearReasons.push(`【S&P500】未明顯下跌 (${percent(sp500Change)}) → 無恐慌`);
+                    fearLevel = '無法判斷';
+                    fearReasons.push('【CNN】指數無資料 → 無法判斷');
                 }
 
                 // JNK 原因
@@ -3580,24 +3605,24 @@ const stock = {
                 );
 
                 // O/X 標記只在非無恐慌時加在 fearLevel
-                if (fearLevel !== '無恐慌') {
+                if (fearLevel !== '無法判斷' && (fearLevel.startsWith('極恐慌') || fearLevel.startsWith('恐懼'))) {
                     const jnkMark = jnkChange >= 0 ? 'O' : 'X';
                     fearLevel = `${fearLevel}(${jnkMark})`;
                 }
 
                 // 判斷總結文字
                 let summary = '';
-                if (fearLevel === '無恐慌') {
-                    if (jnkChange >= 0) {
-                        summary = '市場無恐慌，JNK也穩定，確認真實無恐慌。';
-                    } else {
-                        summary = '市場無恐慌，但JNK下跌，需留意債市風險。';
-                    }
-                } else {
+                if (fearLevel.startsWith('極恐慌') || fearLevel.startsWith('恐懼')) {
                     if (jnkChange < 0) {
                         summary = `市場${fearLevel.replace(/\(.+\)/, '')}，JNK也下跌，確認真實恐慌。`;
                     } else {
                         summary = `市場${fearLevel.replace(/\(.+\)/, '')}，但JNK未下跌，可能為短線過度反應，留意反彈機會。`;
+                    }
+                } else {
+                    if (jnkChange >= 0) {
+                        summary = '市場無明顯恐慌，JNK也穩定，確認市場穩定。';
+                    } else {
+                        summary = '市場無明顯恐慌，但JNK下跌，需留意債市風險。';
                     }
                 }
                 fearReasons.push(`總結：${summary}`);
@@ -3698,10 +3723,28 @@ const stock = {
             });
 
             // 先取得恐慌理由
-            const { fearLevel, fearReasons } = detectFearLevel(sp500Change, jnkChange);
+            const { fearLevel, fearReasons } = detectFearLevel(cnnIndex, jnkChange);
 
             // 合併理由，fearReasons 在前，中間加分隔線，再接資金流理由
-            const reasons = [...fearReasons, '———————————————————', ...capitalFlow.reasons];
+
+            // CNN Fear & Greed Index 範圍定義
+            const cnnRangeTable = [
+                'CNN 恐慌與貪婪指數說明：',
+                '0 – 24　→　極恐懼：市場極度悲觀',
+                '25 – 44　→　恐懼：市場偏向保守',
+                '45 – 54　→　中性：市場情緒均衡',
+                '55 – 74　→　貪婪：市場較樂觀',
+                '75 – 10　→　極貪婪：市場可能過熱',
+                '',
+            ];
+
+            const reasons = [
+                ...fearReasons,
+                '　', // 增加一個換行
+                ...cnnRangeTable,
+                '———————————————————',
+                ...capitalFlow.reasons,
+            ];
 
             return {
                 fear: fearLevel,

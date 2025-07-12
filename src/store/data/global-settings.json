@@ -29,5 +29,8 @@
             "multiples": 25,
             "fair_value": 112.2
         }
-    ]
+    ],
+    "cnn_fear_greed_index": 75.2857142857143,
+    "cnn_fear_greed_status": "extreme greed",
+    "cnn_fear_greed_update": "2025-07-12 07:59:55"
 }

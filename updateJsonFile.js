@@ -104,6 +104,11 @@ const funds = [
         url: 'https://www.cmoney.tw/forum/stock/00937B?s=dividend',
         type: 'stock_dividend',
     },
+    {
+        name: 'CNN Fear & Greed Index',
+        url: 'https://money.cnn.com/data/fear-and-greed/',
+        type: 'index',
+    },
 ];
 
 function getPromise(fund) {
@@ -318,6 +323,58 @@ function getPromise(fund) {
                     console.error('JNK 抓取失敗:', error);
                     resolve({ name: fund.name, values: [], type: fund.type });
                 });
+        } else if (fund.type === 'index') {
+            // 用axios 會有 data: "I'm a teapot. You're a bot."
+            // 改用 request 也會有 data: "I'm a teapot. You're a bot."
+            // request 加 header 才能正常抓取
+            request(
+                {
+                    url: 'https://production.dataviz.cnn.io/index/fearandgreed/graphdata',
+                    json: true,
+                    proxy: proxy,
+                    headers: {
+                        'User-Agent':
+                            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                        Accept: 'application/json, text/plain, */*',
+                        'Accept-Language': 'en-US,en;q=0.9',
+                        Referer: 'https://edition.cnn.com/markets/fear-and-greed',
+                        Origin: 'https://edition.cnn.com',
+                    },
+                },
+                (error, response, body) => {
+                    console.log('CNN Index 回應 statusCode:', response && response.statusCode);
+                    if (error) {
+                        console.error('CNN Fear & Greed Index 抓取失敗 error:', error);
+                        resolve({ name: fund.name, values: {}, type: fund.type });
+                        return;
+                    }
+                    if (!body) {
+                        console.error('CNN Fear & Greed Index 抓取失敗，body 為空:', body);
+                        resolve({ name: fund.name, values: {}, type: fund.type });
+                        return;
+                    }
+                    if (response.statusCode !== 200) {
+                        console.error('CNN Fear & Greed Index 抓取失敗，statusCode:', response.statusCode, 'body:', body);
+                        resolve({ name: fund.name, values: {}, type: fund.type });
+                        return;
+                    }
+                    if (!body.fear_and_greed || !Array.isArray(body.fear_and_greed)) {
+                        // 新版 API 結構
+                        if (body.fear_and_greed && typeof body.fear_and_greed === 'object') {
+                            const index = body.fear_and_greed.score || '';
+                            const status = body.fear_and_greed.rating || '';
+                            const updateText = body.fear_and_greed.timestamp
+                                ? moment(body.fear_and_greed.timestamp).format('YYYY-MM-DD HH:mm:ss')
+                                : '';
+                            resolve({ name: fund.name, values: { index, status, updateText }, type: fund.type });
+                        } else {
+                            console.error('CNN Fear & Greed Index 抓取失敗，body 結構異常:', body);
+                            resolve({ name: fund.name, values: {}, type: fund.type });
+                        }
+                        return;
+                    }
+                }
+            );
         } else {
             // 如果不是 'price' 類型，直接返回空值
             resolve({ name: fund.name, values: [], type: fund.type });
@@ -334,7 +391,7 @@ Promise.all(funds.map(getPromise)).then(function (results) {
     // console.log('抓取到的結果:', results);
     results.forEach((result) => {
         const foundStock = myLocalstorageStockList.find((obj) => obj.name === result.name);
-        if (!foundStock) {
+        if (!foundStock && result.type !== 'index') {
             console.warn(`找不到名稱為 ${result.name} 的股票`);
             return; // 跳過這筆
         }
@@ -351,6 +408,18 @@ Promise.all(funds.map(getPromise)).then(function (results) {
             foundStock.data = foundStock.data || {};
             foundStock.data.dividend = foundStock.data.dividend || [];
             foundStock.data.dividend = result.values;
+        } else if (result.type === 'index') {
+            // 寫入 global-settings.json
+            let rawdata = fs.readFileSync('./src/store/data/global-settings.json');
+            let globalSettings = JSON.parse(rawdata);
+            globalSettings.cnn_fear_greed_index = result.values.index;
+            globalSettings.cnn_fear_greed_status = result.values.status;
+            globalSettings.cnn_fear_greed_update = result.values.updateText;
+            let writeData = JSON.stringify(globalSettings, null, 4);
+            fs.writeFile('./src/store/data/global-settings.json', writeData, (err) => {
+                if (err) throw err;
+                console.log('CNN Fear & Greed Index written to file');
+            });
         }
     });
 

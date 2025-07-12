@@ -30,11 +30,27 @@
                         :disabled="!fearLevel.reasons || !fearLevel.reasons.length"
                         popper-class="tooltip-pre-line"
                     >
-                        <span style="display: block; line-height: 1.2; position: relative; top: 10px">
-                            <span :style="fearColorStyle">{{ fearLevel.fear }}</span
-                            ><br />
-                            <span :style="sentimentColorStyle">{{ fearLevel.sentiment }}</span>
-                        </span>
+                        <div style="display: flex; flex-direction: column; align-items: flex-start">
+                            <el-progress
+                                id="cnn-fear-greed-index"
+                                v-if="cnnFearGreedIndex !== null"
+                                :percentage="cnnFearGreedIndex"
+                                :stroke-width="14"
+                                :show-text="true"
+                                text-inside
+                                style="width: 85px; margin-top: 6px"
+                                :color="cnnFearGreedColor"
+                                :format="fearLevelTextFormat"
+                            />
+                            <!-- <span :style="fearColorStyle">{{ fearLevel.fear }}</span
+                            ><br /> -->
+                            <span
+                                :style="
+                                    Object.assign({}, sentimentColorStyle, { 'margin-top': '-15px', display: 'inline-block' })
+                                "
+                                >{{ fearLevel.sentiment }}</span
+                            >
+                        </div>
                         <template #content>
                             <div v-for="(r, i) in fearLevelReasonsColored" :key="i" v-html="r"></div>
                         </template>
@@ -66,6 +82,22 @@ export default {
         };
     },
     computed: {
+        cnnFearGreedColor() {
+            const v = this.cnnFearGreedIndex;
+            if (v === null || v === undefined) return '#888';
+            if (v <= 24) return '#b71c1c'; // 深紅 Extreme Fear
+            if (v <= 44) return '#f56c6c'; // 淺紅 Fear
+            if (v <= 54) return '#424242'; // 深灰 Neutral
+            if (v <= 74) return '#81c784'; // 淺綠 Greed
+            return '#388e3c'; // 深綠 Extreme Greed
+        },
+        cnnFearGreedIndex() {
+            // 取自 vuex state
+            const val = this.$store.state.price.cnn_fear_greed_index ?? this.$store.state.price?.cnn_fear_greed_index;
+            if (typeof val === 'number') return Math.round(val);
+            if (typeof val === 'string' && !isNaN(Number(val))) return Math.round(Number(val));
+            return null;
+        },
         fearLevel() {
             return this.$store.getters.getFearLevel();
         },
@@ -77,23 +109,34 @@ export default {
                     return { color: '#b39ddb', 'font-weight': 'bold', 'font-size': '16px' }; // 淺紫
                 case '很恐慌':
                     return { color: '#7e57c2', 'font-weight': 'bold', 'font-size': '16px' }; // 紫
-                case '極度恐慌':
+                case '極恐慌':
                     return { color: '#512da8', 'font-weight': 'bold', 'font-size': '16px' }; // 深紫
                 default:
                     return { color: '#888', 'font-weight': 'bold', 'font-size': '16px' };
             }
         },
         fearLevelReasonsColored() {
-            // 將百分比數值部分包 span 並加顏色
             if (!this.fearLevel.reasons) return [];
             return this.fearLevel.reasons.map((str) => {
-                // 尋找 (±1.23%) 這種格式
+                // CNN 指數行特殊處理
+                if (str.includes('【CNN】')) {
+                    // 取出括號內數值
+                    const match = str.match(/（([\d.]+)）/);
+                    if (match) {
+                        const val = Number(match[1]);
+                        let color = '#888';
+                        if (val <= 24) color = '#b71c1c';
+                        else if (val <= 44) color = '#f56c6c';
+                        else if (val <= 54) color = '#424242';
+                        else if (val <= 74) color = '#81c784';
+                        else color = '#388e3c';
+                        // 用 span 包住數值
+                        return str.replace(/（([\d.]+)）/, `（<span style="color:${color};font-weight:bold;">$1</span>）`);
+                    }
+                }
+                // 其餘行維持原本百分比著色
                 return str.replace(/([+-]\d+\.\d{2}%)/g, (match) => {
-                    const color = match.startsWith('+')
-                        ? '#e57373' // 淺紅
-                        : match.startsWith('-')
-                        ? '#4caf50' // 淺綠
-                        : '#888';
+                    const color = match.startsWith('+') ? '#e57373' : match.startsWith('-') ? '#4caf50' : '#888';
                     return `<span style="color:${color};font-weight:bold;">${match}</span>`;
                 });
             });
@@ -117,22 +160,23 @@ export default {
     },
     methods: {
         onMenuItemClick(page) {
-            // const { audio } = this.$refs;
-            // audio.play();
             this.routerName = page;
             this.$store.commit('SAVE_ROUTER_NAME', page);
             window.scrollTo(0, 0);
         },
         doShowSearch() {
-            // console.log(this.$refs);
-            // 父改子去顯示 drawer 變數 不好，子要被改值
-            // 父傳一堆變數給子也不太好
-            // 所以父傳id給子，最簡單，子拿此參數再去 vuex 取值，改值，再填回 localstorage
             this.$store.dispatch('GET_TAIWAN_STOCK');
             this.$refs.childFormSearch.onInit();
         },
         doShowLink() {
             this.$refs.childFormLink.onInit();
+        },
+        fearLevelTextFormat(percentage) {
+            // 讓 el-progress 顯示『75% 極貪婪』格式
+            if (this.fearLevel && this.fearLevel.fear) {
+                return `${percentage}% ${this.fearLevel.fear}`;
+            }
+            return percentage + '%';
         },
     },
 };
@@ -160,4 +204,7 @@ export default {
     white-space: pre-line
     font-size: 15px
     line-height: 1.6
+
+#cnn-fear-greed-index .el-progress-bar__outer
+    height: 26px!important
 </style>
