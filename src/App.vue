@@ -85,11 +85,11 @@ export default {
         cnnFearGreedColor() {
             const v = this.cnnFearGreedIndex;
             if (v === null || v === undefined) return '#888';
-            if (v <= 24) return '#b71c1c'; // 深紅 Extreme Fear
-            if (v <= 44) return '#f56c6c'; // 淺紅 Fear
+            if (v <= 24) return '#ff5858'; // 深紅 Extreme Fear
+            if (v <= 44) return '#ff7442'; // 淺紅 Fear
             if (v <= 54) return '#424242'; // 深灰 Neutral
-            if (v <= 74) return '#81c784'; // 淺綠 Greed
-            return '#388e3c'; // 深綠 Extreme Greed
+            if (v <= 74) return '#43d94a'; // 淺綠 Greed
+            return '#2ed37e'; // 深綠 Extreme Greed
         },
         cnnFearGreedIndex() {
             // 取自 vuex state
@@ -125,11 +125,11 @@ export default {
                     if (match) {
                         const val = Number(match[1]);
                         let color = '#888';
-                        if (val <= 24) color = '#b71c1c';
-                        else if (val <= 44) color = '#f56c6c';
+                        if (val <= 24) color = '#ff5858';
+                        else if (val <= 44) color = '#ff7442';
                         else if (val <= 54) color = '#424242';
-                        else if (val <= 74) color = '#81c784';
-                        else color = '#388e3c';
+                        else if (val <= 74) color = '#43d94a';
+                        else color = '#2ed37e';
                         // 用 span 包住數值
                         return str.replace(/（([\d.]+)）/, `（<span style="color:${color};font-weight:bold;">$1</span>）`);
                     }
