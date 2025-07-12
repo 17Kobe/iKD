@@ -1627,13 +1627,13 @@ input::-webkit-inner-spin-button
     padding: 0 10px
 
 .shake-base > .el-badge__content
-    text-shadow: 0 0 10px #1e1e1e, 0 0 20px #ffcc00, 0 0 30px #ffcc00
+    // text-shadow: 0 0 10px #1e1e1e, 0 0 20px #ffcc00, 0 0 30px #ffcc00
     animation: shake-base 2s infinite ease-in-out
     animation-delay: 0s
     right: -20px
     top: -9px
     opacity: unset!important
-    box-shadow: 0 0 3px 1.3px #ffcc00, 0 0 4px -3.3px #fff200
+    // box-shadow: 0 0 3px 1.3px #ffcc00, 0 0 4px -3.3px #fff200
 
 .cell-chart.shake-base
     text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00

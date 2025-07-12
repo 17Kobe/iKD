@@ -1607,7 +1607,7 @@ export default {
 
 .pre_sell .el-badge__content
     background: #eaffea !important
-    color: #04ef27 !important
+    color: #00cd1f !important
     font-weight: bold
     border: 1px solid #04ef27 !important
 </style>
