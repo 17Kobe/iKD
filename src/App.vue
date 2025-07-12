@@ -134,6 +134,14 @@ export default {
                         return str.replace(/（([\d.]+)）/, `（<span style="color:${color};font-weight:bold;">$1</span>）`);
                     }
                 }
+                // 分數行特殊處理
+                if (str.startsWith('總結：分數')) {
+                    // 只替換冒號後第一個數字
+                    return str.replace(
+                        /分數([^\d]*)(\d+)/,
+                        (m, p1, p2) => `分數${p1}<span style="color:rgb(255,159,64);font-weight:bold;">${p2}</span>`
+                    );
+                }
                 // 其餘行維持原本百分比著色
                 return str.replace(/([+-]\d+\.\d{2}%)/g, (match) => {
                     const color = match.startsWith('+') ? '#e57373' : match.startsWith('-') ? '#4caf50' : '#888';
