@@ -3729,18 +3729,37 @@ const stock = {
 
             // CNN Fear & Greed Index 範圍定義
             const cnnRangeTable = [
-                'CNN 恐慌與貪婪指數說明：',
                 '0 – 24　→　極恐懼：市場極度悲觀',
                 '25 – 44　→　恐懼：市場偏向保守',
                 '45 – 54　→　中性：市場情緒均衡',
                 '55 – 74　→　貪婪：市場較樂觀',
-                '75 – 10　→　極貪婪：市場可能過熱',
+                '75 – 100　→　極貪婪：市場可能過熱',
                 '',
             ];
+
+            // CNN 指數抓取時間（假設存在 state.cnn_fear_greed_index_time）
+            let cnnTime = state.cnn_fear_greed_update;
+            let cnnTimeStr = '';
+            if (cnnTime) {
+                // 若為 Date 物件或字串，格式化顯示
+                try {
+                    const d = new Date(cnnTime);
+                    if (!isNaN(d.getTime())) {
+                        cnnTimeStr = `抓取：${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+                            d.getDate()
+                        ).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                    } else {
+                        cnnTimeStr = `抓取：${cnnTime}`;
+                    }
+                } catch {
+                    cnnTimeStr = `抓取：${cnnTime}`;
+                }
+            }
 
             const reasons = [
                 ...fearReasons,
                 '　', // 增加一個換行
+                ...['CNN 恐慌與貪婪指數說明' + (cnnTimeStr ? `（${cnnTimeStr}）` : '')],
                 ...cnnRangeTable,
                 '———————————————————',
                 ...capitalFlow.reasons,
