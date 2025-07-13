@@ -36,7 +36,7 @@
                                 :stroke-width="14"
                                 :show-text="true"
                                 text-inside
-                                style="width: 85px; margin-top: 6px"
+                                :style="cnnProgressStyle"
                                 :color="cnnFearGreedColor"
                                 :format="fearLevelTextFormat"
                             />
@@ -55,7 +55,7 @@
                                 :stroke-width="10"
                                 :show-text="true"
                                 text-inside
-                                style="width: 85px; margin-top: 2px"
+                                :style="scoreProgressStyle"
                                 :color="scoreProgressColor(fearLevel.score)"
                                 :format="scoreProgressFormat"
                             />
@@ -177,6 +177,28 @@ export default {
             }
             return { color: '#888', 'font-weight': 'bold', 'font-size': '16px' };
         },
+        // 動態CNN進度條樣式
+        cnnProgressStyle() {
+            const mainColor = this.cnnFearGreedColor;
+            const lightColor = this.getLightColor(mainColor);
+            return {
+                width: '85px',
+                marginTop: '6px',
+                '--cnn-main-color': mainColor,
+                '--cnn-light-color': lightColor,
+            };
+        },
+        // 動態分數進度條樣式
+        scoreProgressStyle() {
+            const mainColor = this.scoreProgressColor(this.fearLevel.score);
+            const lightColor = this.getLightColor(mainColor);
+            return {
+                width: '85px',
+                marginTop: '2px',
+                '--score-main-color': mainColor,
+                '--score-light-color': lightColor,
+            };
+        },
     },
     methods: {
         onMenuItemClick(page) {
@@ -223,6 +245,21 @@ export default {
             const sentiment = this.fearLevel?.sentiment || '';
             return `${score}分 ${sentiment}`;
         },
+        // 工具函數：計算亮色
+        getLightColor(hexColor) {
+            // 將hex轉為rgb
+            const hex = hexColor.replace('#', '');
+            const r = parseInt(hex.substr(0, 2), 16);
+            const g = parseInt(hex.substr(2, 2), 16);
+            const b = parseInt(hex.substr(4, 2), 16);
+
+            // 與白色混合產生亮色
+            const lightR = Math.round(r + (255 - r) * 0.6);
+            const lightG = Math.round(g + (255 - g) * 0.6);
+            const lightB = Math.round(b + (255 - b) * 0.6);
+
+            return `rgb(${lightR}, ${lightG}, ${lightB})`;
+        },
     },
 };
 </script>
@@ -252,12 +289,43 @@ export default {
 
 #cnn-fear-greed-index .el-progress-bar__outer
     height: 23px!important
+    border: 1px solid #ddd
+    border-radius: 100px
 
 #fear-level-score .el-progress-bar__outer
     height: 23px!important
+    border: 1px solid #ddd
+    border-radius: 100px
 
-// el-progress 文字顏色覆蓋
+// el-progress 文字顏色與陰影
 #cnn-fear-greed-index .el-progress-bar__innerText,
 #fear-level-score .el-progress-bar__innerText
-    color: #2d2d2d !important
+    color: #000000 !important
+    text-shadow: 0 1px 2px #fff, 0 0px 2px #fff
+
+// el-progress 動態同色系漸層條（由淺到深，文字置頂）
+#cnn-fear-greed-index .el-progress-bar__inner,
+#fear-level-score .el-progress-bar__inner
+    position: relative
+    background: none !important
+    z-index: 0
+    &::before
+        content: ''
+        position: absolute
+        left: 0
+        top: 0
+        width: 100%
+        height: 100%
+        border-radius: 100px
+        z-index: 0
+        opacity: 1
+        pointer-events: none
+#cnn-fear-greed-index .el-progress-bar__inner::before
+    background-image: linear-gradient(90deg, var(--cnn-light-color, #a8e6b1) 0%, var(--cnn-main-color, #43d94a) 100%)
+#fear-level-score .el-progress-bar__inner::before
+    background-image: linear-gradient(90deg, var(--score-light-color, #ffd1b1) 0%, var(--score-main-color, #ff7442) 100%)
+#cnn-fear-greed-index .el-progress-bar__innerText,
+#fear-level-score .el-progress-bar__innerText
+    position: relative
+    z-index: 2
 </style>
