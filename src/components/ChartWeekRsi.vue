@@ -415,7 +415,7 @@ export default {
                 plotBands.push({
                     from: this.rsiOverBoughtLimit,
                     to: 100,
-                    color: 'rgba(75, 192, 192, 0.5)', // 設定填充顏色為紅色
+                    color: 'rgba(75, 192, 202, 0.25)', // 設定填充顏色為紅色
                 });
             }
             if (this.rsiTurnDownLmit !== -999) {
@@ -701,7 +701,7 @@ export default {
                         type: 'area',
                         name: 'RSI區域(0-30)',
                         data: this.rsi5.map(([x, y]) => [x, y < 30 ? y : 30]),
-                        color: 'rgba(253, 207, 232, 0.5)',
+                        color: 'rgba(255, 160, 160, 0.07)',
                         fillOpacity: 1,
                         lineWidth: 0,
                         enableMouseTracking: false,
@@ -714,7 +714,7 @@ export default {
                         type: 'area',
                         name: 'RSI區域(超買區間)',
                         data: this.rsi5.map(([x, y]) => [x, y >= limit ? y : limit]),
-                        color: 'rgba(253, 207, 232, 0.5)',
+                        color: 'rgba(210, 230, 80, 0.16)',
                         fillOpacity: 1,
                         lineWidth: 0,
                         enableMouseTracking: false,

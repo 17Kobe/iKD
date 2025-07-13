@@ -1521,7 +1521,7 @@ export default {
                             linkedTo: null,
                             showInLegend: false,
                             states: { hover: { enabled: false } },
-                            zIndex: 2,
+                            zIndex: 3,
                         });
                     }
                     lastIndex = i;
@@ -1534,36 +1534,42 @@ export default {
             // component 參考 https://stackoverflow.com/questions/68381856/how-to-access-highcharts-stock-tooltip-data-in-vue
             const component = this;
 
-            let plotBands = [];
-            if (this.kdTurnDownLmit !== -999) {
-                plotBands.push({
-                    from: this.kdTurnDownLmit,
-                    to: this.showJLine ? 115 : 100,
-                    color: 'rgba(75, 192, 192, 0.5)', // 設定填充顏色為紅色
-                });
-            }
-            if (this.kdDeadLimit !== -999) {
-                plotBands.push({
-                    from: this.kdDeadLimit,
-                    to: this.kdTurnDownLmit !== -999 ? this.kdTurnDownLmit : this.showJLine ? 115 : 100,
-                    color: 'rgba(75, 192, 192, 0.05)', // 設定填充顏色為紅色
-                });
-            }
+            // let plotBands = [];
+            // if (this.kdTurnDownLmit !== -999) {
+            //     plotBands.push({
+            //         from: this.kdTurnDownLmit,
+            //         to: this.showJLine ? 115 : 100,
+            //         color: 'rgba(75, 192, 192, 0.5)', // 設定填充顏色為紅色
+            //     });
+            // }
+            // if (this.kdDeadLimit !== -999) {
+            //     plotBands.push({
+            //         from: this.kdDeadLimit,
+            //         to: this.kdTurnDownLmit !== -999 ? this.kdTurnDownLmit : this.showJLine ? 115 : 100,
+            //         color: 'rgba(75, 192, 192, 0.05)', // 設定填充顏色為紅色
+            //     });
+            // }
 
-            if (this.kdTurnUpLmit !== -999) {
-                plotBands.push({
-                    from: this.showJLine ? -15 : 0,
-                    to: this.kdTurnUpLmit,
-                    color: 'rgba(255, 99, 132, 0.5)', // 設定填充顏色為紅色
-                });
-            }
-            if (this.kdGoldLimit !== -999) {
-                plotBands.push({
-                    from: this.kdTurnUpLmit !== -999 ? this.kdTurnUpLmit : this.showJLine ? -15 : 0,
-                    to: this.kdGoldLimit,
-                    color: 'rgba(255, 99, 132, 0.2)', // 設定填充顏色為紅色
-                });
-            }
+            // if (this.kdTurnUpLmit !== -999) {
+            //     plotBands.push({
+            //         from: this.showJLine ? -15 : 0,
+            //         to: this.kdTurnUpLmit,
+            //         color: 'rgba(255, 99, 132, 0.5)', // 設定填充顏色為紅色
+            //     });
+            // }
+            // if (this.kdGoldLimit !== -999) {
+            //     plotBands.push({
+            //         from: this.kdTurnUpLmit !== -999 ? this.kdTurnUpLmit : this.showJLine ? -15 : 0,
+            //         to: this.kdGoldLimit,
+            //         color: 'rgba(255, 99, 132, 0.2)', // 設定填充顏色為紅色
+            //     });
+            // }
+
+            // 取得動態臨界值
+            const kdGold = Number(this.kdGoldLimit);
+            const kdDead = Number(this.kdDeadLimit);
+            const buyLimit = !isNaN(kdGold) && kdGold > -20 && kdGold < 120 ? kdGold : 20;
+            const sellLimit = !isNaN(kdDead) && kdDead > -20 && kdDead < 120 ? kdDead : 80;
 
             return {
                 chart: {
@@ -1841,7 +1847,7 @@ export default {
                     {
                         min: this.showJLine ? -15 : 0, // 設定 y 軸的最小值
                         max: this.showJLine ? 115 : 100, // 設定 y 軸的最大值
-                        plotBands: plotBands,
+                        // plotBands: plotBands,
                         tickInterval: 20,
                         gridLineWidth: 0,
                         showLastLabel: true,
@@ -1902,6 +1908,33 @@ export default {
                     },
                 ],
                 series: [
+                    // 準買區域色塊
+                    {
+                        type: 'area',
+                        name: 'KDJ區域(準買)',
+                        data: this.kdj.map(([x, y]) => [x, y < buyLimit ? y : buyLimit]),
+                        color: 'rgba(255, 160, 160, 0.07)',
+                        fillOpacity: 1,
+                        lineWidth: 0,
+                        enableMouseTracking: false,
+                        showInLegend: false,
+                        zIndex: 0,
+                        threshold: buyLimit,
+                    },
+                    // 準賣區域色塊
+                    {
+                        type: 'area',
+                        name: 'KDJ區域(準賣)',
+                        data: this.kdj.map(([x, y]) => [x, y >= sellLimit ? y : sellLimit]),
+                        color: 'rgba(210, 230, 80, 0.16)',
+                        fillOpacity: 1,
+                        lineWidth: 0,
+                        enableMouseTracking: false,
+                        showInLegend: false,
+                        zIndex: 0,
+                        threshold: sellLimit,
+                    },
+                    // 主線
                     {
                         name: 'K線',
                         color: '#4286f5',
@@ -1920,29 +1953,23 @@ export default {
                     },
                     {
                         type: 'scatter',
-
                         color: 'rgba(255, 40, 40, 0.9)',
-
                         marker: {
                             symbol: 'circle',
                             lineWidth: 1,
                             lineColor: '#222',
                         },
-                        // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
                         data: this.stockDataOfPolicyResultBuy,
                     },
                     {
                         type: 'scatter',
-
                         color: 'rgba(4, 239, 39, 0.9)',
-
                         marker: {
                             symbol: 'circle',
                             lineWidth: 1,
                             lineColor: '#222',
                         },
-                        // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
                         data: this.stockDataOfPolicyResultSell,
                     },
@@ -1970,31 +1997,14 @@ export default {
                         enableMouseTracking: false,
                         data: this.stockDataOfPolicyResultSellCancel,
                     },
-                    // {
-                    //     type: 'scatter',
-
-                    //     color: 'rgba(104, 104, 104, 0.9)',
-
-                    //     marker: {
-                    //         symbol: 'circle',
-                    //         lineWidth: 1,
-                    //         lineColor: '#222',
-                    //     },
-                    //     // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
-                    //     enableMouseTracking: false,
-                    //     data: this.stockDataOfPolicyResultBuyOrSellCancel,
-                    // },
                     {
                         type: 'scatter',
-
                         color: 'rgba(230, 230, 230, 0.9)',
-
                         marker: {
                             symbol: 'triangle-down',
                             lineWidth: 1,
                             lineColor: '#222',
                         },
-                        // 此點將不要滑鼠追蹤，因為不要顯示 tooltip
                         enableMouseTracking: false,
                         data: this.stockDataDividendToKdjList,
                     },
