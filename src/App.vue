@@ -255,4 +255,9 @@ export default {
 
 #fear-level-score .el-progress-bar__outer
     height: 23px!important
+
+// el-progress 文字顏色覆蓋
+#cnn-fear-greed-index .el-progress-bar__innerText,
+#fear-level-score .el-progress-bar__innerText
+    color: #2d2d2d !important
 </style>
