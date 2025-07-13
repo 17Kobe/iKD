@@ -328,4 +328,16 @@ export default {
 #fear-level-score .el-progress-bar__innerText
     position: relative
     z-index: 2
+
+// 加號按鈕實心樣式
+.el-icon-circle-plus-outline
+    color: #a9a9a9 !important
+    width: 36px !important
+    font-size: 38px !important
+    transition: all 0.2s ease-out !important
+    cursor: pointer !important
+    &:hover
+        color: #409EFF !important
+        transform: scale(1.05) !important
+        filter: brightness(1.1) !important
 </style>
