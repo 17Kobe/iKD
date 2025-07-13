@@ -692,7 +692,7 @@ export default {
                                 color: '#4286f5', // 30~limit藍色
                             },
                             {
-                                color: '#e75c9a', // 超過limit紅色
+                                color: '#4caf50', // 超過limit紅色
                             },
                         ],
                     },
