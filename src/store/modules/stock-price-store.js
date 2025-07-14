@@ -506,8 +506,9 @@ const stock = {
 
                 if (
                     ((stockId === null && stcokObj.cost) || stockId === stcokObj.id) &&
-                    ((stcokObj.type !== 'fund' && stcokObj.type !== 'exchange' && stcokObj.is_dividend !== false) ||
-                        stcokObj.name.includes('債'))
+                    stcokObj.type !== 'fund' &&
+                    stcokObj.type !== 'exchange' &&
+                    stcokObj.is_dividend === true
                 ) {
                     const stockDataDividend = _.has(stcokObj, 'data.dividend') ? stcokObj.data.dividend : [];
                     const localcrawlerDividendLastDate = moment(

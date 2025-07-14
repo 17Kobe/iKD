@@ -165,7 +165,7 @@
                         :plain="true"
                         size="mini"
                         style="position: absolute; left: 17px; top: 6px; padding: 0px 8px"
-                        v-if="['exchange', 'fund', 'usStock'].indexOf(stockData.type) === -1 && stockData.is_dividend !== false"
+                        v-if="stockData.is_dividend === true"
                         @click="getDividend"
                         >息</el-button
                     >

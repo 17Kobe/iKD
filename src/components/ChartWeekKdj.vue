@@ -266,11 +266,7 @@
                 </span>
 
                 <span
-                    v-if="
-                        stockData.data &&
-                        ['exchange', 'fund', 'usStock'].indexOf(stockData.type) === -1 &&
-                        stockData.is_dividend !== false
-                    "
+                    v-if="stockData.data && stockData.is_dividend === true"
                     style="
                         position: absolute;
                         top: 0px;
