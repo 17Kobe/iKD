@@ -50,14 +50,14 @@
                             > -->
                             <!-- 顯示 score 並用 el-progress 呈現，僅在 sentiment 包含偏多時 -->
                             <el-progress
-                                id="fear-level-score"
-                                :percentage="scoreToProgress(fearLevel.score)"
+                                id="eco-light-score"
+                                :percentage="100"
                                 :stroke-width="10"
                                 :show-text="true"
                                 text-inside
-                                :style="scoreProgressStyle"
-                                :color="scoreProgressColor(fearLevel.score)"
-                                :format="scoreProgressFormat"
+                                :style="ecoLightProgressStyle"
+                                :color="ecoLightProgressColor"
+                                :format="ecoLightProgressFormat"
                             />
                         </div>
                         <template #content>
@@ -106,6 +106,13 @@ export default {
         cnnFearGreedIndex() {
             // 取自 vuex state
             const val = this.$store.state.price.cnn_fear_greed_index ?? this.$store.state.price?.cnn_fear_greed_index;
+            if (typeof val === 'number') return Math.round(val);
+            if (typeof val === 'string' && !isNaN(Number(val))) return Math.round(Number(val));
+            return null;
+        },
+        ecoLightScore() {
+            // 取自 vuex state
+            const val = this.$store.state.price.eco_light_score ?? this.$store.state.price?.eco_light_score;
             if (typeof val === 'number') return Math.round(val);
             if (typeof val === 'string' && !isNaN(Number(val))) return Math.round(Number(val));
             return null;
@@ -189,14 +196,53 @@ export default {
             };
         },
         // 動態分數進度條樣式
-        scoreProgressStyle() {
-            const mainColor = this.scoreProgressColor(this.fearLevel.score);
-            const lightColor = this.getLightColor(mainColor);
+        ecoLightProgressStyle() {
+            const score = this.ecoLightScore;
+            let mainColor = '#eee';
+            let lightColor = '#eee';
+            if (score >= 38 && score <= 45) {
+                // 熱絡
+                mainColor = '#ff5858';
+                lightColor = '#ffb3b3';
+            } else if (score >= 32 && score <= 37) {
+                // 轉向
+                mainColor = '#ff5858';
+                lightColor = '#ffe066';
+            } else if (score >= 23 && score <= 31) {
+                // 穩定
+                mainColor = '#43d94a';
+                lightColor = '#d6f5d6';
+            } else if (score >= 17 && score <= 22) {
+                // 轉向
+                mainColor = '#43d94a';
+                lightColor = '#ffe066';
+            } else if (score >= 9 && score <= 16) {
+                // 低迷
+                mainColor = '#0055ff';
+                lightColor = '#b3e0ff';
+            }
             return {
                 width: '85px',
                 marginTop: '2px',
                 '--score-main-color': mainColor,
                 '--score-light-color': lightColor,
+            };
+        },
+        ecoLightProgressColor() {
+            // el-progress 需要 color 屬性，但我們用 style 覆蓋
+            return '#fff';
+        },
+        ecoLightProgressFormat() {
+            // 回傳一個 function，el-progress 會呼叫這個 function
+            return () => {
+                const score = this.ecoLightScore;
+                if (score === null) return '';
+                if (score >= 38 && score <= 45) return `${score}分 熱絡`;
+                if (score >= 32 && score <= 37) return `${score}分 轉向`;
+                if (score >= 23 && score <= 31) return `${score}分 穩定`;
+                if (score >= 17 && score <= 22) return `${score}分 轉向`;
+                if (score >= 9 && score <= 16) return `${score}分 低迷`;
+                return `${score}分`;
             };
         },
     },
@@ -292,20 +338,20 @@ export default {
     border: 1px solid #ddd
     border-radius: 100px
 
-#fear-level-score .el-progress-bar__outer
+#eco-light-score .el-progress-bar__outer
     height: 23px!important
     border: 1px solid #ddd
     border-radius: 100px
 
 // el-progress 文字顏色與陰影
 #cnn-fear-greed-index .el-progress-bar__innerText,
-#fear-level-score .el-progress-bar__innerText
+#eco-light-score .el-progress-bar__innerText
     color: #000000 !important
     text-shadow: 0 1px 2px #fff, 0 0px 2px #fff
 
 // el-progress 動態同色系漸層條（由淺到深，文字置頂）
 #cnn-fear-greed-index .el-progress-bar__inner,
-#fear-level-score .el-progress-bar__inner
+#eco-light-score .el-progress-bar__inner
     position: relative
     background: none !important
     z-index: 0
@@ -322,10 +368,10 @@ export default {
         pointer-events: none
 #cnn-fear-greed-index .el-progress-bar__inner::before
     background-image: linear-gradient(90deg, var(--cnn-light-color, #a8e6b1) 0%, var(--cnn-main-color, #43d94a) 100%)
-#fear-level-score .el-progress-bar__inner::before
+#eco-light-score .el-progress-bar__inner::before
     background-image: linear-gradient(90deg, var(--score-light-color, #ffd1b1) 0%, var(--score-main-color, #ff7442) 100%)
 #cnn-fear-greed-index .el-progress-bar__innerText,
-#fear-level-score .el-progress-bar__innerText
+#eco-light-score .el-progress-bar__innerText
     position: relative
     z-index: 2
 
@@ -340,4 +386,5 @@ export default {
         color: #409EFF !important
         transform: scale(1.05) !important
         filter: brightness(1.1) !important
+
 </style>

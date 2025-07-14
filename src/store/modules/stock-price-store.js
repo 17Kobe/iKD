@@ -1075,24 +1075,6 @@ const stock = {
                                 kdMTurnDownTimes >= foundKdM.limit &&
                                 moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') <= 330
                             ) {
-                                // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
-                                const index = _.findIndex(policyResult, ['date', item[0]]);
-                                const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
-                                if (index === -1)
-                                    policyResult.push({
-                                        date: item[0],
-                                        is_sell: true,
-                                        k,
-                                        // number_of_buy: 2, 後面才加
-                                        price: dataWeeklyPrice,
-                                        reason: ['kd_m'],
-                                    });
-                                else {
-                                    policyResult[index].is_sell = true;
-                                    policyResult[index].k = k;
-                                    // policyResult[index].number_of_buy = 2; 後面才加
-                                    policyResult[index].reason.push('kd_m');
-                                }
                             } else if (
                                 preKdMTurnDownDate !== '' &&
                                 moment(item[0]).diff(moment(preKdMTurnDownDate), 'days') > 330
@@ -1106,69 +1088,6 @@ const stock = {
                             kdMReady2 = false;
                         }
                     }
-                    preK = k;
-
-                    // 固定日期 買進訊號
-                    // length =3 , 0, 1, 2，但到2時就不行
-                    const nextDate =
-                        dataIndex + 1 < foundTempStock.data.weekly_kdj.length
-                            ? foundTempStock.data.weekly_kdj[dataIndex + 1][0]
-                            : moment(foundTempStock.data.weekly_kdj[dataIndex][0], 'YYYY-MM-DD')
-                                  .add(7, 'days')
-                                  .format('YYYY-MM-DD');
-                    // console.log('==================');
-                    // console.log(foundTempStock.data.weekly_kdj);
-                    // console.log(dataIndex);
-                    // console.log(item[0]);
-                    // console.log(nextDate);
-                    if (foundAnnualFixedDateBuy) {
-                        if (
-                            // 在該週內的日期就買了
-                            annualFixedDateBuyCurrDate.isAfter(preDate) &&
-                            annualFixedDateBuyCurrDate.isSameOrBefore(moment(item[0], 'YYYY-MM-DD')) &&
-                            moment(nextDate, 'YYYY-MM-DD').isAfter(annualFixedDateBuyCurrDate)
-                        ) {
-                            const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
-                            if (index === -1)
-                                policyResult.push({
-                                    date: item[0],
-                                    is_buy: true,
-                                    price: dataWeeklyPrice,
-                                    reason: ['annual_fixed_date_buy'],
-                                });
-                            else {
-                                policyResult[index].is_buy = true;
-                                policyResult[index].reason.push('annual_fixed_date_buy');
-                            }
-                            annualFixedDateBuyCurrDate.add(1, 'years');
-                        }
-                    }
-                    if (foundAnnualFixedDateSell) {
-                        if (
-                            // 在該週內的日期就買了
-                            annualFixedDateSellCurrDate.isAfter(preDate) &&
-                            annualFixedDateSellCurrDate.isSameOrBefore(moment(item[0], 'YYYY-MM-DD')) &&
-                            moment(nextDate, 'YYYY-MM-DD').isAfter(annualFixedDateSellCurrDate)
-                        ) {
-                            const index = _.findIndex(policyResult, ['date', item[0]]);
-                            const dataWeeklyPrice = foundTempStock.data.weekly[dataIndex][4];
-                            if (index === -1)
-                                policyResult.push({
-                                    date: item[0],
-                                    is_sell: true,
-                                    price: dataWeeklyPrice,
-                                    reason: ['annual_fixed_date_sell'],
-                                });
-                            else {
-                                policyResult[index].is_sell = true;
-                                policyResult[index].reason.push('annual_fixed_date_sell');
-                            }
-                            annualFixedDateSellCurrDate.add(1, 'years');
-                        }
-                    }
-
-                    preDate = moment(item[0], 'YYYY-MM-DD');
                 });
 
                 // RSI 相關訊號
@@ -1204,6 +1123,87 @@ const stock = {
                                 policyResult[index].is_buy = true;
                                 policyResult[index].rsi = rsi;
                                 policyResult[index].k = mappedToK;
+                                policyResult[index].reason.push('rsi_over_sold');
+                            }
+                        }
+                    }
+                    // 週 RSI 往上轉折 買進訊號
+                    if (foundRsiTurnUp) {
+                        if (rsi < preRsi) {
+                            rsiTurnUpReady = true;
+                        }
+                        if (preRsi <= foundRsiTurnUp.limit && rsi >= preRsi && rsiTurnUpReady) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            const dataWeeklyPrice = foundTempStock.data.weekly[weeklyDataIndex][4];
+                            const mappedToK = _.find(foundTempStock.data.weekly_kdj, (array) => array[0] === item[0])?.[1]; // 為了顯示在KDJ圖上
+                            if (index === -1)
+                                policyResult.push({
+                                    date: item[0],
+                                    is_buy: true,
+                                    rsi,
+                                    k: mappedToK,
+                                    price: dataWeeklyPrice,
+                                    reason: ['rsi_turn_up'],
+                                });
+                            else {
+                                policyResult[index].is_buy = true;
+                                policyResult[index].rsi = rsi;
+                                policyResult[index].k = mappedToK;
+                                policyResult[index].reason.push('rsi_turn_up');
+                            }
+                            rsiTurnUpReady = false;
+                        }
+                    }
+
+                    // 週 RSI 超買 賣出訊號
+                    if (foundRsiOverBought) {
+                        if (rsi >= foundRsiOverBought.limit) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            const dataWeeklyPrice = foundTempStock.data.weekly[weeklyDataIndex][4];
+                            const mappedToK = _.find(foundTempStock.data.weekly_kdj, (array) => array[0] === item[0])?.[1]; // 為了顯示在KDJ圖上
+                            if (index === -1)
+                                policyResult.push({
+                                    date: item[0],
+                                    is_sell: true,
+                                    rsi,
+                                    k: mappedToK,
+                                    price: dataWeeklyPrice,
+                                    reason: ['rsi_over_bought'],
+                                });
+                            else {
+                                policyResult[index].is_sell = true;
+                                policyResult[index].rsi = rsi;
+                                policyResult[index].k = mappedToK;
+                                policyResult[index].reason.push('rsi_over_bought');
+                            }
+                        }
+                    }
+                    // 週 RSI 往下轉折 賣出訊號
+                    if (foundRsiTurnDown) {
+                        if (rsi > preRsi) {
+                            rsiTurnDownReady = true;
+                        }
+                        if (preRsi >= foundRsiTurnDown.limit && rsi <= preRsi && rsiTurnDownReady) {
+                            // 寫這樣有錯，不是<=20，然後K>=D就是買進。正確要之前先有K<D
+                            const index = _.findIndex(policyResult, ['date', item[0]]);
+                            const dataWeeklyPrice = foundTempStock.data.weekly[weeklyDataIndex][4];
+                            const mappedToK = _.find(foundTempStock.data.weekly_kdj, (array) => array[0] === item[0])?.[1]; // 為了顯示在KDJ圖上
+                            if (index === -1)
+                                policyResult.push({
+                                    date: item[0],
+                                    is_sell: true,
+                                    rsi,
+                                    k: mappedToK,
+                                    price: dataWeeklyPrice,
+                                    reason: ['rsi_turn_down'],
+                                });
+                            else {
+                                policyResult[index].is_sell = true;
+                                policyResult[index].rsi = rsi;
+                                policyResult[index].k = mappedToK;
+                                policyResult[index].reason.push('rsi_turn_down');
                                 policyResult[index].reason.push('rsi_over_sold');
                             }
                         }
@@ -1382,6 +1382,13 @@ const stock = {
             }
             if (data.cnn_fear_greed_update !== undefined) {
                 state.cnn_fear_greed_update = data.cnn_fear_greed_update;
+            }
+
+            if (data.eco_light_score !== undefined) {
+                state.eco_light_score = data.eco_light_score;
+            }
+            if (data.eco_light_date !== undefined) {
+                state.eco_light_date = data.eco_light_date;
             }
             // 你可以依需求加上其他 global-settings 欄位
         },

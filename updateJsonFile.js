@@ -109,6 +109,11 @@ const funds = [
         url: 'https://money.cnn.com/data/fear-and-greed/',
         type: 'index',
     },
+    {
+        name: '景氣燈號',
+        url: '',
+        type: 'eco_light',
+    },
 ];
 
 function getPromise(fund) {
@@ -375,6 +380,23 @@ function getPromise(fund) {
                     }
                 }
             );
+        } else if (fund.type === 'eco_light') {
+            // 呼叫 puppeteer 爬蟲腳本
+            const { exec } = require('child_process');
+            exec('node ./crawler/fetchEcoLight.js', (err, stdout, stderr) => {
+                if (err) {
+                    console.error('景氣燈號爬蟲執行失敗:', err);
+                    resolve({ name: fund.name, values: {}, type: fund.type });
+                    return;
+                }
+                try {
+                    const result = JSON.parse(stdout);
+                    resolve({ name: fund.name, values: result, type: fund.type });
+                } catch (e) {
+                    console.error('景氣燈號資料解析失敗:', e, stdout);
+                    resolve({ name: fund.name, values: {}, type: fund.type });
+                }
+            });
         } else {
             // 如果不是 'price' 類型，直接返回空值
             resolve({ name: fund.name, values: [], type: fund.type });
@@ -391,7 +413,7 @@ Promise.all(funds.map(getPromise)).then(function (results) {
     // console.log('抓取到的結果:', results);
     results.forEach((result) => {
         const foundStock = myLocalstorageStockList.find((obj) => obj.name === result.name);
-        if (!foundStock && result.type !== 'index') {
+        if (!foundStock && result.type !== 'index' && result.type !== 'eco_light') {
             console.warn(`找不到名稱為 ${result.name} 的股票`);
             return; // 跳過這筆
         }
@@ -419,6 +441,18 @@ Promise.all(funds.map(getPromise)).then(function (results) {
             fs.writeFile('./src/store/data/global-settings.json', writeData, (err) => {
                 if (err) throw err;
                 console.log('CNN Fear & Greed Index written to file');
+            });
+        } else if (result.type === 'eco_light') {
+            // 寫入 global-settings.json
+            let rawdata = fs.readFileSync('./src/store/data/global-settings.json');
+            let globalSettings = JSON.parse(rawdata);
+            globalSettings.eco_light_score = result.values.score;
+            globalSettings.eco_light_signal = result.values.signal;
+            globalSettings.eco_light_date = result.values.date;
+            let writeData = JSON.stringify(globalSettings, null, 4);
+            fs.writeFile('./src/store/data/global-settings.json', writeData, (err) => {
+                if (err) throw err;
+                console.log('Eco Light written to file');
             });
         }
     });
