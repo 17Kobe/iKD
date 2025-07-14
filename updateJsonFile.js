@@ -314,7 +314,8 @@ function getPromise(fund) {
                     json: true,
                     proxy: proxy,
                     headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                        'User-Agent':
+                            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
                         Accept: 'application/json, text/plain, */*',
                         'Accept-Language': 'en-US,en;q=0.9',
                         Referer: 'https://finance.yahoo.com/',
@@ -322,7 +323,14 @@ function getPromise(fund) {
                     },
                 },
                 (error, response, body) => {
-                    if (!error && response.statusCode === 200 && body && body.chart && body.chart.result && body.chart.result[0]) {
+                    if (
+                        !error &&
+                        response.statusCode === 200 &&
+                        body &&
+                        body.chart &&
+                        body.chart.result &&
+                        body.chart.result[0]
+                    ) {
                         let values = [];
                         const data = body.chart.result[0];
                         const timestamps = data.timestamp;
@@ -451,10 +459,8 @@ Promise.all(funds.map(getPromise)).then(function (results) {
             globalSettings.cnn_fear_greed_status = result.values.status;
             globalSettings.cnn_fear_greed_update = result.values.updateText;
             let writeData = JSON.stringify(globalSettings, null, 4);
-            fs.writeFile('./src/store/data/global-settings.json', writeData, (err) => {
-                if (err) throw err;
-                console.log('CNN Fear & Greed Index written to file');
-            });
+            fs.writeFileSync('./src/store/data/global-settings.json', writeData);
+            console.log('CNN Fear & Greed Index written to file');
         } else if (result.type === 'eco_light') {
             // 寫入 global-settings.json
             let rawdata = fs.readFileSync('./src/store/data/global-settings.json');
@@ -463,10 +469,8 @@ Promise.all(funds.map(getPromise)).then(function (results) {
             globalSettings.eco_light_signal = result.values.signal;
             globalSettings.eco_light_date = result.values.date;
             let writeData = JSON.stringify(globalSettings, null, 4);
-            fs.writeFile('./src/store/data/global-settings.json', writeData, (err) => {
-                if (err) throw err;
-                console.log('Eco Light written to file');
-            });
+            fs.writeFileSync('./src/store/data/global-settings.json', writeData);
+            console.log('eco_light Index written to file');
         }
     });
 
