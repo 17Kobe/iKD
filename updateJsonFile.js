@@ -307,27 +307,40 @@ function getPromise(fund) {
                 }
             );
         } else if (fund.type === 'us_stock') {
-            axios
-                .get(fund.url)
-                .then((response) => {
-                    let values = [];
-                    const data = response.data.chart.result[0];
-                    const timestamps = data.timestamp;
-                    const closes = data.indicators.quote[0].close;
-                    for (let i = 0; i < timestamps.length; i++) {
-                        const date = moment.unix(timestamps[i]).format('YYYY-MM-DD');
-                        const close = closes[i];
-                        if (close !== null) {
-                            values.push([date, close]);
+            // 改用 request 並加 proxy
+            request(
+                {
+                    url: fund.url,
+                    json: true,
+                    proxy: proxy,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                        Accept: 'application/json, text/plain, */*',
+                        'Accept-Language': 'en-US,en;q=0.9',
+                        Referer: 'https://finance.yahoo.com/',
+                        Origin: 'https://finance.yahoo.com',
+                    },
+                },
+                (error, response, body) => {
+                    if (!error && response.statusCode === 200 && body && body.chart && body.chart.result && body.chart.result[0]) {
+                        let values = [];
+                        const data = body.chart.result[0];
+                        const timestamps = data.timestamp;
+                        const closes = data.indicators.quote[0].close;
+                        for (let i = 0; i < timestamps.length; i++) {
+                            const date = moment.unix(timestamps[i]).format('YYYY-MM-DD');
+                            const close = closes[i];
+                            if (close !== null) {
+                                values.push([date, close]);
+                            }
                         }
+                        resolve({ name: fund.name, values: values, type: fund.type });
+                    } else {
+                        console.error('JNK 抓取失敗:', error || (response && response.statusCode), body);
+                        resolve({ name: fund.name, values: [], type: fund.type });
                     }
-                    // console.log(`處理 ${fund.name} 的股價數據`, values);
-                    resolve({ name: fund.name, values: values, type: fund.type });
-                })
-                .catch((error) => {
-                    console.error('JNK 抓取失敗:', error);
-                    resolve({ name: fund.name, values: [], type: fund.type });
-                });
+                }
+            );
         } else if (fund.type === 'index') {
             // 用axios 會有 data: "I'm a teapot. You're a bot."
             // 改用 request 也會有 data: "I'm a teapot. You're a bot."

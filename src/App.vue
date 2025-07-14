@@ -210,11 +210,11 @@ export default {
                 lightColor = '#ffe066';
             } else if (score >= 23 && score <= 31) {
                 // 穩定
-                mainColor = '#43d94a';
-                lightColor = '#d6f5d6';
+                mainColor = '#d3fcd7';
+                lightColor = '#f0f7f1';
             } else if (score >= 17 && score <= 22) {
                 // 轉向
-                mainColor = '#43d94a';
+                mainColor = '#0055ff';
                 lightColor = '#ffe066';
             } else if (score >= 9 && score <= 16) {
                 // 低迷
@@ -237,11 +237,11 @@ export default {
             return () => {
                 const score = this.ecoLightScore;
                 if (score === null) return '';
-                if (score >= 38 && score <= 45) return `${score}分 熱絡`;
-                if (score >= 32 && score <= 37) return `${score}分 轉向`;
-                if (score >= 23 && score <= 31) return `${score}分 穩定`;
-                if (score >= 17 && score <= 22) return `${score}分 轉向`;
-                if (score >= 9 && score <= 16) return `${score}分 低迷`;
+                if (score >= 38 && score <= 45) return `${score}分(紅) 熱絡`;
+                if (score >= 32 && score <= 37) return `${score}分(黃紅) 轉向`;
+                if (score >= 23 && score <= 31) return `${score}分(綠) 穩定`;
+                if (score >= 17 && score <= 22) return `${score}分(黃藍) 轉向`;
+                if (score >= 9 && score <= 16) return `${score}分(藍) 低迷`;
                 return `${score}分`;
             };
         },
