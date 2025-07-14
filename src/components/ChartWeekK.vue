@@ -688,7 +688,7 @@ export default {
                         type: 'area',
                         name: '成本線',
                         lineColor: 'transparent', // 設定線條顏色為透明
-                        fillColor: 'rgba(54, 162, 235, 0.2)', // 設定填滿顏色
+                        fillColor: 'rgba(157, 116, 255, 0.2)', // 設定填滿顏色
                         data: this.cost,
                         // dashStyle: 'ShortDash',
                         step: 'right',
@@ -712,7 +712,7 @@ export default {
                         fillColor: {
                             linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
                             stops: [
-                                [0, 'rgba(255, 215, 0, 0.18)'],
+                                [0, 'rgba(177, 107, 2, 0.2)'],
                                 [1, 'rgba(255, 165, 0, 0.12)'],
                             ],
                         },
