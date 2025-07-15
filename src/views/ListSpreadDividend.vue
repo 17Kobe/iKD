@@ -1406,6 +1406,28 @@ export default {
 
                 // 動態判斷 badge 是否為賣類型（含準賣、賣、賣1/2等）
                 let badgeText = `<span style="color: ${badgeColor}; font-weight: bold;">${row.badge}</span>`;
+
+                // 準買/準賣顯示預設預測價
+                if (['準買', '準買x2'].includes(row.badge) && row.predictGoldPrice) {
+                    console.log("111");
+                    
+                    badgeText += `<br>預測黃金交叉股價：<span style="color: #bda3ef; font-weight:bold;">${Number(row.predictGoldPrice).toLocaleString('en-US')} 元</span>`;
+                }
+                if (
+                    [
+                        '準賣',
+                        '準賣½',
+                        '準賣⅓',
+                        '準賣¼',
+                        '準賣⅕',
+                        '準賣⅙',
+                        '準賣⅐',
+                    ].includes(row.badge) &&
+                    row.predictDeadPrice
+                ) {
+                    badgeText += `<br>預測死亡交叉股價：<span style="color: #bda3ef; font-weight:bold;">${Number(row.predictDeadPrice).toLocaleString('en-US')} 元</span>`;
+                }
+
                 // 僅處理含「賣」的 badge
                 if (/賣/.test(row.badge) && row.cost && row.cost.market_value && row.cost.total) {
                     // 解析分數（如 1/2、1/3... 或 Unicode 分數符號）

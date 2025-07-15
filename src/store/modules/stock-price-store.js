@@ -20,6 +20,58 @@ function getUnitSymbol(unit) {
     return `${Math.round(unit * 100)}%`;
 }
 
+function calcCrossPrice(K_prev, D_prev, pastHighs, pastLows, thisWeekHigh, thisWeekLow, type = 'gold') {
+    console.log('calcCrossPrice params:', {
+        K_prev,
+        D_prev,
+        pastHighs,
+        pastLows,
+        thisWeekHigh,
+        thisWeekLow,
+        type,
+    });
+
+    // ✳️ 若已交叉完成，就不預測
+    // if ((type === 'gold' && K_prev >= D_prev) || (type === 'dead' && K_prev <= D_prev)) {
+    //     console.log(`[${type}] 已交叉過，不再預測`);
+    //     return null;
+    // }
+
+    const highInitial = Math.max(...pastHighs, thisWeekHigh);
+    const lowInitial = Math.min(...pastLows, thisWeekLow);
+
+    const tolerance = 0.01;
+    const maxIter = 30;
+
+    let left = lowInitial;
+    let right = highInitial;
+    let best = null;
+
+    for (let i = 0; i < maxIter; i++) {
+        const mid = (left + right) / 2;
+        const high9 = Math.max(...pastHighs, thisWeekHigh, mid);
+        const low9 = Math.min(...pastLows, thisWeekLow, mid);
+        const rsv = (mid - low9) / (high9 - low9) * 100;
+
+        const K = (2 / 3) * K_prev + (1 / 3) * rsv;
+        const D = (2 / 3) * D_prev + (1 / 3) * K;
+
+        if (Math.abs(K - D) < tolerance) {
+            best = mid;
+            break;
+        }
+
+        if ((type === 'gold' && K > D) || (type === 'dead' && K < D)) {
+            best = mid;
+            right = mid;
+        } else {
+            left = mid;
+        }
+    }
+
+    return best ? Number(best.toFixed(2)) : null;
+}
+
 const defaultState = {
     // usdExchange: 30,
     stockList: [], // 目前知道 ios 在 19支股票，>=19會不能儲存localstorage
@@ -682,29 +734,58 @@ const stock = {
             let todayK = 0;
             let todayD = 0;
             let todayJ = 0;
+            let predictGoldPrice = null;
+            let predictDeadPrice = null;
 
-            // 從最早日期開始算，因為公式有用昨天
             for (let k = 0; k <= foundStock.data.weekly.length - 1; k += 1) {
-                const startIndex = k - 8 < 0 ? 0 : k - 8; // 如果減完小於0，就=0。正常寫法是-9+1，但我寫-8就好了
+                const startIndex = k - 8 < 0 ? 0 : k - 8;
                 const endIndex = k;
                 const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
-                const rangeHighArray = _.map(range2dArray, (v) => v[2]);
-                const rangeLowArray = _.map(range2dArray, (v) => v[3]);
+                const rangeHighArray = _.map(range2dArray, (v) => v[2]); // 高
+                const rangeLowArray = _.map(range2dArray, (v) => v[3]);  // 低
                 const low = _.min(rangeLowArray);
                 const high = _.max(rangeHighArray);
 
-                rsv = high - low !== 0 ? ((foundStock.data.weekly[k][4] - low) / (high - low)) * 100 : 100; // (今日收盤價-最近9天最低價)/(最近9天最高價-最近9天最低價)*100
-                todayK = (2 / 3) * preK + (1 / 3) * rsv; // k=2/3 * 昨日的k值 + 1/3*今日的RSV
-                todayD = (2 / 3) * preD + (1 / 3) * todayK; // d=2/3 * 昨日的d值 + 1/3*今日的k值
+                const close = foundStock.data.weekly[k][4];
+                rsv = high - low !== 0 ? ((close - low) / (high - low)) * 100 : 100;
+                todayK = (2 / 3) * preK + (1 / 3) * rsv;
+                todayD = (2 / 3) * preD + (1 / 3) * todayK;
                 todayJ = 3 * todayD - 2 * todayK;
                 preK = todayK;
                 preD = todayD;
                 const date = foundStock.data.weekly[endIndex][0];
 
                 weeklyKdData.push([date, todayK, todayD, todayJ]);
+
+                // ✅ 如果是最後一週，內部計算黃金交叉 & 死亡交叉收盤價
+                const isLast = k === foundStock.data.weekly.length - 1;
+                if (isLast) {
+                    const pastHighs = rangeHighArray.slice(0, -1);
+                    const pastLows = rangeLowArray.slice(0, -1);
+                    const thisWeekHigh = rangeHighArray[rangeHighArray.length - 1];
+                    const thisWeekLow = rangeLowArray[rangeLowArray.length - 1];
+
+                    // === 黃金交叉收盤價 ===
+                    predictGoldPrice = calcCrossPrice(
+                        preK, preD, pastHighs, pastLows,
+                        thisWeekHigh, thisWeekLow,
+                        'gold'
+                    );
+
+                    // === 死亡交叉收盤價 ===
+                    predictDeadPrice = calcCrossPrice(
+                        preK, preD, pastHighs, pastLows,
+                        thisWeekHigh, thisWeekLow,
+                        'dead'
+                    );
+                }
             }
-            return weeklyKdData;
-            // commit('SAVE_STOCK_WEEKLY_KD', { stockId: stockId, data: weeklyKdData });
+
+            return {
+                data: weeklyKdData,
+                predictGoldPrice,
+                predictDeadPrice
+            };
         },
         async CALC_STOCK_WEEKLY_RSI({ state }, stockId) {
             const period = 5;
@@ -1976,7 +2057,7 @@ const stock = {
                 tempStockListStockData.weekly = weekly_data;
                 state.tempStockList.push({ id: stockId, data: tempStockListStockData });
 
-                const [weekly_kdj_data, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
+                const [weekly_kdj_obj, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
                     this.dispatch('CALC_STOCK_WEEKLY_KDJ', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_RSI', stockId),
                     this.dispatch('CALC_STOCK_WEEKLY_MA', stockId),
@@ -1984,7 +2065,9 @@ const stock = {
                 ]);
 
                 tempStockListStockData = {};
-                tempStockListStockData.weekly_kdj = weekly_kdj_data;
+                tempStockListStockData.weekly_kdj = weekly_kdj_obj.data;
+                tempStockListStockData.predictGoldPrice = weekly_kdj_obj.predictGoldPrice;
+                tempStockListStockData.predictDeadPrice = weekly_kdj_obj.predictDeadPrice;
                 tempStockListStockData.weekly_rsi = weekly_rsi_data;
                 tempStockListStockData.weekly_ma = weekly_ma_data;
                 tempStockListStockData.cost = weekly_cost_line_data;
@@ -1996,7 +2079,9 @@ const stock = {
                 const weekly_rsi_min = _.minBy(weekly_rsi_data, (element) => element[1])[1];
 
                 foundStock.data.weekly = _.slice(weekly_data, -26);
-                foundStock.data.weekly_kdj = _.slice(weekly_kdj_data, -26);
+                foundStock.data.weekly_kdj = _.slice(weekly_kdj_obj.data, -26);
+                foundStock.predictGoldPrice = weekly_kdj_obj.predictGoldPrice; // 因為 ListStock 顯示沒有 data，所以存外層
+                foundStock.predictDeadPrice = weekly_kdj_obj.predictDeadPrice;
                 foundStock.data.weekly_rsi = _.slice(weekly_rsi_data, -26);
                 foundStock.data.weekly_rsi_max = weekly_rsi_max;
                 foundStock.data.weekly_rsi_min = weekly_rsi_min;
@@ -2126,7 +2211,7 @@ const stock = {
                     tempStockListStockData.weekly = weekly_data;
                     state.tempStockList.push({ id: stockId, data: tempStockListStockData }); // 新增 state.tempStockList 資料
 
-                    const [weekly_kdj_data, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
+                    const [weekly_kdj_obj, weekly_rsi_data, weekly_ma_data, weekly_cost_line_data] = await Promise.all([
                         this.dispatch('CALC_STOCK_WEEKLY_KDJ', stockId),
                         this.dispatch('CALC_STOCK_WEEKLY_RSI', stockId),
                         this.dispatch('CALC_STOCK_WEEKLY_MA', stockId),
@@ -2134,7 +2219,13 @@ const stock = {
                     ]);
 
                     tempStockListStockData = {};
-                    tempStockListStockData.weekly_kdj = weekly_kdj_data;
+                    tempStockListStockData.weekly_kdj = weekly_kdj_obj.data;
+                    tempStockListStockData.predictGoldPrice = weekly_kdj_obj.predictGoldPrice;
+                    tempStockListStockData.predictDeadPrice = weekly_kdj_obj.predictDeadPrice;
+                    // console.log("weekly_kdj_obj", weekly_kdj_obj);
+                    foundStock.predictGoldPrice = weekly_kdj_obj.predictGoldPrice; // 因為 ListStock 顯示沒有 data，所以存外層
+                    foundStock.predictDeadPrice = weekly_kdj_obj.predictDeadPrice;
+                    
                     tempStockListStockData.weekly_rsi = weekly_rsi_data;
                     tempStockListStockData.weekly_ma = weekly_ma_data;
 
