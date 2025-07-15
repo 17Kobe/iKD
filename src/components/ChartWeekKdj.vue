@@ -442,7 +442,8 @@
                             : '77px',
                         background: ['KD 高檔鈍化', 'KD 低檔鈍化', '成本價未跌過'].includes(status)
                             ? 'rgb(170, 170, 170)'
-                            : ['KD ≥ 80超買', 'KD 死亡交叉', 'KD 往下轉折', 'KD M頭', '每年固定日賣'].includes(status)
+                            : status.includes('死叉') ||
+                              ['KD ≥ 80超買', 'KD 死亡交叉', 'KD 往下轉折', 'KD M頭', '每年固定日賣'].includes(status)
                             ? 'rgb(103, 194, 58)'
                             : 'rgb(242, 139, 130)',
                         color: 'white',

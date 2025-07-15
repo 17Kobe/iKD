@@ -31,45 +31,46 @@ function calcCrossPrice(K_prev, D_prev, pastHighs, pastLows, thisWeekHigh, thisW
         type,
     });
 
-    // ✳️ 若已交叉完成，就不預測
-    // if ((type === 'gold' && K_prev >= D_prev) || (type === 'dead' && K_prev <= D_prev)) {
-    //     console.log(`[${type}] 已交叉過，不再預測`);
-    //     return null;
-    // }
-
-    const highInitial = Math.max(...pastHighs, thisWeekHigh);
-    const lowInitial = Math.min(...pastLows, thisWeekLow);
+    // ✅ 若已交叉，不再預測
+    if ((type === 'gold' && K_prev >= D_prev) || (type === 'dead' && K_prev <= D_prev)) {
+        console.log(`[${type}] 已交叉過，不再預測`);
+        return null;
+    }
 
     const tolerance = 0.01;
-    const maxIter = 30;
+    const maxIter = 50;
+    const high9 = Math.max(...pastHighs, thisWeekHigh);
+    const low9 = Math.min(...pastLows, thisWeekLow);
+    const range = high9 - low9;
 
-    let left = lowInitial;
-    let right = highInitial;
-    let best = null;
+    if (range === 0) return null;
+
+    let left = 0;
+    let right = 100;
+    let bestPrice = null;
 
     for (let i = 0; i < maxIter; i++) {
-        const mid = (left + right) / 2;
-        const high9 = Math.max(...pastHighs, thisWeekHigh, mid);
-        const low9 = Math.min(...pastLows, thisWeekLow, mid);
-        const rsv = (mid - low9) / (high9 - low9) * 100;
+        const rsv = (left + right) / 2;
 
         const K = (2 / 3) * K_prev + (1 / 3) * rsv;
         const D = (2 / 3) * D_prev + (1 / 3) * K;
 
+        const condition = type === 'gold' ? K > D : K < D;
+
         if (Math.abs(K - D) < tolerance) {
-            best = mid;
+            bestPrice = low9 + (rsv / 100) * range;
             break;
         }
 
-        if ((type === 'gold' && K > D) || (type === 'dead' && K < D)) {
-            best = mid;
-            right = mid;
+        if (condition) {
+            bestPrice = low9 + (rsv / 100) * range;
+            right = rsv;
         } else {
-            left = mid;
+            left = rsv;
         }
     }
 
-    return best ? Number(best.toFixed(2)) : null;
+    return bestPrice ? Number(bestPrice.toFixed(2)) : null;
 }
 
 const defaultState = {
@@ -742,7 +743,7 @@ const stock = {
                 const endIndex = k;
                 const range2dArray = _.slice(foundStock.data.weekly, startIndex, endIndex + 1);
                 const rangeHighArray = _.map(range2dArray, (v) => v[2]); // 高
-                const rangeLowArray = _.map(range2dArray, (v) => v[3]);  // 低
+                const rangeLowArray = _.map(range2dArray, (v) => v[3]); // 低
                 const low = _.min(rangeLowArray);
                 const high = _.max(rangeHighArray);
 
@@ -766,25 +767,19 @@ const stock = {
                     const thisWeekLow = rangeLowArray[rangeLowArray.length - 1];
 
                     // === 黃金交叉收盤價 ===
-                    predictGoldPrice = calcCrossPrice(
-                        preK, preD, pastHighs, pastLows,
-                        thisWeekHigh, thisWeekLow,
-                        'gold'
-                    );
+                    predictGoldPrice = calcCrossPrice(preK, preD, pastHighs, pastLows, thisWeekHigh, thisWeekLow, 'gold');
 
+                    console.log('predictGoldPrice', predictGoldPrice);
                     // === 死亡交叉收盤價 ===
-                    predictDeadPrice = calcCrossPrice(
-                        preK, preD, pastHighs, pastLows,
-                        thisWeekHigh, thisWeekLow,
-                        'dead'
-                    );
+                    predictDeadPrice = calcCrossPrice(preK, preD, pastHighs, pastLows, thisWeekHigh, thisWeekLow, 'dead');
+                    console.log('predictDeadPrice', predictDeadPrice);
                 }
             }
 
             return {
                 data: weeklyKdData,
                 predictGoldPrice,
-                predictDeadPrice
+                predictDeadPrice,
             };
         },
         async CALC_STOCK_WEEKLY_RSI({ state }, stockId) {
@@ -2225,7 +2220,7 @@ const stock = {
                     // console.log("weekly_kdj_obj", weekly_kdj_obj);
                     foundStock.predictGoldPrice = weekly_kdj_obj.predictGoldPrice; // 因為 ListStock 顯示沒有 data，所以存外層
                     foundStock.predictDeadPrice = weekly_kdj_obj.predictDeadPrice;
-                    
+
                     tempStockListStockData.weekly_rsi = weekly_rsi_data;
                     tempStockListStockData.weekly_ma = weekly_ma_data;
 
@@ -3107,6 +3102,30 @@ const stock = {
 
             if (lastestK >= 80 && lastSecondK >= 80 && lastThirdK >= 80) kdStatus.push('KD 高檔鈍化');
             if (lastestK <= 20 && lastSecondK <= 20 && lastThirdK <= 20) kdStatus.push('KD 低檔鈍化');
+
+            if (foundStock.badge === '準買' || foundStock.badge === '準買x2') {
+                if (foundStock.predictGoldPrice == null) {
+                    kdStatus.push('本週無金叉');
+                } else {
+                    kdStatus.push(`估金叉 ${Number(foundStock.predictGoldPrice).toLocaleString('en-US')}`);
+                }
+            }
+            if (
+                foundStock.badge === '準賣' ||
+                foundStock.badge === '準賣½' ||
+                foundStock.badge === '準賣⅓' ||
+                foundStock.badge === '準賣¼' ||
+                foundStock.badge === '準賣⅕' ||
+                foundStock.badge === '準賣⅙' ||
+                foundStock.badge === '準賣⅐'
+            ) {
+                if (foundStock.predictDeadPrice == null) {
+                    kdStatus.push('本週無死叉');
+                } else {
+                    kdStatus.push(`估死叉 ${Number(foundStock.predictDeadPrice).toLocaleString('en-US')}`);
+                }
+            }
+
             foundStock.kd_status = kdStatus;
 
             // 算 rsi線圖的 badge
