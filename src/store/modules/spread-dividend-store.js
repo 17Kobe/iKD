@@ -345,7 +345,7 @@ const dividend = {
                         _.filter(rootState.price.stockList, function (obj) {
                             return obj.cost;
                         }),
-                        ['cost.sum'],
+                        ['cost.market_value'],
                         ['desc']
                     );
                     if (!isCurrentAndOnlyBuy) {
