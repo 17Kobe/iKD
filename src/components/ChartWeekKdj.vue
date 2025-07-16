@@ -111,7 +111,7 @@
                                                 ? this.formattedEps[this.formattedEps.length - 1].acc
                                                 : 0;
                                         const base = eps < 10 ? 0 : 0;
-                                        return base + (this.isMobile ? 2 : 0) + 'px';
+                                        return base + (this.isMobile && eps < 10 ? 2 : 0) + 'px';
                                     })(),
                                 }"
                                 >EPS</span
