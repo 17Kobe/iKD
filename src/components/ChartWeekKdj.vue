@@ -111,7 +111,7 @@
                                                 ? this.formattedEps[this.formattedEps.length - 1].acc
                                                 : 0;
                                         const base = eps < 10 ? 0 : 0;
-                                        return base + (this.isMobile && eps < 10 ? 2 : 0) + 'px';
+                                        return base + (this.isMobile ? 2 : 0) + 'px';
                                     })(),
                                 }"
                                 >EPS</span
@@ -134,7 +134,15 @@
                                 ></i>
                                 <i v-else class="el-icon-caret-top" style="color: transparent; font-size: 13px"></i>
                             </span>
-                            <b>{{ formattedEps.length > 0 ? formattedEps[formattedEps.length - 1].acc : '' }}</b>
+                            <b>
+                                {{
+                                    formattedEps.length > 0
+                                        ? Number(formattedEps[formattedEps.length - 1].acc) >= 10
+                                            ? Number(formattedEps[formattedEps.length - 1].acc).toFixed(1)
+                                            : Number(formattedEps[formattedEps.length - 1].acc).toFixed(2)
+                                        : ''
+                                }}
+                            </b>
                         </div>
                     </el-tooltip>
                 </span>
