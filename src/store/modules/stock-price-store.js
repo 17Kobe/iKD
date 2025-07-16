@@ -3112,7 +3112,7 @@ const stock = {
                         goldPrice >= 100
                             ? goldPrice.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
                             : goldPrice.toLocaleString('en-US');
-                    kdStatus.push(`估金叉 ${goldPriceStr}`);
+                    kdStatus.push(`金叉估 ${goldPriceStr}`);
                 }
             }
             if (
@@ -3132,7 +3132,7 @@ const stock = {
                         deadPrice >= 100
                             ? deadPrice.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
                             : deadPrice.toLocaleString('en-US');
-                    kdStatus.push(`估死叉 ${deadPriceStr}`);
+                    kdStatus.push(`死叉估 ${deadPriceStr}`);
                 }
             }
 
