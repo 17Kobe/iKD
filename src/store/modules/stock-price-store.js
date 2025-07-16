@@ -3107,7 +3107,12 @@ const stock = {
                 if (foundStock.predictGoldPrice == null) {
                     kdStatus.push('本週無金叉');
                 } else {
-                    kdStatus.push(`估金叉 ${Number(foundStock.predictGoldPrice).toLocaleString('en-US')}`);
+                    let goldPrice = Number(foundStock.predictGoldPrice);
+                    let goldPriceStr =
+                        goldPrice >= 100
+                            ? goldPrice.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+                            : goldPrice.toLocaleString('en-US');
+                    kdStatus.push(`估金叉 ${goldPriceStr}`);
                 }
             }
             if (
@@ -3122,7 +3127,12 @@ const stock = {
                 if (foundStock.predictDeadPrice == null) {
                     kdStatus.push('本週無死叉');
                 } else {
-                    kdStatus.push(`估死叉 ${Number(foundStock.predictDeadPrice).toLocaleString('en-US')}`);
+                    let deadPrice = Number(foundStock.predictDeadPrice);
+                    let deadPriceStr =
+                        deadPrice >= 100
+                            ? deadPrice.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+                            : deadPrice.toLocaleString('en-US');
+                    kdStatus.push(`估死叉 ${deadPriceStr}`);
                 }
             }
 

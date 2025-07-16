@@ -334,11 +334,14 @@
             <el-table-column :label="modeSpread === '目前' ? '現價' : '賣價'" prop="last_price" width="70" align="center">
                 <template #default="scope">
                     <span v-if="scope.row.last_price !== undefined && scope.row.last_price !== null">
-                        <span v-if="Number(scope.row.last_price) % 1 === 0">
-                            {{ Number(scope.row.last_price) }}
+                        <span v-if="Number(scope.row.last_price) >= 1000">
+                            {{ Number(scope.row.last_price).toLocaleString('en-US', { maximumFractionDigits: 0 }) }}
+                        </span>
+                        <span v-else-if="Number(scope.row.last_price) >= 100">
+                            {{ Number(scope.row.last_price).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) }}
                         </span>
                         <span v-else>
-                            {{ Number(scope.row.last_price).toFixed(2) }}
+                            {{ Number(scope.row.last_price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
                         </span>
                     </span>
                 </template>

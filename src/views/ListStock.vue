@@ -193,6 +193,17 @@
                                             String(scope.row.last_price).split('.')[1] || '00'
                                         }}
                                     </template>
+                                    <template v-else-if="scope.row.type === 'stock' && scope.row.last_price !== undefined && scope.row.last_price !== null">
+                                        <span v-if="Number(scope.row.last_price) >= 1000">
+                                            {{ Number(scope.row.last_price).toLocaleString('en-US', { maximumFractionDigits: 0 }) }}
+                                        </span>
+                                        <span v-else-if="Number(scope.row.last_price) >= 100">
+                                            {{ Number(scope.row.last_price).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) }}
+                                        </span>
+                                        <span v-else>
+                                            {{ Number(scope.row.last_price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                                        </span>
+                                    </template>
                                     <template v-else>
                                         <span v-if="Number(scope.row.last_price) % 1 === 0">
                                             {{ Number(scope.row.last_price) }}
