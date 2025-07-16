@@ -557,12 +557,7 @@ const stock = {
                 // const localcrawlerDividendLastDate = moment(stcokObj.crawler_dividend_last_date).add(1, 'days') || moment().subtract(10, 'years');
                 // 必須是有買的才要去抓未來配息
 
-                if (
-                    ((stockId === null && stcokObj.cost) || stockId === stcokObj.id) &&
-                    stcokObj.type !== 'fund' &&
-                    stcokObj.type !== 'exchange' &&
-                    stcokObj.is_dividend === true
-                ) {
+                if (((stockId === null && stcokObj.cost) || stockId === stcokObj.id) && stcokObj.is_dividend === true) {
                     const stockDataDividend = _.has(stcokObj, 'data.dividend') ? stcokObj.data.dividend : [];
                     const localcrawlerDividendLastDate = moment(
                         stockDataDividend.length === 0
