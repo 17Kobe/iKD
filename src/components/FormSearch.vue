@@ -106,6 +106,10 @@
                         ><i class="el-icon-refresh-right"></i> 立即更新股價</el-button
                     >
                 </el-tooltip>
+
+                <br />
+                &nbsp;&nbsp;<el-button type="success" @click="onFixHistoryDividend" style="margin-top: 10px;"><i class="el-icon-help"></i> 修正工具</el-button
+                >
                 <!-- <br />
                 <br />
                 &nbsp;
@@ -124,6 +128,7 @@
                     active-text="開啟即時股價模式"
                     inactive-text="關閉"
                 />
+
             </el-collapse-item>
         </el-collapse>
     </el-drawer>
@@ -675,6 +680,24 @@ export default {
             textField.remove();
 
             // 這裡可以添加一個提示或反饋給用戶
+        },
+        onFixHistoryDividend() {
+            const obj = {
+                id: "F00001EM6G",
+                name: "元大2至10年投資級企業債券基金",
+                payment_date: "2025-07-15",
+                trading_date: "2025-07-03",
+                earnings_distribution: 0.135,
+                number_of_shares: 7074.07,
+                isSure: true
+            };
+            let arr = [];
+            try {
+                arr = JSON.parse(localStorage.getItem('historyDividendList')) || [];
+            } catch (e) {}
+            arr.push(obj);
+            localStorage.setItem('historyDividendList', JSON.stringify(arr));
+            this.$message.success('已修正並寫入 localStorage！');
         },
     },
 };
