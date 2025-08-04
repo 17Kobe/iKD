@@ -1,4 +1,5 @@
 @echo off
+cd /d D:\Code\Other\iKD
 REM 重要：在執行此腳本前，要先 push master
 
 REM 定義變數
