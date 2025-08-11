@@ -3104,7 +3104,9 @@ const stock = {
                 } else {
                     let goldPrice = Number(foundStock.predictGoldPrice);
                     let goldPriceStr =
-                        goldPrice >= 100
+                        goldPrice >= 1000
+                            ? goldPrice.toLocaleString('en-US', { maximumFractionDigits: 0 })
+                            : goldPrice >= 100
                             ? goldPrice.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
                             : goldPrice.toLocaleString('en-US');
                     kdStatus.push(`金叉估 ${goldPriceStr}`);
@@ -3124,7 +3126,9 @@ const stock = {
                 } else {
                     let deadPrice = Number(foundStock.predictDeadPrice);
                     let deadPriceStr =
-                        deadPrice >= 100
+                        deadPrice >= 1000
+                            ? deadPrice.toLocaleString('en-US', { maximumFractionDigits: 0 })
+                            : deadPrice >= 100
                             ? deadPrice.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
                             : deadPrice.toLocaleString('en-US');
                     kdStatus.push(`死叉估 ${deadPriceStr}`);
