@@ -445,9 +445,9 @@
             </el-row>
         </template>
         <el-row>
-            <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="5" style="padding: 2px 4px 5px 4px">
+            <el-col :xs="24" :sm="10" :md="7" :lg="6" :xl="5" style="padding: 2px 4px 5px 4px">
                 <el-button type="primary" size="small" @click="onAddDeposit" round plain>
-                    <i class="el-icon-plus" style="font-size: 16px; margin-right: 6px"></i> 新增資產
+                    <i class="el-icon-plus"></i> 新增資產
                 </el-button>
             </el-col>
             <!-- <el-col :xs="24" :sm="10" :md="7" :lg="7" :xl="3" style="padding-left: 4px; padding-top: 4px">
