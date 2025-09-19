@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-row class="row-bg" justify="space-between" style="align-items: center; max-width: 1024px">
-            <el-col :span="10" style="margin-left: 6px; font-size: 18px"
+            <el-col :span="9" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">價差&nbsp;&nbsp;</span>
                 <el-radio-group v-model="modeSpread" size="small" fill="#dedede" text-color="#373737">
                     <el-radio-button label="目前" />
@@ -18,7 +18,7 @@
                     <span v-else-if="modeSpread === '歷史'">5筆</span></el-link
                 >
             </el-col>
-            <el-col :span="13" style="margin-right: 4px">
+            <el-col :span="14" style="margin-right: 4px">
                 <el-tooltip effect="dark" placement="bottom" popper-class="tooltip-pre-line">
                     <template #content>
                         <div>
@@ -462,7 +462,7 @@
 
         <!-- ================================ 股利 -->
         <el-row class="row-bg" justify="space-between" style="margin-top: 10px; align-items: center; max-width: 1024px">
-            <el-col :span="10" style="margin-left: 6px; font-size: 18px"
+            <el-col :span="9" style="margin-left: 6px; font-size: 18px"
                 ><span style="font-weight: bold">股利&nbsp;&nbsp;</span>
                 <el-radio-group v-model="modeDividend" size="small" fill="#dedede" text-color="#373737">
                     <el-radio-button label="未來" />
@@ -484,7 +484,7 @@
                     <span v-else>5筆</span></el-link
                 >
             </el-col>
-            <el-col :span="13" style="margin-right: 4px">
+            <el-col :span="14" style="margin-right: 4px">
                 <el-tag class="ml-2" size="large" style="margin: 5px 2px; padding: 0 4px; float: right"
                     >總計
                     <span style="font-size: 24px"> $ </span>
