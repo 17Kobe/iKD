@@ -1219,7 +1219,7 @@ export default {
                             } else {
                                 console.warn(`DefaultStockList 找不到基金 ID: ${tempStockObj.id}，或資料缺失`);
                             }
-                        } else if (obj.name === '元大美債20年' || obj.name === '元大高股息' || obj.name === '群益ESG投等債20+') {
+                        } else if (obj.name === '元大美債20年' || obj.name === '元大高股息' || obj.name === '群益ESG投等債20+' || obj.name === '元大2至10年投資級企業債券基金') {
                             const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
                             tempStockObj.data.dividend = _.cloneDeep(foundStock.data.dividend);
                         }
