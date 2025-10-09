@@ -12,6 +12,21 @@
             </el-form-item>
 
             <br>
+            <span style="font-size: 24px">&nbsp;&nbsp;&nbsp;&nbsp;配息追蹤</span>
+            <el-form-item>
+                <el-row>
+                    <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" style="padding-left: 3px">
+                        <el-switch
+                            v-model="form.isDividend"
+                            active-text="開啟配息追蹤"
+                            inactive-text="關閉配息追蹤"
+                            @change="onDividendChange"
+                        />
+                    </el-col>
+                </el-row>
+            </el-form-item>
+
+            <br>
             <span style="font-size: 24px">&nbsp;&nbsp;&nbsp;&nbsp;手動新增EPS</span>
             <el-form-item>
                 <el-row>
@@ -59,6 +74,7 @@ export default {
 
             form: {
                 comment: '',
+                isDividend: false,
             },
 
             newEps: {
@@ -81,6 +97,7 @@ export default {
             // 一定要用 else，不然可能用到上個開的股票了
 
             this.form.comment = _.has(this.stockData, 'comment') ? this.stockData.comment : '';
+            this.form.isDividend = _.has(this.stockData, 'is_dividend') ? this.stockData.is_dividend : false;
 
             // this.$nextTick(() => {
             // this.$refs.cost0[0].focus();
@@ -135,6 +152,19 @@ export default {
             // 清空輸入框並重新計算下一個日期
             this.newEps.value = '';
             this.calculateNextEpsDate();
+        },
+        onDividendChange() {
+            // 當開關狀態改變時，立即儲存到 store
+            this.$store.commit('SAVE_STOCK_IS_DIVIDEND', {
+                stockId: this.stockId,
+                isDividend: this.form.isDividend,
+            });
+
+            // 顯示成功訊息
+            ElMessage({
+                type: 'success',
+                message: `配息追蹤已${this.form.isDividend ? '開啟' : '關閉'}`,
+            });
         },
         onClosed() {
             // 因為無法解決手機無法輸入.小數點時轉float會連.都沒有，所以最後才轉

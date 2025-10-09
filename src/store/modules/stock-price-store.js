@@ -1692,6 +1692,15 @@ const stock = {
             // localStorage.setItem('stockList', JSON.stringify(state.stockList));
             await saveStockToDb('stockList', foundStock);
         },
+        async SAVE_STOCK_IS_DIVIDEND(state, { stockId, isDividend }) {
+            console.log('SAVE_STOCK_IS_DIVIDEND');
+            // object of array 去 find 並 update
+            const foundStock = state.stockList.find((v) => v.id === stockId);
+            foundStock.is_dividend = isDividend;
+
+            // save to localstorage
+            await saveStockToDb('stockList', foundStock);
+        },
         async SAVE_STOCK_COST_RETURN(state, stockId, saveToDB = true) {
             console.log('SAVE_STOCK_COST_RETURN');
             // object of array 去 find 並 update
