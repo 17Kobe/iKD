@@ -3742,7 +3742,7 @@ const stock = {
 
                 // O/X 標記只在非無恐慌時加在 fearLevel
                 if (fearLevel !== '無法判斷' && (fearLevel.startsWith('極恐慌') || fearLevel.startsWith('恐懼'))) {
-                    const jnkMark = jnkChange >= 0 ? 'O' : 'X';
+                    const jnkMark = jnkChange < 0 ? 'O' : 'X';
                     fearLevel = `${fearLevel}(${jnkMark})`;
                 }
 
