@@ -59,14 +59,14 @@ const funds = [
         type: 'price',
         moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=SHZ18',
     },
-    // {
-    //     name: '貝萊德世界能源基金A2',
-    //     url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04K8F:FO;timeslot=2012-01-01T00:00:00Z-' +
-    //         today +
-    //         'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
-    //     type: 'price',
-    //     moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=shza6'
-    // },
+    {
+        name: '貝萊德世界能源基金A2',
+        url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04K8F:FO;timeslot=2012-01-01T00:00:00Z-' +
+            today +
+            'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
+        type: 'price',
+        moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=shza6'
+    },
     {
         name: '元大2至10年投資級企業債券基金',
         url:
@@ -99,11 +99,11 @@ const funds = [
             '&interval=1d&events=history',
         type: 'us_stock',
     },
-    {
-        name: '群益ESG投等債20+',
-        url: 'https://www.cmoney.tw/forum/stock/00937B?s=dividend',
-        type: 'stock_dividend',
-    },
+    // {
+    //     name: '群益ESG投等債20+',
+    //     url: 'https://www.cmoney.tw/forum/stock/00937B?s=dividend',
+    //     type: 'stock_dividend',
+    // },
     {
         name: 'CNN Fear & Greed Index',
         url: 'https://money.cnn.com/data/fear-and-greed/',
