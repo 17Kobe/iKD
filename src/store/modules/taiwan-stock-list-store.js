@@ -38,6 +38,9 @@ const taiwan = {
                 { stock_id: 'USD', stock_name: '美金匯率', type: 'exchange' },
                 { stock_id: 'BTCUSDT', stock_name: '比特幣', type: 'btc' },
                 { stock_id: 'JNK', stock_name: '彭博高收益債', type: 'usStock' },
+                { stock_id: 'MSFT', stock_name: '微軟', type: 'usStock' },
+                { stock_id: 'GOOGL', stock_name: '谷歌', type: 'usStock' },
+                { stock_id: 'NVDA', stock_name: '輝達', type: 'usStock' },
             ];
             if (_.has(data, 'data') && data.data.length > 0) {
                 state.taiwanStockList.push(...data.data);

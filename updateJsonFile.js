@@ -61,11 +61,12 @@ const funds = [
     },
     {
         name: '貝萊德世界能源基金A2',
-        url: 'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04K8F:FO;timeslot=2012-01-01T00:00:00Z-' +
+        url:
+            'https://tw.stock.yahoo.com/_td-stock/api/resource/FundServices.fundsPriceHistory;fundId=F0GBR04K8F:FO;timeslot=2012-01-01T00:00:00Z-' +
             today +
             'T23:59:59Z?bkt=&device=desktop&ecma=modern&feature=ecmaModern,useVersionSwitch,useNewQuoteTabColor&intl=tw&lang=zh-Hant-TW&partner=none&prid=e4nof9lh3r54p&region=TW&site=finance&tz=Asia/Taipei&ver=1.2.1233&returnMeta=true',
         type: 'price',
-        moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=shza6'
+        moneyDjUrl: 'https://www.moneydj.com/funddj/ya/yp010001.djhtm?a=shza6',
     },
     {
         name: '元大2至10年投資級企業債券基金',
@@ -95,6 +96,30 @@ const funds = [
         name: '彭博高收益債',
         url:
             'https://query1.finance.yahoo.com/v8/finance/chart/JNK?period1=1325376000&period2=' +
+            moment().unix() +
+            '&interval=1d&events=history',
+        type: 'us_stock',
+    },
+    {
+        name: '微軟',
+        url:
+            'https://query1.finance.yahoo.com/v8/finance/chart/MSFT?period1=1325376000&period2=' +
+            moment().unix() +
+            '&interval=1d&events=history',
+        type: 'us_stock',
+    },
+    {
+        name: '谷歌',
+        url:
+            'https://query1.finance.yahoo.com/v8/finance/chart/GOOGL?period1=1325376000&period2=' +
+            moment().unix() +
+            '&interval=1d&events=history',
+        type: 'us_stock',
+    },
+    {
+        name: '輝達',
+        url:
+            'https://query1.finance.yahoo.com/v8/finance/chart/NVDA?period1=1325376000&period2=' +
             moment().unix() +
             '&interval=1d&events=history',
         type: 'us_stock',
@@ -475,7 +500,13 @@ Promise.all(funds.map(getPromise)).then(function (results) {
     });
 
     const defaultStockList = _.map(myLocalstorageStockList, (item) => {
-        if (_.includes(item.name, '基金') || item.name === '彭博高收益債') {
+        if (
+            _.includes(item.name, '基金') ||
+            item.name === '彭博高收益債' ||
+            item.name === '微軟' ||
+            item.name === '谷歌' ||
+            item.name === '輝達'
+        ) {
             item.data.daily = _.map(item.data.daily, ([date, value]) => [date, value]); // 移掉open close high low 節省空間
             return item;
         } else if (item.name === '元大美債20年' || item.name === '元大高股息' || item.name === '群益ESG投等債20+') {
