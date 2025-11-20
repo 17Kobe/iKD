@@ -513,7 +513,8 @@ Promise.all(funds.map(getPromise)).then(function (results) {
             item.name === '彭博高收益債' ||
             item.name === '微軟' ||
             item.name === '谷歌' ||
-            item.name === '輝達'
+            item.name === '輝達' ||
+            item.name === '波克夏'
         ) {
             item.data.daily = _.map(item.data.daily, ([date, value]) => [date, value]); // 移掉open close high low 節省空間
             return item;
