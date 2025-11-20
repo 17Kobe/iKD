@@ -994,7 +994,7 @@ export default {
             const star = stock?.star ?? 3; // 預設3星
             // const name = stock?.name ?? '';
 
-            let buyPeriod = 365;
+            let buyPeriod = 547;
             let sellPeriod = 547;
             // 中華電及卜蜂要特別處理，因為他們是3星要存股，但允許久一點再買，|| (star === 3 && ['中華電', '卜蜂'].includes(name))
             if (star <= 2) {
