@@ -124,6 +124,14 @@ const funds = [
             '&interval=1d&events=history',
         type: 'us_stock',
     },
+    {
+        name: '波克夏',
+        url:
+            'https://query1.finance.yahoo.com/v8/finance/chart/BRK-B?period1=1325376000&period2=' +
+            moment().unix() +
+            '&interval=1d&events=history',
+        type: 'us_stock',
+    },
     // {
     //     name: '群益ESG投等債20+',
     //     url: 'https://www.cmoney.tw/forum/stock/00937B?s=dividend',
