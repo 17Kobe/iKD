@@ -41,6 +41,7 @@ const taiwan = {
                 { stock_id: 'MSFT', stock_name: '微軟', type: 'usStock' },
                 { stock_id: 'GOOGL', stock_name: '谷歌', type: 'usStock' },
                 { stock_id: 'NVDA', stock_name: '輝達', type: 'usStock' },
+                { stock_id: 'AAPL', stock_name: '蘋果', type: 'usStock' },
                 { stock_id: 'BRK-B', stock_name: '波克夏', type: 'usStock' },
                 { stock_id: 'VOO', stock_name: 'VOO', type: 'usStock' },
                 { stock_id: 'QQQ', stock_name: 'QQQ', type: 'usStock' },

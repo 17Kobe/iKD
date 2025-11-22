@@ -125,6 +125,14 @@ const funds = [
         type: 'us_stock',
     },
     {
+        name: '蘋果',
+        url:
+            'https://query1.finance.yahoo.com/v8/finance/chart/AAPL?period1=1325376000&period2=' +
+            moment().unix() +
+            '&interval=1d&events=history',
+        type: 'us_stock',
+    },
+    {
         name: '波克夏',
         url:
             'https://query1.finance.yahoo.com/v8/finance/chart/BRK-B?period1=1325376000&period2=' +
@@ -538,6 +546,7 @@ Promise.all(funds.map(getPromise)).then(function (results) {
             item.name === '微軟' ||
             item.name === '谷歌' ||
             item.name === '輝達' ||
+            item.name === '蘋果' ||
             item.name === '波克夏' ||
             item.name === 'VOO' ||
             item.name === 'QQQ' ||
