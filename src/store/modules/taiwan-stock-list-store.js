@@ -42,6 +42,9 @@ const taiwan = {
                 { stock_id: 'GOOGL', stock_name: '谷歌', type: 'usStock' },
                 { stock_id: 'NVDA', stock_name: '輝達', type: 'usStock' },
                 { stock_id: 'BRK-B', stock_name: '波克夏', type: 'usStock' },
+                { stock_id: 'VOO', stock_name: 'VOO', type: 'usStock' },
+                { stock_id: 'QQQ', stock_name: 'QQQ', type: 'usStock' },
+                { stock_id: 'GDX', stock_name: 'GDX', type: 'usStock' },
             ];
             if (_.has(data, 'data') && data.data.length > 0) {
                 state.taiwanStockList.push(...data.data);

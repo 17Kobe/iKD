@@ -132,6 +132,30 @@ const funds = [
             '&interval=1d&events=history',
         type: 'us_stock',
     },
+    {
+        name: 'VOO',
+        url:
+            'https://query1.finance.yahoo.com/v8/finance/chart/VOO?period1=1325376000&period2=' +
+            moment().unix() +
+            '&interval=1d&events=history',
+        type: 'us_stock',
+    },
+    {
+        name: 'QQQ',
+        url:
+            'https://query1.finance.yahoo.com/v8/finance/chart/QQQ?period1=1325376000&period2=' +
+            moment().unix() +
+            '&interval=1d&events=history',
+        type: 'us_stock',
+    },
+    {
+        name: 'GDX',
+        url:
+            'https://query1.finance.yahoo.com/v8/finance/chart/GDX?period1=1325376000&period2=' +
+            moment().unix() +
+            '&interval=1d&events=history',
+        type: 'us_stock',
+    },
     // {
     //     name: '群益ESG投等債20+',
     //     url: 'https://www.cmoney.tw/forum/stock/00937B?s=dividend',
@@ -514,7 +538,10 @@ Promise.all(funds.map(getPromise)).then(function (results) {
             item.name === '微軟' ||
             item.name === '谷歌' ||
             item.name === '輝達' ||
-            item.name === '波克夏'
+            item.name === '波克夏' ||
+            item.name === 'VOO' ||
+            item.name === 'QQQ' ||
+            item.name === 'GDX'
         ) {
             item.data.daily = _.map(item.data.daily, ([date, value]) => [date, value]); // 移掉open close high low 節省空間
             return item;
