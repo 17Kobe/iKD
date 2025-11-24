@@ -30,7 +30,14 @@ console.log('proxy=' + proxy);
 
 const today = moment().format('YYYY-MM-DD');
 
-// 新的結構：將 fundName 和 urls 合併為一個物件數組
+// Alpha Vantage API Key
+const ALPHA_VANTAGE_API_KEY = '3DUVG0JCYIVKWJ6H';
+
+// Alpha Vantage API 呼叫計數器和延遲設定
+let alphaVantageCallCount = 0;
+const ALPHA_VANTAGE_DELAY = 13000; // 13秒延遲 (每分鐘最多5次，免費版限制)
+
+// 新的結構:將 fundName 和 urls 合併為一個物件數組
 const funds = [
     {
         name: '富達全球科技基金',
@@ -99,6 +106,7 @@ const funds = [
             moment().unix() +
             '&interval=1d&events=history',
         type: 'us_stock',
+        // 不抓取 EPS 和 PE ratio (ETF)
     },
     {
         name: '微軟',
@@ -107,6 +115,7 @@ const funds = [
             moment().unix() +
             '&interval=1d&events=history',
         type: 'us_stock',
+        symbol: 'MSFT',
     },
     {
         name: '谷歌',
@@ -115,6 +124,7 @@ const funds = [
             moment().unix() +
             '&interval=1d&events=history',
         type: 'us_stock',
+        symbol: 'GOOGL',
     },
     {
         name: '輝達',
@@ -123,6 +133,7 @@ const funds = [
             moment().unix() +
             '&interval=1d&events=history',
         type: 'us_stock',
+        symbol: 'NVDA',
     },
     {
         name: '蘋果',
@@ -131,6 +142,7 @@ const funds = [
             moment().unix() +
             '&interval=1d&events=history',
         type: 'us_stock',
+        symbol: 'AAPL',
     },
     {
         name: '波克夏',
@@ -139,6 +151,7 @@ const funds = [
             moment().unix() +
             '&interval=1d&events=history',
         type: 'us_stock',
+        symbol: 'BRK-B',
     },
     {
         name: 'VOO',
@@ -147,6 +160,7 @@ const funds = [
             moment().unix() +
             '&interval=1d&events=history',
         type: 'us_stock',
+        // 不抓取 EPS 和 PE ratio (ETF)
     },
     {
         name: 'QQQ',
@@ -155,6 +169,7 @@ const funds = [
             moment().unix() +
             '&interval=1d&events=history',
         type: 'us_stock',
+        // 不抓取 EPS 和 PE ratio (ETF)
     },
     {
         name: 'GDX',
@@ -163,6 +178,7 @@ const funds = [
             moment().unix() +
             '&interval=1d&events=history',
         type: 'us_stock',
+        // 不抓取 EPS 和 PE ratio (ETF)
     },
     // {
     //     name: '群益ESG投等債20+',
@@ -180,6 +196,106 @@ const funds = [
         type: 'eco_light',
     },
 ];
+
+// 抓取美股 EPS 歷史資料 (使用 Alpha Vantage API)
+function fetchUSStockEPS(symbol) {
+    return new Promise((resolve) => {
+        // 延遲執行以避免超過 API 限制
+        setTimeout(() => {
+            alphaVantageCallCount++;
+            console.log(`[Alpha Vantage] 呼叫 #${alphaVantageCallCount}: ${symbol} EPS`);
+            
+            const url = `https://www.alphavantage.co/query?function=EARNINGS&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+            
+            request(
+                {
+                    url: url,
+                    json: true,
+                    proxy: proxy,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    },
+                },
+                (error, response, body) => {
+                    if (!error && response.statusCode === 200 && body.quarterlyEarnings) {
+                        const epsData = body.quarterlyEarnings
+                            .filter(item => item.fiscalDateEnding && item.reportedEPS)
+                            .map(item => ({
+                                date: item.fiscalDateEnding,
+                                value: parseFloat(item.reportedEPS)
+                            }))
+                            .filter(item => !isNaN(item.value))
+                            .reverse(); // 由舊到新排序
+                        
+                        if (epsData.length > 0) {
+                            console.log(`成功抓取 ${symbol} EPS 資料，共 ${epsData.length} 筆`);
+                            resolve(epsData);
+                        } else {
+                            console.log(`${symbol} 無 EPS 資料`);
+                            resolve([]);
+                        }
+                    } else if (body?.Note) {
+                        console.error(`${symbol} EPS API 限制: 已達每日上限`);
+                        resolve([]);
+                    } else {
+                        console.error(`抓取 ${symbol} EPS 失敗:`, error?.message || response?.statusCode);
+                        resolve([]);
+                    }
+                }
+            );
+        }, (alphaVantageCallCount) * ALPHA_VANTAGE_DELAY);
+    });
+}
+
+// 抓取美股本益比資料 (使用 Alpha Vantage API)
+function fetchUSStockPE(symbol) {
+    return new Promise((resolve) => {
+        // 延遲執行以避免超過 API 限制
+        setTimeout(() => {
+            alphaVantageCallCount++;
+            console.log(`[Alpha Vantage] 呼叫 #${alphaVantageCallCount}: ${symbol} PE Ratio`);
+            
+            const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+            
+            request(
+                {
+                    url: url,
+                    json: true,
+                    proxy: proxy,
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    },
+                },
+                (error, response, body) => {
+                    if (!error && response.statusCode === 200 && body.PERatio) {
+                        const peValue = parseFloat(body.PERatio);
+                        
+                        if (!isNaN(peValue) && peValue > 0) {
+                            const result = {
+                                last: parseFloat(peValue.toFixed(2)),
+                                mean: null,  // Alpha Vantage 只提供當前值
+                                median: null,
+                                max: null,
+                                min: null
+                            };
+                            console.log(`成功抓取 ${symbol} 本益比: ${result.last}`);
+                            resolve(result);
+                        } else {
+                            console.log(`${symbol} 本益比值無效`);
+                            resolve(null);
+                        }
+                    } else if (body?.Note) {
+                        console.error(`${symbol} PE API 限制: 已達每日上限`);
+                        resolve(null);
+                    } else {
+                        console.error(`抓取 ${symbol} 本益比失敗:`, error?.message || response?.statusCode);
+                        resolve(null);
+                    }
+                }
+            );
+        }, (alphaVantageCallCount) * ALPHA_VANTAGE_DELAY);
+    });
+}
 
 function getPromise(fund) {
     return new Promise(function (resolve) {
@@ -238,14 +354,21 @@ function getPromise(fund) {
                                         }
                                     });
 
-                                    const lastValueDate = moment(_.last(values)[0], 'YYYY-MM-DD');
-                                    data = data.reverse();
-                                    for (let i = 0; i < data.length; i++) {
-                                        const currentDate = moment(data[i][0], 'YYYY-MM-DD');
+                                    // 檢查 values 是否有資料，避免 undefined 錯誤
+                                    if (values.length > 0) {
+                                        const lastValueDate = moment(_.last(values)[0], 'YYYY-MM-DD');
+                                        data = data.reverse();
+                                        for (let i = 0; i < data.length; i++) {
+                                            const currentDate = moment(data[i][0], 'YYYY-MM-DD');
 
-                                        if (currentDate.isAfter(lastValueDate)) {
-                                            values.push(data[i]);
+                                            if (currentDate.isAfter(lastValueDate)) {
+                                                values.push(data[i]);
+                                            }
                                         }
+                                    } else {
+                                        // 如果 values 是空的，直接使用 data
+                                        data = data.reverse();
+                                        values = data;
                                     }
                                     resolve({ name: fund.name, values: values, type: fund.type });
                                 } else {
@@ -387,7 +510,7 @@ function getPromise(fund) {
                         Origin: 'https://finance.yahoo.com',
                     },
                 },
-                (error, response, body) => {
+                async (error, response, body) => {
                     if (
                         !error &&
                         response.statusCode === 200 &&
@@ -407,10 +530,22 @@ function getPromise(fund) {
                                 values.push([date, close]);
                             }
                         }
-                        resolve({ name: fund.name, values: values, type: fund.type });
+                        
+                        // 如果有 symbol，抓取 EPS 和本益比
+                        let eps = [];
+                        let per = null;
+                        if (fund.symbol) {
+                            console.log(`正在抓取 ${fund.name} (${fund.symbol}) 的 EPS 和本益比...`);
+                            [eps, per] = await Promise.all([
+                                fetchUSStockEPS(fund.symbol),
+                                fetchUSStockPE(fund.symbol)
+                            ]);
+                        }
+                        
+                        resolve({ name: fund.name, values: values, type: fund.type, eps: eps, per: per });
                     } else {
-                        console.error('JNK 抓取失敗:', error || (response && response.statusCode), body);
-                        resolve({ name: fund.name, values: [], type: fund.type });
+                        console.error(`${fund.name} 抓取失敗:`, error || (response && response.statusCode), body);
+                        resolve({ name: fund.name, values: [], type: fund.type, eps: [], per: null });
                     }
                 }
             );
@@ -508,10 +643,26 @@ Promise.all(funds.map(getPromise)).then(function (results) {
         if (result.type === 'price' || result.type === 'us_stock') {
             if (result.type === 'us_stock') {
                 console.log(`抓取到 ${result.name} 的股價數據`);
+                if (result.eps && result.eps.length > 0) {
+                    console.log(`抓取到 ${result.name} 的 EPS 數據，共 ${result.eps.length} 筆`);
+                }
+                if (result.per) {
+                    console.log(`抓取到 ${result.name} 的本益比: ${result.per.last}`);
+                }
             }
             foundStock.data = foundStock.data || {};
             foundStock.data.daily = foundStock.data.daily || [];
             foundStock.data.daily = result.values;
+            
+            // 儲存 EPS 和本益比資料
+            if (result.type === 'us_stock') {
+                if (result.eps && result.eps.length > 0) {
+                    foundStock.data.eps = result.eps;
+                }
+                if (result.per) {
+                    foundStock.data.per = result.per;
+                }
+            }
         } else if (result.type === 'fund_dividend' || result.type === 'stock_dividend') {
             foundStock.data = foundStock.data || {};
             foundStock.data.dividend = foundStock.data.dividend || [];
