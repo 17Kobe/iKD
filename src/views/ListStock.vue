@@ -193,15 +193,33 @@
                                             String(scope.row.last_price).split('.')[1] || '00'
                                         }}
                                     </template>
-                                    <template v-else-if="scope.row.type === 'stock' && scope.row.last_price !== undefined && scope.row.last_price !== null">
+                                    <template
+                                        v-else-if="
+                                            scope.row.type === 'stock' &&
+                                            scope.row.last_price !== undefined &&
+                                            scope.row.last_price !== null
+                                        "
+                                    >
                                         <span v-if="Number(scope.row.last_price) >= 1000">
-                                            {{ Number(scope.row.last_price).toLocaleString('en-US', { maximumFractionDigits: 0 }) }}
+                                            {{
+                                                Number(scope.row.last_price).toLocaleString('en-US', { maximumFractionDigits: 0 })
+                                            }}
                                         </span>
                                         <span v-else-if="Number(scope.row.last_price) >= 100">
-                                            {{ Number(scope.row.last_price).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) }}
+                                            {{
+                                                Number(scope.row.last_price).toLocaleString('en-US', {
+                                                    minimumFractionDigits: 1,
+                                                    maximumFractionDigits: 1,
+                                                })
+                                            }}
                                         </span>
                                         <span v-else>
-                                            {{ Number(scope.row.last_price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                                            {{
+                                                Number(scope.row.last_price).toLocaleString('en-US', {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2,
+                                                })
+                                            }}
                                         </span>
                                     </template>
                                     <template v-else>
@@ -1214,12 +1232,20 @@ export default {
                                     _.cloneDeep({
                                         daily: foundStock.data.daily,
                                         dividend: foundStock.data.dividend,
+                                        // 複製美股專屬的 per 與 eps 資料
+                                        per: foundStock.data.per || null,
+                                        eps: foundStock.data.eps || [],
                                     })
                                 );
                             } else {
                                 console.warn(`DefaultStockList 找不到基金 ID: ${tempStockObj.id}，或資料缺失`);
                             }
-                        } else if (obj.name === '元大美債20年' || obj.name === '元大高股息' || obj.name === '群益ESG投等債20+' || obj.name === '元大2至10年投資級企業債券基金') {
+                        } else if (
+                            obj.name === '元大美債20年' ||
+                            obj.name === '元大高股息' ||
+                            obj.name === '群益ESG投等債20+' ||
+                            obj.name === '元大2至10年投資級企業債券基金'
+                        ) {
                             const foundStock = DefaultStockList.find((v) => v.id === tempStockObj.id);
                             tempStockObj.data.dividend = _.cloneDeep(foundStock.data.dividend);
                         }

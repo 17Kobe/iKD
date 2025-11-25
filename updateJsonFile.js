@@ -30,8 +30,23 @@ console.log('proxy=' + proxy);
 
 const today = moment().format('YYYY-MM-DD');
 
-// Alpha Vantage API Key
-const ALPHA_VANTAGE_API_KEY = '3DUVG0JCYIVKWJ6H';
+// Alpha Vantage API Keys (多組輪替使用)
+const ALPHA_VANTAGE_API_KEYS = ['O9AQMAP6D3WFXVM6', '6NW4VW3GB1SYF7HD', '3DUVG0JCYIVKWJ6H'];
+let currentApiKeyIndex = 0;
+
+// 取得當前 API Key
+function getCurrentApiKey() {
+    return ALPHA_VANTAGE_API_KEYS[currentApiKeyIndex];
+}
+
+// 切換到下一組 API Key
+function switchToNextApiKey() {
+    const oldKey = ALPHA_VANTAGE_API_KEYS[currentApiKeyIndex];
+    currentApiKeyIndex = (currentApiKeyIndex + 1) % ALPHA_VANTAGE_API_KEYS.length;
+    const newKey = ALPHA_VANTAGE_API_KEYS[currentApiKeyIndex];
+    console.log(`API Key 已達上限，從 ${oldKey.substring(0, 6)}... 切換到 ${newKey.substring(0, 6)}...`);
+    return newKey;
+}
 
 // Alpha Vantage API 呼叫計數器和延遲設定
 let alphaVantageCallCount = 0;
@@ -197,16 +212,24 @@ const funds = [
     },
 ];
 
-// 抓取美股 EPS 歷史資料 (使用 Alpha Vantage API)
-function fetchUSStockEPS(symbol) {
+// 抓取美股 EPS 歷史資料 (使用 Alpha Vantage API，支援多組 Key 輪替)
+function fetchUSStockEPS(symbol, retryCount = 0) {
     return new Promise((resolve) => {
+        // 如果已經試過所有 Key，放棄
+        if (retryCount >= ALPHA_VANTAGE_API_KEYS.length) {
+            console.error(`${symbol} EPS: 所有 API Key 都已達上限，無法抓取`);
+            resolve([]);
+            return;
+        }
+
         // 延遲執行以避免超過 API 限制
         setTimeout(() => {
             alphaVantageCallCount++;
-            console.log(`[Alpha Vantage] 呼叫 #${alphaVantageCallCount}: ${symbol} EPS`);
-            
-            const url = `https://www.alphavantage.co/query?function=EARNINGS&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
-            
+            const apiKey = getCurrentApiKey();
+            console.log(`[Alpha Vantage] 呼叫 #${alphaVantageCallCount}: ${symbol} EPS (Key: ${apiKey.substring(0, 6)}...)`);
+
+            const url = `https://www.alphavantage.co/query?function=EARNINGS&symbol=${symbol}&apikey=${apiKey}`;
+
             request(
                 {
                     url: url,
@@ -219,14 +242,14 @@ function fetchUSStockEPS(symbol) {
                 (error, response, body) => {
                     if (!error && response.statusCode === 200 && body.quarterlyEarnings) {
                         const epsData = body.quarterlyEarnings
-                            .filter(item => item.fiscalDateEnding && item.reportedEPS)
-                            .map(item => ({
+                            .filter((item) => item.fiscalDateEnding && item.reportedEPS)
+                            .map((item) => ({
                                 date: item.fiscalDateEnding,
-                                value: parseFloat(item.reportedEPS)
+                                value: parseFloat(item.reportedEPS),
                             }))
-                            .filter(item => !isNaN(item.value))
+                            .filter((item) => !isNaN(item.value))
                             .reverse(); // 由舊到新排序
-                        
+
                         if (epsData.length > 0) {
                             console.log(`成功抓取 ${symbol} EPS 資料，共 ${epsData.length} 筆`);
                             resolve(epsData);
@@ -234,29 +257,39 @@ function fetchUSStockEPS(symbol) {
                             console.log(`${symbol} 無 EPS 資料`);
                             resolve([]);
                         }
-                    } else if (body?.Note) {
-                        console.error(`${symbol} EPS API 限制: 已達每日上限`);
-                        resolve([]);
+                    } else if (body?.Note || body?.Information?.includes('API rate limit')) {
+                        console.warn(`${symbol} EPS API 限制: 已達每日上限，嘗試切換 Key...`);
+                        switchToNextApiKey();
+                        // 遞迴重試，使用下一組 Key
+                        resolve(fetchUSStockEPS(symbol, retryCount + 1));
                     } else {
                         console.error(`抓取 ${symbol} EPS 失敗:`, error?.message || response?.statusCode);
                         resolve([]);
                     }
                 }
             );
-        }, (alphaVantageCallCount) * ALPHA_VANTAGE_DELAY);
+        }, alphaVantageCallCount * ALPHA_VANTAGE_DELAY);
     });
 }
 
-// 抓取美股本益比資料 (使用 Alpha Vantage API)
-function fetchUSStockPE(symbol) {
+// 抓取美股本益比資料 (使用 Alpha Vantage API，支援多組 Key 輪替)
+function fetchUSStockPE(symbol, retryCount = 0) {
     return new Promise((resolve) => {
+        // 如果已經試過所有 Key，放棄
+        if (retryCount >= ALPHA_VANTAGE_API_KEYS.length) {
+            console.error(`${symbol} PE: 所有 API Key 都已達上限，無法抓取`);
+            resolve(null);
+            return;
+        }
+
         // 延遲執行以避免超過 API 限制
         setTimeout(() => {
             alphaVantageCallCount++;
-            console.log(`[Alpha Vantage] 呼叫 #${alphaVantageCallCount}: ${symbol} PE Ratio`);
-            
-            const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
-            
+            const apiKey = getCurrentApiKey();
+            console.log(`[Alpha Vantage] 呼叫 #${alphaVantageCallCount}: ${symbol} PE Ratio (Key: ${apiKey.substring(0, 6)}...)`);
+
+            const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${apiKey}`;
+
             request(
                 {
                     url: url,
@@ -269,14 +302,14 @@ function fetchUSStockPE(symbol) {
                 (error, response, body) => {
                     if (!error && response.statusCode === 200 && body.PERatio) {
                         const peValue = parseFloat(body.PERatio);
-                        
+
                         if (!isNaN(peValue) && peValue > 0) {
                             const result = {
                                 last: parseFloat(peValue.toFixed(2)),
-                                mean: null,  // Alpha Vantage 只提供當前值
+                                mean: null, // Alpha Vantage 只提供當前值
                                 median: null,
                                 max: null,
-                                min: null
+                                min: null,
                             };
                             console.log(`成功抓取 ${symbol} 本益比: ${result.last}`);
                             resolve(result);
@@ -284,16 +317,18 @@ function fetchUSStockPE(symbol) {
                             console.log(`${symbol} 本益比值無效`);
                             resolve(null);
                         }
-                    } else if (body?.Note) {
-                        console.error(`${symbol} PE API 限制: 已達每日上限`);
-                        resolve(null);
+                    } else if (body?.Note || body?.Information?.includes('API rate limit')) {
+                        console.warn(`${symbol} PE API 限制: 已達每日上限，嘗試切換 Key...`);
+                        switchToNextApiKey();
+                        // 遞迴重試，使用下一組 Key
+                        resolve(fetchUSStockPE(symbol, retryCount + 1));
                     } else {
                         console.error(`抓取 ${symbol} 本益比失敗:`, error?.message || response?.statusCode);
                         resolve(null);
                     }
                 }
             );
-        }, (alphaVantageCallCount) * ALPHA_VANTAGE_DELAY);
+        }, alphaVantageCallCount * ALPHA_VANTAGE_DELAY);
     });
 }
 
@@ -530,18 +565,15 @@ function getPromise(fund) {
                                 values.push([date, close]);
                             }
                         }
-                        
+
                         // 如果有 symbol，抓取 EPS 和本益比
                         let eps = [];
                         let per = null;
                         if (fund.symbol) {
                             console.log(`正在抓取 ${fund.name} (${fund.symbol}) 的 EPS 和本益比...`);
-                            [eps, per] = await Promise.all([
-                                fetchUSStockEPS(fund.symbol),
-                                fetchUSStockPE(fund.symbol)
-                            ]);
+                            [eps, per] = await Promise.all([fetchUSStockEPS(fund.symbol), fetchUSStockPE(fund.symbol)]);
                         }
-                        
+
                         resolve({ name: fund.name, values: values, type: fund.type, eps: eps, per: per });
                     } else {
                         console.error(`${fund.name} 抓取失敗:`, error || (response && response.statusCode), body);
@@ -653,7 +685,7 @@ Promise.all(funds.map(getPromise)).then(function (results) {
             foundStock.data = foundStock.data || {};
             foundStock.data.daily = foundStock.data.daily || [];
             foundStock.data.daily = result.values;
-            
+
             // 儲存 EPS 和本益比資料
             if (result.type === 'us_stock') {
                 if (result.eps && result.eps.length > 0) {

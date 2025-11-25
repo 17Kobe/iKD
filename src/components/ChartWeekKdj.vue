@@ -27,7 +27,7 @@
                         position: absolute;
                         top: -63px;
                         display: inline-block;
-                        min-width: 64px;
+                        min-width: 65px;
                         background: rgb(231 255 251);
                         color: rgb(62 207 188);
                         padding: 0px 3px;
@@ -147,12 +147,12 @@
                     </el-tooltip>
                 </span>
                 <span
-                    v-if="stockData.data && stockData.data.per && stockData.data.dy_per_pbr_date"
+                    v-if="stockData.data && stockData.data.per && stockData.data.per.last != null"
                     style="
                         position: absolute;
                         top: -42px;
                         display: inline-block;
-                        min-width: 64px;
+                        min-width: 65px;
                         background: rgb(241, 256, 209);
                         color: rgb(81 177 35);
                         padding: 0px 3px;
@@ -176,23 +176,35 @@
                                     :style="{
                                         color: 'rgb(255 105 105)',
                                         textDecoration:
-                                            stockData.data.per.last < stockData.data.per.median ? 'underline' : 'none',
+                                            stockData.data.per.last != null &&
+                                            stockData.data.per.median != null &&
+                                            stockData.data.per.last < stockData.data.per.median
+                                                ? 'underline'
+                                                : 'none',
                                     }"
                                 >
-                                    {{ stockData.data.per.last.toFixed(2) }}
+                                    {{ stockData.data.per.last != null ? Number(stockData.data.per.last).toFixed(2) : '—' }}
                                 </span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">中位數</span> 本益比:
-                                <span style="color: rgb(255, 202, 100)">{{ stockData.data.per.median.toFixed(2) }}</span>
+                                <span style="color: rgb(255, 202, 100)">{{
+                                    stockData.data.per.median != null ? Number(stockData.data.per.median).toFixed(2) : '—'
+                                }}</span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">平均</span> 本益比:
-                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.per.mean.toFixed(2) }}</span>
+                                <span style="color: rgb(176, 224, 230)">{{
+                                    stockData.data.per.mean != null ? Number(stockData.data.per.mean).toFixed(2) : '—'
+                                }}</span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">最高</span> 本益比:
-                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.per.max.toFixed(2) }}</span>
+                                <span style="color: rgb(176, 224, 230)">{{
+                                    stockData.data.per.max != null ? Number(stockData.data.per.max).toFixed(2) : '—'
+                                }}</span>
                                 <br />
                                 &nbsp;近 5 年 <span style="color: #bbb">最低</span> 本益比:
-                                <span style="color: rgb(255 202 100)">{{ stockData.data.per.min.toFixed(2) }}</span>
+                                <span style="color: rgb(255 202 100)">{{
+                                    stockData.data.per.min != null ? Number(stockData.data.per.min).toFixed(2) : '—'
+                                }}</span>
                                 <br />
                                 <span v-for="(zone, index) in peZones" :key="index">
                                     &nbsp;近 4 季 EPS 估算 <span style="color: #bbb">{{ zone }} 倍</span> 本益比的股價:
@@ -214,22 +226,27 @@
                             <span style="color: rgb(34, 35, 38); font-size: 9px; margin-right: 4px">本益比</span>
                             <b
                                 :style="{
-                                    textDecoration: stockData.data.per.last < stockData.data.per.median ? 'underline' : 'none',
+                                    textDecoration:
+                                        stockData.data.per.last != null &&
+                                        stockData.data.per.median != null &&
+                                        stockData.data.per.last < stockData.data.per.median
+                                            ? 'underline'
+                                            : 'none',
                                 }"
                             >
-                                {{ stockData.data.per.last.toFixed(1) }}
+                                {{ stockData.data.per.last != null ? Number(stockData.data.per.last).toFixed(1) : '—' }}
                             </b>
                         </div>
                     </el-tooltip>
                 </span>
 
                 <span
-                    v-if="stockData.data && stockData.data.pbr && stockData.data.dy_per_pbr_date"
+                    v-if="stockData.data && stockData.data.pbr && stockData.data.pbr.last != null"
                     style="
                         position: absolute;
                         top: -21px;
                         display: inline-block;
-                        min-width: 64px;
+                        min-width: 65px;
                         background: rgb(255 241 208);
                         color: rgb(237 172 15);
                         padding: 0px 3px;
@@ -263,7 +280,9 @@
                                 <span style="color: rgb(255 202 100)">{{ stockData.data.pbr.min.toFixed(2) }}</span>
                                 <br />
                                 &nbsp;計算日期:
-                                <span style="color: rgb(176, 224, 230)">{{ stockData.data.dy_per_pbr_date }}</span>
+                                <span style="color: rgb(176, 224, 230)">{{
+                                    stockData.data.dy_per_pbr_date || stockData.data.dy_per_pbr_date
+                                }}</span>
                             </div>
                         </template>
                         <div>
@@ -279,7 +298,7 @@
                         position: absolute;
                         top: 0px;
                         display: inline-block;
-                        min-width: 64px;
+                        min-width: 65px;
                         background: rgb(235 246 255);
                         color: rgb(48 152 241);
                         padding: 0px 3px;
