@@ -94,7 +94,7 @@
                                     </span>
                                     <br />
                                     <span
-                                        v-if="item.date.endsWith('03-31')"
+                                        v-if="isFirstQuarterOfYear(item, index)"
                                         style="display: block; border-top: 1px solid #ccc; margin: 4px 0"
                                     ></span>
                                 </span>
@@ -932,6 +932,19 @@ export default {
         this.popoverTrigger = this.isMobile ? 'click' : 'hover';
     },
     methods: {
+        // 判斷是否為該年度的第一季（用於 EPS 表格年度分隔線）
+        isFirstQuarterOfYear(item, index) {
+            const reversedEps = this.formattedEps.slice().reverse();
+            // 如果是最後一筆資料，不需要分隔線
+            if (index >= reversedEps.length - 1) return false;
+
+            // 取得下一筆資料的年份，如果年份不同，表示這是該年度的第一季
+            const currentYear = item.date.split('-')[0];
+            const nextItem = reversedEps[index + 1];
+            const nextYear = nextItem?.date?.split('-')[0];
+
+            return currentYear !== nextYear;
+        },
         calculatePEZones(max, min, median) {
             // 四捨五入平均
             let center = Math.round(median);
@@ -1283,6 +1296,13 @@ export default {
             if (!this.stockData || !this.stockData.data || !this.stockData.data.eps) return [];
 
             const epsList = this.stockData.data.eps;
+
+            // 自動偵測季度月份：從資料中取得所有出現的月份
+            // 例如：NVDA 是 01、04、07、10，AAPL 是 03、06、09、12
+            const allMonths = [...new Set(epsList.map((item) => item.date.split('-')[1]))].sort();
+            // 如果資料不足或月份太多，使用預設的標準季度
+            const quarterMonths = allMonths.length >= 4 ? allMonths : ['03', '06', '09', '12'];
+
             const groupedByYear = _.groupBy(epsList, (item) => item.date.split('-')[0]);
 
             const result = [];
@@ -1291,7 +1311,7 @@ export default {
                 let acc = 0;
                 let cumValues = []; // 用於累積 Q1、Q1+Q2... 計算用
 
-                const sortedData = _.sortBy(data, 'date'); // 確保順序 3→6→9→12
+                const sortedData = _.sortBy(data, 'date'); // 確保順序
 
                 for (let i = 0; i < sortedData.length; i++) {
                     const entry = { ...sortedData[i] };
@@ -1301,8 +1321,8 @@ export default {
                     const date = entry.date;
                     const month = date.split('-')[1];
 
-                    // 判斷是否為 3、6、9、12月
-                    if (['03', '06', '09', '12'].includes(month)) {
+                    // 判斷是否為有效的季度結尾月份（動態偵測）
+                    if (quarterMonths.includes(month)) {
                         let yoy = null;
 
                         const lastYear = (parseInt(year) - 1).toString();

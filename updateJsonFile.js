@@ -31,7 +31,13 @@ console.log('proxy=' + proxy);
 const today = moment().format('YYYY-MM-DD');
 
 // Alpha Vantage API Keys (多組輪替使用)
-const ALPHA_VANTAGE_API_KEYS = ['O9AQMAP6D3WFXVM6', '6NW4VW3GB1SYF7HD', '3DUVG0JCYIVKWJ6H'];
+const ALPHA_VANTAGE_API_KEYS = [
+    'FRA0E7YOIVPLEHTF',
+    'O9AQMAP6D3WFXVM6',
+    '6NW4VW3GB1SYF7HD',
+    '3DUVG0JCYIVKWJ6H',
+    'MEOYPLAJV3RN1HGT',
+];
 let currentApiKeyIndex = 0;
 
 // 取得當前 API Key
