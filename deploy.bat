@@ -22,6 +22,8 @@ if not exist "%DIST_DIR%\.git" (
 
 git pull origin master --force
 
+REM 使用 nvm 執行 dev（若需在部署期間啟動 dev 指令）
+npm run nvm
 REM 更新美金匯率及基金每日淨值至JSON檔案內
 node updateJsonFile.js
 
