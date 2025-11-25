@@ -57,6 +57,9 @@ function switchToNextApiKey() {
 // Alpha Vantage API 呼叫計數器和延遲設定
 let alphaVantageCallCount = 0;
 const ALPHA_VANTAGE_DELAY = 13000; // 13秒延遲 (每分鐘最多5次，免費版限制)
+// 追蹤每個 Key 的最後呼叫時間，用於計算需要等待的時間
+const apiKeyLastCallTime = {};
+ALPHA_VANTAGE_API_KEYS.forEach((key) => (apiKeyLastCallTime[key] = 0));
 
 // 新的結構:將 fundName 和 urls 合併為一個物件數組
 const funds = [
@@ -218,6 +221,22 @@ const funds = [
     },
 ];
 
+// 計算當前 Key 需要等待的時間
+function getDelayForCurrentKey() {
+    const apiKey = getCurrentApiKey();
+    const lastCall = apiKeyLastCallTime[apiKey] || 0;
+    const now = Date.now();
+    const elapsed = now - lastCall;
+    // 如果距離上次呼叫不到 13 秒，需要等待剩餘時間
+    return elapsed < ALPHA_VANTAGE_DELAY ? ALPHA_VANTAGE_DELAY - elapsed : 0;
+}
+
+// 更新 Key 的最後呼叫時間
+function updateKeyCallTime() {
+    const apiKey = getCurrentApiKey();
+    apiKeyLastCallTime[apiKey] = Date.now();
+}
+
 // 抓取美股 EPS 歷史資料 (使用 Alpha Vantage API，支援多組 Key 輪替)
 function fetchUSStockEPS(symbol, retryCount = 0) {
     return new Promise((resolve) => {
@@ -228,11 +247,18 @@ function fetchUSStockEPS(symbol, retryCount = 0) {
             return;
         }
 
-        // 延遲執行以避免超過 API 限制
+        // 計算需要等待的時間（基於當前 Key 的上次呼叫時間）
+        const delay = getDelayForCurrentKey();
+
         setTimeout(() => {
             alphaVantageCallCount++;
+            updateKeyCallTime();
             const apiKey = getCurrentApiKey();
-            console.log(`[Alpha Vantage] 呼叫 #${alphaVantageCallCount}: ${symbol} EPS (Key: ${apiKey.substring(0, 6)}...)`);
+            console.log(
+                `[Alpha Vantage] 呼叫 #${alphaVantageCallCount}: ${symbol} EPS (Key: ${apiKey.substring(0, 6)}...)${
+                    delay > 0 ? ` [等待 ${Math.round(delay / 1000)}s]` : ''
+                }`
+            );
 
             const url = `https://www.alphavantage.co/query?function=EARNINGS&symbol=${symbol}&apikey=${apiKey}`;
 
@@ -274,7 +300,7 @@ function fetchUSStockEPS(symbol, retryCount = 0) {
                     }
                 }
             );
-        }, alphaVantageCallCount * ALPHA_VANTAGE_DELAY);
+        }, delay);
     });
 }
 
@@ -288,11 +314,18 @@ function fetchUSStockPE(symbol, retryCount = 0) {
             return;
         }
 
-        // 延遲執行以避免超過 API 限制
+        // 計算需要等待的時間（基於當前 Key 的上次呼叫時間）
+        const delay = getDelayForCurrentKey();
+
         setTimeout(() => {
             alphaVantageCallCount++;
+            updateKeyCallTime();
             const apiKey = getCurrentApiKey();
-            console.log(`[Alpha Vantage] 呼叫 #${alphaVantageCallCount}: ${symbol} PE Ratio (Key: ${apiKey.substring(0, 6)}...)`);
+            console.log(
+                `[Alpha Vantage] 呼叫 #${alphaVantageCallCount}: ${symbol} PE Ratio (Key: ${apiKey.substring(0, 6)}...)${
+                    delay > 0 ? ` [等待 ${Math.round(delay / 1000)}s]` : ''
+                }`
+            );
 
             const url = `https://www.alphavantage.co/query?function=OVERVIEW&symbol=${symbol}&apikey=${apiKey}`;
 
@@ -334,7 +367,7 @@ function fetchUSStockPE(symbol, retryCount = 0) {
                     }
                 }
             );
-        }, alphaVantageCallCount * ALPHA_VANTAGE_DELAY);
+        }, delay);
     });
 }
 
