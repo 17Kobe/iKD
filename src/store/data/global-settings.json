@@ -30,9 +30,9 @@
             "fair_value": 112.2
         }
     ],
-    "cnn_fear_greed_index": 10.5142857142857,
+    "cnn_fear_greed_index": 14,
     "cnn_fear_greed_status": "extreme fear",
-    "cnn_fear_greed_update": "2025-11-22 07:59:54",
+    "cnn_fear_greed_update": "2025-11-25 16:43:46",
     "eco_light_score": "35",
     "eco_light_date": "2025-09"
 }
