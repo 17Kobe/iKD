@@ -22,10 +22,18 @@ if not exist "%DIST_DIR%\.git" (
 
 git pull origin master --force
 
-REM 使用 nvm 執行 dev（若需在部署期間啟動 dev 指令）
-npm run nvm
+REM 使用 nvm 切換 Node 版本（在新的 cmd 視窗中執行才會生效）
+call nvm use 16.20.2
+
 REM 更新美金匯率及基金每日淨值至JSON檔案內
-node updateJsonFile.js
+echo === 開始執行 updateJsonFile.js ===
+call node updateJsonFile.js
+if %ERRORLEVEL% neq 0 (
+    echo [錯誤] updateJsonFile.js 執行失敗，錯誤碼: %ERRORLEVEL%
+    pause
+    exit /b %ERRORLEVEL%
+)
+echo === updateJsonFile.js 執行完成 ===
 
 REM 備份 dist data/my_localstorage.json及images目錄
 md dist-temp\assets\data 2>nul
