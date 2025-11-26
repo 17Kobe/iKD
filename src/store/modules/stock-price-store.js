@@ -3476,13 +3476,18 @@ const stock = {
             console.log('getDatetoExchange');
 
             const foundExchange = state.stockList.find((v) => v.name === '美金匯率');
-            // TODO: daily
-            const matchingExchange = foundExchange.data.daily.find(function (exchangeObj) {
-                const exchangeDate = moment(exchangeObj[0]); // 轉換成日期物件
-                return exchangeDate.isSameOrBefore(date);
-            });
-            console.log(matchingExchange);
-            return matchingExchange ? matchingExchange[1] : 1;
+            if (!foundExchange || !foundExchange.data || !foundExchange.data.daily) return 1;
+            
+            // 從後面往前找，找到第一個日期 <= date 的
+            const dailyData = foundExchange.data.daily;
+            for (let i = dailyData.length - 1; i >= 0; i--) {
+                const exchangeDate = moment(dailyData[i][0]);
+                if (exchangeDate.isSameOrBefore(date)) {
+                    console.log(dailyData[i]);
+                    return dailyData[i][1];
+                }
+            }
+            return 1;
         },
         // object of array to filter
         getStock: (state) => (id) => {
