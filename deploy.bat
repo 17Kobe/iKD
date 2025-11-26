@@ -1,13 +1,13 @@
 @echo off
 cd /d D:\Code\Other\iKD
-REM 重要：在執行此腳本前，要先 push master
+REM Important: Push master before running this script
 
-REM 定義變數
+REM Define variables
 set DIST_DIR=dist
 set BRANCH=gh-pages
 for /f "delims=" %%i in ('git config --get remote.origin.url') do set REPO_URL=%%i
 
-REM 如果 dist\.git 不存在，就 clone gh-pages 分支
+REM Clone gh-pages branch if dist\.git does not exist
 if not exist "%DIST_DIR%\.git" (
     echo Cloning %BRANCH% branch into %DIST_DIR%...
     rd /s /q "%DIST_DIR%"
@@ -22,34 +22,31 @@ if not exist "%DIST_DIR%\.git" (
 
 git pull origin master --force
 
-REM 使用 nvm 切換 Node 版本（在新的 cmd 視窗中執行才會生效）
+REM Switch Node version using nvm
 call nvm use 16.20.2
 
-REM 更新美金匯率及基金每日淨值至JSON檔案內
-echo === 開始執行 updateJsonFile.js ===
+REM Update USD rate and fund NAV to JSON files
+echo === Starting updateJsonFile.js ===
 call node updateJsonFile.js
 if %ERRORLEVEL% neq 0 (
-    echo [錯誤] updateJsonFile.js 執行失敗，錯誤碼: %ERRORLEVEL%
+    echo [ERROR] updateJsonFile.js failed with code: %ERRORLEVEL%
     pause
     exit /b %ERRORLEVEL%
 )
-echo === updateJsonFile.js 執行完成 ===
+echo === updateJsonFile.js completed ===
 
-REM 備份 dist data/my_localstorage.json及images目錄
+REM Backup dist data and images
 md dist-temp\assets\data 2>nul
 md dist-temp\assets\images 2>nul
 xcopy /E /Y /I dist\assets\data dist-temp\assets\data
 xcopy /E /Y /I dist\assets\images dist-temp\assets\images
 
-REM 打包
+REM Build
 call npm run build
-:: 同 mv dist-temp/images dist-temp/data dist/assets/ && rm -rf dist-temp
-:: Move-Item -Path dist-temp/images, dist-temp/data -Destination dist/assets/
-:: Remove-Item -Path dist-temp -Recurse
 xcopy /s /e /i /y dist-temp\assets\data dist\assets\data
 xcopy /s /e /i /y dist-temp\assets\images dist\assets\images
 rmdir /s /q dist-temp
-:: curl --proxy http://10.160.3.88:8080 -o ./dist/assets/data/my_localstorage.json https://17kobe.github.io/iKD/assets/data/my_localstorage.json
+
 cd dist
 git add -A
 git commit -m 'deploy'
