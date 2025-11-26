@@ -20,6 +20,61 @@ function getUnitSymbol(unit) {
     return `${Math.round(unit * 100)}%`;
 }
 
+/**
+ * 股票分割配置
+ * - id: 股票代碼
+ * - date: 分割生效日期 (YYYY-MM-DD)
+ * - ratio: 分割比例 (例如 1:7 分割，ratio = 7，表示 1 股變 7 股)
+ * 注意：這是前復權，歷史價格需除以 ratio
+ */
+const STOCK_SPLITS = [
+    { id: '0052', date: '2025-11-26', ratio: 7 },
+    // 可在此新增更多股票分割記錄
+];
+
+/**
+ * 對日線資料進行前復權調整（Stock Split Adjustment）
+ * @param {string} stockId - 股票代碼
+ * @param {Array} dailyData - 日線資料 [[date, open, high, low, close, volume], ...]
+ * @returns {Array} - 調整後的日線資料
+ */
+function adjustDailyDataForSplit(stockId, dailyData) {
+    if (!dailyData || dailyData.length === 0) return dailyData;
+
+    // 找出該股票所有的分割記錄
+    const splits = STOCK_SPLITS.filter((s) => s.id === stockId);
+    if (splits.length === 0) return dailyData;
+
+    // 複製資料以避免修改原始資料
+    const adjustedData = dailyData.map((item) => [...item]);
+
+    splits.forEach((split) => {
+        const splitDate = moment(split.date);
+        const ratio = split.ratio;
+
+        adjustedData.forEach((item, index) => {
+            const itemDate = moment(item[0]);
+            // 分割日期之前的資料需要調整（前復權）
+            if (itemDate.isBefore(splitDate)) {
+                if (item.length === 2) {
+                    // [date, close] 格式（如基金）
+                    adjustedData[index][1] = Number((item[1] / ratio).toFixed(4));
+                } else if (item.length >= 5) {
+                    // [date, open, high, low, close, volume?] 格式
+                    adjustedData[index][1] = Number((item[1] / ratio).toFixed(4)); // open
+                    adjustedData[index][2] = Number((item[2] / ratio).toFixed(4)); // high
+                    adjustedData[index][3] = Number((item[3] / ratio).toFixed(4)); // low
+                    adjustedData[index][4] = Number((item[4] / ratio).toFixed(4)); // close
+                    // volume 通常不調整，或乘以 ratio（這裡不調整）
+                }
+            }
+        });
+    });
+
+    console.log(`[Stock Split] ${stockId} 前復權調整完成`);
+    return adjustedData;
+}
+
 function calcCrossPrice(K_prev, D_prev, pastHighs, pastLows, thisWeekHigh, thisWeekLow, type = 'gold') {
     console.log('calcCrossPrice params:', {
         K_prev,
@@ -637,31 +692,34 @@ const stock = {
             const foundStock = state.stockList.find((v) => v.id === stockId);
             let resData = [];
 
-            let i = foundStock.data.daily.length - 1;
+            // 股票分割前復權調整
+            const adjustedDaily = adjustDailyDataForSplit(stockId, foundStock.data.daily);
+
+            let i = adjustedDaily.length - 1;
             let j = i;
-            const lastStockDate = moment(_.last(foundStock.data.daily)[0]);
+            const lastStockDate = moment(_.last(adjustedDaily)[0]);
             let firstDayOfWeek = lastStockDate.startOf('isoWeek');
-            if (foundStock.data.daily[0].length === 2) {
+            if (adjustedDaily[0].length === 2) {
                 // [date, close]
                 while (i >= 0) {
                     // console.log(i);
                     // console.log(moment(currStock[index].data.daily[i][0]).format('YYYY-MM-DD'));
                     // console.log(firstDayOfWeek.format('YYYY-MM-DD'));
                     // 不能用 isSame 因為有可能那週沒資料，或那週星期一也放假，所以要用 isBefore
-                    if (moment(foundStock.data.daily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
+                    if (moment(adjustedDaily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
                         // console.log('isBefore');
                         // 0最後一個也要跑進來
 
                         // startIndex 值要小於等於 endIndex，for 是由大到小, i<j
                         const startIndex = i + 1; // 因為是找到前一個才算後面1個
                         const endIndex = j; // 因為外層array 是從日期最現在，往以前日期去掃。endIndex應該是最現在日期. i比n大
-                        const range2dArray = _.slice(foundStock.data.daily, startIndex, endIndex + 1);
+                        const range2dArray = _.slice(adjustedDaily, startIndex, endIndex + 1);
                         const rangeCloseArray = _.map(range2dArray, (v) => v[1]);
                         // const rangeVolumeArray = _.map(range2dArray, (v) => v[5]);
 
-                        const date = foundStock.data.daily[endIndex][0];
-                        const open = foundStock.data.daily[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
-                        const close = foundStock.data.daily[endIndex][1]; // 之前的i，還沒i=n是下一個
+                        const date = adjustedDaily[endIndex][0];
+                        const open = adjustedDaily[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
+                        const close = adjustedDaily[endIndex][1]; // 之前的i，還沒i=n是下一個
                         const low = _.min(rangeCloseArray);
                         const high = _.max(rangeCloseArray);
                         // const volume = _.sum(rangeVolumeArray);
@@ -670,7 +728,7 @@ const stock = {
                         j = startIndex - 1;
 
                         // 要採用下個i值的該週第一天，不能用firstDayOfWeek-7天，因為有可能該週都沒值
-                        firstDayOfWeek = moment(foundStock.data.daily[i][0]).startOf('isoWeek');
+                        firstDayOfWeek = moment(adjustedDaily[i][0]).startOf('isoWeek');
                     }
                     i -= 1;
                 }
@@ -681,22 +739,22 @@ const stock = {
                     // console.log(moment(currStock[index].data.daily[i][0]).format('YYYY-MM-DD'));
                     // console.log(firstDayOfWeek.format('YYYY-MM-DD'));
                     // 不能用 isSame 因為有可能那週沒資料，或那週星期一也放假，所以要用 isBefore
-                    if (moment(foundStock.data.daily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
+                    if (moment(adjustedDaily[i][0]).isBefore(firstDayOfWeek) || i === 0) {
                         // console.log('isBefore');
                         // 0最後一個也要跑進來
 
                         // startIndex 值要小於等於 endIndex，for 是由大到小, i<j
                         const startIndex = i + 1; // 因為是找到前一個才算後面1個
                         const endIndex = j; // 因為外層array 是從日期最現在，往以前日期去掃。endIndex應該是最現在日期. i比n大
-                        const range2dArray = _.slice(foundStock.data.daily, startIndex, endIndex + 1);
+                        const range2dArray = _.slice(adjustedDaily, startIndex, endIndex + 1);
                         const rangeHighArray = _.map(range2dArray, (v) => v[2]);
                         const rangeLowArray = _.map(range2dArray, (v) => v[3]);
                         const rangeTradingVolumeArray = _.map(range2dArray, (v) => (v.length >= 6 ? v[5] : 0));
                         // const rangeVolumeArray = _.map(range2dArray, (v) => v[5]);
 
-                        const date = foundStock.data.daily[endIndex][0];
-                        const open = foundStock.data.daily[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
-                        const close = foundStock.data.daily[endIndex][4]; // 之前的i，還沒i=n是下一個
+                        const date = adjustedDaily[endIndex][0];
+                        const open = adjustedDaily[startIndex][1]; // 上一個n的意思， 也許有 bug n+1應該要<這迴圈數量，若只有1個就有問題
+                        const close = adjustedDaily[endIndex][4]; // 之前的i，還沒i=n是下一個
                         const low = _.min(rangeLowArray);
                         const high = _.max(rangeHighArray);
                         const tradingVolume = _.sum(rangeTradingVolumeArray);
@@ -706,7 +764,7 @@ const stock = {
                         j = startIndex - 1;
 
                         // 要採用下個i值的該週第一天，不能用firstDayOfWeek-7天，因為有可能該週都沒值
-                        firstDayOfWeek = moment(foundStock.data.daily[i][0]).startOf('isoWeek');
+                        firstDayOfWeek = moment(adjustedDaily[i][0]).startOf('isoWeek');
                     }
                     i -= 1;
                 }
@@ -3477,7 +3535,7 @@ const stock = {
 
             const foundExchange = state.stockList.find((v) => v.name === '美金匯率');
             if (!foundExchange || !foundExchange.data || !foundExchange.data.daily) return 1;
-            
+
             // 從後面往前找，找到第一個日期 <= date 的
             const dailyData = foundExchange.data.daily;
             for (let i = dailyData.length - 1; i >= 0; i--) {
