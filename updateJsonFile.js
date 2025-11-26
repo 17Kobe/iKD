@@ -304,6 +304,69 @@ function fetchUSStockEPS(symbol, retryCount = 0) {
     });
 }
 
+// 從 EPS 和股價資料計算近5年的歷史本益比統計值
+function calculateHistoricalPE(eps, dailyPrices) {
+    if (!eps || eps.length < 4 || !dailyPrices || dailyPrices.length === 0) {
+        return null;
+    }
+
+    const fiveYearsAgo = moment().subtract(5, 'years');
+    const peValues = [];
+
+    // 遍歷每個月的收盤價，計算當時的本益比
+    const monthlyPrices = new Map();
+    dailyPrices.forEach(item => {
+        const date = item[0];
+        const close = item[1];
+        if (moment(date).isAfter(fiveYearsAgo)) {
+            const ym = moment(date).format('YYYY-MM');
+            monthlyPrices.set(ym, { date, close });
+        }
+    });
+
+    // 對每個月計算本益比
+    monthlyPrices.forEach(({ date, close }) => {
+        const currentDate = moment(date, 'YYYY-MM-DD');
+        
+        // 找到當前日期之前的近四季 EPS
+        const recentFourQuarters = eps
+            .filter(e => moment(e.date, 'YYYY-MM-DD').isSameOrBefore(currentDate))
+            .slice(-4);
+        
+        if (recentFourQuarters.length === 4) {
+            const ttmEps = recentFourQuarters.reduce((sum, e) => sum + e.value, 0);
+            if (ttmEps > 0) {
+                const pe = close / ttmEps;
+                if (pe > 0 && pe < 500) { // 過濾異常值
+                    peValues.push(pe);
+                }
+            }
+        }
+    });
+
+    if (peValues.length === 0) {
+        return null;
+    }
+
+    // 計算統計值
+    const sorted = [...peValues].sort((a, b) => a - b);
+    const mean = _.mean(sorted);
+    const median = sorted.length % 2 === 1
+        ? sorted[Math.floor(sorted.length / 2)]
+        : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
+    const max = _.max(sorted);
+    const min = _.min(sorted);
+    const last = peValues[peValues.length - 1]; // 最新的本益比
+
+    return {
+        last: parseFloat(last.toFixed(2)),
+        mean: parseFloat(mean.toFixed(2)),
+        median: parseFloat(median.toFixed(2)),
+        max: parseFloat(max.toFixed(2)),
+        min: parseFloat(min.toFixed(2))
+    };
+}
+
 // 抓取美股本益比資料 (使用 Alpha Vantage API，支援多組 Key 輪替)
 function fetchUSStockPE(symbol, retryCount = 0) {
     return new Promise((resolve) => {
@@ -611,6 +674,22 @@ function getPromise(fund) {
                         if (fund.symbol) {
                             console.log(`正在抓取 ${fund.name} (${fund.symbol}) 的 EPS 和本益比...`);
                             [eps, per] = await Promise.all([fetchUSStockEPS(fund.symbol), fetchUSStockPE(fund.symbol)]);
+                            
+                            // 從 EPS 和股價計算歷史本益比統計值
+                            if (eps.length >= 4 && values.length > 0) {
+                                const calculatedPE = calculateHistoricalPE(eps, values);
+                                if (calculatedPE) {
+                                    // 使用 API 的最新值，但用計算的統計值
+                                    per = {
+                                        last: per?.last || calculatedPE.last,
+                                        mean: calculatedPE.mean,
+                                        median: calculatedPE.median,
+                                        max: calculatedPE.max,
+                                        min: calculatedPE.min
+                                    };
+                                    console.log(`計算 ${fund.symbol} 歷史本益比: mean=${per.mean}, median=${per.median}, max=${per.max}, min=${per.min}`);
+                                }
+                            }
                         }
 
                         resolve({ name: fund.name, values: values, type: fund.type, eps: eps, per: per });

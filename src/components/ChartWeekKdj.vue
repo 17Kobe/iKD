@@ -1024,10 +1024,11 @@ export default {
 
             _.forEach(daily, (item) => {
                 const dateStr = item[0];
-                const close = item[4];
+                // 相容美股格式 [date, close] 和台股格式 [date, open, high, low, close, volume]
+                const close = item.length === 2 ? item[1] : item[4];
                 const date = moment(dateStr, 'YYYY-MM-DD');
 
-                if (!date.isValid() || date.isBefore(cutoff)) return;
+                if (!date.isValid() || date.isBefore(cutoff) || close === undefined || close === null) return;
 
                 const ym = date.format('YYYY-MM');
                 monthlyMap.set(ym, { date: dateStr, close }); // 覆蓋表示保留當月最後一筆
