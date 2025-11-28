@@ -60,18 +60,19 @@ xcopy /E /Y /I dist\assets\images dist-temp\assets\images
 
 REM Build
 echo === Starting npm build ===
-C:\nvm4w\nodejs\npm.cmd run build
-echo Build exit code: %ERRORLEVEL%
-if %ERRORLEVEL% neq 0 (
-    echo [ERROR] npm build failed with code: %ERRORLEVEL%
+call C:\nvm4w\nodejs\npm.cmd run build
+set BUILD_ERROR=%ERRORLEVEL%
+echo Build exit code: %BUILD_ERROR%
+if %BUILD_ERROR% neq 0 (
+    echo [ERROR] npm build failed with code: %BUILD_ERROR%
     pause
-    exit /b %ERRORLEVEL%
+    exit /b %BUILD_ERROR%
 )
 echo === npm build completed ===
 
 echo === Restoring data and images ===
-xcopy /s /e /i /y dist-temp\assets\data dist\assets\data
-xcopy /s /e /i /y dist-temp\assets\images dist\assets\images
+xcopy /E /Y /I dist-temp\assets\data dist\assets\data
+xcopy /E /Y /I dist-temp\assets\images dist\assets\images
 rmdir /s /q dist-temp
 
 echo === Pushing to gh-pages ===
