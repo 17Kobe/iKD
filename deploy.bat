@@ -1,6 +1,13 @@
 @echo off
+setlocal enabledelayedexpansion
 cd /d D:\Code\Other\iKD
 REM Important: Push master before running this script
+
+REM Prevent window from closing on error
+if "%1"=="" (
+    cmd /k "%~f0" run
+    exit /b
+)
 
 REM Set PATH for nvm and node (required for Windows Task Scheduler)
 set NVM_HOME=C:\Users\user\AppData\Local\nvm
@@ -54,6 +61,7 @@ xcopy /E /Y /I dist\assets\images dist-temp\assets\images
 REM Build
 echo === Starting npm build ===
 C:\nvm4w\nodejs\npm.cmd run build
+echo Build exit code: %ERRORLEVEL%
 if %ERRORLEVEL% neq 0 (
     echo [ERROR] npm build failed with code: %ERRORLEVEL%
     pause
@@ -61,6 +69,7 @@ if %ERRORLEVEL% neq 0 (
 )
 echo === npm build completed ===
 
+echo === Restoring data and images ===
 xcopy /s /e /i /y dist-temp\assets\data dist\assets\data
 xcopy /s /e /i /y dist-temp\assets\images dist\assets\images
 rmdir /s /q dist-temp
@@ -69,7 +78,9 @@ echo === Pushing to gh-pages ===
 cd dist
 git add -A
 git commit -m "deploy"
+echo Commit exit code: %ERRORLEVEL%
 git push -f origin gh-pages
+echo Push exit code: %ERRORLEVEL%
 if %ERRORLEVEL% neq 0 (
     echo [ERROR] git push failed with code: %ERRORLEVEL%
     cd ..
@@ -85,3 +96,4 @@ echo   Deploy completed successfully!
 echo ========================================
 echo.
 pause
+exit /b 0
