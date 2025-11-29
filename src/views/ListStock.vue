@@ -110,9 +110,9 @@
                                             : scope.row.type === 'fund'
                                             ? '#e6a23c'
                                             : scope.row.type === 'usStock'
-                                            ? '#919191'
-                                            : scope.row.type === 'exchange'
                                             ? '#f56c6c'
+                                            : scope.row.type === 'exchange'
+                                            ? '#919191'
                                             : '#409eff',
                                 }"
                             >

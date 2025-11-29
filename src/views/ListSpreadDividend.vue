@@ -184,9 +184,9 @@
                                             : scope.row.type === 'fund'
                                             ? '#e6a23c'
                                             : scope.row.type === 'usStock'
-                                            ? '#919191'
-                                            : scope.row.type === 'exchange'
                                             ? '#f56c6c'
+                                            : scope.row.type === 'exchange'
+                                            ? '#919191'
                                             : '#409eff',
                                 }"
                                 @click="goToStockAnalysis(scope.row.id, scope.row.url)"
@@ -338,10 +338,20 @@
                             {{ Number(scope.row.last_price).toLocaleString('en-US', { maximumFractionDigits: 0 }) }}
                         </span>
                         <span v-else-if="Number(scope.row.last_price) >= 100">
-                            {{ Number(scope.row.last_price).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) }}
+                            {{
+                                Number(scope.row.last_price).toLocaleString('en-US', {
+                                    minimumFractionDigits: 1,
+                                    maximumFractionDigits: 1,
+                                })
+                            }}
                         </span>
                         <span v-else>
-                            {{ Number(scope.row.last_price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+                            {{
+                                Number(scope.row.last_price).toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                })
+                            }}
                         </span>
                     </span>
                 </template>
