@@ -32,11 +32,11 @@ const today = moment().format('YYYY-MM-DD');
 
 // Alpha Vantage API Keys (多組輪替使用)
 const ALPHA_VANTAGE_API_KEYS = [
-    'FRA0E7YOIVPLEHTF',
-    'O9AQMAP6D3WFXVM6',
-    '6NW4VW3GB1SYF7HD',
-    '3DUVG0JCYIVKWJ6H',
-    'MEOYPLAJV3RN1HGT',
+    'RTLNMQ7DIJTG6S6B',
+    'XVUY3OGP50W54R9K',
+    'W8UXPY261E6N0EER',
+    'GFLC3Q60O6HQRWJU',
+    '20UOLC7F98MC39TC',
 ];
 let currentApiKeyIndex = 0;
 
@@ -315,7 +315,7 @@ function calculateHistoricalPE(eps, dailyPrices) {
 
     // 遍歷每個月的收盤價，計算當時的本益比
     const monthlyPrices = new Map();
-    dailyPrices.forEach(item => {
+    dailyPrices.forEach((item) => {
         const date = item[0];
         const close = item[1];
         if (moment(date).isAfter(fiveYearsAgo)) {
@@ -327,17 +327,16 @@ function calculateHistoricalPE(eps, dailyPrices) {
     // 對每個月計算本益比
     monthlyPrices.forEach(({ date, close }) => {
         const currentDate = moment(date, 'YYYY-MM-DD');
-        
+
         // 找到當前日期之前的近四季 EPS
-        const recentFourQuarters = eps
-            .filter(e => moment(e.date, 'YYYY-MM-DD').isSameOrBefore(currentDate))
-            .slice(-4);
-        
+        const recentFourQuarters = eps.filter((e) => moment(e.date, 'YYYY-MM-DD').isSameOrBefore(currentDate)).slice(-4);
+
         if (recentFourQuarters.length === 4) {
             const ttmEps = recentFourQuarters.reduce((sum, e) => sum + e.value, 0);
             if (ttmEps > 0) {
                 const pe = close / ttmEps;
-                if (pe > 0 && pe < 500) { // 過濾異常值
+                if (pe > 0 && pe < 500) {
+                    // 過濾異常值
                     peValues.push(pe);
                 }
             }
@@ -351,9 +350,10 @@ function calculateHistoricalPE(eps, dailyPrices) {
     // 計算統計值
     const sorted = [...peValues].sort((a, b) => a - b);
     const mean = _.mean(sorted);
-    const median = sorted.length % 2 === 1
-        ? sorted[Math.floor(sorted.length / 2)]
-        : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
+    const median =
+        sorted.length % 2 === 1
+            ? sorted[Math.floor(sorted.length / 2)]
+            : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
     const max = _.max(sorted);
     const min = _.min(sorted);
     const last = peValues[peValues.length - 1]; // 最新的本益比
@@ -363,7 +363,7 @@ function calculateHistoricalPE(eps, dailyPrices) {
         mean: parseFloat(mean.toFixed(2)),
         median: parseFloat(median.toFixed(2)),
         max: parseFloat(max.toFixed(2)),
-        min: parseFloat(min.toFixed(2))
+        min: parseFloat(min.toFixed(2)),
     };
 }
 
@@ -674,7 +674,7 @@ function getPromise(fund) {
                         if (fund.symbol) {
                             console.log(`正在抓取 ${fund.name} (${fund.symbol}) 的 EPS 和本益比...`);
                             [eps, per] = await Promise.all([fetchUSStockEPS(fund.symbol), fetchUSStockPE(fund.symbol)]);
-                            
+
                             // 從 EPS 和股價計算歷史本益比統計值
                             if (eps.length >= 4 && values.length > 0) {
                                 const calculatedPE = calculateHistoricalPE(eps, values);
@@ -685,9 +685,11 @@ function getPromise(fund) {
                                         mean: calculatedPE.mean,
                                         median: calculatedPE.median,
                                         max: calculatedPE.max,
-                                        min: calculatedPE.min
+                                        min: calculatedPE.min,
                                     };
-                                    console.log(`計算 ${fund.symbol} 歷史本益比: mean=${per.mean}, median=${per.median}, max=${per.max}, min=${per.min}`);
+                                    console.log(
+                                        `計算 ${fund.symbol} 歷史本益比: mean=${per.mean}, median=${per.median}, max=${per.max}, min=${per.min}`
+                                    );
                                 }
                             }
                         }
