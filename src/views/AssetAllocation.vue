@@ -601,7 +601,7 @@ export default {
             budgetData: {
                 monthlyIncome: 76975, // 每月月薪
                 monthlyExpenses: [
-                    { name: '給老婆', amount: 41000 },
+                    { name: '給老婆', amount: 43999 },
                     { name: '給爸爸', amount: 3000 },
                     { name: '房貸', amount: 17500 },
                     { name: '車貸', amount: 23000 },
@@ -618,7 +618,8 @@ export default {
                     { name: '中秋獎金0.3個月月薪', month: 9, day: 5, multiplier: 0.3 },
                 ],
                 oneTimeExpenses: [
-                    { name: '紅包', month: 1, day: 31, amount: 90200 },
+                    { name: '紅包', month: 1, day: 31, amount: 102800 }, // 3600 * 1 = 3600。18000 * 5 = 90000 。4600 * 2 = 9200
+                    { name: '健檢費用', month: 2, day: 5, amount: 15000 },
                     { name: '車子保險費', month: 3, day: 5, amount: 50000 },
                     { name: '我的實支實附保險費', month: 3, day: 5, amount: 23000 },
                     { name: '汽車牌照稅', month: 4, day: 5, amount: 11230 },
@@ -628,7 +629,7 @@ export default {
                     { name: '房子火險', month: 5, day: 5, amount: 2000 },
                     { name: '汽車燃料稅', month: 7, day: 5, amount: 6180 },
                     { name: '出去玩', month: 8, day: 5, amount: 20000 },
-                    { name: '地價稅', month: 11, day: 5, amount: 140 },
+                    { name: '地價稅', month: 11, day: 5, amount: 190 },
                     { name: '車保養', month: 12, day: 5, amount: 20000 },
                 ],
             },
